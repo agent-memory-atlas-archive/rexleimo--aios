@@ -5,6 +5,12 @@ description: "AIOS の全リリース履歴: 各バージョンで何が変わ�
 
 # 変更履歴
 
+## v6.2.1（2026-09-28）——導線の整備と、死んでいたリンク経路の復旧
+
+- **README が導線になりました**：`rexai.top` は 79 行目とページ末尾にしか出ておらず、GitHub 検索・Explore・Trending から来た訪問者は最初の画面でコンテンツハブに到達できませんでした。両 README にサイトバッジ、最初のリンク行のエントリ、そして 30 秒インストールの直後（文書中で最も意図が高い時点）に「Where to go next」節を追加しました。まず描画済みページを実測しています：GitHub は README のすべての外部リンクに `rel="nofollow"` を付け、バッジでは `alt` がアンカーテキストとして読まれるため、リンクはブランド入りのアンカーテキスト（`AIOS Docs — cli.rexai.top`、`RexAI Content Hub — rexai.top`）を持ち、本リポジトリと 2 つサイトの対応関係は本文に明文化しました。
+- **サイト間リンク経路が死んでいて、何も失敗していませんでした**：`{% block footer %}{% endblock %}` が Material のフッターを空にしていたため、`extra.footer_links`（rexai.top / os.rexai.top / tool.rexai.top）が死んだ設定になっていました。ビルド済みページのフッターリンクは 0 本で、それが約 3 ヶ月続きました。フッターは `partials/copyright.html` を再び描画し、`cli.rexai.top/blog` にも同じリンク群を付与したので、順位を持つ両プロパティがコンテンツハブへの follow リンクを出すようになりました。`scripts/tests/readme-funnel.test.mjs` と `scripts/tests/site-footer-links.test.mjs` が両方を検査します。
+- **`llms.txt` は手コピーではなく生成に**：AI 回答エンジンに提供されていた機械可読インデックスが古く（`Version: v5.20.0`、68 本中 24 本）なっていました。`scripts/generate-llms-txt.mjs` がバージョンを `VERSION` から、日を `CHANGELOG` から、ブログ索引を投稿の front matter から導出し、`scripts/tests/llms-txt.test.mjs` が取り締まります。
+
 ## v6.2.0（2026-09-28）——発火する標準と、公開を必須にされるカーネル
 
 - **エンジニアリング標準が実際に発火します**：`rex-engineering-standards` はすべてのクライアントに行き渡っていたものの、どのシーケンスにも要求されていませんでした——コード生産 Provider 四つはいずれも名指さず、プル型のスキル読込みでは誰も引かなかったのです。いま `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening` が第一ステップとして読み込み、Definition of Done が完了を判定し、名指しをやめた Provider があればビルドが落ちます。標準にはファイル粒度のベースラインも加わりました：1 ファイル 1 責任、約 400 行のソフト予算、kebab-case 命名、意味の無い分割の禁止。参照：[エンジニアリング標準](engineering-standards.md) と [v6.2.0 リリース記事](/blog/ja/2026-09-engineering-standards-trigger-chain/)。

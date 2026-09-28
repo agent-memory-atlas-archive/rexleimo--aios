@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import { generateLlmsTxt } from '../generate-llms-txt.mjs';
+import { isMaintenanceRelease } from '../lib/release-impact.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -47,14 +48,33 @@ test('every published post is listed, and no listed post is missing', async () =
   }
 });
 
-test('the current release is the first entry in the Blog index', async () => {
+test('the Blog index leads with the current release, and never invents a post', async () => {
   const [version, llms] = await Promise.all([
     readFile(path.join(rootDir, 'VERSION'), 'utf8'),
     readLlms(),
   ]);
+  const current = version.trim();
+  const result = await generateLlmsTxt({ rootDir, write: false });
   const blogSection = llms.split('## Blog\n')[1].split('\n## ')[0];
   const firstEntry = blogSection.split('\n').find((line) => line.startsWith('- ')) || '';
-  assert.ok(firstEntry.includes(`v${version.trim()}:`), `expected the v${version.trim()} release post first, got: ${firstEntry}`);
+  assert.ok(firstEntry.includes(`v${current}`), `the first Blog entry must be about v${current}, got: ${firstEntry}`);
+
+  if (result.currentReleaseHasPost) {
+    assert.match(firstEntry, new RegExp(`v${current.replace(/\./g, '\\.')}:`), 'a published release post is titled "vX.Y.Z: …"');
+    return;
+  }
+  // 没有当前发布帖时，索引必须明说，而且要按发布约定说对话：
+  // 维护发布（patch > 0）本来就只写 changelog，不能写成"帖还没发"。
+  assert.ok(
+    isMaintenanceRelease(current),
+    `v${current} is a feature release — its release post must exist and lead the Blog index`,
+  );
+  assert.match(
+    firstEntry,
+    new RegExp(`^- v${current.replace(/\./g, '\\.')} is a maintenance release — changelog only`),
+    `maintenance releases must be labelled "changelog only", got: ${firstEntry}`,
+  );
+  assert.doesNotMatch(llms, /release post not yet published/u, 'no pending-post line may survive for a maintenance release');
 });
 
 test('llms.txt cross-links the sibling properties so discovery flows both ways', async () => {

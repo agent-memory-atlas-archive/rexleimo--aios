@@ -6,6 +6,8 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+## [6.2.1] - 2026-09-28
+
 - fix(site): the docs and blog sites render a footer again, restoring the only non-`nofollow`
   outbound link path to `rexai.top`. `docs-site/overrides/main.html` had `{% block footer %}{% endblock %}`,
   which emptied Material's footer on every page and therefore made `extra.footer_links` (added in

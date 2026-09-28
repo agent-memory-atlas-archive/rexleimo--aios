@@ -14,7 +14,8 @@
 //   - the version marker comes from VERSION
 //   - the release index comes from blog-site/*.md, newest first, titled by the
 //     post's own front matter
-//   - a release is only announced as current if its post is actually published
+//   - a release is only announced as current if its post is actually published, and a
+//     maintenance release is labelled "changelog only" instead of "not yet published"
 // The hand-written prose (Search Intents, Core Docs, Problem-First Guides) stays
 // in llms.src.md, because that is editorial judgement and nothing else in the repo
 // owns it.
@@ -25,6 +26,8 @@
 //   node scripts/generate-llms-txt.mjs --json     # report counts for tests
 
 import { readFile, readdir, writeFile } from 'node:fs/promises';
+
+import { isMaintenanceRelease } from './lib/release-impact.mjs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -131,7 +134,12 @@ function renderReleaseIndex(posts, version) {
   const lines = posts.map((post) => `- ${SITE_BASE}/blog/${post.slug}/ — ${post.title}`);
   const current = findReleasePost(posts, version);
   if (!current) {
-    lines.unshift(`- v${version} release post not yet published — see ${SITE_BASE}/changelog/`);
+    // 维护发布（patch > 0）按仓库约定只写 changelog，不强制产出博文；这里必须说清是
+    // "本就不有帖"而不是"帖还没写好"，否则对外机读索引在暗示一篇不会存的文章。
+    const note = isMaintenanceRelease(version)
+      ? `- v${version} is a maintenance release — changelog only, see ${SITE_BASE}/changelog/`
+      : `- v${version} release post not yet published — see ${SITE_BASE}/changelog/`;
+    lines.unshift(note);
   }
   return lines.join('\n');
 }
@@ -170,6 +178,7 @@ export async function generateLlmsTxt({ rootDir = repoRoot(), write = true } = {
     postCount: posts.length,
     listingCount: (output.match(/\n- https:\/\/cli\.rexai\.top\/blog\//gu) || []).length,
     currentReleaseHasPost: Boolean(findReleasePost(posts, version)),
+    maintenanceRelease: isMaintenanceRelease(version),
     stale,
     target: path.relative(rootDir, target),
   };

@@ -5,6 +5,12 @@ description: "AIOS 完整版本历史：每个版本发生了什么变化、升�
 
 # 更新日志
 
+## v6.2.1（2026-09-28）——把 README 变成漏斗，并修通一条死掉的链接路径
+
+- **README 现在是引流入口**：`rexai.top` 原先只出现在第 79 行和页底，从 GitHub 搜索、Explore、Trending 进来的人在首屏看不到内容站。两份 README 加上站点徽章、首行链接条入口，以及 30 秒安装之后的「下一步去哪儿」——那是全文意图最高的时刻。先实测渲染页：GitHub 给 README 所有站外链接加 `rel="nofollow"`，徽章的锚文本读的是 `alt`，所以链接现在带品牌锚文本（`AIOS Docs — cli.rexai.top`、`RexAI Content Hub — rexai.top`），本仓库与两个站点的对应关系也写进正文。
+- **一条站间链接路径原本是死的，而且没有任何一步失败**：`{% block footer %}{% endblock %}` 把 Material 页脚置空，于是 `extra.footer_links`（rexai.top / os.rexai.top / tool.rexai.top）成为死配置——构建产物里页脚链接为 0，这种情况持续约三个月。页脚现在重新渲染 `partials/copyright.html`，`cli.rexai.top/blog` 也补上同一组链接，两个有排名的站点都会对内容站发出 follow 链接。`scripts/tests/readme-funnel.test.mjs` 与 `scripts/tests/site-footer-links.test.mjs` 分别守住这两处。
+- **`llms.txt` 改为生成，不再手抄**：给 AI 答案引擎的机读索引曾经陈旧（`Version: v5.20.0`，68 篇里只列 24 篇）。现在 `scripts/generate-llms-txt.mjs` 从 `VERSION` 取版本、从 `CHANGELOG` 取日期、从文章 front matter 取博客索引，并由 `scripts/tests/llms-txt.test.mjs` 把关。
+
 ## v6.2.0（2026-09-28）——标准真会触发，内核必须先发布
 
 - **工程标准现在真的会触发**：`rex-engineering-standards` 被分发到每个客户端，却没有任何流程要求读它——四个代码生产类 Provider 都没点名它，于是没人拉取（技能加载是按次拉取）。现在 `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening` 把它作为第一步加载，它的 Definition of Done 会给完成判否，而任何一个 Provider 不再点名它就会让构建失败。标准还新增文件粒度基线：单文件单职责、~400 行软预算、kebab-case 命名、禁止语义空洞的拆分。见：[工程标准](engineering-standards.md) 与 [v6.2.0 发布博客](/blog/zh/2026-09-engineering-standards-trigger-chain/)。

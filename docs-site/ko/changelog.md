@@ -5,6 +5,12 @@ description: "AIOS 전체 릴리스 이력입니다. 각 버전에서 무엇이 
 
 # 변경 로그
 
+## v6.2.1（2026-09-28）— 퍼널을 열고, 죽어 있던 링크 경로를 복원
+
+- **README가 퍼널이 됩니다**: `rexai.top`은 79행과 페이지 하단에만 있어서 GitHub 검색·Explore·Trending으로 유입된 방문자가 첫 화면에서 콘텐츠 허브를 볼 수 없었습니다. 두 README에 사이트 배지, 첫 링크 줄의 항목, 그리고 30초 설치 바로 다음(문서에서 의도가 가장 높은 지점)에 "Where to go next" 절을 추가했습니다. 렌더링된 페이지를 먼저 실측했습니다: GitHub는 README의 모든 외부 링크에 `rel="nofollow"`를 붙이고 배지는 `alt`를 앵커 텍스트로 읽으므로, 링크는 브랜드 앵커 텍스트(`AIOS Docs — cli.rexai.top`, `RexAI Content Hub — rexai.top`)를 담고 이 저장소와 두 사이트의 대응 관계는 본문 문장으로 명시했습니다.
+- **사이트 간 링크 경로가 죽어 있었고 아무것도 실패하지 않았습니다**: `{% block footer %}{% endblock %}`가 Material 푸터를 비우면서 `extra.footer_links`(rexai.top / os.rexai.top / tool.rexai.top)가 죽은 설정이 됐습니다. 빌드된 페이지의 푸터 링크는 0개였고 그게 약 3개월간 이어졌습니다. 푸터는 `partials/copyright.html`을 다시 렌더하고 `cli.rexai.top/blog`에도 같은 링크 세트를 넣었으므로, 순위에 있는 두 프로퍼티가 콘텐츠 허브로 follow 링크를 냅니다. `scripts/tests/readme-funnel.test.mjs`와 `scripts/tests/site-footer-links.test.mjs`가 두 표면을 지킵니다.
+- **`llms.txt`는 손복사가 아니라 생성입니다**: AI 응답 엔진에 제공되던 기계 가독 인덱스가 낡아(`Version: v5.20.0`, 68개 중 24개) 있었습니다. `scripts/generate-llms-txt.mjs`가 버전을 `VERSION`에서, 날짜를 `CHANGELOG`에서, 블로그 색인을 게시글 front matter에서 유도하고 `scripts/tests/llms-txt.test.mjs`가 검사합니다.
+
 ## v6.2.0（2026-09-28）— 트리거되는 표준, 그리고 공개가 강제되는 커널
 
 - **엔지니어링 표준이 실제로 트리거됩니다**：`rex-engineering-standards`는 모든 클라이언트에 배포됐지만 어떤 순서에도 요구되지 않았습니다——코드 생산 Provider 네 개 중 어느 것도 이름 부르지 않았고, 호출 단위 풀 방식이라 아무도 당기지 않았습니다. 이제 `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening`가 첫 단계에서 읽고, Definition of Done이 완료를 판정하며, 이름 부하기를 멈추면 빌드가 실패합니다. 표준에 파일 입도 베이스라인도 추가됐습니다：파일당 단일 책임, 약 400행 소프트 예산, kebab-case 네이밍, 의미 없는 분할 금지. 참조: [엔지니어링 표준](engineering-standards.md) 및 [v6.2.0 릴리스 글](/blog/ko/2026-09-engineering-standards-trigger-chain/).
