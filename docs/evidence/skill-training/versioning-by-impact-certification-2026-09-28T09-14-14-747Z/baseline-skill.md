@@ -62,11 +62,6 @@ published rex-harness release, and in which order the two tags must go out.
 - Read current version: `cat VERSION`
 - Bump version + changelog entry: `scripts/release-version.sh <patch|minor|major> "summary"`
 - Preview only: `scripts/release-version.sh --dry-run <patch|minor|major> "summary"`
-- Refresh the machine-readable LLM index after any version/changelog/post change:
-  `node scripts/generate-llms-txt.mjs` (verify only: add `--check`). `docs-site/llms.txt`
-  is generated from `site-sources/llms.src.md` plus `VERSION`, `CHANGELOG.md` and
-  `blog-site/*.md`; a hand-edited copy drifts (the live file once advertised v5.20.0
-  while v6.2.0 was shipping, and listed 24 of 68 published posts).
 
 ## Default Behavior
 

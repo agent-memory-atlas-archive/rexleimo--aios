@@ -1,6 +1,12 @@
+<!--
+  docs-site/llms.txt is GENERATED. Edit site-sources/llms.src.md instead, then run:
+      node scripts/generate-llms-txt.mjs
+  The version marker and the Blog index below are derived from VERSION, CHANGELOG.md
+  and blog-site/*.md, so they cannot drift from what is actually shipped.
+-->
 # AIOS
 
-> Local-first agent workflow layer for Claude Code, Codex CLI, Gemini CLI, OpenCode, Hermes, Grok Build, WorkBuddy (CodeBuddy CLI), Pi, ZCode, and Qoder. Adds cross-session project memory (ContextDB), adaptive workflow routing (noop/direct/guarded/planned), multi-agent collaboration, and verification gates on top of the coding clients you already use — without replacing them. Entirely local: memory, logs, and evidence stay on your machine. Version: v5.20.0 · Updated: 2026-09-19.
+> Local-first agent workflow layer for Claude Code, Codex CLI, Gemini CLI, OpenCode, Hermes, Grok Build, WorkBuddy (CodeBuddy CLI), Pi, ZCode, and Qoder. Adds cross-session project memory (ContextDB), adaptive workflow routing (noop/direct/guarded/planned), multi-agent collaboration, and verification gates on top of the coding clients you already use — without replacing them. Entirely local: memory, logs, and evidence stay on your machine. Version: v6.2.0 · Updated: 2026-09-28.
 
 ## One-Line Definition
 AIOS is a local-first agent workflow layer that gives coding CLIs (Claude Code, Codex, Gemini CLI, OpenCode, Hermes, Grok, WorkBuddy, Pi, ZCode, Qoder) cross-session project memory, adaptive routing, multi-agent teams, and verification — same commands, now with a brain.
@@ -60,30 +66,75 @@ AIOS is a local-first agent workflow layer that gives coding CLIs (Claude Code, 
 - https://cli.rexai.top/windows-ai-coding-agent-setup/ — Windows AI coding agent setup in 10 minutes
 
 ## Blog
-- https://cli.rexai.top/blog/2026-09-v512-memory-plane-closeout/ — memory plane closeout: hygiene, report, migration import, tiered AgentView
-- https://cli.rexai.top/blog/2026-09-v511-prompt-contracts/ — prompt contracts hardened
-- https://cli.rexai.top/blog/2026-09-v590-memory-activation-across-clients/ — memory activation across clients
-- https://cli.rexai.top/blog/2026-09-v510-release-trust-and-repo-slimming/ — release trust and repo slimming
-- https://cli.rexai.top/blog/2026-08-v581-stall-fix-llm-judged-grilling/ — aios-shell stall fix + LLM-judged requirements grilling
-- https://cli.rexai.top/blog/2026-08-v580-governed-self-evolution/ — governed self-evolution release
-- https://cli.rexai.top/blog/2026-08-10-aios-loop-graph-engineering/ — Graph Engine Locally: AIOS composes Loop Engineering into a verifiable agent graph
-- https://cli.rexai.top/blog/2026-08-v551-agent-lifecycle-promotion/ — evidence-driven agent promotion
-- https://cli.rexai.top/blog/2026-08-v550-ask-first-requirements-alignment/ — Ask-First requirements alignment
-- https://cli.rexai.top/blog/2026-08-v544-agent-smoke-reliability/ — output-contract smoke tests
-- https://cli.rexai.top/blog/2026-08-v543-crg-decision-checkpoints/ — CRG decision checkpoints
-- https://cli.rexai.top/blog/2026-08-v541-windows-self-update-safety/ — Windows self-update fix
-- https://cli.rexai.top/blog/2026-08-parallel-coding-agents/ — why worktrees isolate files, not state
-- https://cli.rexai.top/blog/2026-08-ai-agent-security/ — agent security practices
-- https://cli.rexai.top/blog/2026-08-ai-coding-cost-crisis/ — coding agent cost control
-- https://cli.rexai.top/blog/2026-08-v540-workflow-iteration-v21/ — workflow iteration v2.1
-- https://cli.rexai.top/blog/2026-07-v400-adaptive-workflow-policy/ — how route selection works
-- https://cli.rexai.top/blog/2026-07-v320-harness-reliability-upgrade/ — harness reliability upgrade
-- https://cli.rexai.top/blog/2026-07-grok-build-aios-client/ — Grok Build first-class client
-- https://cli.rexai.top/blog/2026-07-headroom-token-intelligence/ — Headroom token intelligence
-- https://cli.rexai.top/blog/2026-07-choose-agent-workflow/ — workflow decision table
-- https://cli.rexai.top/blog/2026-07-raw-cli-to-reliable-workflow/ — boundaries that make automation repeatable
-- https://cli.rexai.top/blog/2026-06-v150-unified-aios-search/ — unified search across memory/docs/plans
-- https://cli.rexai.top/blog/2026-05-token-compression/ — token compression introduction
+
+- https://cli.rexai.top/blog/2026-09-engineering-standards-trigger-chain/ — v6.2.0: Engineering Standards That Actually Trigger
+- https://cli.rexai.top/blog/2026-09-browser-mcp-default-off/ — v6.1.0: Browser MCP Off by Default — One Install-Time Choice, Three Modes
+- https://cli.rexai.top/blog/2026-09-v601-engineering-standards-rex/ — v6.0.1: Engineering Standards Move to rex-harness — The Baseline Lives With Its Consumers
+- https://cli.rexai.top/blog/2026-09-v600-engineering-standards/ — v6.0.0: Engineering Standards — AIOS Builds Software, Not Just Code
+- https://cli.rexai.top/blog/2026-09-v520-qoder-client/ — v5.20.0: Qoder Joins AIOS — Ten Clients, One Definition Block
+- https://cli.rexai.top/blog/2026-09-v5192-names-windows-can-hold/ — v5.19.2: Names Windows Can Hold
+- https://cli.rexai.top/blog/2026-09-v5191-declaration-you-can-reach/ — v5.19.1: A Declaration You Can Actually Reach
+- https://cli.rexai.top/blog/2026-09-v519-judgment-gate-surfaces/ — v5.19.0: Giving the Judgment Gate a Body
+- https://cli.rexai.top/blog/2026-09-v518-judgment-gate/ — v5.18.0: TypeSafe Jev in AIOS — Off by Default, On Purpose
+- https://cli.rexai.top/blog/2026-09-v516-zcode-client/ — v5.16.0: ZCode Joins AIOS — with Real Subagents
+- https://cli.rexai.top/blog/2026-09-v515-pi-mcp-bridge/ — v5.15.0: Pi Gains Real MCP Capability
+- https://cli.rexai.top/blog/2026-09-v514-loopx-control-plane/ — v5.14.0: LoopX Control Plane + No-Orphan Process Trees
+- https://cli.rexai.top/blog/2026-09-v512-memory-plane-closeout/ — v5.12.0 — Memory Closeout: Hygiene, Reports, Import
+- https://cli.rexai.top/blog/2026-09-v511-prompt-contracts/ — v5.11.0 — Prompt Contracts: Models Report Their Own State
+- https://cli.rexai.top/blog/2026-09-v510-release-trust-and-repo-slimming/ — v5.10.0 — Release Trust and a Leaner Repo
+- https://cli.rexai.top/blog/2026-09-v590-memory-activation-across-clients/ — v5.9.0 — Memory Activation Across Clients
+- https://cli.rexai.top/blog/2026-09-pi-client-aios/ — Pi coding agent is now a first-class AIOS client
+- https://cli.rexai.top/blog/2026-09-jev-aios-quickstart/ — Jev + AIOS Quickstart: Background Judgments With No Keywords (JVM Confusion Explained)
+- https://cli.rexai.top/blog/2026-08-v582-plan-sync-workbuddy/ — v5.8.2: Plans Stop Jumping the Gun, and WorkBuddy Lands
+- https://cli.rexai.top/blog/2026-08-v581-stall-fix-llm-judged-grilling/ — v5.8.1: No More Frozen Agents — aios-shell Stall Fix
+- https://cli.rexai.top/blog/2026-08-v580-governed-self-evolution/ — v5.8.0: Governed Self-Evolution and Session Memory
+- https://cli.rexai.top/blog/2026-08-v561-aios-work-plan-driven-dispatch/ — v5.6.1: Plan-Driven Dispatch — aios work Reads Your Plan
+- https://cli.rexai.top/blog/2026-08-v560-aios-work-concurrent-dispatch/ — v5.6.0: Parallel Multi-Agent Coding with One Command
+- https://cli.rexai.top/blog/2026-08-v551-agent-lifecycle-promotion/ — v5.5.1: Evidence-Driven Agent Lifecycle Promotion
+- https://cli.rexai.top/blog/2026-08-v550-ask-first-requirements-alignment/ — v5.5.0: Ask-First Alignment — Agents Stop Guessing
+- https://cli.rexai.top/blog/2026-08-v544-agent-smoke-reliability/ — v5.4.4: Reliable Agent Smoke and Escalating Probe Timeouts
+- https://cli.rexai.top/blog/2026-08-v543-crg-decision-checkpoints/ — v5.4.3: CRG Decision Checkpoints and Idempotent aios init
+- https://cli.rexai.top/blog/2026-08-v541-windows-self-update-safety/ — v5.4.1: Why 'aios update' Broke on Windows
+- https://cli.rexai.top/blog/2026-08-v540-workflow-iteration-v21/ — v5.4.0: Workflow Iteration v2.1 — Activation Safety
+- https://cli.rexai.top/blog/2026-08-parallel-coding-agents/ — Parallel Agents: Git Worktrees Isolate Files, Not State
+- https://cli.rexai.top/blog/2026-08-ai-coding-cost-crisis/ — AI Coding Bills Are Out of Control: Cursor Hid the Numbers
+- https://cli.rexai.top/blog/2026-08-ai-agent-security/ — Agent Security Is a State Machine Problem, Not Just Prompts
+- https://cli.rexai.top/blog/2026-08-10-aios-loop-graph-engineering/ — Graph Engine Locally: Loop Engineering as an Agent Graph
+- https://cli.rexai.top/blog/2026-07-v400-adaptive-workflow-policy/ — v4.0 Adaptive Workflow Policy: The Right Amount of Process
+- https://cli.rexai.top/blog/2026-07-headroom-token-intelligence/ — v3.6.0: A Safer Token Workflow with Headroom and Ponytail
+- https://cli.rexai.top/blog/2026-07-v320-harness-reliability-upgrade/ — v3.2.0 — Harness Reliability and Skill Lifecycle
+- https://cli.rexai.top/blog/2026-07-raw-cli-to-reliable-workflow/ — From Raw CLI Commands to a Reliable AI Agent Workflow
+- https://cli.rexai.top/blog/2026-07-grok-build-aios-client/ — Grok Build Is Now a First-Class AIOS Client
+- https://cli.rexai.top/blog/2026-07-choose-agent-workflow/ — Which AI Agent Workflow Should You Choose? A Decision Guide
+- https://cli.rexai.top/blog/2026-06-v202-ecc-uplift/ — v2.0.2: Safer Skill Health Records and Cleaner Crush Config
+- https://cli.rexai.top/blog/2026-06-v152-aios-shell-mcp/ — v1.52.0: Deterministic Shell Output Compression via MCP
+- https://cli.rexai.top/blog/2026-06-v1501-token-compression-compliance/ — v1.50.1: All-Client Token Compression Compliance
+- https://cli.rexai.top/blog/2026-06-v150-unified-aios-search/ — v1.50.0: Unified Search Across Memory, Docs, Plans
+- https://cli.rexai.top/blog/2026-06-hermes-agent-aios-client/ — Hermes Agent Is Now a First-Class AIOS Client
+- https://cli.rexai.top/blog/2026-06-agent-governance/ — Agent Governance: Make Team Runs Prove Themselves
+- https://cli.rexai.top/blog/2026-05-v140-multi-client-expansion/ — v1.40: Now Supporting 6 AI Coding Clients
+- https://cli.rexai.top/blog/2026-05-token-compression/ — Token Compression: Months of Memory Into One Prompt
+- https://cli.rexai.top/blog/2026-05-native-token-compression/ — Token Intelligence: ContextDB, RTK, Caveman, Headroom MCP
+- https://cli.rexai.top/blog/2026-05-model-router/ — Model Router: Stop Guessing Which AI Model To Use
+- https://cli.rexai.top/blog/2026-05-debug-hub-mcp/ — debug-hub: When Your Agent Can Debug Itself
+- https://cli.rexai.top/blog/2026-05-codemap-crg/ — Codemap: Give Your AI Agent a Map of Your Codebase
+- https://cli.rexai.top/blog/2026-05-aios-memo-gui/ — aios memo GUI: See Your Agent's Memory As a Living Graph
+- https://cli.rexai.top/blog/2026-04-solo-harness/ — Solo Harness: Start a Task, Sleep, Check Results
+- https://cli.rexai.top/blog/2026-04-rexcli-ink-tui-refactor/ — AIOS TUI Refactor: Modern Terminal UI with React Ink
+- https://cli.rexai.top/blog/2026-04-contextdb-lazy-load/ — ContextDB Lazy Load: From 5s Startup to Self-Discovery
+- https://cli.rexai.top/blog/2026-04-browser-mcp-weak-model-upgrade/ — Browser MCP Weak-Model Upgrade: Semantic Snapshot
+- https://cli.rexai.top/blog/2026-03-rexcli-windows-cost-tracking/ — AIOS Update: Windows Native Support + Live Cost Tracking
+- https://cli.rexai.top/blog/2026-03-rexcli-skills-install-experience/ — AIOS Skills Install: Scope Picker and Clearer Prompts
+- https://cli.rexai.top/blog/xiaohongshu-automation/ — I Automated Xiaohongshu with AI — Colleagues Noticed
+- https://cli.rexai.top/blog/windows-cli-startup-stability/ — Windows CLI Startup Stability: Keep the Chain Reliable
+- https://cli.rexai.top/blog/rl-training-system/ — AIOS RL Training: Synthetic Bugfixes to Mixed Environments
+- https://cli.rexai.top/blog/orchestrate-live/ — Orchestrate Live: Opt-In Subagent Runtime
+- https://cli.rexai.top/blog/launch-post/ — I Built the Tool That Ends the AI CLI Debate
+- https://cli.rexai.top/blog/contextdb-fts-bm25-search/ — ContextDB Search Upgrade: FTS5/BM25 + Incremental Index Sync
+- https://cli.rexai.top/blog/cli-comparison-post/ — Long-Task Showdown: Codex vs Claude vs Gemini
+- https://cli.rexai.top/blog/automation-playbook-post/ — Automation Playbook: A Reliable Browser Content Workflow
+- https://cli.rexai.top/blog/ai-cli-comparison/ — Stop Debating AI Programming Tools in 2026
+- https://cli.rexai.top/blog/advanced-design-skills-page-building/ — Advanced Design Skills: From Vague Prompts to Production UI
 
 ## Languages
 - https://cli.rexai.top/zh/ — 简体中文 docs (local-first agent harness 定位)
