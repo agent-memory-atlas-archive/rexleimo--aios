@@ -29,7 +29,7 @@ AIOS는 로컬 우선 오케스트레이션 제어 평면이며, 코드 생성�
 | --- | --- |
 | diff를 생성하고 기도한다 | 각 단계가 타입화된 증거(`implementation-diff-recorded`, `focused-tests-pass`, receipt)를 낸 뒤 다음 단계가 풀린다 |
 | "완료"는 모델이 그렇게 말했다는 뜻 | 완료 = Definition of Done 체크리스트와 증거 계약을 모두 통과 |
-| 기준은 아무도 로드하지 않는 스타일 가이드 속에 | 기준은 스킬이며, router가 코드 생산 Provider 실행 **전에** 로드한다 |
+| 기준은 아무도 로드하지 않는 스타일 가이드 속에 | 기준은 모든 코드 생산 Provider 스킬 자신의 첫 단계에 이름으로 적히고, 그 적기를 멈추면 빌드가 실패한다 |
 | 리뷰는 감각 | 리뷰는 fixed-point diff에 Fowler 악취 기준선 + 명세 축 + 기준 축으로 돈다 |
 | 품질은 마지막 광택 | 품질 문이 계획 → 구현 → 경화 → 리뷰 전 chain에 내장되어 있다 |
 
@@ -103,12 +103,15 @@ AIOS는 로컬 우선 오케스트레이션 제어 평면이며, 코드 생성�
 ```text
 router (aios-workflow-router)
   └─ 코드 생산 Provider 선택 (rex-implement / rex-refactor-hardening / rex-code-review / rex-design)
-       └─ rex-engineering-standards를 먼저 로드  ← 공통 품질 기준
+       └─ 그 Provider 자신의 첫 단계: rex-engineering-standards 읽기  ← 공통 품질 기준
             └─ Provider가 자신의 증거 기반 단계를 실행
                  └─ 완료 = Provider의 증거 계약 그리고 이 Definition of Done를 모두 통과
+
+빌드 가드 (rex-harness skill-sources 테스트)
+  └─ 모든 코드 생산 Provider 스킬은 각 공유 참조 스킬을 이름으로 지어야 하며, 그렇지 않으면 빌드 실패
 ```
 
-`pre-edit-safety-gate`는 또한 첫 편집 전에 선택한 변경 형태(로컬 변경 / 확장·재사용 / 리팩터 추출)를 이 기준으로 대조한다. 어떤 단계도 opt out할 수 없다 — "품질 건너뛰기" 경로는 없다. 기준은 정중함이 아니라 router에 의해 로드되기 때문이다.
+`pre-edit-safety-gate`는 또한 첫 편집 전에 선택한 변경 형태(로컬 변경 / 확장·재사용 / 리팩터 추출)를 이 기준으로 대조한다. 어떤 단계도 opt out할 수 없다 — "품질 건너뛰기" 경로는 없다. 기준은 정중함이 아니라 출시된 Provider 스킬이 이름으로 지칭하고, 그 지칭을 멈춘 Provider는 빌드가 통과시키지 않기 때문이다. 라우팅만으로는 담보가 아닙니다 — 이 기준은 한때 "어떤 순서에도 요구되지 않는 스킬"로 출시된 적이 있습니다.
 
 ## 참고 자료
 

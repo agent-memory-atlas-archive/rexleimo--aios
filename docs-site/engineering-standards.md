@@ -29,7 +29,7 @@ AIOS is a local-first orchestration control plane, not a chat wrapper around a c
 | --- | --- |
 | Generates a diff and hopes | Every stage produces typed evidence (`implementation-diff-recorded`, `focused-tests-pass`, receipts) before the next stage unlocks |
 | "Done" means the model said so | Done means the Definition of Done checklist plus the evidence contract both pass |
-| Standards live in a style guide nobody loads | The standard is a skill the router loads **before** code-producing providers run |
+| Standards live in a style guide nobody loads | The standard is named in step 1 of every code-producing Provider skill, and a build guard fails if any of them stops naming it |
 | Review is vibes | Review runs a Fowler smell baseline plus spec and standards axes against a fixed-point diff |
 | Quality is a final polish | Quality gates are wired into plan → implement → harden → review |
 
@@ -103,12 +103,15 @@ Claiming "done" requires every row; any "no" means keep working:
 ```text
 router (aios-workflow-router)
   └─ code-producing provider selected (rex-implement / rex-refactor-hardening / rex-code-review / rex-design)
-       └─ rex-engineering-standards loaded FIRST  ← the shared baseline
+       └─ the provider's own sequence, step 1: read rex-engineering-standards  ← the shared baseline
             └─ provider runs its own evidence-driven steps
                  └─ completion requires BOTH the provider's evidence contract AND this Definition of Done
+
+build guard (rex-harness skill-sources test)
+  └─ every code-producing provider skill must name every shared reference skill, or the build fails
 ```
 
-`pre-edit-safety-gate` additionally checks the chosen change shape (local change / extend / refactor) against the baseline before the first edit. No stage can opt out; there is no "skip quality" route, because the standard is loaded by the router, not by politeness.
+`pre-edit-safety-gate` additionally checks the chosen change shape (local change / extend / refactor) against the baseline before the first edit. No stage can opt out; there is no "skip quality" route — the standard is named by the shipped Provider skills and the build refuses a Provider that stops naming it, not by politeness. Routing alone was never the guarantee: the standard shipped once as a skill no shipped sequence required.
 
 ## Reference materials
 

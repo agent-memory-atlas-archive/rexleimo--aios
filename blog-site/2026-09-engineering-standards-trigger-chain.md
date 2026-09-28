@@ -1,6 +1,6 @@
 ---
 title: "Engineering Standards That Actually Trigger"
-description: "AIOS shipped an engineering-standards skill months ago — and it never fired once. A zero-reference audit, a new shared-reference projection lane, and a file-granularity baseline now put classic software engineering discipline on every code-producing path."
+description: "AIOS shipped an engineering-standards skill months ago — and it never fired once. An audit that found the skill distributed but never named by its consumers, a new shared-reference projection lane, and a file-granularity baseline now put classic software engineering discipline on every code-producing path."
 date: 2026-09-28
 tags: ["AIOS", "engineering-standards", "rex", "skills", "projection", "clean-code"]
 ---
@@ -10,22 +10,30 @@ tags: ["AIOS", "engineering-standards", "rex", "skills", "projection", "clean-co
 We had a suspicion, and it was worse than we thought: AIOS shipped an
 `rex-engineering-standards` skill — Clean Architecture boundaries, deep modules,
 naming, a Definition of Done — and it never triggered once. Not because the
-content was wrong, but because nothing anywhere referenced it.
+content was wrong, but because nothing that had to consume it ever named it.
 
 ## The audit
 
-Three separate breaks, each sufficient on its own:
+Getting the file into the package closed one break, and 0.7.0 had already closed
+it: the standard used to live only in a per-machine `~/.zcode/skills/` copy that
+nothing versioned — gone on reinstall, never reaching the other clients. It now
+ships inside the projected skill tree.
 
-1. **It was never in the repository.** The skill lived only in a per-machine
-   `~/.zcode/skills/` directory. Not versioned, not projected to other clients,
-   gone on reinstall.
-2. **Zero references.** A repo-wide search found no file that mentions it — not
-   AGENTS.md, not the workflow router, and crucially not `rex-implement` itself.
-   The standard claimed "read me before implementing", but the implementing
-   skill didn't know it existed. Skill loading is pull-per-invocation; nobody
-   pulls what nobody names.
-3. **No runtime backstop.** File granularity — the thing users actually feel —
-   is the easiest rule to machine-check, and nothing checked it.
+The audit was about what survived that fix. Two breaks, each sufficient on its
+own:
+
+1. **Distributed, never named.** `install.mjs` projected the skill and
+   `client-install.test.mjs` counted it, so the file sat on disk in every client.
+   But nothing on the consuming side told anyone to read it: no code-producing
+   Provider named it, and `AGENTS.md` did not mention it either. The referrers that
+   did exist — `aios-workflow-router` and `pre-edit-safety-gate` — are host-side
+   AIOS guidance, which a client running rex-harness standalone never loads. The
+   file was distributed to everyone and required by no sequence. The standard claimed "read me before
+   implementing", but the implementing skill didn't know it existed. Skill loading
+   is pull-per-invocation; nobody pulls what nobody names.
+2. **No runtime backstop.** File granularity — the thing users actually feel —
+   is the easiest rule to machine-check, and nothing checked it. Neither was
+   "being referenced" itself checked, which is why this break was invisible.
 
 The result was exactly what you'd predict: code without engineering shape.
 Unclear file names, one file piling up a dozen responsibilities.
@@ -65,15 +73,17 @@ self-check gate now fails closed on "one big file" deliveries.
 ## The anti-lesson we keep re-learning
 
 The fix that worked wasn't "write a better skill". It was "make the skill
-referenced, projected, and checkable" — the same conclusion our competitor
-analysis keeps reaching from the other direction: no mature harness leaves
-"should this have happened" at the prompt layer. Standards that live only in a
-prompt are suggestions. Standards that are named by the runtime are gates.
+named by its consumers, projected, and checkable" — the same conclusion our
+competitor analysis keeps reaching from the other direction: no mature harness
+leaves "should this have happened" at the prompt layer. Standards that live only
+in a prompt are suggestions. Standards that the shipped consumers name are gates.
+Distribution was never the missing piece; the file was already on disk in every
+client, and it still never fired.
 
 And a guard so this cannot regress silently: `skill-sources.test.mjs` now fails
-the build if any code-producing Provider stops naming the standard. A skill that
-nothing references is not a defect anyone sees at runtime — so the check is
-objective (string presence in the shipped skill tree), not a review opinion.
+the build if any code-producing Provider stops naming the standard. A skill
+nobody is told to read raises no error at runtime — so the check is objective
+(string presence in the shipped skill tree), not a review opinion.
 
 Verification: 215 rex-harness tests, the client-install and skill-sources
 suites, and the scripts-side projection suite all green; every projected skill

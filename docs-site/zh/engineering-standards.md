@@ -29,7 +29,7 @@ AIOS 是本地优先的编排控制平面，不是套在代码生成器外面的
 | --- | --- |
 | 生成一个 diff，然后祈祷 | 每个阶段先产出类型化证据（`implementation-diff-recorded`、`focused-tests-pass`、receipt），才解锁下一阶段 |
 | "完成"意味着模型说完成了 | 完成 = Definition of Done 清单与证据契约同时通过 |
-| 标准写在没人加载的规范文档里 | 标准是一个技能，router 在代码生产类 Provider 执行**之前**加载 |
+| 标准写在没人加载的规范文档里 | 标准被写进每个代码生产类 Provider 技能的第一步，任何一个不再点名的Provider 会让构建直接失败 |
 | 评审靠感觉 | 评审基于 fixed-point diff 跑 Fowler 坏味道基线 + 规格轴 + 标准轴 |
 | 质量是最后一道抛光 | 质量门内建在 计划 → 实现 → 加固 → 评审 全链路 |
 
@@ -103,12 +103,15 @@ AIOS 是本地优先的编排控制平面，不是套在代码生成器外面的
 ```text
 router（aios-workflow-router）
   └─ 选出代码生产类 Provider（rex-implement / rex-refactor-hardening / rex-code-review / rex-design）
-       └─ 首先加载 rex-engineering-standards  ← 共同质量基线
+       └─ 该 Provider 自己的流程第一步：先读 rex-engineering-standards  ← 共同质量基线
             └─ Provider 执行自己的证据驱动步骤
                  └─ 完成 = Provider 证据契约 且 本 Definition of Done 同时通过
+
+构建守卫（rex-harness skill-sources 测试）
+  └─ 每个代码生产类 Provider 技能必须点名每个共享参照技能，否则构建直接失败
 ```
 
-`pre-edit-safety-gate` 还会在第一次编辑前，按本基线核对选定的变更形态（本地修改 / 扩展复用 / 重构提取）。没有任何阶段可以 opt out——不存在"跳过质量"的路线，因为标准是 router 加载的，不靠客气。
+`pre-edit-safety-gate` 还会在第一次编辑前，按本基线核对选定的变更形态（本地修改 / 扩展复用 / 重构提取）。没有任何阶段可以 opt out——不存在"跳过质量"的路线：标准由发布的 Provider 技能自己点名，不再点名的 Provider 会被构建拦下，不靠客气。光靠路由从来不是担保：这份标准曾以“没有任何流程要求读取”的技能形式发布过。
 
 ## 参考文案
 

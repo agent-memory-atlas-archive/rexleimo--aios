@@ -18,17 +18,20 @@
 - [x] A3 `package.json` 0.6.2 → 0.7.0
 - [x] A4 `CHANGELOG.md` [0.7.0] 条目
 - [x] A5 子模块 commit + push（ssh://git@ssh.github.com:443/rexleimo/rex-harness.git）
-- [x] A6 新增 `rexSharedSkills` 投影机制（共享技能不是 provider，原 skillIds() 只投影 provider 绑定——不补机制新技能永远投影不出去）；同步更新 `tests/contract/client-install.test.mjs` 与 `tests/skills/skill-sources.test.mjs` 的技能集合断言
+- [x] A6 新增共享参照技能投影机制（共享技能不是 provider，原 skillIds() 只投影 provider 绑定——不补机制新技能永远投影不出去）；同步更新 `tests/contract/client-install.test.mjs` 与 `tests/skills/skill-sources.test.mjs` 的技能集合断言
+  - 当时发布为 `rexSharedSkills`（对象数组，0.7.0）；**已由 0.8.0 重命名为 `sharedReferenceSkillIds`**（技能 id 字符串数组），现行名称以此为准
+  - 0.8.0 补上本计划未预见的缺口：四个代码生产 Provider 技能必须点名该标准（触发链守卫），否则它仍是“随包发布但无人引用”的文档
 
 ### B. 宿主 harness-cli（release 6.0.1）
 - [x] B1 删除 `skill-sources/aios-engineering-standards/`
 - [x] B2 `aios-workflow-router` / `pre-edit-safety-gate` 引用改名为 `rex-engineering-standards`
 - [x] B3 `scripts/tests/rex-client-projection.test.mjs`：adopted 13 → 14
+  - 硬编码计数已由本轮改为从 `rex-harness/skill-sources/` 动态推导，新增技能不再需要改测试
 - [x] B4 VERSION → 6.0.1；`CHANGELOG.md` [6.0.1]
 - [x] B5 `docs-site/changelog.md`（+zh/ja/ko）v6.0.1 条目
 - [x] B6 活文档 `docs-site/engineering-standards.md`（+zh/ja/ko）技能名更新
 - [x] B7 四语发布博客 `2026-09-v601-engineering-standards-rex.md` + 各语言 index 登记
-- [ ] B8 bump 子模块指针并提交
+- [x] B8 bump 子模块指针并提交（aios main `55960222` → rex-harness `869b87f` / 0.8.0）
 - [x] B9 `scripts/lib/skills/sync/run.mjs` 新增孤儿投影清理（源技能删除后托管投影自动移除；信任模型与 misprojection 一致：元数据 source 必须自洽）
 
 ### C. 验证

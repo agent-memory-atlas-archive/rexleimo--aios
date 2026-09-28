@@ -29,7 +29,7 @@ AIOS はローカルファーストのオーケストレーションコントロ
 | --- | --- |
 | diff を生成して祈る | 各ステージが型付き証拠（`implementation-diff-recorded`、`focused-tests-pass`、receipt）を出してから次のステージが解放される |
 | 「完了」はモデルがそう言ったこと | 完了 = Definition of Done チェックリストと証拠契約の両方を通過 |
-| 基準は誰も読み込まないスタイルガイドの中 | 基準はスキルであり、router がコード生産 Provider の実行**前**に読み込む |
+| 基準は誰も読み込まないスタイルガイドの中 | 基準はすべてのコード生産 Provider スキル自身の第一ステップに名指しされ、名指しをやめた瞬間にビルドが落ちる |
 | レビューは感覚 | レビューは fixed-point diff に対し Fowler スメル基線＋仕様軸＋基準軸で走る |
 | 品質は最後の磨き | 品質門は 計画 → 実装 → 硬化 → レビュー の全鎖に組み込まれている |
 
@@ -103,12 +103,15 @@ AIOS はローカルファーストのオーケストレーションコントロ
 ```text
 router（aios-workflow-router）
   └─ コード生産 Provider を選択（rex-implement / rex-refactor-hardening / rex-code-review / rex-design）
-       └─ rex-engineering-standards を最初に読み込む  ← 共通品質基準
+       └─ その Provider 自身の第一ステップ：rex-engineering-standards を読む  ← 共通品質基準
             └─ Provider が自分の証拠駆動ステップを実行
                  └─ 完了 = Provider の証拠契約 かつ 本 Definition of Done の両方を通過
+
+ビルドガード（rex-harness skill-sources テスト）
+  └─ すべてのコード生産 Provider スキルが共有参照スキルを名指しすること。やめればビルド失敗
 ```
 
-`pre-edit-safety-gate` はさらに最初の編集前に、選んだ変更の形（ローカル変更／拡張・再利用／リファクタ抽出）をこの基準で照合する。どのステージも opt out できない——「品質スキップ」ルートは存在しない。基準は丁寧さではなく router によって読み込まれるからだ。
+`pre-edit-safety-gate` はさらに最初の編集前に、選んだ変更の形（ローカル変更／拡張・再利用／リファクタ抽出）をこの基準で照合する。どのステージも opt out できない——「品質スキップ」ルートは存在しない。基準は丁寧さではなく、出荷された Provider スキルが名指しし、名指しをやめた Provider はビルドが通さない。ルーティングだけでは担保になりません——この基準はかつて「どのシーケンスにも要求されないスキル」として出荷されたことがあります。
 
 ## 参考資料
 
