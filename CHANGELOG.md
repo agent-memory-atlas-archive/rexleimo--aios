@@ -24,6 +24,24 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- feat(skills): `rex-engineering-standards` joins the bundled Rex projection as a shared
+  reference skill (projected via the new `sharedReferenceSkillIds` list in
+  `rex-harness/src/clients/install.mjs`; no fake capability binding — it stays a
+  prerequisite standard, not a Command-selectable Provider). The code-producing
+  Providers (`rex-implement` / `rex-design` / `rex-code-review` /
+  `rex-refactor-hardening`) now load it before executing, AGENTS.md documents the
+  prerequisite as workflow-policy rule 6, and the standard gains a file-granularity
+  baseline (one responsibility per file, ~400-line soft budget, kebab-case naming,
+  no semantically empty splits) plus a matching Definition of Done row. Covered by
+  `rex-harness/tests/contract/client-install.test.mjs`,
+  `rex-harness/tests/skills/skill-sources.test.mjs` (including a trigger-chain guard
+  that fails the build if a code-producing Provider stops naming the standard), and
+  `scripts/tests/rex-client-projection.test.mjs` (whose hardcoded projected-skill
+  count now derives from the source tree).
+- chore(deps): `rex-harness` submodule bumped to 0.8.0, which ships the trigger chain
+  above and adds `scripts/refresh-projection-history.mjs` so a skill edit cannot ship
+  without its canonical projection digest.
+
 ## [6.0.12] - 2026-09-22
 
 - fix(audit): A8-class re-export defect, unresolvable test entries, and invisible unit suite (A11-A13)

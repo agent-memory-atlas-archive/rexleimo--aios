@@ -26,6 +26,7 @@ AIOS를 처음 사용하시나요? 이 게시물들이 방향을 잡아줄 것�
 - [v6.0.0: 엔지니어링 표준 내장 — AIOS는 코드를 생성할 뿐만 아니라 소프트웨어를 구축한다](2026-09-v600-engineering-standards.md) — 고전 서적에서 도출한 하나의 품질 기준을 router가 코드 생산 Provider 전에 로드하고 모든 변경에 Definition of Done 적용
 - [v5.20.0: Qoder가 AIOS에 합류 — 열 번째 클라이언트, 정의 블록 하나](2026-09-v520-qoder-client.md) — 열 번째 1급 클라이언트, Qoder가 실제로 읽는 settings.json의 MCP, AGENTS.md 컨텍스트, `-p` 헤드리스 team
 - [Jev + AIOS 퀵스타트: 키워드 없이 백그라운드 자동 판단](2026-09-jev-aios-quickstart.md) — TYPESAFE_API_KEY를 설정하고 판단 게이트를 켜면 평소대로 대화만 해도 Jev가 백그라운드에서 판단한다
+- [실제로 트리거되는 엔지니어링 표준](2026-09-engineering-standards-trigger-chain.md) — 어디에도 참조되지 않던 표준 스킬, 공유 참조 프로젝션 경로, 그리고 완료를 판정하는 파일 입도 베이스라인
 - [v5.19.2: Windows가 감당할 수 있는 이름](2026-09-v5192-names-windows-can-hold.md) — 후보 id를 파일 이름으로 쓰면 NTFS에서 대체 데이터 스트림이 되어 승격이 조용히 사라지고, 가져오기 쪽은 오류 0건을 보고한다
 - [v5.19.1: 실제로 닿을 수 있는 선언 채널](2026-09-v5191-declaration-you-can-reach.md) — shell에서 선언할 수 있게 되었고, 그를 위해 쓴 가드가 82개 미실행 테스트 파일을 찾아냄
 - [v5.19.0: 판단 게이트에 몸을 붙이다](2026-09-v519-judgment-gate-surfaces.md) — 꺼져 있으면 아예 없는 aios_judge 도구와 보류만 할 수 있는 rex 단계 게이트

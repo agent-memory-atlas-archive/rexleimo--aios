@@ -24,6 +24,7 @@ Evaluate the AIOS workflow policy before creating a plan, selecting a skill, or 
 3. `planned` turns create or reuse one work-item plan, then execute only the Provider selected by the current rex Command.
 4. Do not insert a global bootstrap or compatibility skill chain. `aios-workflow-router` helps classify work but does not replace the Provider selected by the current Rex Capability Command.
 5. Invoke the selected Provider rather than paraphrasing it; use `verification-before-completion` before claiming a changed behavior is complete.
+6. Code-producing Providers (`rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening`) load the `rex-engineering-standards` shared reference skill before executing; its Definition of Done (including file-granularity rules: one responsibility per file, ~400-line soft budget, kebab-case naming) gates completion.
 </IMPORTANT>
 <!-- END AIOS WORKFLOW POLICY -->
 

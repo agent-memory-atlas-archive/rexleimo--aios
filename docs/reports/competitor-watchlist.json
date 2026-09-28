@@ -1,8 +1,8 @@
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-08-14",
-  "lastMetadataCheck": "2026-08-14 (9/9 GitHub REST metadata + latest release + recent commits; 6/9 full local tarballs: TencentDB, OMO, Graphiti, Letta Code, mem0, OpenHarness; OpenClaw/Hermes/OpenViking metadata-only because size or archive policy)",
-  "lastDeepDive": "2026-08-14 (TencentDB v2.0.0/v2.0.1-beta.1 full source; OMO v5 hashline-core + memory-core + fork-cost; Graphiti/Letta/mem0/OpenHarness current trees; see docs/reports/2026-08-14-competitor-source-refresh.md)",
+  "lastUpdated": "2026-09-28",
+  "lastMetadataCheck": "2026-09-28 (14-repo GitHub REST metadata + release-body trigger screening, see docs/reports/2026-09-28-competitor-watchlist-refresh.md; all 5 active refs non-archived and pushed within 3 days; goose repo moved to aaif-goose/goose — API redirect confirmed)",
+  "lastDeepDive": "2026-08-14 (TencentDB v2.0.0/v2.0.1-beta.1 full source; OMO v5 hashline-core + memory-core + fork-cost; Graphiti/Letta/mem0/OpenHarness current trees; see docs/reports/2026-08-14-competitor-source-refresh.md). 2026-09-28 was trigger screening only, no source deep dive",
   "refreshMethod": "api.github.com metadata + codeload.github.com tarballs + local source review of ACL/loadout/hashline/citation/temporal contracts",
   "pendingDeepDive": [],
   "portfolioPolicy": {
@@ -87,10 +87,10 @@
         "refreshCadence": "event-driven; quarterly metadata-only check",
         "refreshTrigger": "其 auto-recall、offload 或 result-ref 机制发生相关源码变化；或 AIOS 修改 recall budget / validated compaction 合同时。普通版本号、star 变化不触发 deep dive。",
         "rationale": "12 项中对预算降级、分层 offload 与 ref provenance 的组合最直接，且 TypeScript 实现便于双侧源码核对；保留为唯一的预算/表示层核心参照。",
-        "evidenceSnapshot": "InjectionMode direct/summary/tool/reference + Agent Loadout; checkPermission/canBindAsset 纯函数（private 对 admin 也 DENY）; Skill 乐观锁+内容 hash 幂等; result_ref offload。Hub/Proxy/Wiki/LLM 管线不吸收",
+        "evidenceSnapshot": "InjectionMode direct/summary/tool/reference + Agent Loadout; checkPermission/canBindAsset 纯函数（private 对 admin 也 DENY）; Skill 乐观锁+内容 hash 幂等; result_ref offload。Hub/Proxy/Wiki/LLM 管线不吸收。2026-09-28：核心契约未变；v1.0.x 线为 OpenClaw 宿主插件兼容轨（embedding 不可用自动降级 keyword；OpenClaw 9.5 staged package-N 隔离目录下 sqlite-vec 嵌套 vec0.so 直连 loadExtension + 回退 + 显式 degraded）",
         "license": "MIT",
         "language": "TypeScript",
-        "sourceEvidenceAsOf": "2026-08-14"
+        "sourceEvidenceAsOf": "2026-09-28"
       },
       {
         "id": "oh-my-openagent",
@@ -103,10 +103,10 @@
         "refreshCadence": "event-driven; quarterly metadata-only check",
         "refreshTrigger": "active-work discovery、continuation/lineage、Hashline stale-write guard 或相关配置 schema 发生源码变化；或 AIOS 进入 ExecutionContextPacket / write preflight 实施阶段。",
         "rationale": "它是当前组合中唯一同时覆盖主动恢复、lineage 与内容新鲜度写保护的实现；保留为规划到修改前工作集的核心参照，不再跟踪其泛化 agent 功能。",
-        "evidenceSnapshot": "Hashline line#hash write guard、facts durable queue + crash reconcile、reflection/dream fork-vs-quick 按真实账单路由、omo.jsonc 统一配置；不跟踪 omo-ai native / people-card",
+        "evidenceSnapshot": "Hashline line#hash write guard、facts durable queue + crash reconcile、reflection/dream fork-vs-quick 按真实账单路由、omo.jsonc 统一配置；不跟踪 omo-ai native / people-card。2026-09-28：v5.0.0 GA 转型 OmO Native（senpi/pi fork 独立二进制，宿主插件降级兼容线）；git 化 markdown 记忆 + Kibitzer 只读校验回路（quick 链第二 agent，唤醒式核查记忆、单条 nudge 注入、不可写记忆、召回 308ms→5ms）；CodeMode code-as-action eval cell（同模型上下文 0.39x）；mass ulw prompt→DAG 按 category 路由 + workpool；DAG checkpoint 7 天保留清扫（教训：策略存在但无人调用的清扫会积压 711 个 checkpoint）；ulw-research 交付前确定性证明 + 有界修复（3 次/无改进/15min）+ 带缺陷清单交付。Hashline stale-write 契约本身未变",
         "license": "NOASSERTION",
         "language": "TypeScript",
-        "sourceEvidenceAsOf": "2026-08-14"
+        "sourceEvidenceAsOf": "2026-09-28"
       },
       {
         "id": "openclaw",
@@ -119,10 +119,10 @@
         "refreshCadence": "event-driven; quarterly metadata-only check",
         "refreshTrigger": "skill workshop、install policy、proposal/review/apply/rollback/quarantine、provenance 或 stale-hash admission 发生相关源码变化；或 AIOS 准备开启 Team shared-canonical 写入。",
         "rationale": "其治理状态机和反向安全信号最完整，是 Team 发布门与可回滚治理的唯一核心参照；只审查治理路径，不扫描其渠道、桌面或通用插件面。",
-        "evidenceSnapshot": "Skill Workshop 治理闭环、Plugin 外部化、Operator install policy、Memory/channel SQLite",
+        "evidenceSnapshot": "Skill Workshop 治理闭环、Plugin 外部化、Operator install policy、Memory/channel SQLite。2026-09-28（v2026.8.1→9.6）：grounded dreaming 默认开启（provenance 门槛晋升 + Dream Diary + 显式关闭；我们不跟默认值，抄门槛设计）；memory forget 溯源删除（检视贡献会话、排除来源准入、删派生留源 transcript）；automatic self-learning 按作者分信任档（scanner/Workshop 自有自动 apply，用户自改保持 pending）；Workshop pending proposals 硬上限 ≤3 + 历史扫描 SQLite cursor；备份恢复前校验 retained originals；pending child launch 随父 authority 终止；update 在装后 Doctor 失败时回滚 candidate 并保留配置/SecretRef；数据库 quarantine 决策单独存储防自擦除",
         "license": "MIT",
         "language": "TypeScript",
-        "sourceEvidenceAsOf": "2026-07-28"
+        "sourceEvidenceAsOf": "2026-09-28"
       }
     ],
     "specialist-reference": [
@@ -137,10 +137,10 @@
         "refreshCadence": "event-driven; semiannual metadata-only check",
         "refreshTrigger": "Graphiti 的 EntityEdge temporal/provenance contract 发生相关源码变化；或 AIOS 修改 ContextItem validity / supersede schema。除此之外不做仓库级刷新。",
         "rationale": "双时态与 episode provenance 仍是最强窄域证据，但图检索和数据库架构不属于版本目标；降为只回答 temporal semantics 的 specialist。",
-        "evidenceSnapshot": "时序知识图谱 + 事实失效 (bi-temporal) + attribute-hallucination 防御；2026-08-14 FactResult 补 source/target uuid 与 episodes，时态合同未变",
+        "evidenceSnapshot": "时序知识图谱 + 事实失效 (bi-temporal) + attribute-hallucination 防御；2026-08-14 FactResult 补 source/target uuid 与 episodes。2026-09-28：v0.30.x 为 Neo4j database 路由修复 + 搜索修复，temporal/provenance 契约未变，refreshTrigger 未命中",
         "license": "Apache-2.0",
         "language": "Python",
-        "sourceEvidenceAsOf": "2026-08-14"
+        "sourceEvidenceAsOf": "2026-09-28"
       },
       {
         "id": "letta-code",
@@ -153,10 +153,10 @@
         "refreshCadence": "event-driven; semiannual metadata-only check",
         "refreshTrigger": "memory-citations 从 prototype 升级、其实际读取观测链发生相关源码变化；或 AIOS 开始实现 ContextReceipt。其他 sleep-time / agent 功能不触发刷新。",
         "rationale": "实际读取驱动 citation 是独立且直接对应 ContextReceipt 的窄问题；实现仍是 prototype，不足以进入 core，也不值得全仓持续扫描。",
-        "evidenceSnapshot": "memory-citations 仍是 tool_start prototype（非成功读取）；workspace sandbox + memory-git 有增量但不进 core",
+        "evidenceSnapshot": "memory-citations 仍是 tool_start prototype（非成功读取）；2026-09-28 复核 citations 仍无实质进展（release 里的 receipts 是 fork/recall launch 回执）；相邻增量：v0.33.0 post-turn git 记忆冲突后台修复 worker + 工具输出 ambient 凭证强制脱敏；v0.32.15 Workflow tool 薄封装 Agent SDK query() + 转发结构化输出 schema",
         "license": "Apache-2.0",
         "language": "Python",
-        "sourceEvidenceAsOf": "2026-08-14"
+        "sourceEvidenceAsOf": "2026-09-28"
       }
     ],
     "archive-reference": [
@@ -290,7 +290,14 @@
     "letta-code v0.29.10-12（2026-07-28-31）：subagent frontmatter-as-overlay 覆盖模式（bodyless MD 只改 model 等字段，保留 bundled prompt 持续更新）；memory repo 并发 git config 写操作串行化；/mcp 端点暴露 server-side MCP server 列表。",
     "Graphiti v0.29.3（2026-07-27）：纯依赖维护（redis/azure-identity/google-genai），temporal/provenance 合同未动，不触发 refreshTrigger。",
     "OpenClaw 2026.7.2-beta.5（2026-07-28）：今日提交均为 bug fix，无 skill workshop / proposal/review/apply/rollback 架构变化，不触发 refreshTrigger。",
-    "2026-08-14 源码刷新：TencentDB v2.0.0 正式版已读；真正增量是 InjectionMode+Loadout+ACL 纯函数，不是 Hub/Wiki/CodeGraph。OMO v5 hashline-core 与 fork-cost 按真实 child session 计费。Letta citation 仍是 tool_start prototype。OpenHarness 71 天无 push。pendingDeepDive 清空。"
+    "2026-08-14 源码刷新：TencentDB v2.0.0 正式版已读；真正增量是 InjectionMode+Loadout+ACL 纯函数，不是 Hub/Wiki/CodeGraph。OMO v5 hashline-core 与 fork-cost 按真实 child session 计费。Letta citation 仍是 tool_start prototype。OpenHarness 71 天无 push。pendingDeepDive 清空。",
+    "2026-09-28 触发筛选刷新（docs/reports/2026-09-28-competitor-watchlist-refresh.md）：OMO/OpenClaw trigger 命中，TencentDB 核心契约/Graphiti 时态契约/letta citations 未动。",
+    "2026-09-28 记忆轨收敛信号：OMO v5 git 化记忆 + letta v0.33.0 git 冲突后台修复 worker —— git-backed memory 正在成为可版本化 agent 记忆的默认形态；OpenClaw grounded dreaming 默认开启但保留 provenance 晋升门槛 + Dream Diary + 可关，验证我们 candidate-gate 方向，默认值不跟。已否决抄法（2026-09-28 user decision）：git 化记忆/后台整理 worker/冲突修复不采纳——与 AIOS Context Lifecycle 预算降级设计偏离过大，记忆层以 TencentDB InjectionMode/预算降级/ACL 纯函数/result_ref 为主线（迭代计划 W3）。",
+    "2026-09-28 Kibitzer 模式（OMO）：ContextReceipt 的廉价变体 —— 独立 quick 链只读回路核查记忆质量 + 单条 nudge 注入，语义判断留给模型自报告，runtime 只计次；做 ContextReceipt 前先评估此 opt-in 变体。",
+    "2026-09-28 交付证明范本（OMO ulw-research）：确定性检查 + 三重有界修复上限（次数/连续无改进/时限）+ 带缺陷清单交付 + 交付物逐项追踪 delivered/skipped/impossible+原因；agno v3.0.5 同期收敛到 partial ContentStatus —— '显式降级'语义成为行业共识，直接服务 P0-1。",
+    "2026-09-28 checkpoint 保留期教训（OMO）：7 天策略存在但无人调用的 sweep 积压 711 个 checkpoint/170MB；P0-2 CheckpointSaver 必须把 retention+sweep 作为接口一等字段（挂 runtime 启动后、不阻塞启动、保留活跃 lease）。",
+    "2026-09-28 治理事件：goose 仓库迁移至 aaif-goose/goose 组织（API 301 确认）；OpenHands v1.19→1.24 agent profile 资产化（MCP server/secrets 圈定、阻止静默降级），与 P1-4 recipe 化同向。",
+    "2026-09-28 agno（不在 watchlist）v3.0.2→11：知识检索两段式 rerank 管线 + Page 存储系统（原子发布/修订历史/grep）+ embedding 失败显式化；与 TencentDB/mem0 覆盖问题重叠，按组合策略暂不进 watchlist（注意：此为本轮筛选结论，非用户否决；用户 2026-09-28 的原话是要求评估 watchlist 内哪些项目已无跟踪必要）。"
   ],
   "p0OptimizationTargets": {
     "memo": "Supersede ACL/publish gate + runtime provenance + ContextItem validity + candidate promotion + proposal-only consolidation",
@@ -298,11 +305,11 @@
     "team": "Steward-governed shared canonical memory + revisioned evidence handoff + ContextReceipt + ACL-sticky compaction"
   },
   "nextRefresh": {
-    "lastMetadataCheckDate": "2026-08-14",
-    "coreMetadataCheck": "2026-11-14",
-    "specialistMetadataCheck": "2027-02-14",
+    "lastMetadataCheckDate": "2026-09-28",
+    "coreMetadataCheck": "2026-12-28",
+    "specialistMetadataCheck": "2027-03-28",
     "fullPortfolioRefresh": null,
-    "pendingDeepDiveWork": "none; next deep dive only if TencentDB InjectionMode/ACL/result-ref or OMO Hashline contract changes",
+    "pendingDeepDiveWork": "none; candidates: OMO Kibitzer/ulw-research source dive when AIOS starts ContextReceipt or verification-runtime implementation; OpenClaw memory-forget provenance source dive when AIOS starts memo supersede/forget UX; TencentDB sqlite-vec staged-load fallback when AIOS ships sandboxed sqlite-vec",
     "policy": "Metadata checks only detect staleness or archived status. A source deep dive occurs only when the project-specific refreshTrigger fires."
   },
   "removed": {

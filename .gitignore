@@ -21,6 +21,9 @@ temp/
 dist/
 .aios/*
 !.aios/tasks/
+# `.aios/tasks/` 下的子目录需要逐条判断：只有手工维护的指标数据可入库，
+# 运行态队列（当前任务指针、pending 队列）是机器本地状态，不提交。
+.aios/tasks/*
 !.aios/tasks/metrics/
 !.aios/tasks/metrics/**
 .rex-harness/

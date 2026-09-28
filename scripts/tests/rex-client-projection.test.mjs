@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cp, mkdtemp, readFile, rm, symlink } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, readdir, rm, symlink } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -87,6 +87,8 @@ test('AIOS reports identical unmarked Rex projections as adopted changes', async
   const targetRoot = path.join(projectRoot, CLIENT_SKILL_ROOTS.claude);
   try {
     await cp(path.join(rootDir, 'rex-harness', 'skill-sources'), targetRoot, { recursive: true });
+    const bundledSkillCount = (await readdir(path.join(rootDir, 'rex-harness', 'skill-sources'), { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory()).length;
 
     const result = await installRexClientProjections({
       rootDir,
@@ -97,7 +99,7 @@ test('AIOS reports identical unmarked Rex projections as adopted changes', async
 
     assert.equal(result.status, 'installed');
     assert.deepEqual(result.installed, []);
-    assert.equal(result.adopted.length, 14);
+    assert.equal(result.adopted.length, bundledSkillCount);
     assert.deepEqual(result.updated, []);
     assert.deepEqual(result.conflicts, []);
   } finally {

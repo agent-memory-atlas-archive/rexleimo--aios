@@ -169,9 +169,12 @@ faq:
     <span class="rex-band__eyebrow">VERIFICATION / PRIVACY</span>
     <h2 class="rex-band__title">It checks its own work before showing you</h2>
     <p class="rex-band__text">
-      AIOS runs self-diagnostics, safety gates, and verification loops on every
-      change — so you see a working result, not a broken draft. Your code and data
-      never leave your machine.
+      AIOS runs self-diagnostics, safety gates, engineering-standard gates, and
+      verification loops on every change — so you see a working result, not a
+      broken draft. Code-producing paths now carry a shared engineering
+      baseline (module boundaries, file granularity, naming) with a Definition
+      of Done that gates completion. Your code and data never leave your
+      machine.
     </p>
     <a class="rex-band__link" href="troubleshooting">See how verification works <span aria-hidden="true">→</span></a>
   </div>
