@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- fix(tests): test temp directories no longer land in the repository root. `fs.mkdtemp(prefix)` with a single
+  argument treats the prefix as a path **relative to cwd**, so every `browser-mode` / `bsk-writer` run
+  grew fixture directories in the working tree, and a `git add -A` committed 18 of them into
+  `f0bb56c2` — the commit the v6.2.0 tag points at. Both files now create temp dirs under
+  `os.tmpdir()` and remove them in a file-level `after` hook (cleanup runs even when an assertion
+  fails), the tracked junk is removed, and `.gitignore` adds a root-anchored `/aios-*/` guard.
+  Shipped v6.2.0 artifacts were never affected: `scripts/package-release.sh` packs an explicit
+  allowlist, so stray root directories cannot enter the tarball or zip.
+
 ## [6.2.0] - 2026-09-28
 
 - feat(skills): `rex-engineering-standards` joins the bundled Rex projection as a shared
