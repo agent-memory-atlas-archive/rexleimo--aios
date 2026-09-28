@@ -6,6 +6,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- docs(readme): the repository README is now a funnel to the two sites instead of a dead end at the
+   page bottom. `rexai.top` previously appeared only at line 79 and line 161-166, so a visitor arriving
+   from GitHub search, Explore, or a trending list never saw the content hub above the fold. Added a
+   `RexAI` badge to the badge row and a content-hub entry to the first link row in both `README.md` and
+   `README-zh.md`, plus a "Where to go next" / 「下一步去哪儿」 section placed directly after the
+   30-second install — the highest-intent moment in the document — routing to the docs site, the
+   per-version blog, and the Chinese long-form hub. Both READMEs are bundled into the release archive
+   by `scripts/package-release.sh`, so this ships with the next release.
+
 - fix(tests): test temp directories no longer land in the repository root. `fs.mkdtemp(prefix)` with a single
   argument treats the prefix as a path **relative to cwd**, so every `browser-mode` / `bsk-writer` run
   grew fixture directories in the working tree, and a `git add -A` committed 18 of them into

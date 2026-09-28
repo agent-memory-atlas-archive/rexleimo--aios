@@ -1,7 +1,8 @@
 # AIOS
 
 [![Release](https://img.shields.io/github/v/release/rexleimo/aios?display_name=tag&sort=semver)](https://github.com/rexleimo/aios/releases)
-[![Docs](https://img.shields.io/badge/docs-cli.rexai.top-0ea5e9)](https://cli.rexai.top/zh/)
+[![Docs](https://img.shields.io/badge/文档站-cli.rexai.top-0ea5e9)](https://cli.rexai.top/zh/)
+[![RexAI](https://img.shields.io/badge/内容站-rexai.top-ff6b6b)](https://rexai.top)
 [![Local-first](https://img.shields.io/badge/本地优先-Agent_控制平面-7c3aed)](https://cli.rexai.top/zh/architecture/)
 [![License](https://img.shields.io/github/license/rexleimo/aios)](https://github.com/rexleimo/aios)
 [![Node](https://img.shields.io/badge/node-24%20LTS-339933)](https://nodejs.org)
@@ -11,7 +12,7 @@
 
 **它运行在你已有的 Agent 之上**——Codex CLI、Claude Code、Gemini CLI、OpenCode、Hermes、Grok、WorkBuddy、Pi、ZCode。AIOS 不是又一个 Agent 框架：Agent 还是你的 Agent，AIOS 只是在外围补上记忆、协调与验证这一层控制平面，且一切都在本地运行。
 
-[为什么需要 AIOS](#为什么需要-aios) · [30 秒安装](#30-秒安装) · [证据](#证据不是承诺) · [文档站](https://cli.rexai.top/zh/) · [博客](https://cli.rexai.top/blog/zh/) · [English](README.md)
+[为什么需要 AIOS](#为什么需要-aios) · [30 秒安装](#30-秒安装) · [证据](#证据不是承诺) · [文档站](https://cli.rexai.top/zh/) · [博客](https://cli.rexai.top/blog/zh/) · [内容站 rexai.top](https://rexai.top) · [English](README.md)
 
 ![AIOS 架构总览](docs-site/assets/visual-architecture-overview.svg)
 
@@ -66,6 +67,18 @@ Token 智能随同一条命令装好：AIOS 会检测并安装 **RTK**（https:/
 - `aios doctor --native --verbose` 报告你的客户端已检测并同步
 - 项目根目录出现 `.aios/context-db/index.json`
 - `aios memo search "任意词"` 能正常返回
+
+## 下一步去哪儿
+
+刚装完 AIOS，是离开 GitHub、走到站点上去的最佳时刻。三道门，都在 GitHub 外面：
+
+| 你想要的 | 去哪儿 |
+| --- | --- |
+| 完整指南、命令参考、故障恢复 | **[cli.rexai.top](https://cli.rexai.top/zh/)** —— 中英日韩四语文档 |
+| 每个能力背后的发布故事与证据 | **[cli.rexai.top/blog/zh](https://cli.rexai.top/blog/zh/)** —— 一个版本一篇，带验证记录 |
+| AI Agent、Rust 与系统方向的中文长文 | **[rexai.top](https://rexai.top)** —— 作者内容站（梦兽编程） |
+
+如果它帮你保住了一个过夜任务，点个 Star 就是让更多人找到它的方式：[github.com/rexleimo/aios](https://github.com/rexleimo/aios)。
 
 ## 证据，不是承诺
 
