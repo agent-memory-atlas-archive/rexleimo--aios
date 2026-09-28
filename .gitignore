@@ -194,3 +194,10 @@ research/upstream/loopx/
 # （曾经误提交过 aios/work/outcomes/31/artifacts/checkpoint-32-rewrite-blocked-A2.json）。
 aios/temp/
 aios/work/
+
+# 测试临时目录：node 的 mkdtemp(prefix) 只给一个参数时是**相对 cwd** 的路径，
+# 于是仓库根会长出 aios-browser-mode-*/aios-bsk-switch-* 这类垃圾；一次 git add -A
+# 就把它们提交进 main（v6.2.0 的 tag 树里就带了 18 个这类文件）。测试侧已改为
+# mkdtemp(path.join(os.tmpdir(), prefix)) + after 清理，这里再兜一层：任何以 aios-
+# 开头的根级临时目录都不该进版本库。仓库内没有合法的 aios-* 根级路径。
+/aios-*/

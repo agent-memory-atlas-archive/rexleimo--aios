@@ -2,7 +2,7 @@
    覆盖 step 4：三步引导文案 + 工具集转发表 + version_skew:false 判定；
    覆盖 step 3：切到 bsk 时下发引导（互斥三态下，bsk 与 Playwright 不共线）。 */
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { after, test } from 'node:test';
 
 import {
   BSK_INSTALL_STEPS,
@@ -15,8 +15,24 @@ import {
 } from '../lib/components/browser/bsk-writer.mjs';
 import { switchBrowserMcpMode } from '../lib/components/browser/switch.mjs';
 import { resolveBrowserMode } from '../lib/components/browser/mcp-mode.mjs';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
+// 单参 mkdtemp(prefix) 会把目录建在 process.cwd() 下——测试一跑就在仓库根里长出
+// aios-browser-mode-*/aios-bsk-switch-* 之类的垃圾，一次 git add -A 就会把它们提交进
+// main（已发生过：v6.2.0 的 tag 树里带了 18 个测试垃圾文件）。统一落 os.tmpdir()，
+// 并在文件级 after 钩子里清理：断言失败也要删，否则等于没清理。
+const createdTempDirs = [];
+
+async function makeTemp(prefix) {
+  const dir = await mkdtemp(path.join(os.tmpdir(), prefix));
+  createdTempDirs.push(dir);
+  return dir;
+}
+
+after(async () => {
+  await Promise.all(createdTempDirs.map((dir) => rm(dir, { recursive: true, force: true })));
+});
 
 // ── 静态数据契约 ──
 
@@ -179,7 +195,7 @@ test('resolveBskRuntime：未注入时回退真实命令函数', () => {
 // ── 切换命令互斥：切到 bsk 后产出引导，切回 playwright 不再带引导 ──
 
 test('switch 到 bsk：落盘 + 产出 BSK 引导；切回 playwright 不带引导', async () => {
-  const rootDir = await mkdtemp('aios-bsk-switch-');
+  const rootDir = await makeTemp('aios-bsk-switch-');
   await mkdir(path.join(rootDir, 'config'), { recursive: true });
 
   const bskLogs = [];

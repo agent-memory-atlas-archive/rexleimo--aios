@@ -1,9 +1,10 @@
 /* 中文注释：浏览器 MCP 安装选型（none/playwright/bsk）与按 mode 门控注入的测试。
    覆盖 acceptance：mode 三态下 materialize 出的 mcp 配置，browser 条目有/无且互斥。 */
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
-import test from 'node:test';
+import { after, test } from 'node:test';
 
 import {
   BROWSER_MODES,
@@ -18,6 +19,21 @@ import { migrateOneMcpToml } from '../lib/components/browser/mcp-toml.mjs';
 import { migrateOneMcpOpencodeJson } from '../lib/components/browser/mcp-opencode.mjs';
 import { migrateOneHermesYaml } from '../lib/components/browser/mcp-hermes-yaml.mjs';
 import { resolveLocalBrowserMcpScript } from '../lib/components/browser/runtime-paths.mjs';
+// 单参 mkdtemp(prefix) 会把目录建在 process.cwd() 下——测试一跑就在仓库根里长出
+// aios-browser-mode-*/aios-bsk-switch-* 之类的垃圾，一次 git add -A 就会把它们提交进
+// main（已发生过：v6.2.0 的 tag 树里带了 18 个测试垃圾文件）。统一落 os.tmpdir()，
+// 并在文件级 after 钩子里清理：断言失败也要删，否则等于没清理。
+const createdTempDirs = [];
+
+async function makeTemp(prefix) {
+  const dir = await mkdtemp(path.join(os.tmpdir(), prefix));
+  createdTempDirs.push(dir);
+  return dir;
+}
+
+after(async () => {
+  await Promise.all(createdTempDirs.map((dir) => rm(dir, { recursive: true, force: true })));
+});
 
 test('resolveBrowserMode 归一化字符串与非法值', () => {
   assert.equal(resolveBrowserMode('playwright'), 'playwright');
@@ -55,14 +71,14 @@ test('resolveBrowserMode 读 settings 对象 / config/settings.json / 缺失回 
   assert.equal(resolveBrowserMode({}), 'none');
   assert.equal(resolveBrowserMode(null, { rootDir: '/missing' }), 'none');
 
-  const rootDir = await mkdtemp('aios-browser-mode-settings-');
+  const rootDir = await makeTemp('aios-browser-mode-settings-');
   await mkdir(path.join(rootDir, 'config'), { recursive: true });
   await writeFile(path.join(rootDir, 'config', 'settings.json'), '{"browser":{"mcp":"bsk"}}\n', 'utf8');
   assert.equal(resolveBrowserMode(null, { rootDir }), 'bsk');
 });
 
 test('setBrowserModeInSettings 写入后再读回一致（随时可改落点）', async () => {
-  const rootDir = await mkdtemp('aios-browser-mode-write-');
+  const rootDir = await makeTemp('aios-browser-mode-write-');
   await mkdir(path.join(rootDir, 'config'), { recursive: true });
 
   setBrowserModeInSettings(rootDir, 'playwright');
@@ -77,7 +93,7 @@ test('setBrowserModeInSettings 写入后再读回一致（随时可改落点）'
 // ── 各格式 writer 按 mode 门控注入 ──
 
 test('JSON writer：none 不写入 browser 条目（auth/shell 仍注入），playwright 写入', async () => {
-  const rootDir = await mkdtemp('aios-browser-mode-json-');
+  const rootDir = await makeTemp('aios-browser-mode-json-');
 
   const nonePath = path.join(rootDir, 'none.json');
   await writeFile(nonePath, JSON.stringify({}), 'utf8');
@@ -95,7 +111,7 @@ test('JSON writer：none 不写入 browser 条目（auth/shell 仍注入），pl
 });
 
 test('TOML writer：none 不写 [mcp_servers.mcp-browser-use] 段', async () => {
-  const rootDir = await mkdtemp('aios-browser-mode-toml-');
+  const rootDir = await makeTemp('aios-browser-mode-toml-');
   const filePath = path.join(rootDir, 'config.toml');
   await writeFile(filePath, 'model = "gpt-5"\n', 'utf8');
 
@@ -109,7 +125,7 @@ test('TOML writer：none 不写 [mcp_servers.mcp-browser-use] 段', async () => 
 });
 
 test('opencode writer：none 不写 mcp[本 browser 命名空间] 条目', async () => {
-  const rootDir = await mkdtemp('aios-browser-mode-opencode-');
+  const rootDir = await makeTemp('aios-browser-mode-opencode-');
   const filePath = path.join(rootDir, 'opencode.json');
   await writeFile(filePath, JSON.stringify({ theme: 'dark' }), 'utf8');
 
@@ -125,7 +141,7 @@ test('opencode writer：none 不写 mcp[本 browser 命名空间] 条目', async
 });
 
 test('Hermes YAML writer：none 不写 browser 段', async () => {
-  const rootDir = await mkdtemp('aios-browser-mode-yaml-');
+  const rootDir = await makeTemp('aios-browser-mode-yaml-');
   const filePath = path.join(rootDir, 'config.yaml');
   await writeFile(filePath, 'model: test\n', 'utf8');
 
@@ -156,8 +172,8 @@ async function makeMigrateRoot(rootDir, { withRuntime } = {}) {
 }
 
 test('migrate 默认 none：client .mcp.json 有 auth/shell、无 browser（默认关闭验收）', async () => {
-  const rootDir = await mkdtemp('aios-browser-migrate-none-');
-  const codexHome = await mkdtemp('aios-browser-migrate-codex-');
+  const rootDir = await makeTemp('aios-browser-migrate-none-');
+  const codexHome = await makeTemp('aios-browser-migrate-codex-');
   await mkdir(codexHome, { recursive: true });
   await writeFile(path.join(codexHome, 'config.toml'), 'model = "gpt"\n', 'utf8');
 
@@ -175,7 +191,7 @@ test('migrate 默认 none：client .mcp.json 有 auth/shell、无 browser（默�
   assert.match(codexToml, /mcp_servers\.aios-auth-tools\]/, 'auth 段在');
 
   // 切到 playwright 后应出现 browser 段
-  const p2 = await mkdtemp('aios-browser-migrate-pw-');
+  const p2 = await makeTemp('aios-browser-migrate-pw-');
   await mkdir(path.join(p2, 'scripts'), { recursive: true });
   await mkdir(path.join(p2, 'mcp-server'), { recursive: true });
   await mkdir(path.join(p2, 'config'), { recursive: true });
@@ -183,7 +199,7 @@ test('migrate 默认 none：client .mcp.json 有 auth/shell、无 browser（默�
   await writeFile(path.join(p2, 'config', 'settings.json'), JSON.stringify({ browser: { mcp: 'playwright' } }), 'utf8');
   await writeFile(resolveLocalBrowserMcpScript(p2), '#!/usr/bin/env node\n', 'utf8');
   await writeFile(path.join(p2, 'mcp-server', 'package.json'), '{"name":"local-mcp"}\n', 'utf8');
-  const codexHome2 = await mkdtemp('aios-browser-migrate-codex2-');
+  const codexHome2 = await makeTemp('aios-browser-migrate-codex2-');
   await mkdir(codexHome2, { recursive: true });
   await writeFile(path.join(codexHome2, 'config.toml'), 'model = "gpt"\n', 'utf8');
   await import('../lib/components/browser.mjs').then((m) => m.migrateBrowserMcpConfig({
