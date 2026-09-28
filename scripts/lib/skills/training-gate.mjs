@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -224,10 +225,61 @@ export async function verifySkillTrainingGate({ rootDir = process.cwd(), changed
   };
 }
 
+// 显式点名 Skill 的解析：`--changed` 只能发现“相对 base 有差异”的 Skill，而已提交
+// 的内容需要按 base=HEAD 重新出证（新鲜度契约见 scripts/tests/fixtures/
+// skill-training-freshness.mjs）。没有这条路径时，发布前重认证只能靠手写脚本调用
+// 库函数，不可复现。
+export function resolveSkillSourcePaths({ rootDir = process.cwd(), skillIds = [] } = {}) {
+  const files = [];
+  const missing = [];
+  for (const rawId of skillIds) {
+    const skillId = String(rawId || '').trim().replace(/\\/gu, '/');
+    if (!skillId || skillId.includes('..') || skillId.startsWith('/')) {
+      if (skillId) missing.push(skillId);
+      continue;
+    }
+    const paths = [
+      path.posix.join('rex-harness', 'skill-sources', skillId, 'SKILL.md'),
+      path.posix.join('skill-sources', skillId, 'SKILL.md'),
+    ];
+    const found = paths.find((rel) => existsSync(path.resolve(rootDir, rel)));
+    if (found) files.push(found);
+    else missing.push(skillId);
+  }
+  return { files: files.sort(), missing };
+}
+
+function unresolvedSkillReport(kind, missing) {
+  return {
+    schemaVersion: 1,
+    kind,
+    status: 'blocked',
+    changedFiles: [],
+    skills: missing.map((skillId) => ({
+      skillId,
+      status: 'blocked',
+      reason: 'named Skill has no SKILL.md under skill-sources/ or rex-harness/skill-sources/',
+    })),
+  };
+}
+
 export async function runSkillTrainingGate(options = {}, { rootDir = process.cwd(), stdout = process.stdout } = {}) {
+  const base = options.base || 'HEAD';
+  const named = normalizeSkillOption(options.skill);
+  if (named.length > 0) {
+    const { files, missing } = resolveSkillSourcePaths({ rootDir, skillIds: named });
+    if (missing.length > 0) {
+      const blocked = unresolvedSkillReport('aios.skill-training-gate.v1', missing);
+      writeReport(stdout, blocked, options, renderSkillTrainingGateText);
+      return { exitCode: 1, report: blocked };
+    }
+    const report = await verifySkillTrainingGate({ rootDir, base, changedFiles: files });
+    writeReport(stdout, report, options, renderSkillTrainingGateText);
+    return { exitCode: report.status === 'verified' ? 0 : 1, report };
+  }
   const report = await verifySkillTrainingGate({
     rootDir,
-    base: options.base || 'HEAD',
+    base,
   });
   const json = options.json || options.format === 'json';
   if (json) stdout.write(`${JSON.stringify(report, null, 2)}\n`);
@@ -237,6 +289,18 @@ export async function runSkillTrainingGate(options = {}, { rootDir = process.cwd
 
 export async function runSkillTrainingCertification(options = {}, { rootDir = process.cwd(), stdout = process.stdout } = {}) {
   const base = options.base || 'HEAD';
+  const named = normalizeSkillOption(options.skill);
+  if (named.length > 0) {
+    const { files, missing } = resolveSkillSourcePaths({ rootDir, skillIds: named });
+    if (missing.length > 0) {
+      const blocked = unresolvedSkillReport('aios.skill-training-certification-report.v1', missing);
+      writeReport(stdout, blocked, options, renderSkillTrainingCertificationText);
+      return { exitCode: 1, report: blocked };
+    }
+    const report = await certifySkillTraining({ rootDir, changedFiles: files, base });
+    writeReport(stdout, report, options, renderSkillTrainingCertificationText);
+    return { exitCode: report.status === 'verified' ? 0 : 1, report };
+  }
   const report = await certifySkillTraining({
     rootDir,
     changedFiles: changedSkillFilesFromGit({ rootDir, base }),
@@ -246,6 +310,20 @@ export async function runSkillTrainingCertification(options = {}, { rootDir = pr
   if (json) stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   else stdout.write(renderSkillTrainingCertificationText(report));
   return { exitCode: report.status === 'verified' ? 0 : 1, report };
+}
+
+// --skill 支持重复传参与逗号分隔；不猜名字，解析不出来就是 blocked。
+function normalizeSkillOption(value) {
+  const list = Array.isArray(value) ? value : [value];
+  return list
+    .flatMap((entry) => String(entry || '').split(','))
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function writeReport(stdout, report, options, renderText) {
+  if (options.json || options.format === 'json') stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+  else stdout.write(renderText(report));
 }
 
 function renderSkillTrainingGateText(report) {

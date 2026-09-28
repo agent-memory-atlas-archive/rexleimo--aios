@@ -6,7 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { certifySkillTraining, validateCertifiedTrainingEvidence } from '../lib/skills/training-certification.mjs';
-import { runSkillTrainingCertification, verifySkillTrainingGate } from '../lib/skills/training-gate.mjs';
+import { runSkillTrainingCertification, runSkillTrainingGate, verifySkillTrainingGate } from '../lib/skills/training-gate.mjs';
 
 async function createGitSkillFixture() {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-training-certification-'));
@@ -34,6 +34,42 @@ async function createGitSkillFixture() {
   await writeFile(skillPath, `${await readFile(skillPath, 'utf8')}\nUse the recorded evidence instead of claiming a pass.\n`, 'utf8');
   return { rootDir, relativeSkillPath, skillPath };
 }
+
+test('--skill certifies a named Skill even when the content already matches HEAD', async () => {
+  const fixture = await createGitSkillFixture();
+  // 提交后 --changed 什么都发现不了，但新鲜度契约要求能按 base=HEAD 重新出证。
+  execFileSync('git', ['add', '.'], { cwd: fixture.rootDir });
+  execFileSync('git', ['commit', '-m', 'skill update'], { cwd: fixture.rootDir, stdio: 'ignore' });
+  const auto = await runSkillTrainingCertification(
+    { changed: true, base: 'HEAD', json: true },
+    { rootDir: fixture.rootDir, stdout: { write() {} } },
+  );
+  assert.equal(auto.report.skills.length, 0, 'git-derived discovery is empty once committed');
+
+  let output = '';
+  const named = await runSkillTrainingCertification(
+    { skill: ['release-safety'], base: 'HEAD', json: true },
+    { rootDir: fixture.rootDir, stdout: { write: (chunk) => { output += String(chunk); } } },
+  );
+  assert.equal(named.exitCode, 0, output);
+  assert.equal(JSON.parse(output).skills[0].status, 'accepted');
+
+  // 点名不存在的 Skill 是 blocked，不是默默跳过：发布门不能因为拼错名字而放行。
+  let blockedOutput = '';
+  const blocked = await runSkillTrainingCertification(
+    { skill: ['no-such-skill'], base: 'HEAD', json: true },
+    { rootDir: fixture.rootDir, stdout: { write: (chunk) => { blockedOutput += String(chunk); } } },
+  );
+  assert.equal(blocked.exitCode, 1);
+  assert.equal(JSON.parse(blockedOutput).status, 'blocked');
+  assert.match(JSON.parse(blockedOutput).skills[0].reason, /no SKILL\.md/u);
+
+  const verifiedGate = await runSkillTrainingGate(
+    { skill: ['release-safety'], base: 'HEAD', json: true },
+    { rootDir: fixture.rootDir, stdout: { write() {} } },
+  );
+  assert.equal(verifiedGate.exitCode, 0, JSON.stringify(verifiedGate.report));
+});
 
 test('training certification records reproducible evidence and rejects a forged raw response', async () => {
   const fixture = await createGitSkillFixture();

@@ -19,6 +19,7 @@ const SHARED_OPTIONS = [
   ['--scan', 'Scan for proposals'],
   ['--policy', 'Policy check'],
   ['--description <text>', 'Proposal description'],
+  ['--skill <ids>', 'Named Skill ids (repeatable or comma-separated) for certify/verify-training'],
 ];
 
 const program = new Command()
@@ -53,6 +54,7 @@ export function parseSkillArgs(argv = []) {
     subcommand, json: false, format: 'text', dryRun: false,
     dashboard: false, changed: false, base: 'HEAD', client: 'codex',
     description: '', id: '', action: '', name: '', path: '', scan: false, policy: false, live: false,
+    skill: [],
   };
 
   try {
@@ -101,13 +103,22 @@ export function parseSkillArgs(argv = []) {
     if (effectiveFlags.scan === true) options.scan = true;
     if (effectiveFlags.policy === true) options.policy = true;
     if (effectiveFlags.description) options.description = String(effectiveFlags.description);
+    if (effectiveFlags.skill !== undefined) {
+      const listed = Array.isArray(effectiveFlags.skill) ? effectiveFlags.skill : [effectiveFlags.skill];
+      options.skill = listed
+        .flatMap((entry) => String(entry || '').split(','))
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+    }
 
     // 校验
     if (subcommand === 'review' && !options.id) throw new Error('skill review requires a proposal id');
     if (subcommand === 'apply' && !options.id) throw new Error('skill apply requires a proposal id');
     if (subcommand === 'rollback' && !options.name) throw new Error('skill rollback requires a skill name');
     if (subcommand === 'comply' && !options.path) throw new Error('skill comply requires a path');
-    if (subcommand === 'certify' && !options.changed) throw new Error('skill certify requires --changed');
+    if (subcommand === 'certify' && !options.changed && options.skill.length === 0) {
+      throw new Error('skill certify requires --changed or --skill <id>');
+    }
     if (subcommand === 'index') options.scan = true;
 
     return { mode: 'command', help: false, command: 'skill', options };

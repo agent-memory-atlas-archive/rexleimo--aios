@@ -122,7 +122,9 @@ Options:
   aios skill comply <path> --live [--client <client>] [--json]
   aios skill health [--dashboard] [--json]
   aios skill certify --changed [--base <ref>] [--json]
+  aios skill certify --skill <id>[,<id>...] [--base <ref>] [--json]
   aios skill verify-training --changed [--base <ref>] [--json]
+  aios skill verify-training --skill <id>[,<id>...] [--base <ref>] [--json]
 
 Subcommands:
   comply       Generate expected skill behavior and trigger-smoke scenarios
@@ -132,6 +134,7 @@ Subcommands:
 
 Options:
   --client <client>              Target client for compliance scenarios
+  --skill <ids>                    Certify/verify named Skills (repeatable or comma-separated)
   --dry-run                      Generate spec/scenarios without live model execution
   --live                         Run deterministic local compliance scoring
   --dashboard                    Render text dashboard for health

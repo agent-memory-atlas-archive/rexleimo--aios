@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { hermeticAgentEnv } from './fixtures/hermetic-agent-env.mjs';
 import {
   attachTurnRecall,
   classifyOneShotFailure,
@@ -255,10 +256,9 @@ test('ctx-agent legacy Stop hook checkpoint-status writes checkpoint without lau
       ],
       {
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeClaudeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeClaudeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -418,10 +418,9 @@ test('ctx-agent one-shot does not inject persona or user profile overlays', asyn
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          AIOS_IDENTITY_HOME: identityHome,
-        },
+        env: hermeticAgentEnv({
+            AIOS_IDENTITY_HOME: identityHome,
+        }),
       }
     );
 
@@ -531,9 +530,7 @@ test('ctx-agent one-shot does not run context:pack or write context packet expor
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-        },
+        env: hermeticAgentEnv(),
       }
     );
 
@@ -678,11 +675,10 @@ test('ctx-agent one-shot compresses prompt before client stdin and compacts rece
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
-          AIOS_TEST_CAPTURE_PATH: capturePath,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+            AIOS_TEST_CAPTURE_PATH: capturePath,
+        }),
       }
     );
 
@@ -752,10 +748,9 @@ process.stdout.write('provider complete\\nAIOS_REX_EVIDENCE=' + JSON.stringify(p
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1146,10 +1141,9 @@ test('ctx-agent interactive startup does not context:pack before invoking the CL
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1198,10 +1192,9 @@ test('ctx-agent interactive Codex startup passes no implicit prompt', async () =
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1253,11 +1246,10 @@ test('ctx-agent interactive Codex mode can disable MCP startup via env override'
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          CTXDB_CODEX_DISABLE_MCP: '1',
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            CTXDB_CODEX_DISABLE_MCP: '1',
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1309,10 +1301,9 @@ test('ctx-agent interactive Gemini startup passes no implicit prompt', async () 
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1364,10 +1355,9 @@ test('ctx-agent interactive Claude mode does not inject context packet as system
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1419,10 +1409,9 @@ test('ctx-agent interactive Claude startup passes no implicit prompt', async () 
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1476,10 +1465,9 @@ test('ctx-agent one-shot OpenCode mode keeps direct requests free of planning in
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1536,10 +1524,9 @@ test('ctx-agent interactive OpenCode mode does not send context handoff prompt',
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1594,10 +1581,9 @@ test('ctx-agent interactive Hermes startup invokes hermes instead of OpenCode fa
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeHermesBin}${path.delimiter}${fakeOpenCodeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeHermesBin}${path.delimiter}${fakeOpenCodeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
@@ -1640,10 +1626,9 @@ test('ctx-agent interactive OpenCode Windows shell fallback does not pass inject
       {
         cwd: process.cwd(),
         encoding: 'utf8',
-        env: {
-          ...process.env,
-          PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
-        },
+        env: hermeticAgentEnv({
+            PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ''}`,
+        }),
       }
     );
 
