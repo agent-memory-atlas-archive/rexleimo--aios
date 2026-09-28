@@ -4,25 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
-## [6.1.0] - 2026-09-23
-
-- feat(browser): MCP default-off with mode selection (none|playwright|bsk, default none); install-time prompt + switch command + BSK connect baseline; 4-language release blog
-
-## [6.0.13] - 2026-09-22
-
-- fix(integrations): ZCode's HTTP key name is read out of ZCode's own runtime instead of being guessed — `zcode` moves from `manual` to the verified `config` plane and writes `{"type":"http","url":...}` into `~/.zcode/cli/config.json` / `<repo>/.zcode/config.json` under `mcp.servers` (closes A14). ZCode's CLI bundle validates every `mcp.servers` entry with a strict discriminated union on `type` (`stdio`/`http`/`sse`): `http` and `sse` require `url`, `stdio` requires `command`, and an unknown field gets that one server dropped with a `config_mcp_server_invalid` warning. AIOS records that schema as the entry's evidence, and no client falls back to `manual-step-required` any more.
-- fix(mcp): the ZCode strict-schema allowlist had been reverse-engineered from the `stdio` branch only, so it dropped `url` (plus `protocolVersion`/`oauth`) — an AIOS-managed HTTP server would have lost its required field and been discarded by ZCode. The allowlist is now the schema's full field set, with a test that fails if `url` is ever dropped again.
-
-## [6.0.1] - 2026-09-21
-
-- refactor(quality): the engineering-standards skill moves to where its consumers live — `aios-engineering-standards` is now `rex-engineering-standards`, shipped inside the `rex-harness` submodule (release 0.7.0) alongside `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design`. The dependency direction is now correct: the capability chain's shared quality baseline belongs to the capability chain, and standalone rex-harness consumers (npm `@rexleimo/rex-harness`) no longer miss it. The router and `pre-edit-safety-gate` reference the new name; content and Definition of Done are unchanged. Digest registered in `src/clients/projection-history.json`; host catalog back to 27 skills, rex projection now 14.
-
-## [6.0.0] - 2026-09-21
-
-- feat(quality): engineering standards become a first-class framework citizen — the new `aios-engineering-standards` skill encodes the classic software-engineering baseline as the Definition of Done for all code-producing work: Clean Architecture dependency rule and boundary discipline (high cohesion, low coupling, minimal interface), Ousterhout deep modules (small interface, deep implementation; strategic over tactical programming), Clean Code naming/function/error-handling rules, DRY and orthogonality, a test-coverage bar, a toolchain bar for new projects (lint + pre-commit hooks + CI + structured logging), and ADD documentation for consequential changes. `aios-workflow-router` now loads the standard before `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design`, and `pre-edit-safety-gate` checks the chosen change shape against it — the quality baseline rides the existing evidence-driven capability chain instead of running beside it.
-- docs(site): new public Engineering Standards page (en/zh/ja/ko) with the four-stage engineering capability model, the reference reading list (Clean Code, Refactoring 2, The Pragmatic Programmer 2, GoF Design Patterns, Clean Architecture, DDIA, A Philosophy of Software Design, The Mythical Man-Month, Making Things Happen) with core values, free legitimate resources, and a book-principle → AIOS-mechanism mapping; release blog post in en/zh/ja/ko.
-
 ## [Unreleased]
+
+## [6.2.0] - 2026-09-28
 
 - feat(skills): `rex-engineering-standards` joins the bundled Rex projection as a shared
   reference skill (projected via the new `sharedReferenceSkillIds` list in
@@ -41,6 +25,25 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 - chore(deps): `rex-harness` submodule bumped to 0.8.0, which ships the trigger chain
   above and adds `scripts/refresh-projection-history.mjs` so a skill edit cannot ship
   without its canonical projection digest.
+- feat(release): the host release now refuses to ship an unpublished kernel — `scripts/check-release-submodule.mjs` (backed by `scripts/lib/release-submodule-gate.mjs`) proves the recorded `rex-harness` gitlink is pointed at by a tag on the submodule remote, and `release-preflight.sh` / `.ps1` fail closed when it is untagged or unprovable. This closes a defect that had already shipped: the published v6.1.0 archive bundled rex-harness 0.7.0, a version with no tag and no release artifact on the submodule remote, so its changelog claim resolved to nothing and standalone rex-harness consumers received no such release. Covered by `scripts/tests/release-submodule-gate.test.mjs` (8 cases: annotated vs peeled tag refs, non-tag refs rejected, missing input fails closed, `--tags-file` path used by PowerShell) and wired into the regression suite.
+
+## [6.1.0] - 2026-09-23
+
+- feat(browser): MCP default-off with mode selection (none|playwright|bsk, default none); install-time prompt + switch command + BSK connect baseline; 4-language release blog
+
+## [6.0.13] - 2026-09-22
+
+- fix(integrations): ZCode's HTTP key name is read out of ZCode's own runtime instead of being guessed — `zcode` moves from `manual` to the verified `config` plane and writes `{"type":"http","url":...}` into `~/.zcode/cli/config.json` / `<repo>/.zcode/config.json` under `mcp.servers` (closes A14). ZCode's CLI bundle validates every `mcp.servers` entry with a strict discriminated union on `type` (`stdio`/`http`/`sse`): `http` and `sse` require `url`, `stdio` requires `command`, and an unknown field gets that one server dropped with a `config_mcp_server_invalid` warning. AIOS records that schema as the entry's evidence, and no client falls back to `manual-step-required` any more.
+- fix(mcp): the ZCode strict-schema allowlist had been reverse-engineered from the `stdio` branch only, so it dropped `url` (plus `protocolVersion`/`oauth`) — an AIOS-managed HTTP server would have lost its required field and been discarded by ZCode. The allowlist is now the schema's full field set, with a test that fails if `url` is ever dropped again.
+
+## [6.0.1] - 2026-09-21
+
+- refactor(quality): the engineering-standards skill moves to where its consumers live — `aios-engineering-standards` is now `rex-engineering-standards`, shipped inside the `rex-harness` submodule (release 0.7.0) alongside `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design`. The dependency direction is now correct: the capability chain's shared quality baseline belongs to the capability chain, and standalone rex-harness consumers (npm `@rexleimo/rex-harness`) no longer miss it. The router and `pre-edit-safety-gate` reference the new name; content and Definition of Done are unchanged. Digest registered in `src/clients/projection-history.json`; host catalog back to 27 skills, rex projection now 14.
+
+## [6.0.0] - 2026-09-21
+
+- feat(quality): engineering standards become a first-class framework citizen — the new `aios-engineering-standards` skill encodes the classic software-engineering baseline as the Definition of Done for all code-producing work: Clean Architecture dependency rule and boundary discipline (high cohesion, low coupling, minimal interface), Ousterhout deep modules (small interface, deep implementation; strategic over tactical programming), Clean Code naming/function/error-handling rules, DRY and orthogonality, a test-coverage bar, a toolchain bar for new projects (lint + pre-commit hooks + CI + structured logging), and ADD documentation for consequential changes. `aios-workflow-router` now loads the standard before `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design`, and `pre-edit-safety-gate` checks the chosen change shape against it — the quality baseline rides the existing evidence-driven capability chain instead of running beside it.
+- docs(site): new public Engineering Standards page (en/zh/ja/ko) with the four-stage engineering capability model, the reference reading list (Clean Code, Refactoring 2, The Pragmatic Programmer 2, GoF Design Patterns, Clean Architecture, DDIA, A Philosophy of Software Design, The Mythical Man-Month, Making Things Happen) with core values, free legitimate resources, and a book-principle → AIOS-mechanism mapping; release blog post in en/zh/ja/ko.
 
 ## [6.0.12] - 2026-09-22
 

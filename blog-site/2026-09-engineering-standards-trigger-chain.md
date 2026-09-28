@@ -1,8 +1,8 @@
 ---
-title: "Engineering Standards That Actually Trigger"
+title: "v6.2.0: Engineering Standards That Actually Trigger"
 description: "AIOS shipped an engineering-standards skill months ago — and it never fired once. An audit that found the skill distributed but never named by its consumers, a new shared-reference projection lane, and a file-granularity baseline now put classic software engineering discipline on every code-producing path."
 date: 2026-09-28
-tags: ["AIOS", "engineering-standards", "rex", "skills", "projection", "clean-code"]
+tags: ["AIOS", "v6.2.0", "engineering-standards", "rex", "skills", "projection", "clean-code"]
 ---
 
 # Engineering Standards That Actually Trigger
@@ -84,6 +84,19 @@ And a guard so this cannot regress silently: `skill-sources.test.mjs` now fails
 the build if any code-producing Provider stops naming the standard. A skill
 nobody is told to read raises no error at runtime — so the check is objective
 (string presence in the shipped skill tree), not a review opinion.
+
+## Also in this release: the host cannot ship an unpublished kernel
+
+The same audit exposed a worse pattern one layer up. The published v6.1.0 archive bundles the
+`rex-harness` work tree, and it shipped a rex-harness version that had no tag and
+no release artifact on the submodule remote. Nothing failed, because nothing
+checked: the host changelog cited a kernel version that resolved to nowhere, and
+standalone rex-harness consumers never received it.
+
+`scripts/check-release-submodule.mjs` now proves the recorded gitlink is pointed
+at by a tag on the submodule remote, and `release-preflight.sh` refuses to cut a
+host release when it is untagged or unprovable. Release order is a gate, not a
+convention: submodule release first, host release after.
 
 Verification: 215 rex-harness tests, the client-install and skill-sources
 suites, and the scripts-side projection suite all green; every projected skill

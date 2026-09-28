@@ -5,6 +5,11 @@ description: "AIOS 完整版本历史：每个版本发生了什么变化、升�
 
 # 更新日志
 
+## v6.2.0（2026-09-28）——标准真会触发，内核必须先发布
+
+- **工程标准现在真的会触发**：`rex-engineering-standards` 被分发到每个客户端，却没有任何流程要求读它——四个代码生产类 Provider 都没点名它，于是没人拉取（技能加载是按次拉取）。现在 `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening` 把它作为第一步加载，它的 Definition of Done 会给完成判否，而任何一个 Provider 不再点名它就会让构建失败。标准还新增文件粒度基线：单文件单职责、~400 行软预算、kebab-case 命名、禁止语义空洞的拆分。见：[工程标准](engineering-standards.md) 与 [v6.2.0 发布博客](/blog/zh/2026-09-engineering-standards-trigger-chain/)。
+- **宿主不能再打包没发布的内核**：已发布的 v6.1.0 产物带出去的 rex-harness 版本在子模块远端没有 tag、没有发布产物。现在 `scripts/check-release-submodule.mjs` 会证明记录的 gitlink 是被 tag 指向的发布点，未打 tag 或无法证明时 `release-preflight.sh` / `.ps1` 直接拒绝——先子模块，后宿主。
+
 ## v6.0.1（2026-09-21）——工程标准移入 rex-harness
 
 - **基线搬到了消费者旁边**：`aios-engineering-standards` 以 `rex-engineering-standards` 之名随 `rex-harness` 子模块（0.7.0）发布，与 `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design` 同仓。依赖方向自此正确——能力链的共同质量基线属于能力链本身，独立使用 rex-harness 的消费者也不再错过它。router 与 `pre-edit-safety-gate` 改用新名字；内容与 Definition of Done 不变。见：[v6.0.1 发布博客](/blog/zh/2026-09-v601-engineering-standards-rex/)。

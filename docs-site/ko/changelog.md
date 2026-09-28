@@ -5,6 +5,11 @@ description: "AIOS 전체 릴리스 이력입니다. 각 버전에서 무엇이 
 
 # 변경 로그
 
+## v6.2.0（2026-09-28）— 트리거되는 표준, 그리고 공개가 강제되는 커널
+
+- **엔지니어링 표준이 실제로 트리거됩니다**：`rex-engineering-standards`는 모든 클라이언트에 배포됐지만 어떤 순서에도 요구되지 않았습니다——코드 생산 Provider 네 개 중 어느 것도 이름 부르지 않았고, 호출 단위 풀 방식이라 아무도 당기지 않았습니다. 이제 `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening`가 첫 단계에서 읽고, Definition of Done이 완료를 판정하며, 이름 부하기를 멈추면 빌드가 실패합니다. 표준에 파일 입도 베이스라인도 추가됐습니다：파일당 단일 책임, 약 400행 소프트 예산, kebab-case 네이밍, 의미 없는 분할 금지. 참조: [엔지니어링 표준](engineering-standards.md) 및 [v6.2.0 릴리스 글](/blog/ko/2026-09-engineering-standards-trigger-chain/).
+- **호스트가 미공개 커널을 더 이상 동봉할 수 없습니다**：출시된 v6.1.0 아카이브는 서브모듈 원격에 tag도 산출물도 없는 rex-harness 버전을 담았습니다. 이제 `scripts/check-release-submodule.mjs`가 기록된 gitlink이 tag로 지정된 출시 시점임을 증명하고, tag가 없거나 증명 불가면 `release-preflight.sh` / `.ps1`이 fail-closed로 차단합니다 — 먼저 서브모듈, 다음 호스트.
+
 ## v6.0.1 (2026-09-21) — 엔지니어링 표준을 rex-harness로 이동
 
 - **기준의 거주지를 소비자와 함께**: `aios-engineering-standards`가 `rex-engineering-standards`로 `rex-harness` 서브모듈(0.7.0)에서 출하되어 `rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design`와 같은 저장소에 있게 되었다. 의존 방향이 올바르게 됐다 — 능력 체인의 공통 품질 기준은 능력 체인에 속하고, 독립 rex-harness 소비자도它을 놓치지 않는다. router와 `pre-edit-safety-gate`는 새 이름을 참조. 내용과 Definition of Done는 불변. 참조: [v6.0.1 릴리스 글](/blog/ko/2026-09-v601-engineering-standards-rex/)。

@@ -1,8 +1,8 @@
 ---
-title: "真正会触发的工程标准"
+title: "v6.2.0：真正会触发的工程标准"
 description: "AIOS 早就发布了工程标准技能——但它一次都没触发过。一次“被分发却无人点名”的审计、一条新的共享参照投影通道、一份文件粒度基线，让经典软件工程纪律落到了每一条产出代码的路径上。"
 date: 2026-09-28
-tags: ["AIOS", "工程标准", "rex", "skills", "projection", "clean-code"]
+tags: ["AIOS", "v6.2.0", "工程标准", "rex", "skills", "projection", "clean-code"]
 ---
 
 # 真正会触发的工程标准
@@ -73,6 +73,17 @@ self-check gate 现在会对"一个大文件"式的交付判否。
 代码生产类 Provider 不再点名该标准时直接构建失败。“没有任何地方引用的技能”
 在运行时是看不出来的，所以这道检查只验客观事实（已发布技能树里的字符串存在），
 不依赖评审意见。
+
+## 本版本另一件事：宿主不能再打包一个没发布的内核
+
+同一次审计暴露了更上一层的更糟形态。已发布的 v6.1.0 产物打包的是 `rex-harness`
+工作树，而它带出去的 rex-harness 版本在子模块远端没有 tag、没有发布产物。什么都没
+报错，因为没有任何东西在检查：宿主 changelog 引用了一个哪都解析不到的内核版本，
+独立使用 rex-harness 的人则根本没收到过它。
+
+现在 `scripts/check-release-submodule.mjs` 会证明记录的 gitlink 确实被子模块远端的
+某个 tag 指向，`release-preflight.sh` 在未打 tag 或无法证明时拒绝打宿主 tag。
+发版顺序是闸门，不是约定：先发子模块，再发宿主。
 
 验证：rex-harness 215 个测试、client-install 与 skill-sources 套件、
 scripts 侧投影套件全部通过；每个被投影技能的 digest 已按 append-only 登记进

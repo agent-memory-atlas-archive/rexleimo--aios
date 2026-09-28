@@ -5,6 +5,11 @@ description: "AIOS の全リリース履歴: 各バージョンで何が変わ�
 
 # 変更履歴
 
+## v6.2.0（2026-09-28）——発火する標準と、公開を必須にされるカーネル
+
+- **エンジニアリング標準が実際に発火します**：`rex-engineering-standards` はすべてのクライアントに行き渡っていたものの、どのシーケンスにも要求されていませんでした——コード生産 Provider 四つはいずれも名指さず、プル型のスキル読込みでは誰も引かなかったのです。いま `rex-implement` / `rex-design` / `rex-code-review` / `rex-refactor-hardening` が第一ステップとして読み込み、Definition of Done が完了を判定し、名指しをやめた Provider があればビルドが落ちます。標準にはファイル粒度のベースラインも加わりました：1 ファイル 1 責任、約 400 行のソフト予算、kebab-case 命名、意味の無い分割の禁止。参照：[エンジニアリング標準](engineering-standards.md) と [v6.2.0 リリース記事](/blog/ja/2026-09-engineering-standards-trigger-chain/)。
+- **ホストが未公開のカーネルを同梱できなくなりました**：公開済み v6.1.0 のアーカイブは、サブモジュール remote に tag も成果物もない rex-harness バージョンを同梱していました。`scripts/check-release-submodule.mjs` は記録された gitlink が tag 付き発布点であることを証明し、tag が無い／証明できない場合は `release-preflight.sh` / `.ps1` が fail-closed で止めます——まずサブモジュール、次にホスト。
+
 ## v6.0.1（2026-09-21）——エンジニアリング基準を rex-harness へ移動
 
 - **基準の居場所を消費者と同じに**：`aios-engineering-standards` は `rex-engineering-standards` として `rex-harness` サブモジュール（0.7.0）から出荷され、`rex-implement` / `rex-refactor-hardening` / `rex-code-review` / `rex-design` と同じ倉庫になった。依存方向が正しくなった——能力チェーンの共通品質基準は能力チェーンに属し、スタンドアロンの rex-harness 利用者も它を見逃さない。router と `pre-edit-safety-gate` は新しい名前を参照。内容と Definition of Done は不変。参照：[v6.0.1 リリース記事](/blog/ja/2026-09-v601-engineering-standards-rex/)。
