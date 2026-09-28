@@ -22,6 +22,9 @@ Validates:
   - changed Skills have reproducible, committed training evidence
   - generated skill roots materialize from skill-sources via scripts/check-skills-sync.mjs
   - generated native outputs materialize from client-sources/native-base via scripts/check-native-sync.mjs
+  - the rex-harness submodule checkout matches the recorded gitlink and its HEAD exists on the submodule remote
+  - the recorded rex-harness gitlink is a published release on the submodule remote (tagged);
+    untagged or unprovable blocks the host release, because the archive bundles that work tree
 "@
 }
 
@@ -131,6 +134,26 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
         }
       } else {
         Write-Warning "cannot reach the rex-harness remote (offline?); skipping the pushed-commit gate"
+      }
+    }
+    # 中文注释：与 sh 版一致——gitlink 必须命中子模块远端的一个 tag（已发布版本），
+    # 证不了就拦下；宿主 release 打包的是子模块工作树内容。
+    $subGitlink = (& git -C $RootDir rev-parse HEAD:rex-harness 2>$null)
+    if ($LASTEXITCODE -eq 0 -and $subGitlink) {
+      $subGitlink = "$subGitlink".Trim()
+      $tagRefs = & git -C $rexRoot ls-remote --tags origin 2>$null
+      if ($LASTEXITCODE -eq 0 -and $tagRefs) {
+        $gateInput = ($tagRefs -join "`n")
+        $tmpTags = New-TemporaryFile
+        Set-Content -Path $tmpTags -Value $gateInput -Encoding utf8
+        & node (Join-Path $RootDir "scripts/check-release-submodule.mjs") --commit $subGitlink --tags-file $tmpTags 2>$null | Out-Null
+        $gateRc = $LASTEXITCODE
+        Remove-Item $tmpTags -ErrorAction SilentlyContinue
+        if ($gateRc -ne 0) {
+          throw "rex-harness gitlink ($subGitlink) is not a published release on the submodule remote (or cannot be proven); tag + release rex-harness first, then cut the host release"
+        }
+      } else {
+        Write-Warning "cannot reach the rex-harness remote for tags (offline?); skipping the published-release gate"
       }
     }
   }

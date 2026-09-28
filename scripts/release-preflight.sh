@@ -22,6 +22,8 @@ Validates:
   - generated skill roots materialize from skill-sources via scripts/check-skills-sync.mjs
   - generated native outputs materialize from client-sources/native-base via scripts/check-native-sync.mjs
   - the rex-harness submodule checkout matches the recorded gitlink and its HEAD exists on the submodule remote
+  - the recorded rex-harness gitlink is a published release on the submodule remote (tagged);
+    untagged or unprovable blocks the host release, because the archive bundles that work tree
 EOF
 }
 
@@ -115,6 +117,23 @@ if command -v git >/dev/null 2>&1; then
         fi
       else
         echo "[warn] cannot reach the rex-harness remote (offline?); skipping the pushed-commit gate" >&2
+      fi
+    fi
+    # 中文注释：宿主 release 打包的是子模块工作树内容，所以该 gitlink 必须已经是
+    # rex-harness 远端上的一个发布点（带 tag）。否则宿主对外宣称的 rex-harness 版本
+    # 在子模块侧根本不存在：独立使用 rex-harness 的人拿不到产物，宿主 changelog 也
+    # 无法反查。历史已发生一次：v6.1.0 打包的 0.7.0 从未打过 tag。
+    sub_gitlink="$(git -C "$ROOT_DIR" rev-parse HEAD:rex-harness 2>/dev/null || true)"
+    if [[ -n "$sub_gitlink" ]]; then
+      if tag_refs="$(git -C "$ROOT_DIR/rex-harness" ls-remote --tags origin 2>/dev/null)"; then
+        sub_gate_rc=0
+        printf '%s\n' "$tag_refs" | node "$ROOT_DIR/scripts/check-release-submodule.mjs" --commit "$sub_gitlink" >/dev/null 2>&1 || sub_gate_rc=$?
+        if [[ "$sub_gate_rc" -ne 0 ]]; then
+          echo "rex-harness gitlink ($sub_gitlink) is not a published release on the submodule remote (or cannot be proven); tag + release rex-harness first, then cut the host release" >&2
+          exit 1
+        fi
+      else
+        echo "[warn] cannot reach the rex-harness remote for tags (offline?); skipping the published-release gate" >&2
       fi
     fi
   fi

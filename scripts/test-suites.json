@@ -110,6 +110,7 @@
       "scripts/tests/integration.test.mjs",
       "scripts/tests/judgment.test.mjs",
       "scripts/tests/release-pipeline.test.mjs",
+      "scripts/tests/release-submodule-gate.test.mjs",
       "scripts/tests/rex-harness-runtime.test.mjs",
       "scripts/tests/client-capabilities.test.mjs",
       "scripts/tests/client-smoke.test.mjs",
