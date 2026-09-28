@@ -108,6 +108,21 @@ extra:
     product: https://cli.rexai.top/
     blog_main: https://rexai.top/
     tools: https://tool.rexai.top/
+  # 博客站渲染同一个 overrides/main.html 页脚：这里是 cli.rexai.top/blog（版本词最有排名）
+  # 指向内容站的 follow 链接面，所以与文档站保持同一组生态位。
+  footer_links:
+    - text: rexai.top (RexAI Content Hub)
+      href: https://rexai.top
+      title: RexAI content hub for AI engineering articles and tutorials
+    - text: cli.rexai.top (AIOS Docs)
+      href: https://cli.rexai.top
+      title: AIOS documentation in English, Chinese, Japanese, and Korean
+    - text: os.rexai.top (RexOS Agent OS)
+      href: https://os.rexai.top
+      title: RexOS AI Agent OS focused on harness-first long-running workflows
+    - text: tool.rexai.top (Free Tools)
+      href: https://tool.rexai.top
+      title: RexAI free no-ad online tools portal
 
 extra_javascript:
   - assets/analytics-placeholder.js

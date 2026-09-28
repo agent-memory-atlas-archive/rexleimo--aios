@@ -1,0 +1,59 @@
+/*
+ * 站点页脚：承重的不是版权行，而是 `extra.footer_links` 渲染出的自有站点互链。
+ * cli.rexai.top 与 cli.rexai.top/blog 是在 Google 有排名的自有资产，GitHub README 的
+ * 站外链接一律 rel="nofollow"（实测），所以指向 rexai.top 的 follow 链接只能由这里提供。
+ * 由 assets/custom.css 统一 @import，文档站与博客站共用。
+ */
+.rexai-site-footer {
+  border-top: 1px solid var(--rex-border-soft);
+  background: var(--rex-bg);
+  padding: 1.35rem 0 1.6rem;
+  margin-top: 2.5rem;
+}
+
+.rexai-site-footer .md-copyright {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  color: var(--rex-text-muted);
+  font-size: 0.78rem;
+}
+
+.rexai-site-footer .rexai-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+}
+
+.rexai-site-footer .rexai-footer-links a {
+  color: var(--rex-text-body);
+  text-decoration: none;
+  border: 1px solid var(--rex-border);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.rexai-site-footer .rexai-footer-links a:hover {
+  color: var(--rex-accent, #0ea5e9);
+  border-color: var(--rex-accent, #0ea5e9);
+}
+
+.rexai-site-footer .rexai-footer-links__sep {
+  display: none;
+}
+
+.rexai-site-footer .md-copyright__highlight {
+  color: var(--rex-text-muted);
+}
+
+.rexai-site-footer a[href*="mkdocs-material"] {
+  color: var(--rex-text-soft);
+}
+
+@media (max-width: 600px) {
+  .rexai-site-footer {
+    padding: 1.1rem 0 1.3rem;
+  }
+}

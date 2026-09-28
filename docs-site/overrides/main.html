@@ -348,4 +348,17 @@
   {% endif %}
 {% endblock %}
 
-{% block footer %}{% endblock %}
+{#
+  页脚不是装饰：它是 cli.rexai.top / cli.rexai.top/blog 这两个有排名的自有站点指向
+  rexai.top 的**唯一 follow 链接面**（GitHub README 的站外链接全带 nofollow，传不出权重）。
+  6acec8d1 把 Material 页脚置空，连带 4326b084 特意放进 partials/copyright.html 的
+  extra.footer_links 变成死配置：实测线上 /、/changelog/、/zh/ 的 rexai-footer-links 命中数均为 0。
+  所以这里恢复一个紧凑自有页脚，仍然不引入 Material 的上一帖/下一帖导航。
+#}
+{% block footer %}
+  <footer class="rexai-site-footer">
+    <div class="rexai-site-footer__inner md-grid">
+      {% include "partials/copyright.html" %}
+    </div>
+  </footer>
+{% endblock %}

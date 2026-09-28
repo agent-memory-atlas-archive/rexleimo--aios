@@ -1,6 +1,7 @@
 @import url("redesign/tokens.css");
 @import url("redesign/shell.css");
 @import url("redesign/components.css");
+@import url("redesign/footer.css");
 
 /* Compatibility shims for legacy markup emitted by existing markdown pages. */
 .md-home .md-content__inner,

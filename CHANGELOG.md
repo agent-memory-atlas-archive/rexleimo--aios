@@ -6,6 +6,19 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- fix(site): the docs and blog sites render a footer again, restoring the only non-`nofollow`
+  outbound link path to `rexai.top`. `docs-site/overrides/main.html` had `{% block footer %}{% endblock %}`,
+  which emptied Material's footer on every page and therefore made `extra.footer_links` (added in
+  `4326b084`, holding the rexai.top / os.rexai.top / tool.rexai.top entries) dead configuration — the
+  built pages contained zero footer links, and nothing failed. Found by measuring the live site: the
+  `rexai-footer-links` marker appeared 0 times on `/`, `/changelog/`, and `/zh/`. The footer block now
+  includes `partials/copyright.html` again, `docs-site/assets/redesign/footer.css` styles it with the
+  existing `--rex-*` tokens (imported from the shared `custom.css`, so both builds pick it up), and
+  `mkdocs.blog.yml` gains the matching `footer_links` so `cli.rexai.top/blog` — the property that ranks
+  for version queries — also links the content hub.
+  `scripts/tests/site-footer-links.test.mjs` guards the footer block, both configs, and the stylesheet
+  so an emptied block fails instead of silently dropping the links.
+
 - docs(readme): the repository README is now a funnel to the two sites instead of a dead end at the
    page bottom. `rexai.top` previously appeared only at line 79 and line 161-166, so a visitor arriving
    from GitHub search, Explore, or a trending list never saw the content hub above the fold. Added a
