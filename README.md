@@ -1,18 +1,23 @@
 # AIOS
 
 [![Release](https://img.shields.io/github/v/release/rexleimo/aios?display_name=tag&sort=semver)](https://github.com/rexleimo/aios/releases)
-[![Docs](https://img.shields.io/badge/docs-cli.rexai.top-0ea5e9)](https://cli.rexai.top)
-[![RexAI](https://img.shields.io/badge/articles-rexai.top-ff6b6b)](https://rexai.top)
-[![Local-first](https://img.shields.io/badge/local--first-agent_control_plane-7c3aed)](https://cli.rexai.top/architecture/)
+[![AIOS documentation and guides on cli.rexai.top](https://img.shields.io/badge/docs-cli.rexai.top-0ea5e9)](https://cli.rexai.top)
+[![RexAI content hub for AI agent essays on rexai.top](https://img.shields.io/badge/articles-rexai.top-ff6b6b)](https://rexai.top)
+[![AIOS local-first agent control plane architecture on cli.rexai.top](https://img.shields.io/badge/local--first-agent_control_plane-7c3aed)](https://cli.rexai.top/architecture/)
 [![License](https://img.shields.io/github/license/rexleimo/aios)](https://github.com/rexleimo/aios)
 [![Node](https://img.shields.io/badge/node-24%20LTS-339933)](https://nodejs.org)
 
 > **The local-first control plane for long-horizon coding agents.**
 > AIOS gives your AI coding agent what it's missing — cross-session project memory, multi-agent teams, resumable overnight runs, and verifiable evidence for every change. **One sentence. Any complex task. Done.**
 
+**Official properties of this project:** the documentation site is
+[cli.rexai.top](https://cli.rexai.top) (English, 中文, 日本語, 한국어), the per-version release blog is
+[cli.rexai.top/blog](https://cli.rexai.top/blog/), and the author's long-form AI-agent essays in Chinese are on
+[rexai.top](https://rexai.top) (RexAI content hub). This GitHub repository is the source of both.
+
 **It runs on top of the agent you already use** — Codex CLI, Claude Code, Gemini CLI, OpenCode, Hermes, Grok, WorkBuddy, Pi, and ZCode. AIOS is not another agent framework: your agent stays exactly as it is, and AIOS adds the memory, coordination, and verification layer around it. Everything runs locally.
 
-[Why AIOS](#why-aios) · [Install](#install-in-30-seconds) · [Proof](#proof-not-promises) · [Docs](https://cli.rexai.top) · [Blog](https://cli.rexai.top/blog/) · [Articles (rexai.top)](https://rexai.top) · [中文](README-zh.md)
+[Why AIOS](#why-aios) · [Install](#install-in-30-seconds) · [Proof](#proof-not-promises) · [AIOS Docs](https://cli.rexai.top) · [Release Blog](https://cli.rexai.top/blog/) · [RexAI Content Hub (中文)](https://rexai.top) · [中文 README](README-zh.md)
 
 ![AIOS architecture overview](docs-site/assets/visual-architecture-overview.svg)
 
@@ -74,9 +79,9 @@ You just installed AIOS, so this is the highest-value moment to leave the repo. 
 
 | If you want | Go to |
 | --- | --- |
-| The full guide, command reference, and troubleshooting | **[cli.rexai.top](https://cli.rexai.top)** — docs in English, 中文, 日本語, 한국어 |
-| The release story behind each capability | **[cli.rexai.top/blog](https://cli.rexai.top/blog/)** — one post per version, with the evidence |
-| Long-form essays on AI agents, Rust, and systems (中文) | **[rexai.top](https://rexai.top)** — the author's content hub, 梦兽编程 |
+| The full guide, command reference, and troubleshooting | **[AIOS Docs — cli.rexai.top](https://cli.rexai.top)** — English, 中文, 日本語, 한국어 |
+| The release story behind each capability | **[AIOS Release Blog — cli.rexai.top/blog](https://cli.rexai.top/blog/)** — one post per version, with the evidence |
+| Long-form essays on AI agents, Rust, and systems (中文) | **[RexAI Content Hub — rexai.top](https://rexai.top)** — 梦兽编程 |
 
 Star the repo if it saved you an overnight run — it is how other builders find it: [github.com/rexleimo/aios](https://github.com/rexleimo/aios).
 

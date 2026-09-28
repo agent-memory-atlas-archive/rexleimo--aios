@@ -1,18 +1,22 @@
 # AIOS
 
 [![Release](https://img.shields.io/github/v/release/rexleimo/aios?display_name=tag&sort=semver)](https://github.com/rexleimo/aios/releases)
-[![Docs](https://img.shields.io/badge/文档站-cli.rexai.top-0ea5e9)](https://cli.rexai.top/zh/)
-[![RexAI](https://img.shields.io/badge/内容站-rexai.top-ff6b6b)](https://rexai.top)
-[![Local-first](https://img.shields.io/badge/本地优先-Agent_控制平面-7c3aed)](https://cli.rexai.top/zh/architecture/)
+[![AIOS 文档站 cli.rexai.top（中英日韩四语文档）](https://img.shields.io/badge/文档站-cli.rexai.top-0ea5e9)](https://cli.rexai.top/zh/)
+[![rexai.top：AI Agent 与系统方向中文长文内容站](https://img.shields.io/badge/内容站-rexai.top-ff6b6b)](https://rexai.top)
+[![AIOS 本地优先 Agent 控制平面架构（cli.rexai.top）](https://img.shields.io/badge/本地优先-Agent_控制平面-7c3aed)](https://cli.rexai.top/zh/architecture/)
 [![License](https://img.shields.io/github/license/rexleimo/aios)](https://github.com/rexleimo/aios)
 [![Node](https://img.shields.io/badge/node-24%20LTS-339933)](https://nodejs.org)
 
 > **面向长程编码 Agent 的本地优先控制平面。**
 > AIOS 补上你的 AI 编码助手缺少的能力——跨会话项目记忆、多 Agent 协作、可恢复的过夜任务、以及每次变更的可验证证据。**一句话，搞定任何复杂任务。**
 
+**本项目的官方站点：**文档站是 [cli.rexai.top](https://cli.rexai.top/zh/)（中英日韩四语），每个版本的
+发布博文在 [cli.rexai.top/blog](https://cli.rexai.top/blog/zh/)，AI Agent、Rust 与系统方向的中文长文在
+[rexai.top](https://rexai.top)（RexAI 内容站·梦兽编程）。本 GitHub 仓库就是这两个站点的源头。
+
 **它运行在你已有的 Agent 之上**——Codex CLI、Claude Code、Gemini CLI、OpenCode、Hermes、Grok、WorkBuddy、Pi、ZCode。AIOS 不是又一个 Agent 框架：Agent 还是你的 Agent，AIOS 只是在外围补上记忆、协调与验证这一层控制平面，且一切都在本地运行。
 
-[为什么需要 AIOS](#为什么需要-aios) · [30 秒安装](#30-秒安装) · [证据](#证据不是承诺) · [文档站](https://cli.rexai.top/zh/) · [博客](https://cli.rexai.top/blog/zh/) · [内容站 rexai.top](https://rexai.top) · [English](README.md)
+[为什么需要 AIOS](#为什么需要-aios) · [30 秒安装](#30-秒安装) · [证据](#证据不是承诺) · [AIOS 文档站](https://cli.rexai.top/zh/) · [发布博客](https://cli.rexai.top/blog/zh/) · [RexAI 内容站](https://rexai.top) · [English README](README.md)
 
 ![AIOS 架构总览](docs-site/assets/visual-architecture-overview.svg)
 
@@ -74,9 +78,9 @@ Token 智能随同一条命令装好：AIOS 会检测并安装 **RTK**（https:/
 
 | 你想要的 | 去哪儿 |
 | --- | --- |
-| 完整指南、命令参考、故障恢复 | **[cli.rexai.top](https://cli.rexai.top/zh/)** —— 中英日韩四语文档 |
-| 每个能力背后的发布故事与证据 | **[cli.rexai.top/blog/zh](https://cli.rexai.top/blog/zh/)** —— 一个版本一篇，带验证记录 |
-| AI Agent、Rust 与系统方向的中文长文 | **[rexai.top](https://rexai.top)** —— 作者内容站（梦兽编程） |
+| 完整指南、命令参考、故障恢复 | **[AIOS 文档站 — cli.rexai.top](https://cli.rexai.top/zh/)** —— 中英日韩四语文档 |
+| 每个能力背后的发布故事与证据 | **[AIOS 发布博客 — cli.rexai.top/blog/zh](https://cli.rexai.top/blog/zh/)** —— 一个版本一篇，带验证记录 |
+| AI Agent、Rust 与系统方向的中文长文 | **[RexAI 内容站 — rexai.top](https://rexai.top)** —— 梦兽编程 |
 
 如果它帮你保住了一个过夜任务，点个 Star 就是让更多人找到它的方式：[github.com/rexleimo/aios](https://github.com/rexleimo/aios)。
 

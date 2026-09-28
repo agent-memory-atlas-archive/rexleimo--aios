@@ -14,6 +14,15 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
    30-second install — the highest-intent moment in the document — routing to the docs site, the
    per-version blog, and the Chinese long-form hub. Both READMEs are bundled into the release archive
    by `scripts/package-release.sh`, so this ships with the next release.
+ - docs(readme): the site links now carry brand anchor text instead of bare domains, and badge `alt`
+   text now names the domain it points to. Measured against the rendered page: GitHub marks every
+   outbound README link `rel="nofollow"`, so a README link transfers no PageRank, and a badge is an
+   image link whose anchor text is the `alt` attribute (`alt="Docs"` threw that text away). What the
+   README can still do is put the brand and the domain in the indexed text of a page that ranks, so the
+   mapping "this repository = cli.rexai.top + rexai.top" is stated in prose ("Official properties of
+   this project" / 「本项目的官方站点」) and repeated in branded anchors.
+   `scripts/tests/readme-funnel.test.mjs` guards the placement, the `alt`-carries-domain rule, and the
+   brand anchors so the funnel cannot silently rot back into page-footer links.
 
 - fix(tests): test temp directories no longer land in the repository root. `fs.mkdtemp(prefix)` with a single
   argument treats the prefix as a path **relative to cwd**, so every `browser-mode` / `bsk-writer` run
