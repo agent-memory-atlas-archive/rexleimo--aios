@@ -293,11 +293,22 @@ export async function main(argv = process.argv.slice(2)) {
           resolveRun({ stdout: String(stdout || '') });
         });
       });
+      // Headroom MCP for Pi rides the same managed mcp.json merge (Pi has no
+      // built-in MCP surface, so the headroom-mcp config-file chain is a
+      // structural no-op here). Gated behind the same consent flag as the
+      // gemini/grok/hermes registrations; the binary is resolved read-only —
+      // install stays owned by ensureCompressionTools.
+      let headroomExecutable = '';
+      if (yesHeadroomMcp) {
+        const { resolveHeadroomExecutable } = await import('./lib/aios-init/headroom-installer.mjs');
+        headroomExecutable = await resolveHeadroomExecutable({});
+      }
       const mcp = await ensurePiMcpAdapter({
         mcpJsonPath: resolvePiMcpJsonPath(getClientHomes(process.env).pi),
         servers: buildAiosPiMcpServers({
           aiosRoot: AIOS_ROOT,
           browserRuntime: isBrowserMcpRuntimeInstalled({ rootDir: AIOS_ROOT }),
+          headroomExecutable,
         }),
         dryRun,
         io: console,
@@ -312,7 +323,7 @@ export async function main(argv = process.argv.slice(2)) {
       // installed; shell/auth still reach Pi through the project-level
       // .mcp.json that the pi-mcp-adapter reads directly.
       if (!dryRun && !existsSync(resolve(workspaceRoot, '.mcp.json'))) {
-        console.log('  [hint] No project .mcp.json: Pi sees only the global AIOS servers (code-review-graph, aios-memory, aios-bridge, plus browser when its runtime is installed).');
+        console.log('  [hint] No project .mcp.json: Pi sees only the global AIOS servers (code-review-graph, aios-memory, aios-bridge, plus browser/headroom when their runtimes are installed).');
         console.log('  [hint] Shell/auth servers need a project-level .mcp.json (run aios init --agent claude to generate one, then re-run this command).');
       }
     } catch (err) {

@@ -31,6 +31,10 @@ Headroom에는 Python 3.10 이상과 uv 또는 pipx가 필요합니다. AIOS는 
 
 planning, review, privacy, test, verification은 별도 quality gate입니다.
 
+## AIOS token bench의 실측 수치
+
+이 레이어들은 이제 주장만이 아닙니다. 동결된 8-태스크 벤치(`scripts/token-bench/`, 모델 고정, A/B 양 암)가 Pi 관찰 오프로드 메커니즘의 끔과 켬을 3회 반복 비교: 토큰 절감 −16%·−21%·+64%(평균 −4%), 비용 −42%·−40%·+52%(평균 −21%) — 리트리브 턴 분산은 벤치 글에 완전히 공개되었으며, 메커니즘은 공학적 수정이 나올 때까지 **opt-in(기본 꺼짐)으로 출시됩니다**. 경계 오프로드 원장은 2026년 6월 이후 2,552개 이벤트를 기록했고, 추정 5.43M 토큰을 컨텍스트 밖으로 유지했으며 통제 밖 이벤트는 0건입니다. 자신의 설치는 `aios tokens report`(레이어별 절감)와 `scripts/token-bench/compare.mjs`(A/B 차이)로 확인하세요. 방법론과 주의사항은 [token bench A/B 글](https://cli.rexai.top/ko/blog/2026-09-token-bench-first-ab-numbers/)을 참조하세요.
+
 ## RTK와 Caveman
 
 RTK는 local command-output layer입니다. path와 failure를 남기도록 범위를 제한한 command를 사용하세요.

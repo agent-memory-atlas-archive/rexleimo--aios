@@ -1,0 +1,6 @@
+{
+  "id": "bench-004-count-errors",
+  "objective": "Read scripts/fixtures/token-bench/data/sample-app.log and reply with only the number of lines whose log level is ERROR.",
+  "checks": [{ "type": "reply_contains", "value": "11" }],
+  "notes": "forces a full-file read; the observation-size proxy for ObservationPack-style offload"
+}

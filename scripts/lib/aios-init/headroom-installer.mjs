@@ -56,7 +56,7 @@ export function probeHeadroom({ captureImpl = captureCommand, env = process.env 
   };
 }
 
-function resolveHeadroomExecutable({ captureImpl = captureCommand, env = process.env } = {}) {
+export function resolveHeadroomExecutable({ captureImpl = captureCommand, env = process.env } = {}) {
   const resolver = process.platform === 'win32'
     ? { command: 'where.exe', args: ['headroom'] }
     : { command: 'which', args: ['headroom'] };

@@ -31,6 +31,10 @@ Headroom には Python 3.10 以降と uv または pipx が必要です。AIOS �
 
 planning、review、privacy、test、verification は別の quality gate です。
 
+## AIOS token bench の実測数値
+
+これらの層はもはや主張だけではありません。凍結された 8 タスクベンチ（`scripts/token-bench/`、モデル固定、A/B 両アーム）が Pi 観察オフロード機構のオフとオンを 3 組の繰り返しで比較：トークン節約は −16%・−21%・+64%（平均 −4%）、コストは −42%・−40%・+52%（平均 −21%）——リトリーブ・ターン分散はベンチ記事で完全に開示され、機構は工学的修正が出るまで **opt-in（デフォルト オフ）で出荷されます**。境界オフロード台帳は 2026 年 6 月以降 2,552 イベントを記録し、推定 5.43M トークンをコンテキスト外に保持、制御外イベントゼロ。自分のインストールは `aios tokens report`（レイヤー別節約）と `scripts/token-bench/compare.mjs`（A/B 差分）で確認できます。手法と注意書きは [token bench A/B 記事](https://cli.rexai.top/ja/blog/2026-09-token-bench-first-ab-numbers/) を参照。
+
 ## RTK と Caveman
 
 RTK は local command-output layer です。path と failure を残すため、範囲を限定した command を使います。

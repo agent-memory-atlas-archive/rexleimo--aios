@@ -42,6 +42,19 @@ aios doctor --native --verbose
 
 Then measure: run the same task with and without AIOS and compare the token usage reported by your provider. The [token intelligence documentation](https://cli.rexai.top/token-compression/) has the architecture; the [cost-crisis post](https://cli.rexai.top/blog/2026-08-ai-coding-cost-crisis/) has the field numbers.
 
+## Measured on our own harness
+
+We run a frozen 8-task token bench against our own managed Pi transport, model pinned, mechanism off versus on — three repeated A/B pairs, not one:
+
+| Pair | Off tokens | On tokens | Δ tokens | Δ cost |
+| --- | --- | --- | --- | --- |
+| 1 | 304,346 ($0.1035) | 254,348 ($0.0602) | −16% | −42% |
+| 2 | 338,064 ($0.0982) | 268,559 ($0.0585) | −21% | −40% |
+| 3 | 237,685 ($0.0551) | 389,675 ($0.0837) | +64% | +52% |
+| **Average** | 293,365 | 304,194 | **−4%** | **−21%** |
+
+The observation-offload mechanism halves the heavy 126 KB-observation task's tokens when the model settles quickly, but its retrieve-turn behavior is high-variance — so it ships **opt-in (default off)** per our two-gate rule. The boundary layer that offloads oversized tool output has recorded 2,552 events since June 2026: 5.43M estimated tokens kept out of context, zero uncontrolled events. Full tables, diagnosis, and caveats in the [token bench A/B post](https://cli.rexai.top/blog/2026-09-token-bench-first-ab-numbers/).
+
 ## FAQ
 
 **Will compression hurt answer quality?**

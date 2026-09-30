@@ -1,0 +1,6 @@
+{
+  "id": "bench-003-log-level",
+  "objective": "Read the first line of scripts/fixtures/token-bench/data/sample-app.log and reply with only its log level in lowercase (e.g. info, warn, error).",
+  "checks": [{ "type": "reply_contains", "value": "info" }],
+  "notes": "single small file read"
+}

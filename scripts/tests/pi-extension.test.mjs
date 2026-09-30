@@ -139,7 +139,7 @@ function stubPi() {
   };
 }
 
-test('tool defs expose six AIOS tools with real argv', async () => {
+test('tool defs expose seven AIOS tools with real argv', async () => {
   assert.throws(() => buildToolDefs({}), /requires \{ Type, run \}/u);
   const seen = [];
   const defs = buildToolDefs({
@@ -156,6 +156,7 @@ test('tool defs expose six AIOS tools with real argv', async () => {
     'aios_memory_checkpoint',
     'aios_skill_search',
     'aios_codemap_search',
+    'aios_offload_retrieve',
   ]);
   const out = await defs[0].execute('id-1', { query: 'pi', limit: 2 });
   assert.equal(out.content[0].text, 'OUT:memo search pi --limit 2');
@@ -173,8 +174,8 @@ test('extension factory wires tools, gates, session status, and commands', async
     runAios: async ({ argv }) => ({ text: `RUN:${argv.join(' ')}` }),
   });
   assert.equal(aiosRoot, '/fake-aios');
-  assert.equal(pi.tools.length, 6);
-  assert.deepEqual(Object.keys(pi.events).sort(), ['before_agent_start', 'session_start', 'tool_call']);
+  assert.equal(pi.tools.length, 7);
+  assert.deepEqual(Object.keys(pi.events).sort(), ['before_agent_start', 'context', 'session_start', 'tool_call']);
   assert.deepEqual(Object.keys(pi.commands).sort(), ['aios-policy', 'aios-root']);
 
   assert.equal((await pi.events.tool_call({ toolName: 'bash', input: { command: 'rm -rf /' } })).block, true);

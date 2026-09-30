@@ -1,0 +1,6 @@
+{
+  "id": "bench-005-json-envelope",
+  "objective": "Reply with exactly this JSON object and nothing else: {\"ok\": true, \"task\": \"bench-005\"}",
+  "checks": [{ "type": "reply_contains", "value": "\"task\": \"bench-005\"" }],
+  "notes": "output-contract stability probe"
+}

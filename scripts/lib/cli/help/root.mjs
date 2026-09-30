@@ -40,6 +40,7 @@ Commands:
   integration   Install and verify third-party vendor integrations (skill + docs MCP)
   judgment      Opt-in System One judgment gate (off until you enable it)
   session       Inspect session-local changed file state
+  tokens        Per-layer token ledger report ('tokens report [--json]')
   entropy-gc    Auto-archive stale ContextDB artifacts with rollback manifests
   snapshot-rollback Restore pre-mutation snapshot artifacts (manifest-driven)
   release-status Show RL policy release gate state and recent trend
@@ -57,6 +58,7 @@ Examples:
   aios workflow run ecc-uplift-governed --task "Borrow ECC safely" --dry-run --json
   aios plan show --html
   aios dream --preview --to pin --json
+  aios tokens report --json
   aios internal native repair list --limit 20
   aios internal native repair show --repair-id latest
   aios internal native rollback --repair-id latest

@@ -10,6 +10,11 @@
 // all three cwd-less so they follow the Pi session cwd. The browser server
 // joins them once its runtime is installed in this AIOS root (browser
 // readiness has a single owner: components/browser/runtime-readiness.mjs).
+// The headroom server joins once the caller resolves an installed headroom
+// binary behind MCP consent; its env tags the client and disables readback,
+// mirroring headroom-mcp/commands.mjs buildDesiredHeadroomEntry — but Pi
+// skips that config-file chain entirely (structural no-op: Pi has no
+// built-in MCP surface), so this managed entry is Pi's only Headroom route.
 // Shell and auth stay out: a shell MCP tool would bypass the AIOS Pi safety
 // gate, and auth stays niche.
 import fs from 'node:fs';
@@ -55,7 +60,21 @@ export function buildAiosPiBrowserServer({ aiosRoot = '' } = {}) {
   };
 }
 
-export function buildAiosPiMcpServers({ aiosRoot = '', browserRuntime = false } = {}) {
+// `headroomExecutable` is an explicit input like `browserRuntime`: the
+// caller passes the resolved installed binary, or '' when Headroom is
+// absent or unconsented, keeping fs knowledge out of this module.
+export function buildAiosPiHeadroomServer({ executable = '' } = {}) {
+  const headroom = String(executable || '').trim();
+  if (!headroom) return null;
+  return {
+    command: headroom,
+    args: ['mcp', 'serve'],
+    env: { HEADROOM_MCP_CLIENT: 'pi', HEADROOM_MCP_READ: 'off' },
+    lifecycle: 'lazy',
+  };
+}
+
+export function buildAiosPiMcpServers({ aiosRoot = '', browserRuntime = false, headroomExecutable = '' } = {}) {
   const servers = {
     'code-review-graph': {
       command: 'uvx',
@@ -80,6 +99,8 @@ export function buildAiosPiMcpServers({ aiosRoot = '', browserRuntime = false } 
       if (browserServer) servers[PRIMARY_BROWSER_ALIAS] = browserServer;
     }
   }
+  const headroomServer = buildAiosPiHeadroomServer({ executable: headroomExecutable });
+  if (headroomServer) servers['headroom'] = headroomServer;
   return servers;
 }
 

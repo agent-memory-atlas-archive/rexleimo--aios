@@ -10,6 +10,7 @@ import {
   PI_MCP_ADAPTER_VERSION,
   buildAdapterInstallArgs,
   buildAiosPiBrowserServer,
+  buildAiosPiHeadroomServer,
   buildAiosPiMcpServers,
   ensurePiMcpAdapter,
   ensurePiMcpServers,
@@ -49,6 +50,23 @@ test('aios-managed servers add session-following memory and bridge servers when 
     assert.ok(!('env' in servers[name]), `${name} pins no workspace root`);
     assert.ok(path.isAbsolute(servers[name].args[0]), `${name} resolves against the injected install root`);
   }
+});
+
+test('headroom server joins managed servers only with an executable, mirroring headroom-mcp shape', () => {
+  assert.equal(buildAiosPiHeadroomServer({ executable: '' }), null);
+  assert.equal(buildAiosPiHeadroomServer({}), null);
+  const server = buildAiosPiHeadroomServer({ executable: '/opt/uvx-bin/headroom' });
+  assert.deepEqual(server, {
+    command: '/opt/uvx-bin/headroom',
+    args: ['mcp', 'serve'],
+    env: { HEADROOM_MCP_CLIENT: 'pi', HEADROOM_MCP_READ: 'off' },
+    lifecycle: 'lazy',
+  });
+  const servers = buildAiosPiMcpServers({ aiosRoot: '/aios', headroomExecutable: '/usr/local/bin/headroom' });
+  assert.deepEqual(Object.keys(servers), ['code-review-graph', 'aios-memory', 'aios-bridge', 'headroom']);
+  assert.equal(servers.headroom.command, '/usr/local/bin/headroom');
+  const without = buildAiosPiMcpServers({ aiosRoot: '/aios' });
+  assert.ok(!('headroom' in without), 'headroom stays out until consent resolves a binary');
 });
 
 test('mcp.json merge creates file and preserves other keys', async () => {

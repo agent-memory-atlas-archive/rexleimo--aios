@@ -1,0 +1,6 @@
+{
+  "id": "bench-007-big-read",
+  "objective": "Run `cat scripts/fixtures/token-bench/data/big-app.log` with bash, find the request id of the FIRST line whose level is ERROR, and reply with only that request id.",
+  "checks": [{ "type": "reply_contains", "value": "req-10010" }],
+  "notes": "forces one ~126KB observation into context; the ObservationPack-lite trigger"
+}

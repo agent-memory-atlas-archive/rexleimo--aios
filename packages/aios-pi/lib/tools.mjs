@@ -2,6 +2,9 @@
 // provides it at runtime; tests inject a stub) so this module stays
 // runnable under plain node --test. `run` executes resolved AIOS argv
 // and returns { text } content for the tool result.
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+
 import {
   codemapSearchArgs,
   memoCheckpointArgs,
@@ -10,6 +13,7 @@ import {
   memoWriteArgs,
   skillSearchArgs,
 } from './aios-cli.mjs';
+import { resolveOffloadArchiveDir, sliceLines } from './offload.mjs';
 
 function textResult(text, extra = {}) {
   return {
@@ -93,6 +97,23 @@ export function buildToolDefs({ Type, run } = {}) {
       async execute(_toolCallId, params) {
         const { text } = await run({ argv: codemapSearchArgs(params || {}), json: true });
         return textResult(text, { argv: codemapSearchArgs(params || {}) });
+      },
+    },
+    {
+      name: 'aios_offload_retrieve',
+      label: 'AIOS offload retrieve',
+      description: 'Page the exact content of an offloaded observation by ref (the id inside an [aios:offloaded <ref>] handle). Read-only.',
+      parameters: Type.Object({
+        ref: Type.String({ description: 'Ref id from the offload handle' }),
+        offset: Type.Optional(Type.Number({ description: '1-based start line (default 1)' })),
+        limit: Type.Optional(Type.Number({ description: 'Max lines per page (default 200)' })),
+      }),
+      async execute(_toolCallId, params) {
+        const ref = String(params?.ref || '').replace(/[^a-f0-9]/giu, '');
+        const filePath = path.join(resolveOffloadArchiveDir(process.env), `${ref}.txt`);
+        const raw = await readFile(filePath, 'utf8');
+        const page = sliceLines(raw, { offset: params?.offset, limit: params?.limit });
+        return textResult(`lines ${page.from}-${page.to} of ${page.total}\n\n${page.text}`);
       },
     },
   ];

@@ -1,0 +1,6 @@
+{
+  "id": "bench-008-multi-round-edit",
+  "objective": "Create the file .aios/tmp/token-bench/bench-008/app.js containing a Node script that prints exactly BENCH-008-OK, run it with `node .aios/tmp/token-bench/bench-008/app.js`, then reply with only the exact output.",
+  "checks": [{ "type": "reply_contains", "value": "BENCH-008-OK" }],
+  "notes": "write+run multi-round; the round-trip re-billing proxy"
+}

@@ -413,6 +413,20 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       return;
     }
 
+    if (parsed.command === 'tokens') {
+      const [sub, ...flags] = parsed.options.args || [];
+      if (sub !== 'report') {
+        throw new Error('Usage: aios tokens report [--session <id>] [--json]');
+      }
+      const { buildTokensReport, renderTokensReport } = await import('../interception/metrics/report.mjs');
+      const json = flags.includes('--json');
+      const sessionFlag = flags.indexOf('--session');
+      const sessionId = sessionFlag >= 0 ? String(flags[sessionFlag + 1] || 'default') : 'default';
+      const report = await buildTokensReport({ workspaceRoot: workspaceFor(parsed), sessionId });
+      stdout.write(json ? `${JSON.stringify(report, null, 2)}\n` : `${renderTokensReport(report)}\n`);
+      return;
+    }
+
     if (parsed.command === 'import') {
       const { runImportCommand } = await import('../memo/import-cli.mjs');
       await runImportCommand({ args: parsed.options.args || [], rootDir: workspaceFor(parsed), stdout });

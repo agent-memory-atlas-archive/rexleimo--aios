@@ -4,6 +4,7 @@
    newSession 保持单轮上下文语义。任何传输层失败都丢弃当前会话、下一轮重建，
    与 one-shot 超时后 fail-closed 的取向一致。 */
 import { createPiRpcSession } from '../../pi/rpc-client.mjs';
+import { createLedgerUsageTap } from '../../pi/usage-tap.mjs';
 import { classifySoloFailure } from '../../harness/solo-runtime.mjs';
 import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../interception/index.mjs';
 import { normalizeTurnTimeoutMs } from './execute-turn.mjs';
@@ -19,7 +20,11 @@ export function buildPiRpcExecuteTurn({ rootDir, sessionId, objective, turnTimeo
   async function getSession() {
     if (!sessionPromise) {
       sessionPromise = (async () => {
-        const session = sessionImpl ? sessionImpl() : createPiRpcSession({});
+        /* 中文注释：usage tap 只读消费 RPC 事件流、写分层账本（layer=pi_usage），
+           写失败即静默忽略，绝不影响 transport；测试注入 sessionImpl 不经过此路径。 */
+        const session = sessionImpl
+          ? sessionImpl()
+          : createPiRpcSession({ onEvent: createLedgerUsageTap({ workspaceRoot: rootDir, sessionId }) });
         session.start();
         return session;
       })();

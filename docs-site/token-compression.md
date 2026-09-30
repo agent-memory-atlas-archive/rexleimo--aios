@@ -35,6 +35,10 @@ Headroom requires Python 3.10 or later plus uv or pipx. AIOS installs the tested
 
 Planning, code review, privacy, tests, and verification remain separate gates.
 
+## Measured numbers from the AIOS token bench
+
+These layers are no longer claims-only. A frozen 8-task bench (`scripts/token-bench/`, model pinned, A/B arms) compared runs with the Pi observation-offload mechanism off and on across three repeated pairs: token savings of −16%, −21%, and +64% (average −4%), cost −42%, −40%, and +52% (average −21%) — the retrieve-turn variance is disclosed in the bench post, and the mechanism ships **opt-in (default off)** until it has an engineering fix. The boundary offload ledger has recorded 2,552 events since June 2026, keeping an estimated 5.43M tokens out of context with zero uncontrolled events. Inspect your own install with `aios tokens report` (per-layer savings) and `scripts/token-bench/compare.mjs` (A/B diff); methodology and caveats in the [token bench A/B post](https://cli.rexai.top/blog/2026-09-token-bench-first-ab-numbers/).
+
 ## RTK and Caveman
 
 RTK is a local command-output layer. Continue to bound commands so paths and failures remain visible:

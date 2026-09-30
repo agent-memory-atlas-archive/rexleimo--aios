@@ -85,6 +85,15 @@ Options:
   --profile <minimal|standard|strict>
   -h, --help
 `;
+    case 'tokens':
+      return `Usage:
+  aios tokens report [options]
+
+Options:
+  --session <id>                 Ledger session id (default: default)
+  --json                         Output as JSON
+  -h, --help
+`;
     case 'memo':
       return getMemoHelpText();
     case 'quality-gate':

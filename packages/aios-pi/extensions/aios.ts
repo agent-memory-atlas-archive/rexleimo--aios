@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { AIOS_SYSTEM_PROMPT_ADDITION, buildBeforeAgentStartMessage, decideToolCall } from '../lib/gates.mjs';
 import { resolveAiosRoot, runAios, runAiosJson } from '../lib/aios-cli.mjs';
 import { buildToolDefs } from '../lib/tools.mjs';
+import { offloadMessages, resolveOffloadArchiveDir, resolveOffloadConfig } from '../lib/offload.mjs';
 
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 
@@ -38,6 +39,31 @@ export default async function aiosExtension(pi: ExtensionAPI, deps = {}) {
 
   pi.on('tool_call', async (event) => {
     return decideToolCall({ toolName: event?.toolName, input: event?.input });
+  });
+
+  // ObservationPack-lite: before each LLM call, archive oversized text
+  // observations and keep only a handle + excerpt in context. Best-effort:
+  // any failure returns undefined so the turn proceeds unmodified.
+  const offloadEnv = deps.env || process.env;
+  const fsPromises = await import('node:fs/promises');
+  pi.on('context', async (event) => {
+    const config = resolveOffloadConfig(offloadEnv);
+    if (!config.enabled) return undefined;
+    try {
+      await offloadMessages({
+        messages: event?.messages,
+        thresholdChars: config.thresholdChars,
+        archiveDir: resolveOffloadArchiveDir(offloadEnv),
+        readFileImpl: deps.readFileImpl || fsPromises.readFile,
+        writeFileImpl: deps.writeFileImpl || (async (filePath, data, encoding) => {
+          await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
+          await fsPromises.writeFile(filePath, data, encoding);
+        }),
+      });
+      return { messages: event?.messages };
+    } catch {
+      return undefined;
+    }
   });
 
   pi.on('before_agent_start', async () => {

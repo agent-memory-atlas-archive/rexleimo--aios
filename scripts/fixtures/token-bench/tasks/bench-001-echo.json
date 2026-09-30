@@ -1,0 +1,6 @@
+{
+  "id": "bench-001-echo",
+  "objective": "Reply with exactly this token and nothing else: BENCH-001-OK",
+  "checks": [{ "type": "reply_contains", "value": "BENCH-001-OK" }],
+  "notes": "zero tool use; pure per-turn usage baseline"
+}

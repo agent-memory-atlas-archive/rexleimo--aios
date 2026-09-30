@@ -135,6 +135,7 @@ nav:
   - Docs Home: https://cli.rexai.top/
   - Blog Home: index.md
   - Posts:
+      - "We Measured Our Own Token Compression: First A/B Numbers From the AIOS Token Bench": 2026-09-token-bench-first-ab-numbers.md
       - "v5.20.0 Qoder Joins AIOS Ten Clients One Definition Block": 2026-09-v520-qoder-client.md
       - "Jev + AIOS Quickstart: Background Judgments With No Keywords": 2026-09-jev-aios-quickstart.md
       - "v5.19.2 Names Windows Can Hold": 2026-09-v5192-names-windows-can-hold.md

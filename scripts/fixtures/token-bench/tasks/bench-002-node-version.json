@@ -1,0 +1,6 @@
+{
+  "id": "bench-002-node-version",
+  "objective": "Run `node --version` with bash, then reply with a single line containing the exact version string.",
+  "checks": [{ "type": "reply_contains", "value": "v" }],
+  "notes": "one bash round-trip; measures tool-loop overhead floor"
+}

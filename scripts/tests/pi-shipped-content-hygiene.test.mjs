@@ -51,7 +51,7 @@ test('Pi system prompt and session injection stay free of repo-relative invocati
 
 test('Pi tool descriptors and argv builders reference only the global aios CLI', () => {
   const defs = buildToolDefs({ Type: stubTypeBox(), run: async () => ({ text: '' }) });
-  assert.equal(defs.length, 6);
+  assert.equal(defs.length, 7);
   for (const def of defs) {
     assertClean(`tool ${def.name} label`, def.label);
     assertClean(`tool ${def.name} description`, def.description);

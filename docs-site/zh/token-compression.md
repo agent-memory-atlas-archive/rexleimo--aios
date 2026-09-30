@@ -33,6 +33,10 @@ Headroom 需要 Python 3.10 或更高版本，以及 uv 或 pipx。AIOS 会在�
 
 规划、代码审查、隐私、测试和验证仍是独立门禁。
 
+## 来自 AIOS token bench 的实测数字
+
+这些层不再是纯声明。冻结的 8 任务基准（`scripts/token-bench/`，模型钉死，A/B 双臂）对 Pi 观察卸载机制关与开跑了三对重复：token 节省分别为 −16%、−21%、+64%（均值 −4%），成本 −42%、−40%、+52%（均值 −21%）——取回轮次方差在基准文章中完整披露，机制**以 opt-in 发布（默认关闭）**，直到有工程修复。边界卸载账本自 2026 年 6 月起记录 2,552 个事件，估算 5.43M token 未进入上下文，零失控事件。用 `aios tokens report`（分层节省）和 `scripts/token-bench/compare.mjs`（A/B 对比）检查你自己的安装；方法论与免责口径见 [token bench A/B 文章](https://cli.rexai.top/zh/blog/2026-09-token-bench-first-ab-numbers/)。
+
 ## RTK 和 Caveman
 
 RTK 是本地命令输出层。即使启用，也应限制命令范围，让路径和失败信息可见：

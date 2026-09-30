@@ -84,6 +84,7 @@ AIOS is a local-first agent workflow layer that gives coding CLIs (Claude Code, 
 - https://cli.rexai.top/blog/2026-09-v511-prompt-contracts/ — v5.11.0 — Prompt Contracts: Models Report Their Own State
 - https://cli.rexai.top/blog/2026-09-v510-release-trust-and-repo-slimming/ — v5.10.0 — Release Trust and a Leaner Repo
 - https://cli.rexai.top/blog/2026-09-v590-memory-activation-across-clients/ — v5.9.0 — Memory Activation Across Clients
+- https://cli.rexai.top/blog/2026-09-token-bench-first-ab-numbers/ — We Measured Our Own Token Compression: First A/B Numbers From the AIOS Token Bench
 - https://cli.rexai.top/blog/2026-09-pi-client-aios/ — Pi coding agent is now a first-class AIOS client
 - https://cli.rexai.top/blog/2026-09-jev-aios-quickstart/ — Jev + AIOS Quickstart: Background Judgments With No Keywords (JVM Confusion Explained)
 - https://cli.rexai.top/blog/2026-08-v582-plan-sync-workbuddy/ — v5.8.2: Plans Stop Jumping the Gun, and WorkBuddy Lands

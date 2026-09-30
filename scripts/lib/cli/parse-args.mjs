@@ -121,6 +121,7 @@ const TOP_LEVEL_COMMANDS = new Set([
   'skill',
   'integration',
   'session',
+  'tokens',
   'rex',
 ]);
 
@@ -315,6 +316,9 @@ export function parseArgs(argv = []) {
   }
   if (first === 'memory') {
     return { mode: 'command', help: false, command: 'memory', options: { args: argv.slice(1) } };
+  }
+  if (first === 'tokens') {
+    return { mode: 'command', help: false, command: 'tokens', options: { args: argv.slice(1) } };
   }
   if (first === 'import') {
     return { mode: 'command', help: false, command: 'import', options: { args: argv.slice(1) } };

@@ -1,0 +1,6 @@
+{
+  "id": "bench-006-arithmetic-tool",
+  "objective": "Run `node -e \"console.log(17 * 23)\"` with bash, then reply with only the number it printed.",
+  "checks": [{ "type": "reply_contains", "value": "391" }],
+  "notes": "edit/run fusion proxy: one command round-trip with a deterministic answer"
+}
