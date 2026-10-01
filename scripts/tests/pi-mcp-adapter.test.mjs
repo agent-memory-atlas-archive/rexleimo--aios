@@ -6,6 +6,7 @@ import test from 'node:test';
 
 import { resolveLocalBrowserMcpScript } from '../lib/components/browser/runtime-paths.mjs';
 import {
+  PI_BUILTIN_MCP_SINCE,
   PI_MCP_ADAPTER_PACKAGE,
   PI_MCP_ADAPTER_VERSION,
   buildAdapterInstallArgs,
@@ -15,8 +16,10 @@ import {
   ensurePiMcpAdapter,
   ensurePiMcpServers,
   isAdapterInstalled,
+  parsePiVersion,
   piMcpAdapterSpec,
   resolvePiMcpJsonPath,
+  resolvePiMcpMode,
 } from '../lib/components/pi/mcp-adapter.mjs';
 
 async function makeTemp(prefix) {
@@ -161,6 +164,22 @@ test('adapter presence parses pi list output', () => {
   assert.equal(isAdapterInstalled(''), false);
 });
 
+test('version gate parses versions and picks the MCP carrier', () => {
+  assert.equal(PI_BUILTIN_MCP_SINCE, '0.99.0');
+  assert.deepEqual(parsePiVersion('0.99.2'), [0, 99, 2]);
+  assert.deepEqual(parsePiVersion('pi 0.99 (build 7)'), [0, 99, 0]);
+  assert.equal(parsePiVersion(''), null);
+  assert.equal(parsePiVersion('not-a-version'), null);
+  assert.equal(resolvePiMcpMode('0.99.2'), 'builtin');
+  assert.equal(resolvePiMcpMode('0.99.0'), 'builtin');
+  assert.equal(resolvePiMcpMode('0.100.0'), 'builtin');
+  assert.equal(resolvePiMcpMode('1.0.0'), 'builtin');
+  assert.equal(resolvePiMcpMode('0.98.5'), 'adapter');
+  assert.equal(resolvePiMcpMode('0.99'), 'builtin');
+  assert.equal(resolvePiMcpMode(''), 'adapter');
+  assert.equal(resolvePiMcpMode('garbage'), 'adapter');
+});
+
 test('full setup skips install when adapter present', async () => {
   const home = await makeTemp('aios-pi-mcp-full-');
   try {
@@ -169,13 +188,86 @@ test('full setup skips install when adapter present', async () => {
       mcpJsonPath: resolvePiMcpJsonPath(home),
       run: async (cmd, args) => {
         calls.push([cmd, ...args].join(' '));
+        if (args[0] === '--version') return { stdout: '0.98.5' };
         if (args[0] === 'list') return { stdout: 'pi-mcp-adapter 2.33.0' };
         return { stdout: '' };
       },
     });
     assert.equal(result.adapter, 'present');
+    assert.equal(result.mode, 'adapter');
+    assert.equal(result.piVersion, '0.98.5');
     assert.equal(result.mcpAction, 'updated');
-    assert.deepEqual(calls, ['pi list']);
+    assert.deepEqual(calls, ['pi --version', 'pi list']);
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test('builtin mode never installs and reports an already-installed adapter as a conflict', async () => {
+  const home = await makeTemp('aios-pi-mcp-builtin-');
+  try {
+    const calls = [];
+    const logs = [];
+    const result = await ensurePiMcpAdapter({
+      mcpJsonPath: resolvePiMcpJsonPath(home),
+      piVersion: '0.99.2',
+      io: { log: (line) => logs.push(String(line)) },
+      run: async (cmd, args) => {
+        calls.push([cmd, ...args].join(' '));
+        return { stdout: 'pi-mcp-adapter 2.33.0' };
+      },
+    });
+    assert.equal(result.mode, 'builtin');
+    assert.equal(result.piVersion, '0.99.2');
+    assert.equal(result.adapter, 'installed-conflicts');
+    assert.equal(result.mcpAction, 'updated');
+    assert.deepEqual(calls, ['pi list'], 'explicit piVersion skips the version probe');
+    assert.ok(logs.some((line) => line.includes('pi remove npm:pi-mcp-adapter')), 'conflict hint names the opt-in removal command');
+    assert.ok(!calls.some((line) => line.includes('install')), 'builtin mode never installs the adapter');
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test('builtin mode with no adapter stays clean and installs nothing', async () => {
+  const home = await makeTemp('aios-pi-mcp-builtinclean-');
+  try {
+    const calls = [];
+    const logs = [];
+    const result = await ensurePiMcpAdapter({
+      mcpJsonPath: resolvePiMcpJsonPath(home),
+      piVersion: '0.99.2',
+      io: { log: (line) => logs.push(String(line)) },
+      run: async (cmd, args) => {
+        calls.push([cmd, ...args].join(' '));
+        return { stdout: '' };
+      },
+    });
+    assert.equal(result.mode, 'builtin');
+    assert.equal(result.adapter, 'not-installed');
+    assert.deepEqual(logs, []);
+    assert.ok(!calls.some((line) => line.includes('install')));
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test('version detection failure falls back to legacy adapter behavior', async () => {
+  const home = await makeTemp('aios-pi-mcp-fallback-');
+  try {
+    const calls = [];
+    const result = await ensurePiMcpAdapter({
+      mcpJsonPath: resolvePiMcpJsonPath(home),
+      run: async (cmd, args) => {
+        calls.push([cmd, ...args].join(' '));
+        if (args[0] === '--version') throw new Error('spawn pi ENOENT');
+        return { stdout: 'pi-mcp-adapter 2.33.0' };
+      },
+    });
+    assert.equal(result.mode, 'adapter');
+    assert.equal(result.piVersion, null);
+    assert.equal(result.adapter, 'present');
+    assert.deepEqual(calls, ['pi --version', 'pi list']);
   } finally {
     await rm(home, { recursive: true, force: true });
   }

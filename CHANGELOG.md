@@ -6,6 +6,27 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- feat(pi): the Pi MCP bridge now picks its carrier from the installed pi version instead of always
+  installing `pi-mcp-adapter`. pi 0.99.0 (2026-09-29) shipped a built-in `mcp` extension that reads the
+  same `~/.pi/agent/mcp.json`; with the adapter also installed, pi loaded the adapter and skipped the
+  built-in one, printing an `[Extension issues]` warning on every startup. `resolvePiMcpMode()` in
+  `scripts/lib/components/pi/mcp-adapter.mjs` now returns `builtin` for pi >= 0.99.0 and `adapter`
+  otherwise — version-detection failure stays on `adapter`, the legacy always-safe path, so old pi and
+  offline/CI installs keep working unchanged. `ensurePiMcpAdapter` still merges the AIOS-managed servers
+  into `mcp.json` in both modes (the file is carrier-independent), but builtin mode never installs the
+  adapter: an already-installed one is only reported as `installed-conflicts` with an opt-in
+  `pi remove npm:pi-mcp-adapter` hint, never removed automatically (removal flips session behavior).
+  `doctorPiBridge` (`scripts/lib/components/pi/doctor.mjs`) mirrors the split: an adapter shadowing
+  built-in MCP is an `[info]` note (new `notes`/`mode` result fields) instead of silence-plus-warning,
+  and a *missing* adapter on pi >= 0.99.0 is `[ok]` instead of the false "Pi cannot load MCP servers"
+  warning. `aios init` logs the chosen mode and `scripts/lib/integrations/clients.mjs` drops the stale
+  "Pi core has no MCP surface" comment. The default carrier on pi >= 0.99.0 remains the adapter for
+  existing installs; flipping init's default to builtin awaits the tool-name sweep (0.99.2 normalizes
+  `-` to `_` in `mcp__` namespaces; every AIOS server name contains a hyphen).
+  Guarded by new cases in `scripts/tests/pi-mcp-adapter.test.mjs` (gate table, both modes, fallback,
+  explicit-version override) and `scripts/tests/pi-doctor.test.mjs` (conflict-as-info, missing-adapter-ok
+  on builtin, capture-failure fallback).
+
 ## [6.2.1] - 2026-09-28
 
 - fix(site): the docs and blog sites render a footer again, restoring the only non-`nofollow`

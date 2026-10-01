@@ -268,10 +268,12 @@ export async function main(argv = process.argv.slice(2)) {
     } catch (err) {
       console.warn(`[warn] Pi extension registration: ${err.message}`);
     }
-    // 2d. Pi MCP bridge — Pi core has no MCP surface; install the pinned
-    // MCP-client extension and seed AIOS-managed servers into the Pi-global
-    // mcp.json so Pi gains MCP capability on install. Network failures stay
-    // warnings: offline machines keep the extension + project .mcp.json path.
+    // 2d. Pi MCP bridge — seed AIOS-managed servers into the Pi-global
+    // mcp.json (read by both carriers), then pick the carrier: pi >= 0.99.0
+    // ships a built-in MCP extension and needs no adapter; older pi installs
+    // the pinned pi-mcp-adapter (resolvePiMcpMode; detection failure stays
+    // on the adapter). Network failures stay warnings: offline machines keep
+    // the extension + project .mcp.json path.
     try {
       const { getClientHomes } = await import('./lib/platform/paths.mjs');
       const {
@@ -293,9 +295,9 @@ export async function main(argv = process.argv.slice(2)) {
           resolveRun({ stdout: String(stdout || '') });
         });
       });
-      // Headroom MCP for Pi rides the same managed mcp.json merge (Pi has no
-      // built-in MCP surface, so the headroom-mcp config-file chain is a
-      // structural no-op here). Gated behind the same consent flag as the
+      // Headroom MCP for Pi rides the same managed mcp.json merge (the
+      // headroom-mcp config-file chain is a structural no-op for Pi in both
+      // carrier modes). Gated behind the same consent flag as the
       // gemini/grok/hermes registrations; the binary is resolved read-only —
       // install stays owned by ensureCompressionTools.
       let headroomExecutable = '';
@@ -314,7 +316,10 @@ export async function main(argv = process.argv.slice(2)) {
         io: console,
         run,
       });
-      console.log(`  Pi MCP (mcp.json ${mcp.mcpAction}, adapter ${mcp.adapter}): ${mcp.mcpJsonPath}`);
+      console.log(`  Pi MCP (mode ${mcp.mode}, mcp.json ${mcp.mcpAction}, adapter ${mcp.adapter}): ${mcp.mcpJsonPath}`);
+      if (mcp.adapter === 'installed-conflicts') {
+        console.log('  [hint] Optional: pi remove npm:pi-mcp-adapter restores built-in MCP (sessions keep working via the adapter meanwhile).');
+      }
       if (mcp.keptDiffers.length > 0) {
         console.log(`  Pi MCP kept user-edited servers: ${mcp.keptDiffers.join(', ')}`);
       }

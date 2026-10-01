@@ -1,13 +1,15 @@
 // scripts/lib/components/pi/doctor.mjs — Pi MCP bridge health check.
 // Reports the AIOS-managed servers inside the Pi-global mcp.json plus the
-// pinned MCP-client adapter. Repair hints use the global `aios` CLI only;
-// the AIOS root comes in as the doctor runtime root, never a repo-relative
-// literal.
+// carrier state: pi >= 0.99.0 serves mcp.json through its built-in MCP
+// extension (an installed pi-mcp-adapter only shadows it — informational),
+// older pi needs the pinned adapter (absent = warning). Repair hints use
+// the global `aios` CLI only; the AIOS root comes in as the doctor runtime
+// root, never a repo-relative literal.
 import fs from 'node:fs';
 
 import { captureCommand, commandExists } from '../../platform/process.mjs';
 import { getClientHomes } from '../../platform/paths.mjs';
-import { buildAiosPiMcpServers, isAdapterInstalled, resolvePiMcpJsonPath } from './mcp-adapter.mjs';
+import { buildAiosPiMcpServers, isAdapterInstalled, parsePiVersion, piMcpAdapterSpec, resolvePiMcpJsonPath, resolvePiMcpMode } from './mcp-adapter.mjs';
 
 const MANAGED_SERVER_NAMES = ['code-review-graph', 'aios-memory', 'aios-bridge'];
 
@@ -29,6 +31,8 @@ export async function doctorPiBridge({
     managedPresent: [],
     managedMissing: [],
     adapter: 'unknown',
+    mode: 'adapter',
+    notes: [],
     mcpJsonPath: '',
   };
 
@@ -89,9 +93,28 @@ export async function doctorPiBridge({
   }
 
   if (piOnPath) {
+    // Capture failure leaves mode on 'adapter', the legacy always-safe read.
+    let piVersion = '';
+    try {
+      piVersion = String(captureImpl('pi', ['--version'], { env })?.stdout || '');
+    } catch {
+      piVersion = '';
+    }
+    result.mode = resolvePiMcpMode(piVersion);
     try {
       const list = captureImpl('pi', ['list'], { env });
-      if (isAdapterInstalled(list?.stdout)) {
+      const installed = isAdapterInstalled(list?.stdout);
+      if (result.mode === 'builtin') {
+        if (installed) {
+          io.log(`[info] pi ${parsePiVersion(piVersion)?.join('.') || '(version?)'} ships built-in MCP; pi-mcp-adapter shadows it (sessions keep working via the adapter)`);
+          io.log(`[info] optional cleanup restores built-in MCP: pi remove ${piMcpAdapterSpec()}`);
+          result.adapter = 'installed-conflicts';
+          result.notes.push('pi-mcp-adapter shadows built-in MCP; removal is opt-in');
+        } else {
+          io.log('[ok] pi built-in MCP serves mcp.json (pi-mcp-adapter not installed)');
+          result.adapter = 'builtin';
+        }
+      } else if (installed) {
         io.log('[ok] pi-mcp-adapter installed');
         result.adapter = 'installed';
       } else {

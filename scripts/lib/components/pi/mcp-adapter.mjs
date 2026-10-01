@@ -1,10 +1,13 @@
 // scripts/lib/components/pi/mcp-adapter.mjs — Pi MCP bridge setup.
-// Pi core has no built-in MCP surface; MCP capability arrives via a
-// third-party MCP-client extension (pi-mcp-adapter). This module keeps the
-// AIOS-managed side declarative and testable: pinned package spec,
-// AIOS-managed server entries for the Pi-global mcp.json, and idempotent
-// merge/install helpers. Project repos keep using their own .mcp.json
-// (the adapter reads it directly); the Pi-global file only carries servers
+// Pi carries MCP through one of two carriers that both read the same
+// Pi-global mcp.json: the built-in `mcp` extension (pi >= 0.99.0) or the
+// pinned third-party MCP-client extension (pi-mcp-adapter, required before
+// 0.99.0). resolvePiMcpMode() picks the carrier from `pi --version`;
+// detection failure stays on the adapter, the legacy always-safe path. This
+// module keeps the AIOS-managed side declarative and testable: pinned
+// package spec, AIOS-managed server entries for the Pi-global mcp.json, and
+// idempotent merge/install helpers. Project repos keep using their own
+// .mcp.json (the adapter reads it directly); the Pi-global file only carries servers
 // that make sense outside any single project: code-review-graph (cwd-less),
 // plus the AIOS-root-resolved aios-memory and aios-bridge stdio servers,
 // all three cwd-less so they follow the Pi session cwd. The browser server
@@ -13,8 +16,8 @@
 // The headroom server joins once the caller resolves an installed headroom
 // binary behind MCP consent; its env tags the client and disables readback,
 // mirroring headroom-mcp/commands.mjs buildDesiredHeadroomEntry — but Pi
-// skips that config-file chain entirely (structural no-op: Pi has no
-// built-in MCP surface), so this managed entry is Pi's only Headroom route.
+// skips that config-file chain entirely (structural no-op for both carriers),
+// so this managed entry is Pi's only Headroom route.
 // Shell and auth stay out: a shell MCP tool would bypass the AIOS Pi safety
 // gate, and auth stays niche.
 import fs from 'node:fs';
@@ -25,6 +28,37 @@ import { resolveLocalBrowserMcpScript } from '../browser/runtime-paths.mjs';
 
 export const PI_MCP_ADAPTER_PACKAGE = 'pi-mcp-adapter';
 export const PI_MCP_ADAPTER_VERSION = '2.33.0';
+
+// First pi release whose built-in `mcp` extension serves mcp.json itself.
+export const PI_BUILTIN_MCP_SINCE = '0.99.0';
+
+// Parse the first dotted version in `raw` (pi prints e.g. "0.99.2");
+// returns null when nothing numeric parses.
+export function parsePiVersion(raw) {
+  const match = String(raw || '').match(/(\d+)\.(\d+)(?:\.(\d+))?/u);
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3] ?? 0)];
+}
+
+function compareVersionTriples(a, b) {
+  for (let i = 0; i < 3; i += 1) {
+    const left = a[i] ?? 0;
+    const right = b[i] ?? 0;
+    if (left !== right) return left - right;
+  }
+  return 0;
+}
+
+// 'builtin' once pi ships its built-in MCP extension, 'adapter' otherwise.
+// Unknown versions stay on 'adapter': the legacy carrier is always safe
+// (worst case it re-installs what was already there), while assuming
+// 'builtin' from a parse failure would silently leave old pi without MCP.
+export function resolvePiMcpMode(rawPiVersion) {
+  const version = parsePiVersion(rawPiVersion);
+  const since = parsePiVersion(PI_BUILTIN_MCP_SINCE);
+  if (!version || !since) return 'adapter';
+  return compareVersionTriples(version, since) >= 0 ? 'builtin' : 'adapter';
+}
 
 export function piMcpAdapterSpec() {
   return `npm:${PI_MCP_ADAPTER_PACKAGE}@${PI_MCP_ADAPTER_VERSION}`;
@@ -176,21 +210,36 @@ export function isAdapterInstalled(piListOutput) {
   return String(piListOutput || '').includes(PI_MCP_ADAPTER_PACKAGE);
 }
 
-// Full setup: mcp.json servers first (offline-safe), then the adapter
-// package via `pi install` (needs network). `run` spawns
-// `run(cmd, args)` and resolves { stdout }; inject it in tests.
+// Full setup: mcp.json servers first (offline-safe, carrier-independent),
+// then the carrier decision. On pi >= 0.99.0 the built-in MCP extension
+// serves mcp.json and no adapter is installed; an already-installed adapter
+// is only reported (`installed-conflicts`) — removal flips session behavior
+// and stays an explicit operator action (`pi remove npm:pi-mcp-adapter`).
+// On older pi, or whenever `pi --version` cannot be captured, the adapter
+// path runs exactly as before. `run` spawns `run(cmd, args)` and resolves
+// { stdout }; inject it in tests. `piVersion` overrides detection when the
+// caller already captured it.
 export async function ensurePiMcpAdapter({
   mcpJsonPath,
   servers = null,
   dryRun = false,
   io = null,
   run = null,
+  piVersion = null,
 } = {}) {
   if (!mcpJsonPath) {
     throw new Error('ensurePiMcpAdapter requires mcpJsonPath');
   }
   const mcp = ensurePiMcpServers({ mcpJsonPath, servers, dryRun, io });
-  let adapter = 'present';
+  let detected = piVersion == null || piVersion === '' ? '' : String(piVersion);
+  if (!detected && run) {
+    try {
+      detected = String((await run('pi', ['--version'])).stdout || '');
+    } catch {
+      detected = '';
+    }
+  }
+  const mode = resolvePiMcpMode(detected);
   let list = '';
   try {
     list = run ? String((await run('pi', ['list'])).stdout || '') : '';
@@ -198,12 +247,32 @@ export async function ensurePiMcpAdapter({
     // `pi` may be absent from the subprocess PATH (or offline-broken);
     // preview intent under dry-run, fail with a clear message when live.
     if (dryRun) {
-      io?.log?.(`[plan] cannot check pi package list; previewing adapter install anyway`);
+      io?.log?.(mode === 'builtin'
+        ? `[plan] cannot check pi package list; assuming the adapter is absent`
+        : `[plan] cannot check pi package list; previewing adapter install anyway`);
     } else {
       throw new Error(`cannot check pi packages: ${error.message}`);
     }
   }
-  if (!isAdapterInstalled(list)) {
+  const adapterInstalled = isAdapterInstalled(list);
+  if (mode === 'builtin') {
+    if (adapterInstalled) {
+      io?.log?.(`[info] pi ${parsePiVersion(detected)?.join('.') || '(version?)'} ships built-in MCP; pi-mcp-adapter shadows it (sessions keep working via the adapter)`);
+      io?.log?.(`[info] optional cleanup restores built-in MCP: pi remove ${piMcpAdapterSpec()}`);
+    }
+    return {
+      mcpJsonPath,
+      mode,
+      piVersion: parsePiVersion(detected)?.join('.') || null,
+      mcpAction: mcp.action,
+      adapter: adapterInstalled ? 'installed-conflicts' : 'not-installed',
+      added: mcp.added,
+      present: mcp.present,
+      keptDiffers: mcp.keptDiffers,
+    };
+  }
+  let adapter = 'present';
+  if (!adapterInstalled) {
     const args = buildAdapterInstallArgs();
     if (dryRun) {
       io?.log?.(`[plan] would run: pi ${args.join(' ')}`);
@@ -216,5 +285,14 @@ export async function ensurePiMcpAdapter({
       adapter = 'installed';
     }
   }
-  return { mcpJsonPath, mcpAction: mcp.action, adapter, added: mcp.added, present: mcp.present, keptDiffers: mcp.keptDiffers };
+  return {
+    mcpJsonPath,
+    mode,
+    piVersion: parsePiVersion(detected)?.join('.') || null,
+    mcpAction: mcp.action,
+    adapter,
+    added: mcp.added,
+    present: mcp.present,
+    keptDiffers: mcp.keptDiffers,
+  };
 }

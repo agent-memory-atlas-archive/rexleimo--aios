@@ -94,9 +94,11 @@ export const INTEGRATION_CLIENT_TABLE = Object.freeze({
     buildProbe: () => cliAdd('grok', ['mcp', 'list']),
   }),
 
-  // Pi core has no MCP surface; the AIOS-managed path is the pi-mcp-adapter extension,
-  // which reads the Pi-global mcp.json. Its README documents `url` as
-  // "HTTP endpoint (StreamableHTTP with SSE fallback)". AIOS only appends a
+  // Pi reads the Pi-global mcp.json through whichever carrier is active:
+  // the built-in `mcp` extension on pi >= 0.99.0, or the pi-mcp-adapter
+  // extension before that (components/pi/mcp-adapter.mjs picks via
+  // resolvePiMcpMode). HTTP entries follow the documented "HTTP endpoint
+  // (StreamableHTTP with SSE fallback)" shape. AIOS only appends a
   // user-owned entry and never rewrites entries it does not own.
   pi: Object.freeze({
     client: 'pi',
