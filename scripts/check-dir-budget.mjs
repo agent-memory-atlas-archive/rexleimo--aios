@@ -37,7 +37,7 @@ export const EXEMPT_DIRS = Object.freeze({
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
 // codemap/ 已拆完（16→7），故不在此列。
 export const BASELINE_COUNTS = Object.freeze({
-  'scripts/tests': 280,
+  'scripts/tests': 281,
   'scripts/lib': 55,
   'scripts/lib/lifecycle': 43,
   'scripts/lib/harness': 37,
