@@ -4,8 +4,8 @@ import { isDeepStrictEqual } from 'node:util';
 
 import { parseDocument } from 'yaml';
 
-import { CRG_MCP_ALIAS } from '../constants.mjs';
-import { backupFilePath } from '../paths.mjs';
+import { CRG_MCP_ALIAS } from '../../constants.mjs';
+import { backupFilePath } from '../../paths.mjs';
 import { buildCrgEntryForTarget, isCrgServeEntry, isObjectRecord } from './entries.mjs';
 
 function toHermesMcpEntry(entry) {

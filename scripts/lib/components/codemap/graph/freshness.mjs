@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { CRG_DATA_DIR } from './constants.mjs';
+import { CRG_DATA_DIR } from '../constants.mjs';
 
 const GRAPH_DB_NAME = 'graph.db';
 

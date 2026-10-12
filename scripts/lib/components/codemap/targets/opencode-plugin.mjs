@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { backupFilePath, resolveUserPath } from './paths.mjs';
+import { backupFilePath, resolveUserPath } from '../paths.mjs';
 
 const OPENCODE_CRG_PLUGIN = `import type { Plugin } from "@opencode-ai/plugin"
 

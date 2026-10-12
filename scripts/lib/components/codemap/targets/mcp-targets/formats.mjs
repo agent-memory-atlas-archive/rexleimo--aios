@@ -1,4 +1,4 @@
-import { normalizeZcodeServerEntry } from '../../../clients/mcp/zcode-schema.mjs';
+import { normalizeZcodeServerEntry } from '../../../../clients/mcp/zcode-schema.mjs';
 
 import { injectCrgIntoMcpJson, injectCrgIntoOpencodeJson, inspectJsonNamespace, removeCrgFromMcpJson, removeCrgFromNestedJson, removeCrgFromOpencodeJson } from './json.mjs';
 import { inspectCodexToml, removeCrgFromCodexToml, upsertCodexMcpToml } from './toml.mjs';

@@ -11,17 +11,17 @@ import {
   inspectCodemapMcpTarget,
   injectCrgIntoClientTarget,
   removeCrgFromClientTarget,
-} from '../lib/components/codemap/mcp-targets.mjs';
+} from '../lib/components/codemap/targets/mcp-targets.mjs';
 import {
   collectCodemapInstructionFiles,
   getCodemapInstructionSection,
   injectCrgIntoInstructionFiles,
-} from '../lib/components/codemap/instructions.mjs';
+} from '../lib/components/codemap/targets/instructions.mjs';
 import { AGENTS_MD_MARKERS } from '../lib/components/codemap/constants.mjs';
-import { evaluateGraphFreshness, inspectGraphFreshness } from '../lib/components/codemap/freshness.mjs';
-import { ensureOpencodePlugin } from '../lib/components/codemap/opencode-plugin.mjs';
+import { evaluateGraphFreshness, inspectGraphFreshness } from '../lib/components/codemap/graph/freshness.mjs';
+import { ensureOpencodePlugin } from '../lib/components/codemap/targets/opencode-plugin.mjs';
 import { getCodemapHelpText } from '../lib/cli/help/codemap.mjs';
-import { buildCrgEntryForTarget } from '../lib/components/codemap/mcp-targets/entries.mjs';
+import { buildCrgEntryForTarget } from '../lib/components/codemap/targets/mcp-targets/entries.mjs';
 import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../lib/clients/mcp/zcode-schema.mjs';
 import { buildAiosPiMcpServers } from '../lib/components/pi/mcp-adapter.mjs';
 import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../lib/clients/registry.mjs';
@@ -332,10 +332,10 @@ test('codemap component keeps client config responsibilities in focused modules'
 
   const modules = [
     { file: 'scripts/lib/components/codemap/constants.mjs', exports: ['CRG_MCP_ALIAS', 'CRG_DATA_DIR'] },
-    { file: 'scripts/lib/components/codemap/crg.mjs', exports: ['captureCrgCommand', 'runCrgCommand'] },
-    { file: 'scripts/lib/components/codemap/instructions.mjs', exports: ['injectCrgIntoInstructionFiles', 'removeCrgFromInstructionFiles'] },
-    { file: 'scripts/lib/components/codemap/mcp-targets.mjs', exports: ['collectCodemapMcpTargets', 'injectCrgIntoClientTarget'] },
-    { file: 'scripts/lib/components/codemap/opencode-plugin.mjs', exports: ['ensureOpencodePlugin', 'removeOpencodePlugin'] },
+    { file: 'scripts/lib/components/codemap/graph/crg.mjs', exports: ['captureCrgCommand', 'runCrgCommand'] },
+    { file: 'scripts/lib/components/codemap/targets/instructions.mjs', exports: ['injectCrgIntoInstructionFiles', 'removeCrgFromInstructionFiles'] },
+    { file: 'scripts/lib/components/codemap/targets/mcp-targets.mjs', exports: ['collectCodemapMcpTargets', 'injectCrgIntoClientTarget'] },
+    { file: 'scripts/lib/components/codemap/targets/opencode-plugin.mjs', exports: ['ensureOpencodePlugin', 'removeOpencodePlugin'] },
     { file: 'scripts/lib/components/codemap/state-store.mjs', exports: ['readState', 'writeState', 'removeState'] },
   ];
 

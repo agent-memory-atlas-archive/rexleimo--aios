@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { CLIENT_MCP_ENTRY_OVERRIDES, CRG_MCP_ALIAS } from '../constants.mjs';
+import { CLIENT_MCP_ENTRY_OVERRIDES, CRG_MCP_ALIAS } from '../../constants.mjs';
 
 /**
  * pi 的 server entry 形状**独立构造**，不走 `CLIENT_MCP_ENTRY_OVERRIDES`。

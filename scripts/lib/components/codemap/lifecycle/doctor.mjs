@@ -1,17 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { commandExists } from '../../platform/process.mjs';
+import { commandExists } from '../../../platform/process.mjs';
 
-import { AGENTS_MD_MARKERS, CRG_DATA_DIR, CRG_MCP_ALIAS } from './constants.mjs';
-import { captureCrgCommand } from './crg.mjs';
-import { resolveClientHomes } from './environment.mjs';
-import { inspectGraphFreshness } from './freshness.mjs';
-import { collectCodemapInstructionFiles, inspectCodemapInstructionMarkers } from './instructions.mjs';
+import { AGENTS_MD_MARKERS, CRG_DATA_DIR, CRG_MCP_ALIAS } from '../constants.mjs';
+import { captureCrgCommand } from '../graph/crg.mjs';
+import { resolveClientHomes } from '../targets/environment.mjs';
+import { inspectGraphFreshness } from '../graph/freshness.mjs';
+import { collectCodemapInstructionFiles, inspectCodemapInstructionMarkers } from '../targets/instructions.mjs';
 import { installCodemap } from './install.mjs';
-import { collectCodemapMcpTargets, inspectCodemapMcpTarget } from './mcp-targets.mjs';
-import { normalizeClientList } from './selection.mjs';
-import { readState, stateFilePath } from './state-store.mjs';
+import { collectCodemapMcpTargets, inspectCodemapMcpTarget } from '../targets/mcp-targets.mjs';
+import { normalizeClientList } from '../targets/selection.mjs';
+import { readState, stateFilePath } from '../state-store.mjs';
 
 /**
  * claude 的 MCP 是否被**项目级本地设置**禁用。

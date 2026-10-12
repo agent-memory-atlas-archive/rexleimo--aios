@@ -1,4 +1,4 @@
-import { resolveClientSelection } from '../../clients/registry.mjs';
+import { resolveClientSelection } from '../../../clients/registry.mjs';
 
 export function normalizeClientList(client = 'all') {
   try {

@@ -75,6 +75,7 @@ npm run typecheck && npm run build
 - File names: kebab-case for action modules (for example `auth-check.ts`), `index.ts` for module entry points.
 - For `mcp-server` internals, tool names follow `browser_*`; browser sessions may launch locally or attach to a configured CDP endpoint.
 - Keep configuration JSON keys stable; prefer additive changes over renaming.
+- Directory budget: max 8 entries (files + subdirs) per directory; split semantically when over. Enforced by `node scripts/check-dir-budget.mjs` (exemptions + ratcheted baselines live in that script).
 - Repo-local discoverable skills must live under `.codex/skills/` or `.claude/skills/` (optionally `.agents/skills/` only when the target client actually supports it). Do not invent parallel skill roots such as `.baoyu-skills/*/SKILL.md`; those are non-discoverable and should be plain docs or extension config only.
 
 ## Testing Guidelines

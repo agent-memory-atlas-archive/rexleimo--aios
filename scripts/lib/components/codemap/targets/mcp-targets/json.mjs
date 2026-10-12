@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { CRG_MCP_ALIAS } from '../constants.mjs';
-import { backupFilePath } from '../paths.mjs';
+import { CRG_MCP_ALIAS } from '../../constants.mjs';
+import { backupFilePath } from '../../paths.mjs';
 import { buildCrgEntryForTarget, isCrgServeEntry, isObjectRecord } from './entries.mjs';
 
 function parseJsonConfig(filePath, { dryRun = false } = {}) {

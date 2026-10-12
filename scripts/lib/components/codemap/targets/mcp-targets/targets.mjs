@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { resolveUserPath } from '../paths.mjs';
+import { resolveUserPath } from '../../paths.mjs';
 import { normalizeClientList } from '../selection.mjs';
 import { getCodemapTargetFormat } from './formats.mjs';
 

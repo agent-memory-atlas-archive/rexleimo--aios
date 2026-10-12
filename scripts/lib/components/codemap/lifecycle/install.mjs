@@ -1,18 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { commandExists } from '../../platform/process.mjs';
-import { syncGeneratedSkills } from '../../skills/sync.mjs';
+import { commandExists } from '../../../platform/process.mjs';
+import { syncGeneratedSkills } from '../../../skills/sync.mjs';
 
-import { CRG_DATA_DIR, CRG_MCP_ALIAS } from './constants.mjs';
-import { captureCrgCommand, runCrgCommand } from './crg.mjs';
-import { resolveClientHomes } from './environment.mjs';
-import { inspectGraphFreshness } from './freshness.mjs';
-import { injectCrgIntoInstructionFiles } from './instructions.mjs';
-import { collectCodemapMcpTargets, injectCrgIntoClientTarget } from './mcp-targets.mjs';
-import { ensureOpencodePlugin } from './opencode-plugin.mjs';
-import { resolveUserPath } from './paths.mjs';
-import { stateFilePath, writeState } from './state-store.mjs';
+import { CRG_DATA_DIR, CRG_MCP_ALIAS } from '../constants.mjs';
+import { captureCrgCommand, runCrgCommand } from '../graph/crg.mjs';
+import { resolveClientHomes } from '../targets/environment.mjs';
+import { inspectGraphFreshness } from '../graph/freshness.mjs';
+import { injectCrgIntoInstructionFiles } from '../targets/instructions.mjs';
+import { collectCodemapMcpTargets, injectCrgIntoClientTarget } from '../targets/mcp-targets.mjs';
+import { ensureOpencodePlugin } from '../targets/opencode-plugin.mjs';
+import { resolveUserPath } from '../paths.mjs';
+import { stateFilePath, writeState } from '../state-store.mjs';
 
 function logUvCheck({ skipCrgChecks, io }) {
   io.log('[1/8] Checking uv in PATH');

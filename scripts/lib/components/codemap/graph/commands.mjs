@@ -1,5 +1,5 @@
 import { captureCrgCommand, runCrgCommand } from './crg.mjs';
-import { readState, writeState } from './state-store.mjs';
+import { readState, writeState } from '../state-store.mjs';
 
 export async function buildCodemap({ projectRoot, io = console } = {}) {
   const result = runCrgCommand(['build'], { cwd: projectRoot, io });

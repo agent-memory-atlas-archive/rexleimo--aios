@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { CRG_MCP_ALIAS } from '../constants.mjs';
-import { backupFilePath } from '../paths.mjs';
+import { CRG_MCP_ALIAS } from '../../constants.mjs';
+import { backupFilePath } from '../../paths.mjs';
 import { buildCrgMcpServerEntry, isCrgServeEntry, isProjectScopedTarget } from './entries.mjs';
 
 // 纯函数：转义 TOML 字符串，避免 Windows 反斜杠和引号破坏配置。

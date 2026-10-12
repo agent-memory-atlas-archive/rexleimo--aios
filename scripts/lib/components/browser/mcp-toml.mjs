@@ -1,6 +1,6 @@
 /* 中文注释：把浏览器/auth MCP server block 以 [mcp_servers.<alias>] 形式写入 codex config.toml。
    codex 读取 TOML 而非 mcp.json，故对 codex 专用此 writer；采用按段 surgical upsert，
-   保留用户在 config.toml 里的其它配置（参考 codemap/mcp-targets/toml.mjs 的做法）。 */
+   保留用户在 config.toml 里的其它配置（参考 codemap/targets/mcp-targets/toml.mjs 的做法）。 */
 import fs from 'node:fs';
 import path from 'node:path';
 

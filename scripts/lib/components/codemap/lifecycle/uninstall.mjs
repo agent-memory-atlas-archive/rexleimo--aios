@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { CRG_DATA_DIR, CRG_MCP_ALIAS } from './constants.mjs';
-import { resolveClientHomes } from './environment.mjs';
-import { removeCrgFromInstructionFiles } from './instructions.mjs';
-import { collectCodemapMcpTargets, removeCrgFromClientTarget } from './mcp-targets.mjs';
-import { removeOpencodePlugin } from './opencode-plugin.mjs';
-import { normalizeClientList } from './selection.mjs';
-import { removeState, stateFilePath } from './state-store.mjs';
+import { CRG_DATA_DIR, CRG_MCP_ALIAS } from '../constants.mjs';
+import { resolveClientHomes } from '../targets/environment.mjs';
+import { removeCrgFromInstructionFiles } from '../targets/instructions.mjs';
+import { collectCodemapMcpTargets, removeCrgFromClientTarget } from '../targets/mcp-targets.mjs';
+import { removeOpencodePlugin } from '../targets/opencode-plugin.mjs';
+import { normalizeClientList } from '../targets/selection.mjs';
+import { removeState, stateFilePath } from '../state-store.mjs';
 
 export async function uninstallCodemap({ rootDir, projectRoot, dryRun = false, io = console, clientHomes = null, client = 'all' } = {}) {
   const homes = resolveClientHomes(clientHomes);

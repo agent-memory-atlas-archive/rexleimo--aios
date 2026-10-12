@@ -1,6 +1,6 @@
 import os from 'node:os';
 
-import { getClientHomes } from '../../platform/paths.mjs';
+import { getClientHomes } from '../../../platform/paths.mjs';
 
 export function resolveClientHomes(clientHomes) {
   return clientHomes && typeof clientHomes === 'object'

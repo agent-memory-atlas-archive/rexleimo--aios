@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { CRG_DATA_DIR } from './constants.mjs';
-import { installCodemap } from './install.mjs';
+import { installCodemap } from './lifecycle/install.mjs';
 import { readState } from './state-store.mjs';
 
 export const CODEMAP_AUTO_INSTALL_ENV = 'AIOS_CODEMAP_AUTO_INSTALL';

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { AGENTS_MD_MARKERS, CLIENT_INSTRUCTION_FILES } from './constants.mjs';
+import { AGENTS_MD_MARKERS, CLIENT_INSTRUCTION_FILES } from '../constants.mjs';
 import { normalizeClientList } from './selection.mjs';
 
 const AGENTS_MD_CRG_SECTION = `## MCP Tools: code-review-graph

@@ -1,6 +1,6 @@
-import { captureCommand, commandExists, runCommand } from '../../platform/process.mjs';
+import { captureCommand, commandExists, runCommand } from '../../../platform/process.mjs';
 
-import { CRG_MCP_ALIAS } from './constants.mjs';
+import { CRG_MCP_ALIAS } from '../constants.mjs';
 
 export function runCrgCommand(args, { cwd, dryRun = false, io = console } = {}) {
   if (!commandExists('uvx')) {
