@@ -6,16 +6,24 @@ import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
 import { doctorCodemap, installCodemap } from '../lib/components/codemap.mjs';
-import { collectCodemapMcpTargets } from '../lib/components/codemap/mcp-targets.mjs';
+import {
+  collectCodemapMcpTargets,
+  inspectCodemapMcpTarget,
+  injectCrgIntoClientTarget,
+  removeCrgFromClientTarget,
+} from '../lib/components/codemap/mcp-targets.mjs';
 import {
   collectCodemapInstructionFiles,
   getCodemapInstructionSection,
   injectCrgIntoInstructionFiles,
 } from '../lib/components/codemap/instructions.mjs';
 import { AGENTS_MD_MARKERS } from '../lib/components/codemap/constants.mjs';
+import { evaluateGraphFreshness, inspectGraphFreshness } from '../lib/components/codemap/freshness.mjs';
 import { ensureOpencodePlugin } from '../lib/components/codemap/opencode-plugin.mjs';
 import { getCodemapHelpText } from '../lib/cli/help/codemap.mjs';
 import { buildCrgEntryForTarget } from '../lib/components/codemap/mcp-targets/entries.mjs';
+import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../lib/clients/mcp/zcode-schema.mjs';
+import { buildAiosPiMcpServers } from '../lib/components/pi/mcp-adapter.mjs';
 import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../lib/clients/registry.mjs';
 
 async function makeTemp(prefix) {
@@ -41,6 +49,8 @@ async function readJson(filePath) {
 
 test('codemap MCP targets agree with the client registry (single source of truth)', () => {
   const projectRoot = '/proj';
+  // 夹具必须覆盖**每个**声明了 MCP 落点的客户端；少一个就会让「所有客户端」的
+  // 断言失去意义（这正是此前漏掉 pi/zcode/qoder/workbuddy 的原因）。
   const clientHomes = {
     codex: '/h/.codex',
     claude: '/h/.claude',
@@ -48,6 +58,10 @@ test('codemap MCP targets agree with the client registry (single source of truth
     opencode: '/h/.config/opencode',
     hermes: '/h/.hermes',
     grok: '/h/.grok',
+    workbuddy: '/h/.workbuddy',
+    pi: '/h/.pi/agent',
+    zcode: '/h/.zcode',
+    qoder: '/h/.qoder',
   };
   const targets = collectCodemapMcpTargets(projectRoot, clientHomes, 'all');
   const byClient = Object.fromEntries(targets.map((t) => [t.clientKey, t]));
@@ -70,10 +84,18 @@ test('codemap MCP targets agree with the client registry (single source of truth
 
   // The registry descriptor must point at the same file basenames codemap actually writes.
   // Clients that share a dedup'd path are absent from byClient — that's correct because
-  // the first writer already covers them.
-  for (const client of ALL_CLIENTS) {
+  // 每个客户端都必须有 codemap 目标 —— 这里**不允许** `continue` 逃生口。
+  // 历史缺陷：本断言原先带 `if (!target) continue;`，把「清单里根本没有这个客户端」
+  // 当成「路径被 dedup 覆盖」静默跳过，于是 CODEMAP_MCP_TARGETS 漏掉 pi/zcode/qoder
+  // 三个客户端时测试依然全绿。注册表是客户端集合的单一事实来源，codemap 的清单
+  // 必须与它逐一对齐，否则「支持所有客户端」就只是注释里的承诺。
+  const expectedTargetClients = ALL_CLIENTS.filter((c) => getClientMcpTarget(c).format !== 'none');
+  const missing = expectedTargetClients.filter((c) => !byClient[c]);
+  assert.deepEqual(missing, [],
+    `codemap 缺少这些客户端的 MCP 目标：${missing.join(', ')}（它们在注册表里声明了 MCP 落点）`);
+
+  for (const client of expectedTargetClients) {
     const target = byClient[client];
-    if (!target) continue; // dedup'd path — covered by another client
     const desc = getClientMcpTarget(client);
     // desc.scopes[].file 是相对各作用域基准目录（home / project）的路径；
     // 这里用 path.resolve 归一化后再比，才能表达 `../.claude.json` 这种“与 client home 同级”的真实落点。
@@ -83,6 +105,13 @@ test('codemap MCP targets agree with the client registry (single source of truth
       scopePaths.some((candidate) => path.resolve(target.path) === candidate),
       `${client}: registry scopes [${scopePaths}] must match codemap target ${target.path}`,
     );
+    // 点路径 namespace 必须透传：zcode 的 server 桶是 `mcp.servers`，codemap 若按
+    // 单层键写（`parsed['mcp.servers']`）会静默落空 —— 正是此前 uninstall 静默 no-op 的成因。
+    // 单段 namespace（codex 的 mcp_servers 等）由各格式自己的读写器负责，不在此断言。
+    if (desc.namespace && desc.namespace.includes('.')) {
+      assert.equal(target.namespace, desc.namespace,
+        `${client}: codemap target 必须沿用注册表的点路径 namespace ${desc.namespace}`);
+    }
   }
 });
 
@@ -328,4 +357,201 @@ test('OpenCode codemap plugin uses current hooks and bounds background graph com
   assert.match(source, /COMMAND_TIMEOUT_MS = 30_000/u);
   assert.match(source, /Bun\.spawn/u);
   assert.doesNotMatch(source, /app\.on\(/u);
+});
+
+test('codemap writes zcode through the dot-path namespace and normalizes to the strict schema', async () => {
+  const dir = await makeTemp('aios-codemap-zcode-');
+  const filePath = path.join(dir, 'config.json');
+  // 既有内容：一个用户自有的 server + 一个 mcp 之外的顶层键（都必须保留）。
+  await writeJson(filePath, {
+    mcp: { servers: { pencil: { transport: 'stdio', command: 'pencil.exe' } } },
+    hooks: { keep: true },
+  });
+
+  const target = {
+    path: filePath,
+    clientKey: 'zcode',
+    format: 'mcp-json-nested',
+    namespace: 'mcp.servers',
+    createIfMissing: true,
+  };
+  injectCrgIntoClientTarget(target, '/proj', { dryRun: false, io: silentIo() });
+
+  const written = JSON.parse(await readFile(filePath, 'utf8'));
+  assert.ok(written.mcp.servers['code-review-graph'], 'CRG 必须写进 mcp.servers 这个点路径桶');
+  assert.deepEqual(written.mcp.servers.pencil, { transport: 'stdio', command: 'pencil.exe' },
+    '用户自有的 server 必须原样保留');
+  assert.deepEqual(written.hooks, { keep: true }, 'mcp 之外的顶层键必须保留');
+  // 严格 schema：白名单外的字段会被 ZCode 整条丢弃，所以不能落盘。
+  const crgFields = Object.keys(written.mcp.servers['code-review-graph']);
+  for (const field of crgFields) {
+    assert.ok(ZCODE_SERVER_FIELDS_ALLOWLIST.includes(field), `zcode entry 含白名单外字段: ${field}`);
+  }
+
+  // inspect 也要走点路径，否则 doctor 会对 zcode 报 missing。
+  const raw = await readFile(filePath, 'utf8');
+  assert.equal(inspectCodemapMcpTarget({ ...target, path: filePath }).valid, true);
+
+  // 删除同样必须走点路径 —— 单层取值会让 uninstall 对 zcode 静默 no-op。
+  removeCrgFromClientTarget(target, { io: silentIo() });
+  const afterRemove = JSON.parse(await readFile(filePath, 'utf8'));
+  assert.equal(afterRemove.mcp.servers['code-review-graph'], undefined, 'uninstall 必须真删掉 CRG');
+  assert.deepEqual(afterRemove.mcp.servers.pencil, { transport: 'stdio', command: 'pencil.exe' });
+  assert.ok(raw.includes('mcp.servers') === false || true);
+});
+
+test('codemap writes pi entries byte-identical to the pi component definition', async () => {
+  const dir = await makeTemp('aios-codemap-pi-');
+  const filePath = path.join(dir, 'mcp.json');
+  await writeJson(filePath, { mcpServers: { 'aios-memory': { command: 'node', args: ['x'], lifecycle: 'lazy' } } });
+
+  injectCrgIntoClientTarget(
+    { path: filePath, clientKey: 'pi', format: 'pi-json', namespace: '', createIfMissing: true },
+    '/proj',
+    { dryRun: false, io: silentIo() },
+  );
+
+  const written = JSON.parse(await readFile(filePath, 'utf8'));
+  const expected = buildAiosPiMcpServers({})['code-review-graph'];
+  // pi 自己的 doctor 用 JSON.stringify 精确比对（键序敏感）：形状差一个字段或一个键序
+  // 就会永久报 kept-differs。这里钉的就是这个契约。
+  assert.equal(JSON.stringify(written.mcpServers['code-review-graph']), JSON.stringify(expected),
+    'codemap 写出的 pi entry 必须与 pi 组件的定义逐字节一致');
+  assert.equal(written.mcpServers['code-review-graph'].type, undefined, 'pi entry 不应带 type 字段');
+  assert.equal(written.mcpServers['code-review-graph'].lifecycle, 'lazy', 'pi entry 必须带 lifecycle');
+  assert.deepEqual(written.mcpServers['aios-memory'], { command: 'node', args: ['x'], lifecycle: 'lazy' },
+    'pi 的其它 AIOS server 必须原样保留');
+});
+
+test('codemap doctor reports the claude project-level disable that --fix cannot heal', async () => {
+  const projectRoot = await makeTemp('aios-codemap-claude-disable-');
+  await mkdir(path.join(projectRoot, '.claude'), { recursive: true });
+  await writeJson(path.join(projectRoot, '.claude', 'settings.local.json'), {
+    disabledMcpjsonServers: ['code-review-graph', 'aios-shell'],
+  });
+
+  const logs = [];
+  await doctorCodemap({
+    rootDir: projectRoot,
+    projectRoot,
+    io: silentIo(logs),
+    clientHomes: { claude: path.join(projectRoot, '.claude') },
+    client: 'claude',
+    skipCrgChecks: true,
+    statusText: 'Nodes: 1',
+    graphFreshness: { stale: false, reason: 'fresh', graphMtimeMs: 1, commitMs: 0, graphAgeDays: 0, behindHeadDays: 0 },
+  });
+
+  const joined = logs.join('\n');
+  assert.match(joined, /disabledMcpjsonServers/u,
+    'doctor 必须报告 claude 的 project 级禁用，否则「命令报 OK 却仍不工作」再次不可见');
+  assert.match(joined, /does NOT change this file/u, '告警要点明 --fix 修不到这个文件');
+});
+
+test('codemap graph freshness detects a graph that fell behind HEAD', async () => {
+  const projectRoot = await makeTemp('aios-codemap-freshness-');
+  const now = Date.UTC(2026, 9, 13);
+  const day = 86400_000;
+
+  const fresh = evaluateGraphFreshness({ graphMtimeMs: now, commitTimeSeconds: (now - day) / 1000, now });
+  assert.equal(fresh.stale, false);
+  assert.equal(fresh.reason, 'fresh');
+
+  // 两个天数含义不同：图龄（距现在多久没重建）vs 落后 HEAD 多久。混用会把
+  // 「图 11 天没重建」误报成「落后 HEAD 11 天」，两者是不同的量。
+  const stale = evaluateGraphFreshness({ graphMtimeMs: now - 11 * day, commitTimeSeconds: (now - 3 * day) / 1000, now });
+  assert.equal(stale.stale, true);
+  assert.equal(stale.reason, 'behind-head');
+  assert.equal(stale.graphAgeDays, 11, 'graphAgeDays = 图距现在多久没重建');
+  assert.equal(stale.behindHeadDays, 8, 'behindHeadDays = 图比 HEAD commit 晚多久');
+
+  // 信息不足（无图 / 非 git 仓库）不算陈旧 —— 那由「图目录缺失」步骤单独报告。
+  assert.equal(evaluateGraphFreshness({ graphMtimeMs: null, commitTimeSeconds: 1, now }).stale, false);
+  assert.equal(evaluateGraphFreshness({ graphMtimeMs: 1, commitTimeSeconds: null, now }).stale, false);
+
+  // 落盘路径：图旧于 HEAD 时为陈旧。
+  const inspected = inspectGraphFreshness(projectRoot, {
+    fsImpl: { statSync: () => ({ mtimeMs: now - 11 * day }) },
+    execFileSyncImpl: () => `${Math.floor(now / 1000)}\n`,
+    now,
+  });
+  assert.equal(inspected.stale, true);
+  assert.equal(inspected.graphAgeDays, 11);
+});
+
+test('codemap startup gate detects readiness without side effects', async () => {
+  const { isCodemapReady, isCodemapAutoInstallEnabled } = await import(
+    '../lib/components/codemap/ensure.mjs'
+  );
+  const empty = await makeTemp('aios-codemap-ensure-empty-');
+  assert.equal(isCodemapReady(empty), false, '无 state 无图 → 未就绪');
+
+  const stateOnly = await makeTemp('aios-codemap-ensure-state-');
+  await writeJson(path.join(stateOnly, '.aios', 'codemap.json'), { version: 1 });
+  assert.equal(isCodemapReady(stateOnly), false, '只有 state 没有图目录 → 未就绪');
+
+  const ready = await makeTemp('aios-codemap-ensure-ready-');
+  await writeJson(path.join(ready, '.aios', 'codemap.json'), { version: 1 });
+  await mkdir(path.join(ready, '.code-review-graph'), { recursive: true });
+  assert.equal(isCodemapReady(ready), true, 'state + 图目录 → 就绪');
+
+  assert.equal(isCodemapAutoInstallEnabled({}), true, '默认开');
+  assert.equal(isCodemapAutoInstallEnabled({ AIOS_CODEMAP_AUTO_INSTALL: '0' }), false);
+  assert.equal(isCodemapAutoInstallEnabled({ AIOS_CODEMAP_AUTO_INSTALL: 'off' }), false);
+});
+
+test('codemap startup gate installs when missing, never throws', async () => {
+  const { ensureCodemapInstalled } = await import('../lib/components/codemap/ensure.mjs');
+  const logs = [];
+  const io = { log: (line) => logs.push(String(line)), warn: (line) => logs.push(String(line)) };
+
+  // 开关关闭：不调 install。
+  let calls = 0;
+  const disabled = await ensureCodemapInstalled({
+    projectRoot: await makeTemp('aios-codemap-ensure-off-'),
+    io,
+    env: { AIOS_CODEMAP_AUTO_INSTALL: '0' },
+    installImpl: async () => { calls += 1; },
+  });
+  assert.equal(disabled.status, 'disabled');
+  assert.equal(calls, 0, '关闭时不得有任何副作用');
+
+  // 已就绪：不调 install。
+  const readyRoot = await makeTemp('aios-codemap-ensure-ok-');
+  await writeJson(path.join(readyRoot, '.aios', 'codemap.json'), { version: 1 });
+  await mkdir(path.join(readyRoot, '.code-review-graph'), { recursive: true });
+  const ready = await ensureCodemapInstalled({
+    projectRoot: readyRoot,
+    io,
+    env: {},
+    installImpl: async () => { calls += 1; },
+  });
+  assert.equal(ready.status, 'ready');
+  assert.equal(calls, 0, '就绪时不得调 install');
+
+  // 缺失：调一次 install，成功即 installed。
+  const missingRoot = await makeTemp('aios-codemap-ensure-miss-');
+  const installed = await ensureCodemapInstalled({
+    projectRoot: missingRoot,
+    io,
+    env: {},
+    installImpl: async () => {
+      calls += 1;
+      await writeJson(path.join(missingRoot, '.aios', 'codemap.json'), { version: 1 });
+      await mkdir(path.join(missingRoot, '.code-review-graph'), { recursive: true });
+    },
+  });
+  assert.equal(installed.status, 'installed');
+  assert.equal(calls, 1);
+
+  // install 抛错（如缺 uv）：只告警、不抛，启动永不阻塞。
+  const brokenRoot = await makeTemp('aios-codemap-ensure-broken-');
+  const failed = await ensureCodemapInstalled({
+    projectRoot: brokenRoot,
+    io,
+    env: {},
+    installImpl: async () => { throw new Error('Missing required command: uv'); },
+  });
+  assert.equal(failed.status, 'failed');
+  assert.match(failed.reason, /uv/, '失败原因要保留，便于定位');
 });

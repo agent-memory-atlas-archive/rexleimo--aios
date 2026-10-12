@@ -6,10 +6,31 @@ import { commandExists } from '../../platform/process.mjs';
 import { AGENTS_MD_MARKERS, CRG_DATA_DIR, CRG_MCP_ALIAS } from './constants.mjs';
 import { captureCrgCommand } from './crg.mjs';
 import { resolveClientHomes } from './environment.mjs';
+import { inspectGraphFreshness } from './freshness.mjs';
 import { collectCodemapInstructionFiles, inspectCodemapInstructionMarkers } from './instructions.mjs';
 import { installCodemap } from './install.mjs';
 import { collectCodemapMcpTargets, inspectCodemapMcpTarget } from './mcp-targets.mjs';
+import { normalizeClientList } from './selection.mjs';
 import { readState, stateFilePath } from './state-store.mjs';
+
+/**
+ * claude 的 MCP 是否被**项目级本地设置**禁用。
+ *
+ * Claude Code 有两层开关：user 级 `~/.claude.json` 的 mcpServers 决定“注册了没有”，
+ * 项目级 `.claude/settings.local.json` 的 disabledMcpjsonServers 决定“启不启用”。
+ * `doctor --fix` 只走 installCodemap（写 user 级），**不碰** disabledMcpjsonServers
+ * —— 于是出现「doctor 报 OK，实际仍被禁用」这种最难查的状态。这里显式报告它。
+ */
+function inspectClaudeDisabledServers(projectRootPath, { fsImpl = fs } = {}) {
+  const settingsPath = path.join(projectRootPath, '.claude', 'settings.local.json');
+  try {
+    const parsed = JSON.parse(fsImpl.readFileSync(settingsPath, 'utf8'));
+    const disabled = Array.isArray(parsed?.disabledMcpjsonServers) ? parsed.disabledMcpjsonServers : [];
+    return { settingsPath, disabled, disablesCrg: disabled.includes(CRG_MCP_ALIAS) };
+  } catch {
+    return { settingsPath, disabled: [], disablesCrg: false };
+  }
+}
 
 function createDoctorCounters(io) {
   let effectiveWarnings = 0;
@@ -28,7 +49,7 @@ function createDoctorCounters(io) {
   };
 }
 
-function checkDoctorRuntime({ projectRootPath, skipCrgChecks, statusText, crgVersion, io, counters }) {
+function checkDoctorRuntime({ projectRootPath, skipCrgChecks, statusText, crgVersion, io, counters, graphFreshness }) {
   io.log('[1/7] Checking uv in PATH');
   if (skipCrgChecks) counters.ok('uv check skipped (test override)');
   else if (commandExists('uv')) counters.ok('uv found');
@@ -54,6 +75,14 @@ function checkDoctorRuntime({ projectRootPath, skipCrgChecks, statusText, crgVer
     const statusResult = captureCrgCommand(['status'], { cwd: projectRootPath });
     if (statusResult && statusResult.stdout.trim()) counters.ok(`graph status: ${statusResult.stdout.trim().split('\n')[0]}`);
     else counters.warn('graph status unavailable or empty');
+  }
+
+  // 图陈旧：install 原先只在图缺失时构建，于是图会静默落后于 HEAD，
+  // 而 CRG 回答“改这个会影响谁”时读的正是这份旧图。陈旧要能被看见并重建。
+  if (graphFreshness.stale) {
+    counters.warn(`graph is stale: built ${graphFreshness.graphAgeDays} day(s) ago, ${graphFreshness.behindHeadDays} day(s) behind HEAD; run 'codemap install' to rebuild`);
+  } else if (graphFreshness.reason === 'fresh') {
+    counters.ok('graph is newer than HEAD (not stale)');
   }
 }
 
@@ -89,6 +118,28 @@ function checkDoctorStateAndDocs({ projectRootPath, client, counters }) {
   }
 }
 
+/**
+ * 报告 claude 的“已注册但被项目级本地设置禁用”状态。
+ *
+ * 这是 CRG 在 Claude 下“命令报 OK 却依然不工作”的根因：user 级注册由 `--fix` 修复，
+ * 但 project 级 disabledMcpjsonServers 不在任何代码的写入面内，`--fix` 修不到。
+ * 因此必须显式报告，否则该状态永远不可见。
+ */
+function checkClaudeLocalDisable({ projectRootPath, client, counters }) {
+  let enabled = null;
+  try {
+    enabled = new Set(normalizeClientList(client));
+  } catch {
+    enabled = null;
+  }
+  if (enabled && !enabled.has('claude')) return;
+
+  const info = inspectClaudeDisabledServers(projectRootPath);
+  if (info.disablesCrg) {
+    counters.warn(`${CRG_MCP_ALIAS} is disabled for claude by ${info.settingsPath} (disabledMcpjsonServers); 'doctor --fix' does NOT change this file — remove the entry manually`);
+  }
+}
+
 export async function doctorCodemap({
   rootDir,
   projectRoot,
@@ -101,17 +152,20 @@ export async function doctorCodemap({
   skipOpencodePluginInstall = false,
   statusText = '',
   crgVersion = '',
+  graphFreshness = null,
 } = {}) {
   const homes = resolveClientHomes(clientHomes);
   const projectRootPath = path.resolve(projectRoot || process.cwd());
   const counters = createDoctorCounters(io);
+  const freshness = graphFreshness || inspectGraphFreshness(projectRootPath);
 
   io.log('Codemap Doctor');
   io.log(`Project: ${projectRootPath}`);
   io.log('');
-  checkDoctorRuntime({ projectRootPath, skipCrgChecks, statusText, crgVersion, io, counters });
+  checkDoctorRuntime({ projectRootPath, skipCrgChecks, statusText, crgVersion, io, counters, graphFreshness: freshness });
   io.log('[5/7] Checking MCP config in clients');
   checkDoctorConfigs({ projectRootPath, homes, client, counters });
+  checkClaudeLocalDisable({ projectRootPath, client, counters });
   io.log('[6/7] Checking state file');
   io.log('[7/7] Checking client instruction files');
   checkDoctorStateAndDocs({ projectRootPath, client, counters });

@@ -2,7 +2,25 @@ import path from 'node:path';
 
 import { CLIENT_MCP_ENTRY_OVERRIDES, CRG_MCP_ALIAS } from '../constants.mjs';
 
+/**
+ * pi 的 server entry 形状**独立构造**，不走 `CLIENT_MCP_ENTRY_OVERRIDES`。
+ *
+ * 原因：overrides 是 `{...base, ...overrides}` 合并，只能覆盖/新增字段，**删不掉**
+ * base 的 `type:'stdio'`；而 pi 的 mcp.json 条目不带 `type`、带 `lifecycle:'lazy'`。
+ * pi 组件（`components/pi/mcp-adapter.mjs` 的 `buildAiosPiMcpServers`）是形状的
+ * 权威定义，其 `doctor` 用 `JSON.stringify` 精确比对（键序敏感），所以这里必须
+ * 逐字段、按同序构造，否则 pi doctor 会永久报 kept-differs。
+ */
+export function buildCrgPiEntry() {
+  return {
+    command: 'uvx',
+    args: ['code-review-graph', 'serve'],
+    lifecycle: 'lazy',
+  };
+}
+
 export function buildCrgMcpServerEntry(clientKey) {
+  if (clientKey === 'pi') return buildCrgPiEntry();
   const entry = {
     command: 'uvx',
     args: ['code-review-graph', 'serve'],

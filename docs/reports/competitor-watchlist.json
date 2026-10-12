@@ -1,10 +1,58 @@
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-09-28",
-  "lastMetadataCheck": "2026-09-28 (14-repo GitHub REST metadata + release-body trigger screening, see docs/reports/2026-09-28-competitor-watchlist-refresh.md; all 5 active refs non-archived and pushed within 3 days; goose repo moved to aaif-goose/goose — API redirect confirmed)",
-  "lastDeepDive": "2026-08-14 (TencentDB v2.0.0/v2.0.1-beta.1 full source; OMO v5 hashline-core + memory-core + fork-cost; Graphiti/Letta/mem0/OpenHarness current trees; see docs/reports/2026-08-14-competitor-source-refresh.md). 2026-09-28 was trigger screening only, no source deep dive",
+  "lastUpdated": "2026-10-13",
+  "lastMetadataCheck": "2026-10-12 (trigger screening + new-player scan; all 5 active refs core contracts unchanged since 2026-09-28; no deep dive triggered; see docs/reports/2026-10-12-competitor-refresh.md)",
+  "lastDeepDive": "2026-08-14 (TencentDB v2.0.0/v2.0.1-beta.1 full source; OMO v5 hashline-core + memory-core + fork-cost; Graphiti/Letta/mem0/OpenHarness current trees; see docs/reports/2026-08-14-competitor-source-refresh.md). 2026-10-12 was trigger screening + new-player scan only, no source deep dive",
   "refreshMethod": "api.github.com metadata + codeload.github.com tarballs + local source review of ACL/loadout/hashline/citation/temporal contracts",
   "pendingDeepDive": [],
+  "rejectedCandidates": [
+    {
+      "id": "codewhale",
+      "name": "CodeWhale",
+      "repo": "Hmbown/CodeWhale",
+      "pillar": "intelligent-planning",
+      "candidateQuestion": "如何将长任务恢复粒度从 session checkpoint 细化到单步操作级，同时保持证据链完整？（append-only ledger + fleet resume）",
+      "decision": "rejected",
+      "decisionDate": "2026-10-12",
+      "reason": "同一 append-only 语义 AIOS solo-journal 已具备：scripts/lib/harness/solo-journal/iteration.mjs:20 每轮 NDJSON 步内追加日志、hooks.mjs:23 hook 事件流、原子 per-iteration outcome 文件 + rolling summary；恢复面另有 session-owner 租约（claimSessionOwner/isProcessAlive/installSessionSignalHandlers）比 fleet resume 更早防脑裂；回滚面有 solo-worktree.mjs + session/changed-files.mjs。唯一独立想法 constitution.json 声明式行为约束与现有 workflow policy/capability routing 重叠。按 portfolioPolicy 无未覆盖支柱问题，不满足准入。",
+      "residualDifference": "resume 起点能否落在 iteration 内部而非边界；但按 iteration 边界恢复是现有设计意图，不构成立项理由。",
+      "reevaluateIf": "出现可验证的步内（sub-iteration）恢复且现有 solo-journal 边界恢复被证明不足时，作为新候选重评；不得自动回到 watchlist。"
+    }
+  ],
+  "consumedDependencies": {
+    "note": "Not competitors — upstream components AIOS installs and meters. Track by release cadence and version-pin drift, never by watchlist tier or refreshTrigger.",
+    "entries": [
+      {
+        "id": "headroom",
+        "name": "Headroom",
+        "repo": "headroomlabs-ai/headroom",
+        "role": "上下文压缩层，显式 compress/retrieve（CCR 可逆取回原文）",
+        "integration": "scripts/lib/aios-init/headroom-installer.mjs (version pin headroom-ai[all]>=0.31.0,<0.32.0, uv/pipx) + scripts/lib/components/pi/mcp-adapter.mjs (MCP server) + scripts/lib/interception/metrics/ledger.mjs (layer='headroom')",
+        "designBoundary": "docs/plans/2026-09-30-token-intelligence-v2-architecture.md:14 — 不做实时透明的输入拦截，Headroom 已声明该边界，本设计不越界",
+        "trackedBy": "version-pin drift + 采纳率 stats；不占 watchlist 坑位（2026-10-12 由 pendingDeepDive 候选改判为已消费依赖）"
+      },
+      {
+        "id": "rtk",
+        "name": "RTK",
+        "role": "命令输出拦截压缩",
+        "trackedBy": "aios init 自动检测安装；仅 A/B 计量（layer='rtk_ab'）"
+      },
+      {
+        "id": "caveman",
+        "name": "Caveman",
+        "role": "prompt 技能层输出压缩",
+        "trackedBy": "aios init 自动检测安装"
+      },
+      {
+        "id": "sol-pi",
+        "name": "SoL-Pi",
+        "repo": "NVlabs/SoL-Pi",
+        "role": "自动化机制筛选研究方法论（非代码依赖）：152 候选筛到 4 的自动研究循环、冻结 held-out 任务集、两道闸门验收、每机制计账。",
+        "integration": "不安装其包。影响面为方法论与命名：docs/plans/2026-09-30-token-intelligence-v2-architecture.md 的目标与非目标、token-bench 的两道闸门规则、A/B 博客 tags 的 SoL-Pi 署名。评估结论为不引入（闸门绕过 / RPC 传输竞争 / pi 0.87.1 超出其验证域）。",
+        "trackedBy": "方法论引用面：当 token-bench 的闸门规则或冻结任务集语义变化时复核；不跟踪其版本号。2026-10-13 补入——影响过产品决策却从未进册（准入流程原先只覆盖「候选进 pendingDeepDive」，漏了「已在影响我们的来源」）。"
+      }
+    ]
+  },
   "portfolioPolicy": {
     "objective": "Minimize future maintenance cost by keeping only references that own a distinct, decision-relevant question.",
     "decisionDate": "2026-07-28",
@@ -14,16 +62,17 @@
       "specialist-reference"
     ],
     "activeRefreshCount": 5,
-    "fullSourceDeepDiveCount": 3,
+    "fullSourceDeepDiveCount": 2,
     "tierCounts": {
-      "core-reference": 3,
-      "specialist-reference": 2,
-      "archive-reference": 5,
-      "remove": 2
+      "core-reference": 2,
+      "specialist-reference": 3,
+      "archive-reference": 1,
+      "remove": 6
     },
+    "tierCountsNote": "2026-10-13 重算：mem0 / OpenHarness 由 archive→remove，Hermes 由 archive→specialist（pillar 校正为 team-workflow），OpenViking 保留 archive 但理由改按定位口径重写。合计 12，与 baselineProjectCount 一致。",
     "maintenanceReduction": {
-      "activeRefresh": "12 → 5 (-58%)",
-      "fullSourceDeepDive": "12 → 3 (-75%)",
+      "activeRefresh": "12 → 4 (-67%)",
+      "fullSourceDeepDive": "12 → 2 (-83%)",
       "scheduledFullPortfolioRefresh": "removed"
     },
     "tierDefinitions": {
@@ -37,7 +86,10 @@
       "Popularity, ecosystem size, generic agent breadth and already-absorbed basics are not retention reasons.",
       "A counterexample can justify an archive snapshot, not an active refresh slot.",
       "A new candidate must answer an uncovered planned question or displace an existing reference; it cannot only expand the list.",
-      "Stars, forks and routine release numbers are no longer maintained because they do not trigger product decisions."
+      "Stars, forks and routine release numbers are no longer maintained because they do not trigger product decisions.",
+      "引用本仓库能力前必须给出当前源码写入点/调用点行号；给不出即标未验证，不得当已完成引用。",
+      "新候选进入 pendingDeepDive 前，必须先给出「本仓库哪个模块最接近该能力」的自查结论；纯外部视角会系统性高估缺口。",
+      "移除任何参照前，必须先扫一遍其它条目的理由是否引用了它；若引用，该移除必须连带重评引用方。cleanupNotes 每次收缩记录附「受影响的引用方」。"
     ]
   },
   "coreValue": {
@@ -107,22 +159,6 @@
         "license": "NOASSERTION",
         "language": "TypeScript",
         "sourceEvidenceAsOf": "2026-09-28"
-      },
-      {
-        "id": "openclaw",
-        "name": "OpenClaw",
-        "repo": "openclaw/openclaw",
-        "url": "https://github.com/openclaw/openclaw",
-        "pillar": "team-workflow",
-        "tier": "core-reference",
-        "uniqueReferenceQuestion": "Agent 提出的 skill 或共享状态变更，如何通过 proposal → review → apply / rollback / quarantine，并用 provenance 与 stale hash 安全发布？",
-        "refreshCadence": "event-driven; quarterly metadata-only check",
-        "refreshTrigger": "skill workshop、install policy、proposal/review/apply/rollback/quarantine、provenance 或 stale-hash admission 发生相关源码变化；或 AIOS 准备开启 Team shared-canonical 写入。",
-        "rationale": "其治理状态机和反向安全信号最完整，是 Team 发布门与可回滚治理的唯一核心参照；只审查治理路径，不扫描其渠道、桌面或通用插件面。",
-        "evidenceSnapshot": "Skill Workshop 治理闭环、Plugin 外部化、Operator install policy、Memory/channel SQLite。2026-09-28（v2026.8.1→9.6）：grounded dreaming 默认开启（provenance 门槛晋升 + Dream Diary + 显式关闭；我们不跟默认值，抄门槛设计）；memory forget 溯源删除（检视贡献会话、排除来源准入、删派生留源 transcript）；automatic self-learning 按作者分信任档（scanner/Workshop 自有自动 apply，用户自改保持 pending）；Workshop pending proposals 硬上限 ≤3 + 历史扫描 SQLite cursor；备份恢复前校验 retained originals；pending child launch 随父 authority 终止；update 在装后 Doctor 失败时回滚 candidate 并保留配置/SecretRef；数据库 quarantine 决策单独存储防自擦除",
-        "license": "MIT",
-        "language": "TypeScript",
-        "sourceEvidenceAsOf": "2026-09-28"
       }
     ],
     "specialist-reference": [
@@ -157,25 +193,25 @@
         "license": "Apache-2.0",
         "language": "Python",
         "sourceEvidenceAsOf": "2026-09-28"
+      },
+      {
+        "id": "hermes-agent",
+        "name": "Hermes Agent",
+        "repo": "NousResearch/hermes-agent",
+        "url": "https://github.com/NousResearch/hermes-agent",
+        "pillar": "team-workflow",
+        "tier": "specialist-reference",
+        "uniqueReferenceQuestion": "后台 skill review 与 curator 如何形成可审计的自改进闭环？",
+        "reasonForRestore": "2026-10-13 复位（原为 archive-reference，pillar 记 intelligent-planning）。两点修正：① 原归档理由「curator/skill 治理与 OpenClaw 核心问题重叠」随 OpenClaw 移除而失效；② **pillar 记错**——skill 的 review→apply→rollback 治理属 team-workflow，被归为 intelligent-planning 后，它既不算该支柱参照，又在别处被当作「重叠」归档，两处落空。其问法逐字对应 OpenClaw 移除后登记的支柱缺口：「Agent 提出的 skill / 共享状态变更如何经 proposal→review→apply/rollback/quarantine 并用 provenance 与 stale hash 安全发布」。注：既有映射 docs/hermes-inspired-capability-mapping.md 覆盖的是 session recall / memory injection safety / subagent progress / executor capability / pre-mutation rollback，**不含 skill governance**，故「已有映射」不构成归档理由。",
+        "refreshCadence": "event-driven; semiannual metadata-only check",
+        "refreshTrigger": "其 background skill review / curator 的 proposal→apply→rollback 或 provenance 契约发生相关源码变化；或 AIOS 开始实现 skill-governance 发布闸门。渠道/桌面/网关面不触发刷新。",
+        "evidenceSnapshot": "handoff、background skill review、curator、LSP on write、prompt cache；已有 AIOS 映射页",
+        "license": "MIT",
+        "language": "Python",
+        "sourceEvidenceAsOf": "2026-07-28"
       }
     ],
     "archive-reference": [
-      {
-        "id": "mem0",
-        "name": "mem0",
-        "repo": "mem0ai/mem0",
-        "url": "https://github.com/mem0ai/mem0",
-        "pillar": "memo-memory",
-        "tier": "archive-reference",
-        "uniqueReferenceQuestion": "跨 Codex、Claude 与 OpenCode 的 SessionStart / Stop / PreCompact hook，如何以最低接入成本捕获和注入记忆？",
-        "refreshCadence": "none",
-        "refreshTrigger": "不主动刷新；只有发布可验证的 promotion gate 或跨客户端生命周期协议，且 AIOS 现有 projection 无法覆盖时，才作为新候选重新评审。",
-        "rationale": "hook 矩阵的历史证据已充分，自动捕获同时暴露未验证内容晋升风险；该问题已被 AIOS client projection 与 candidate-gate 方向吸收，继续追踪大仓成本高于增量价值。",
-        "evidenceSnapshot": "多客户端 plugin 矩阵 + OpenCode plugin + Stop/SessionStart 记忆 hook；零 LLM 检索管道",
-        "license": "Apache-2.0",
-        "language": "Python",
-        "sourceEvidenceAsOf": "2026-07-28"
-      },
       {
         "id": "openviking",
         "name": "OpenViking",
@@ -186,43 +222,12 @@
         "uniqueReferenceQuestion": "URI 级 agent namespace 与 link-only 预算降级如何组合成可审计的 context container？",
         "refreshCadence": "none",
         "refreshTrigger": "不主动刷新；只有出现 local-first/embedded 路径，并提供 AIOS 核心参照无法覆盖的 ACL 强制或审计证据时，才重新评审。",
-        "rationale": "namespace、ref-only 与 audit 信号分别已由 OpenClaw、TencentDB-Agent-Memory 等更聚焦来源覆盖；AGPL 与服务化形态还增加迁移噪声，保留历史证据即可。",
+        "rationale": "原归档理由「namespace/ref-only/audit 信号已由 OpenClaw、TencentDB 覆盖」在 OpenClaw 移除后失效（覆盖者只剩 TencentDB，而 TencentDB 的窄问题是 full→summary+ref 降级，不含 namespace 与 audit 语义）。改按**定位口径**归档：服务化 Memory Gateway 形态在参照范围外——报告 §3 已把「独立 Memory Gateway 商业化」列入「明确不跟」；AGPL 与服务化形态另增迁移噪声。保留历史证据即可，不因「维护成本低」例外留在活跃层。",
         "evidenceSnapshot": "per-agent 经验命名空间、OVPack 上下文容器、usage/audit schema、Memory V2",
         "license": "AGPL-3.0",
         "language": "Python",
-        "sourceEvidenceAsOf": "2026-07-28"
-      },
-      {
-        "id": "hermes-agent",
-        "name": "Hermes Agent",
-        "repo": "NousResearch/hermes-agent",
-        "url": "https://github.com/NousResearch/hermes-agent",
-        "pillar": "intelligent-planning",
-        "tier": "archive-reference",
-        "uniqueReferenceQuestion": "后台 skill review 与 curator 如何形成可审计的自改进闭环？",
-        "refreshCadence": "none",
-        "refreshTrigger": "不主动刷新；只有出现影响 Context Lifecycle / handoff 的新 enforcement 机制，且 docs/hermes-inspired-capability-mapping.md 尚未覆盖时，才重新评审。",
-        "rationale": "已有专门能力映射，curator/skill 治理又与 OpenClaw 核心问题重叠；活跃跟踪整个 Hermes 仓库会重复维护，历史映射足够。",
-        "evidenceSnapshot": "handoff、background skill review、curator、LSP on write、prompt cache；已有 AIOS 映射页",
-        "license": "MIT",
-        "language": "Python",
-        "sourceEvidenceAsOf": "2026-07-28"
-      },
-      {
-        "id": "open-harness",
-        "name": "OpenHarness",
-        "repo": "HKUDS/OpenHarness",
-        "url": "https://github.com/HKUDS/OpenHarness",
-        "pillar": "intelligent-planning",
-        "tier": "archive-reference",
-        "uniqueReferenceQuestion": "长循环启动前如何表达 ready / warning / blocked，并把记忆整理拆成 preview / apply？",
-        "refreshCadence": "none",
-        "refreshTrigger": "不主动刷新；只有 readiness 接入真实 write admission，或 preview 变成有 hash、proposal 与 rollback 的强制协议时，才重新评审。",
-        "rationale": "readiness 结构已被 AIOS 吸收，PREVIEW 仅提示词写保护则作为反例记录；现有信号不足以支持持续源码刷新。",
-        "evidenceSnapshot": "dry-run ready/warning/blocked、autodream sleep-time、文件型 mailbox、auto-compaction",
-        "license": "MIT",
-        "language": "Python",
-        "sourceEvidenceAsOf": "2026-07-28"
+        "sourceEvidenceAsOf": "2026-07-28",
+        "archiveReasonRewritten": "2026-10-13：原理由引用已移除的 OpenClaw，改按定位口径重写。"
       }
     ],
     "remove": [
@@ -263,12 +268,56 @@
         "name": "superpowers",
         "url": "https://github.com/obra/superpowers",
         "reason": "太重，与 rex-harness 工作流方向不符，不再参考（user decision 2026-07-31）"
+      },
+      {
+        "id": "openclaw",
+        "name": "OpenClaw",
+        "repo": "openclaw/openclaw",
+        "url": "https://github.com/openclaw/openclaw",
+        "pillar": "team-workflow",
+        "tier": "remove",
+        "reason": "定位与 AIOS 不一致：OpenClaw 是面向终端用户的多渠道 agent 产品，AIOS 是本地优先的 coding client 编排控制面；skill workshop 治理状态的证据已充分吸收，继续跟踪其渠道/桌面/插件面维护成本高于增量价值（user decision 2026-10-12）",
+        "refreshCadence": "none",
+        "refreshTrigger": "不刷新。其 Skill Workshop proposal/review/apply/rollback/quarantine 状态机证据见下方 evidenceSnapshot 与 2026-09-28 报告；若未来出现单一可源码验证的 runtime enforcement 且能替代 team-workflow 支柱的核心问题，才作为新候选重新评审。",
+        "evidenceSnapshot": "Skill Workshop 治理闭环、Plugin 外部化、Operator install policy、Memory/channel SQLite。2026-09-28（v2026.8.1→9.6）：grounded dreaming 默认开启（provenance 门槛晋升 + Dream Diary + 显式关闭；我们不跟默认值，抄门槛设计）；memory forget 溯源删除（检视贡献会话、排除来源准入、删派生留源 transcript）；automatic self-learning 按作者分信任档（scanner/Workshop 自有自动 apply，用户自改保持 pending）；Workshop pending proposals 硬上限 ≤3 + 历史扫描 SQLite cursor；备份恢复前校验 retained originals；pending child launch 随父 authority 终止；update 在装后 Doctor 失败时回滚 candidate 并保留配置/SecretRef；数据库 quarantine 决策单独存储防自擦除",
+        "pillarGapNote": "移除后 team-workflow 支柱的参照缺口。缺口定义：Agent 提出的 skill / 共享状态变更如何经 proposal → review → apply / rollback / quarantine 并用 provenance 与 stale hash 安全发布。**2026-10-13 更新：缺口已由 Hermes Agent 填补**（复位为 specialist-reference，pillar 校正为 team-workflow）——其 uniqueReferenceQuestion 逐字对应本缺口，比原先指向的 Paperclip（组织治理/预算/心跳）更贴。Paperclip 仍需按 portfolioPolicy 准入评审，且须先证明它回答该支柱内一个未被覆盖的问题。",
+        "license": "MIT",
+        "language": "TypeScript",
+        "sourceEvidenceAsOf": "2026-09-28"
+      },
+      {
+        "id": "mem0",
+        "name": "mem0",
+        "repo": "mem0ai/mem0",
+        "pillar": "memo-memory",
+        "tier": "remove",
+        "reason": "归档理由成立且无独立存续价值：hook 矩阵的历史证据已充分，自动捕获又暴露未验证内容晋升风险；该问题已被 AIOS client projection 与 candidate-gate 方向吸收。tierDefinitions.archive-reference 已声明该层「无定期刷新」，占坑但零维护（user decision 2026-10-13，承接 2026-10-12 §6.1）。",
+        "refreshCadence": "none",
+        "refreshTrigger": "不主动刷新；只有发布可验证的 promotion gate 或跨客户端生命周期协议，且 AIOS 现有 projection 无法覆盖时，才作为新候选重新评审。",
+        "evidenceSnapshot": "多客户端 plugin 矩阵 + OpenCode plugin + Stop/SessionStart 记忆 hook；零 LLM 检索管道",
+        "license": "Apache-2.0",
+        "language": "Python",
+        "sourceEvidenceAsOf": "2026-07-28"
+      },
+      {
+        "id": "open-harness",
+        "name": "OpenHarness",
+        "repo": "HKUDS/OpenHarness",
+        "pillar": "intelligent-planning",
+        "tier": "remove",
+        "reason": "归档理由成立且无独立存续价值：readiness 结构已被 AIOS 吸收，PREVIEW 仅提示词写保护已作为反例记录；报告自记 71 天无 push，属纯证据快照（user decision 2026-10-13，承接 2026-10-12 §6.1）。",
+        "refreshCadence": "none",
+        "refreshTrigger": "不主动刷新；只有 readiness 接入真实 write admission，或 preview 变成有 hash、proposal 与 rollback 的强制协议时，才重新评审。",
+        "evidenceSnapshot": "dry-run ready/warning/blocked、autodream sleep-time、文件型 mailbox、auto-compaction",
+        "license": "MIT",
+        "language": "Python",
+        "sourceEvidenceAsOf": "2026-07-28"
       }
     ]
   },
   "crossCuttingTrends": [
     "2026-07-28 W2 强制收缩：12 项中仅 5 项保留活跃刷新（3 core + 2 specialist）；5 项仅存档，2 项移除；取消 12 项定期全量刷新。",
-    "活跃问题所有权：TencentDB-Agent-Memory=预算/降级/ref，oh-my-openagent=active work/lineage/stale write，OpenClaw=proposal/review/apply/rollback 治理，Graphiti=双时态事实语义，Letta Code=实际读取 citation/receipt。",
+    "活跃问题所有权：TencentDB-Agent-Memory=预算/降级/ref，oh-my-openagent=active work/lineage/stale write，Graphiti=双时态事实语义，Letta Code=实际读取 citation/receipt。team-workflow 支柱自 2026-10-12 OpenClaw 移除后暂无活跃参照（缺口见 portfolio.remove.openclaw.pillarGapNote）。",
     "三支柱过滤：memo 记忆 / 智能规划 / team 工作流 — 不在三支柱内的竞品不进 watchlist",
     "superpowers 方法论已吸收；rex-harness 是唯一控制面，方法论或 skill 文案变化不再单独触发 refresh",
     "记忆轨优先：Recall 预算、分层压缩、事实失效、sleep-time consolidation、跨 client memo 注入",
@@ -297,7 +346,18 @@
     "2026-09-28 交付证明范本（OMO ulw-research）：确定性检查 + 三重有界修复上限（次数/连续无改进/时限）+ 带缺陷清单交付 + 交付物逐项追踪 delivered/skipped/impossible+原因；agno v3.0.5 同期收敛到 partial ContentStatus —— '显式降级'语义成为行业共识，直接服务 P0-1。",
     "2026-09-28 checkpoint 保留期教训（OMO）：7 天策略存在但无人调用的 sweep 积压 711 个 checkpoint/170MB；P0-2 CheckpointSaver 必须把 retention+sweep 作为接口一等字段（挂 runtime 启动后、不阻塞启动、保留活跃 lease）。",
     "2026-09-28 治理事件：goose 仓库迁移至 aaif-goose/goose 组织（API 301 确认）；OpenHands v1.19→1.24 agent profile 资产化（MCP server/secrets 圈定、阻止静默降级），与 P1-4 recipe 化同向。",
-    "2026-09-28 agno（不在 watchlist）v3.0.2→11：知识检索两段式 rerank 管线 + Page 存储系统（原子发布/修订历史/grep）+ embedding 失败显式化；与 TencentDB/mem0 覆盖问题重叠，按组合策略暂不进 watchlist（注意：此为本轮筛选结论，非用户否决；用户 2026-09-28 的原话是要求评估 watchlist 内哪些项目已无跟踪必要）。"
+    "2026-09-28 agno（不在 watchlist）v3.0.2→11：知识检索两段式 rerank 管线 + Page 存储系统（原子发布/修订历史/grep）+ embedding 失败显式化；与 TencentDB/mem0 覆盖问题重叠，按组合策略暂不进 watchlist（注意：此为本轮筛选结论，非用户否决；用户 2026-09-28 的原话是要求评估 watchlist 内哪些项目已无跟踪必要）。",
+    "2026-10-12 分类更正 Headroom：不是竞品，是已消费依赖 —— installer 版本 pin headroom-ai[all]>=0.31.0,<0.32.0、pi MCP server 挂载提供显式 compress/retrieve、Token Intelligence v2 里作为 layer='headroom' 独立计量并统计 opt-in 采纳率；设计边界见 2026-09-30 token-intelligence-v2 架构文档:14（不做实时透明输入拦截）。移入 consumedDependencies，不占 watchlist 坑位。教训：把已集成组件当新候选评估会虚增观察面。",
+    "2026-10-12 否决 CodeWhale（Hmbown/CodeWhale, 40K★）：其 append-only ledger + fleet resume 已被 AIOS solo-journal 同语义覆盖（iteration.mjs:20 每轮 NDJSON 步内追加日志、hooks.mjs:23 hook 事件流、原子 per-iteration outcome、rolling summary），恢复面我们另有 session-owner 租约（claimSessionOwner/isProcessAlive/signals）比 fleet resume 更早防脑裂，回滚面有 solo-worktree + session/changed-files。唯一独立想法 constitution.json 声明式行为约束与现有 workflow policy/capability routing 重叠。按 portfolioPolicy 无未覆盖问题，不进 watchlist。",
+    "2026-10-12 轴区分记录：code-review-graph MCP 是静态结构图（符号/callers/imports/tests_for/community，回答「改这个影响谁」），与执行流水账（agent 动作序列/状态转移/可重放）不是同一维度；detect_changes 虽在编辑后运行，但读 diff、不记动作序列、不提供恢复。评估可恢复执行类竞品时对照物是 solo-journal，不是 CRG。",
+    "2026-10-12 观察 Orca/ADE（stablyai/orca, 80K★）：30+ agent worktree 隔离并行 + BYOS + PTY daemon 保活；AIOS 已有 worktree 并发模型，需评估增量价值后再决定是否进入 watchlist。",
+    "2026-10-12 观察 Paperclip（paperclipai/paperclip, 97K★）：agent 组织架构 + 预算上限 + 心跳调度 + Companies 模板市场；与 team-workflow 支柱相关但当前 AIOS team 模型偏 capability routing，治理抽象层差异大，暂观察。",
+    "2026-10-12 MCP 无状态重构（生态级）：2026-07 完成会话握手→无状态协议重构；月 SDK 下载 4 亿、Server 1.4 万+、四巨头全面适配；AIOS MCP browser/ContextDB 应跟进适配，写入趋势而非单一竞品条目。",
+    "2026-10-12 定位过滤（user decision）：OpenClaw core-reference → remove。理由是定位不一致 —— OpenClaw 是面向终端用户的多渠道 agent 产品，AIOS 是本地优先的 coding client 编排控制面；其 Skill Workshop 治理状态机证据已充分吸收，继续跟踪渠道/桌面/插件面成本高于增量价值。活跃刷新降至 4 项（2 core + 2 specialist），全量源码 deep dive 降至 2 项。",
+    "2026-10-12 支柱缺口登记：team-workflow 移除 OpenClaw 后无活跃参照。按 portfolioPolicy decisionRules，新候选必须回答该支柱内一个未被覆盖的问题才可入选；Paperclip（agent 组织治理/预算/心跳）为当前最近似候选，但其治理抽象与 AIOS capability routing 模型差异大，暂留观察不自动晋升。",
+    "2026-10-13 组合引用完整性：移除一个参照会让**其它条目的归档理由静默失效**——OpenViking 与 Hermes 的归档理由都写着「已被 OpenClaw 覆盖」，而 OpenClaw 本轮被移除。三个同源发现（SoL-Pi 影响过决策却不在册；两条归档理由悬空；Hermes 归错 pillar 导致两处落空）都不是外部信息不足，而是组合账本内部的引用完整性问题。已补 decisionRules 第 ③ 条：移除前先扫谁引用了它。",
+    "2026-10-13 Hermes 复位：其 uniqueReferenceQuestion（后台 skill review + curator 的可审计闭环）逐字对应 OpenClaw 移除后登记的 team-workflow 缺口，且原 pillar 记错（intelligent-planning → team-workflow）。原归档理由依赖已移除的 OpenClaw，不再成立。「已有专门映射」也不构成理由——docs/hermes-inspired-capability-mapping.md 不含 skill governance。",
+    "2026-10-13 SoL-Pi 入册 consumedDependencies：影响过 v2 方法论与 token-bench 闸门规则、并被 A/B 博客署名，却从未进册。说明准入流程只覆盖「候选进 pendingDeepDive」，漏了「已在影响我们的来源」这一类。"
   ],
   "p0OptimizationTargets": {
     "memo": "Supersede ACL/publish gate + runtime provenance + ContextItem validity + candidate promotion + proposal-only consolidation",
@@ -305,11 +365,11 @@
     "team": "Steward-governed shared canonical memory + revisioned evidence handoff + ContextReceipt + ACL-sticky compaction"
   },
   "nextRefresh": {
-    "lastMetadataCheckDate": "2026-09-28",
-    "coreMetadataCheck": "2026-12-28",
-    "specialistMetadataCheck": "2027-03-28",
+    "lastMetadataCheckDate": "2026-10-12",
+    "coreMetadataCheck": "2027-01-12",
+    "specialistMetadataCheck": "2027-04-12",
     "fullPortfolioRefresh": null,
-    "pendingDeepDiveWork": "none; candidates: OMO Kibitzer/ulw-research source dive when AIOS starts ContextReceipt or verification-runtime implementation; OpenClaw memory-forget provenance source dive when AIOS starts memo supersede/forget UX; TencentDB sqlite-vec staged-load fallback when AIOS ships sandboxed sqlite-vec",
+    "pendingDeepDiveWork": "OMO Kibitzer/ulw-research source dive when AIOS starts ContextReceipt or verification-runtime implementation; TencentDB sqlite-vec staged-load fallback when AIOS ships sandboxed sqlite-vec. (OpenClaw memory-forget provenance dive dropped 2026-10-12 — project removed, absorbed evidence stays in portfolio.remove.openclaw.evidenceSnapshot. Headroom dropped — already a consumed dependency, see consumedDependencies. CodeWhale dropped — fails portfolioPolicy, covered by solo-journal.)",
     "policy": "Metadata checks only detect staleness or archived status. A source deep dive occurs only when the project-specific refreshTrigger fires."
   },
   "removed": {
@@ -366,6 +426,13 @@
         "repo": "affaan-m/ecc",
         "reason": "skill compliance / changed-files ledger 与 Rex evidence、reconciliation 和 retained stale-write 问题重叠，无更强 canonical runtime。"
       }
+    ],
+    "2026-10-12": [
+      {
+        "id": "openclaw",
+        "repo": "openclaw/openclaw",
+        "reason": "定位不一致（终端用户多渠道 agent 产品 vs AIOS 本地优先 coding client 编排控制面）；Skill Workshop 治理证据已吸收，渠道/桌面/插件面维护成本高于增量价值（user decision）。证据快照保留于 portfolio.remove.openclaw.evidenceSnapshot。"
+      }
     ]
   },
   "cleanupNotes": [
@@ -401,6 +468,35 @@
       "removeCount": 2,
       "scheduledFullPortfolioRefresh": false
     },
-    "2026-07-31: superpowers moved archive→remove (user decision: too heavy, not aligned)."
+    "2026-07-31: superpowers moved archive→remove (user decision: too heavy, not aligned).",
+    {
+      "date": "2026-10-12",
+      "reason": "Positioning filter applied per user decision: OpenClaw is an end-user multi-channel agent product, not a local-first coding-client orchestration control plane. Skill Workshop governance evidence already absorbed; channel/desktop/plugin surface costs more to track than it returns.",
+      "moved": "openclaw: core-reference → remove",
+      "activeRefreshAfterCount": 4,
+      "coreReferenceCount": 2,
+      "specialistReferenceCount": 2,
+      "archiveReferenceCount": 4,
+      "removeCount": 4,
+      "countCorrection": "archive-reference 5→4, remove 2→4: reflects both the 2026-07-31 superpowers archive→remove migration (previously unrecorded) and this 2026-10-12 OpenClaw core→remove move. Sum 2+2+4+4=12 matches baselineProjectCount.",
+      "pillarGap": "team-workflow now has no active reference; gap registered in portfolio.remove.openclaw.pillarGapNote"
+    },
+    {
+      "date": "2026-10-13",
+      "reason": "组合收缩（user decision，承接 2026-10-12 §6.1）：四项 archive 依「理由是否仍成立」分别处置，不再一并处理。",
+      "beforeActiveRefresh": 4,
+      "afterActiveRefresh": 5,
+      "tierCounts": {
+        "core-reference": 2,
+        "specialist-reference": 3,
+        "archive-reference": 1,
+        "remove": 6
+      },
+      "affectedReferenceParties": [
+        "OpenViking：理由原引用 OpenClaw（已移除）→ 重写为定位口径理由",
+        "Hermes：理由原引用 OpenClaw（已移除）→ 复位为 team-workflow 参照",
+        "crossCuttingTrends：OpenClaw 移除登记的支柱缺口原本指向 Paperclip，本轮改为指向 Hermes（更贴）"
+      ]
+    }
   ]
 }

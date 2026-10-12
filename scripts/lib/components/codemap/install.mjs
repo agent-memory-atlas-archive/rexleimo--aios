@@ -7,6 +7,7 @@ import { syncGeneratedSkills } from '../../skills/sync.mjs';
 import { CRG_DATA_DIR, CRG_MCP_ALIAS } from './constants.mjs';
 import { captureCrgCommand, runCrgCommand } from './crg.mjs';
 import { resolveClientHomes } from './environment.mjs';
+import { inspectGraphFreshness } from './freshness.mjs';
 import { injectCrgIntoInstructionFiles } from './instructions.mjs';
 import { collectCodemapMcpTargets, injectCrgIntoClientTarget } from './mcp-targets.mjs';
 import { ensureOpencodePlugin } from './opencode-plugin.mjs';
@@ -41,21 +42,30 @@ function resolveCrgVersion({ projectRootPath, skipCrgChecks, crgVersion, io }) {
   return resolved;
 }
 
-function ensureGraphBuilt({ projectRootPath, dryRun, io }) {
+function ensureGraphBuilt({ projectRootPath, dryRun, io, freshness = null }) {
   io.log('[3/8] Building graph');
   const crgDataDir = path.join(projectRootPath, CRG_DATA_DIR);
   const graphExists = fs.existsSync(crgDataDir);
-  if (graphExists) {
-    io.log('OK   graph data directory exists, skipping build');
-  } else {
+  const freshnessInfo = freshness || inspectGraphFreshness(projectRootPath);
+  if (!graphExists) {
     io.log(`+ uvx ${CRG_MCP_ALIAS} build`);
     if (dryRun) {
       io.log(`[dry-run] skipped: uvx ${CRG_MCP_ALIAS} build`);
     } else {
       runCrgCommand(['build'], { cwd: projectRootPath, io });
     }
+  } else if (freshnessInfo.stale) {
+    // 图存在但落在 HEAD 之前：CRG 读的是旧结构，影响面分析会失真，必须重建。
+    io.log(`WARN graph is stale: built ${freshnessInfo.graphAgeDays} day(s) ago, ${freshnessInfo.behindHeadDays} day(s) behind HEAD; rebuilding`);
+    if (dryRun) {
+      io.log(`[dry-run] skipped: uvx ${CRG_MCP_ALIAS} build`);
+    } else {
+      runCrgCommand(['build'], { cwd: projectRootPath, io });
+    }
+  } else {
+    io.log('OK   graph data directory exists, skipping build');
   }
-  return { crgDataDir, graphExists };
+  return { crgDataDir, graphExists, freshness: freshnessInfo };
 }
 
 function injectClientMcpConfigs({ projectRootPath, homes, client, dryRun, io }) {

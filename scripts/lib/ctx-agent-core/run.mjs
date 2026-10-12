@@ -502,6 +502,22 @@ export async function runCtxAgent(argv = process.argv.slice(2)) {
   if (!opts.project) opts.project = path.basename(opts.workspaceRoot);
   if (opts.saveGuard) { runSaveGuardCheckpoint(opts); return; }
 
+  // 启动门禁：CRG 缺失就地补装（只管从无到有，陈旧由 doctor 管；
+  // 失败只告警不阻塞；AIOS_CODEMAP_AUTO_INSTALL=0 可关）。放在 saveGuard
+  // 分流之后，使交互与单发两种模式共用同一入口。
+  try {
+    const { ensureCodemapInstalled } = await import('../components/codemap.mjs');
+    const { ROOT_DIR } = await import('./common.mjs');
+    await ensureCodemapInstalled({
+      projectRoot: opts.workspaceRoot,
+      rootDir: ROOT_DIR,
+      io: console,
+      env: process.env,
+    });
+  } catch (error) {
+    console.warn(`[warn] codemap startup check skipped: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
   if (opts.prompt) {
     await maybeCreateBootstrapTask(opts);
   }

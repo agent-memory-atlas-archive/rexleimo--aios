@@ -75,6 +75,43 @@ const CODEMAP_MCP_TARGETS = Object.freeze([
       return workbuddyHome ? path.join(workbuddyHome, 'mcp.json') : '';
     },
   }),
+  // pi 的 MCP 落点是 Pi 全局 `mcp.json`（`PI_CODING_AGENT_DIR`，默认 ~/.pi/agent）。
+  // 注意：这个文件**同样由 pi 组件写入**（aios-init → buildAiosPiMcpServers），
+  // 形状为 {command, args, lifecycle:'lazy'}。本表写出的 entry 必须与其逐字节一致，
+  // 否则 pi 自己的 doctor（JSON.stringify 精确比对）会永久报 kept-differs；
+  // 形状定义见 entries.mjs 的 buildCrgPiEntry。
+  Object.freeze({
+    clientKey: 'pi',
+    format: 'pi-json',
+    createIfMissing: true,
+    resolvePath: (_projectRoot, clientHomes) => {
+      const piHome = resolveUserPath(clientHomes.pi);
+      return piHome ? path.join(piHome, 'mcp.json') : '';
+    },
+  }),
+  // zcode 的 server 桶是**点路径** `mcp.servers`，且 schema 是严格白名单
+  // （未知字段会被整条丢弃），故走 mcp-json-nested + 落盘前规范化。
+  Object.freeze({
+    clientKey: 'zcode',
+    format: 'mcp-json-nested',
+    namespace: 'mcp.servers',
+    createIfMissing: true,
+    resolvePath: (_projectRoot, clientHomes) => {
+      const zcodeHome = resolveUserPath(clientHomes.zcode);
+      return zcodeHome ? path.join(zcodeHome, 'cli', 'config.json') : '';
+    },
+  }),
+  // qoder 是标准 mcpServers；home 由 resolveQoderHome 做发行版判定
+  // （CN 是 ~/.qoder-cn，国际版 ~/.qoder），clientHomes.qoder 已解析完毕。
+  Object.freeze({
+    clientKey: 'qoder',
+    format: 'mcp-json',
+    createIfMissing: true,
+    resolvePath: (_projectRoot, clientHomes) => {
+      const qoderHome = resolveUserPath(clientHomes.qoder);
+      return qoderHome ? path.join(qoderHome, 'settings.json') : '';
+    },
+  }),
 ]);
 
 export function injectCrgIntoClientTarget(target, projectRoot, { dryRun = false, io = console } = {}) {
@@ -90,11 +127,11 @@ export function collectCodemapMcpTargets(projectRoot, clientHomes = {}, client =
   const seen = new Set();
   const enabled = new Set(normalizeClientList(client));
 
-  const addUnique = (absPath, clientKey, createIfMissing, format = 'mcp-json') => {
+  const addUnique = (absPath, clientKey, createIfMissing, format = 'mcp-json', namespace = '') => {
     if (!enabled.has(clientKey)) return;
     if (!absPath || seen.has(absPath)) return;
     seen.add(absPath);
-    targets.push({ path: absPath, clientKey, createIfMissing, format });
+    targets.push({ path: absPath, clientKey, createIfMissing, format, namespace });
   };
 
   for (const target of CODEMAP_MCP_TARGETS) {
@@ -102,7 +139,8 @@ export function collectCodemapMcpTargets(projectRoot, clientHomes = {}, client =
       target.resolvePath(projectRoot, clientHomes),
       target.clientKey,
       target.createIfMissing,
-      target.format
+      target.format,
+      target.namespace || ''
     );
   }
 
