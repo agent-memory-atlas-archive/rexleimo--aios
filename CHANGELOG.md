@@ -36,6 +36,16 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
   the same way. Entrance timings moved forward (`team` gate 66→54, `resume` cards 30→14, `cta` clients 34→18)
   and the verification frame list now includes `beat start + 14` for every beat, re-checked by extracting frames
   from the encoded mp4 rather than from source.
+- feat(video): `video/scripts/jianying_draft.py` turns the same `timeline.json` cue table into a 剪映 draft — the
+  rendered mp4 on the video track plus one `VoiceOver` segment per caption — so narration no longer depends on a
+  human importing an SRT by hand. It deliberately creates no subtitle track (the captions are already burned into
+  the frame, a second set would double up), bypasses the third-party skill's `add_media_safe()` because its
+  normalizer hardcodes `scale/pad=1920:1080` and would letterbox a 9:16 film, and puts the repository-bundled
+  `ffprobe` on PATH since there is no system ffmpeg here. Verified structurally (draft `version 360000` matching
+  what 剪映 11.6 writes for its own drafts, 1 video + 1 audio + 0 text tracks, 18 segments at 0.0000s offset from
+  the timeline, every measured clip inside its own caption window, all audio staged inside the draft dir); opening
+  the draft and exporting stay human actions because 11.6 has no working auto-export. The skill itself stays a
+  user-scope install outside this repo, addressed through `JY_SKILL_ROOT`.
 
 ## [6.3.0] - 2026-10-01
 

@@ -36,6 +36,35 @@ npm run srt                                       # 导出 out/aios-promo.srt �
 - 单场 4~7 秒（同一个测试断言）：下限是读完字幕，上限是滑走阈值，中间由旁白密度决定。
 - 每场都有推镜（`Stage` 里 `scale 1 → 1.042`）和硬切白闪，静止画面在短视频里等于没做完。
 
+## 配音草稿：直接生成剪映工程
+
+`npm run srt` 是交给人工的。`scripts/jianying_draft.py` 把同一条链路自动化：读同一份 `timeline.json` 的
+cue 起点，把渲染好的 mp4 铺进视频轨，逐句合成进 `VoiceOver` 轨，产出一个剪映草稿。
+
+```bash
+# 额外依赖：Python 3.12 + jianying-editor（第三方 skill，装在本仓库之外，用 JY_SKILL_ROOT 指过去）
+cd video
+JY_SKILL_ROOT=~/.qoder-cn/skills/jianying-editor \
+  python scripts/jianying_draft.py [--draft NAME] [--speaker VOICE] [--dry-run]
+```
+
+三个有意的选择：
+
+- **不建字幕轨**：硬字幕已经烧在 mp4 里，再加一层等于同屏两份字。
+- **绕过 `add_media_safe()`**：它对 `.mp4` 的规范化滤镜写死 `scale/pad=1920:1080`，并且任何不能被 16 整除的
+  宽度（1080）也会触发，会把竖版压成信箱。这里走 `_stage_local_asset` + `_add_video_safe`，是同一条路径
+  去掉那次重编码，草稿 `materials/` 里的 mp4 与渲染产物字节相同。
+- **ffprobe 用仓库自带的**：脚本把 `node_modules/@remotion/compositor-win32-x64-msvc` 前置到 PATH，本机没有全局 ffmpeg。
+
+已验证的是**结构**：草稿 `version 360000` 与 11.6 自己写的草稿一致，1 视频轨 + 1 配音轨 + 0 文本轨，18 段
+音频相对 `timeline.json` 偏移 0.0000s，每段实测时长都落在自己的字幕窗口内（余量 +0.07s ~ +0.99s，旁白总
+跨度 44.73s / 片长 45.17s），且音频全部落在草稿目录内。未验证的是**观感**：剪映 11.6 打开会不会报「检测到
+媒体丢失」、听着对不对。11.6 没有可用的自动导出（`auto_exporter.py` 只覆盖 ≤5.9），导出仍是人工一步；
+剪映不会实时刷新草稿列表，生成后要重启剪映（或进出一次旧草稿）才看得到。
+
+配音走剪映自家云端 TTS（`add_tts_intelligent` 先试 SAMI 后端，edge-tts 兜底），所以这一步需要网络；
+渲染侧依然零音频、零网络，离线复现那条约束没破。
+
 ## 分镜表（storyboard）
 
 时间轴唯一来源是 `src/timeline.json`，`src/timeline.ts` 与 `scripts/render.mjs` 都读它；
@@ -149,7 +178,8 @@ video/
 ├── scripts/
 │   ├── render.mjs       # 带可见进度的 bundle + renderMedia/renderStill
 │   ├── narration.mjs    # 旁白音节估算器：测试门禁与 SRT 导出共用
-│   └── export-srt.mjs   # timeline.json → out/aios-promo.srt（剪映配音稿）
+│   ├── export-srt.mjs   # timeline.json → out/aios-promo.srt（剪映配音稿）
+│   └── jianying_draft.py # timeline.json + mp4 → 剪映草稿（配音轨，需 Python + jianying-editor skill）
 └── tests/timeline.test.mjs
 ```
 
