@@ -1,5 +1,5 @@
 /* 中文注释：手动配置片段只负责展示给用户复制的 MCP block，不参与迁移写文件。 */
-import { PRIMARY_BROWSER_ALIAS } from './constants.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../constants.mjs';
 
 function printMcpBlock(io, command, argsStr, cdpUrl) {
   io.log('');

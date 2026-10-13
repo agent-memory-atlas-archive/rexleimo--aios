@@ -42,7 +42,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/harness': 37,
   'scripts/lib/cli/parse-args': 25,
   'scripts/lib/harness/subagent-runtime': 24,
-  'scripts/lib/components/browser': 22,
   'scripts/lib/rl-shell-v1': 22,
   'scripts/lib/memo/storage': 20,
   'agent-sources/roles': 19,

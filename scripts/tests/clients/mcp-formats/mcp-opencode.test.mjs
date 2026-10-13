@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpOpencodeJson } from '../../../lib/components/browser/mcp-opencode.mjs';
+import { migrateOneMcpOpencodeJson } from '../../../lib/components/browser/mcp/formats/mcp-opencode.mjs';
 import {
   AUTH_TOOLS_ALIAS,
   PRIMARY_BROWSER_ALIAS,

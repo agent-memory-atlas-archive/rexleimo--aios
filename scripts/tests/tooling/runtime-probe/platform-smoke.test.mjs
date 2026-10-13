@@ -16,18 +16,18 @@ function countSourceLines(source) {
 
 describe('MCP Server Config - Local Runtime (static analysis)', () => {
   const browserFacadeSrc = readRepoSource('scripts', 'lib', 'components', 'browser.mjs');
-  const browserRuntimePathsSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime-paths.mjs');
-  const browserMcpBuilderSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'mcp-server-builders.mjs');
-  const browserCdpServiceSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'cdp-service.mjs');
-  const browserDoctorSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'doctor.mjs');
+  const browserRuntimePathsSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'runtime-paths.mjs');
+  const browserMcpBuilderSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'mcp', 'mcp-server-builders.mjs');
+  const browserCdpServiceSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'cdp-service.mjs');
+  const browserDoctorSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'lifecycle', 'doctor.mjs');
 
   it('browser component entrypoint stays a thin facade over focused modules', () => {
     assert.equal(countSourceLines(browserFacadeSrc) <= 40, true,
       'browser.mjs should stay a facade and keep browser responsibilities under components/browser/*');
-    assert.ok(browserFacadeSrc.includes("from './browser/mcp-config.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/install.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/cdp-service.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/doctor.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './browser/mcp/mcp-config.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './browser/lifecycle/install.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './browser/runtime/cdp-service.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './browser/lifecycle/doctor.mjs'"));
   });
 
   it('preferred browser MCP always uses the repository-local Node launcher', () => {

@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpToml } from '../../../lib/components/browser/mcp-toml.mjs';
+import { migrateOneMcpToml } from '../../../lib/components/browser/mcp/formats/mcp-toml.mjs';
 import {
   AUTH_TOOLS_ALIAS,
   PRIMARY_BROWSER_ALIAS,

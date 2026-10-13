@@ -13,12 +13,12 @@ import {
   resolveBrowserMode,
   setBrowserModeInSettings,
   validateBrowserMode,
-} from '../../../lib/components/browser/mcp-mode.mjs';
-import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp-migration.mjs';
-import { migrateOneMcpToml } from '../../../lib/components/browser/mcp-toml.mjs';
-import { migrateOneMcpOpencodeJson } from '../../../lib/components/browser/mcp-opencode.mjs';
-import { migrateOneHermesYaml } from '../../../lib/components/browser/mcp-hermes-yaml.mjs';
-import { resolveLocalBrowserMcpScript } from '../../../lib/components/browser/runtime-paths.mjs';
+} from '../../../lib/components/browser/modes/mcp-mode.mjs';
+import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp/mcp-migration.mjs';
+import { migrateOneMcpToml } from '../../../lib/components/browser/mcp/formats/mcp-toml.mjs';
+import { migrateOneMcpOpencodeJson } from '../../../lib/components/browser/mcp/formats/mcp-opencode.mjs';
+import { migrateOneHermesYaml } from '../../../lib/components/browser/mcp/formats/mcp-hermes-yaml.mjs';
+import { resolveLocalBrowserMcpScript } from '../../../lib/components/browser/runtime/runtime-paths.mjs';
 // 单参 mkdtemp(prefix) 会把目录建在 process.cwd() 下——测试一跑就在仓库根里长出
 // aios-browser-mode-*/aios-bsk-switch-* 之类的垃圾，一次 git add -A 就会把它们提交进
 // main（已发生过：v6.2.0 的 tag 树里带了 18 个测试垃圾文件）。统一落 os.tmpdir()，

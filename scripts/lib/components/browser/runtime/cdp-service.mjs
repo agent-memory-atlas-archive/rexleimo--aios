@@ -2,11 +2,11 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { captureCommand, commandExists, runCommand } from '../../platform/process.mjs';
+import { captureCommand, commandExists, runCommand } from '../../../platform/process.mjs';
 import {
   CDP_SERVICE_LABEL_PREFIX,
   DEFAULT_CDP_SERVICE_PORT,
-} from './constants.mjs';
+} from '../constants.mjs';
 import {
   normalizeCdpPort,
   resolveDefaultCdpPort,

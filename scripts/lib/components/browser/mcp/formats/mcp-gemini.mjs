@@ -3,7 +3,7 @@
    "Invalid configuration in ~/.gemini/settings.json ... Unrecognized key(s)" 并拒绝运行。
    因此 AIOS 写入的三个 server 必须先按 Gemini 字段白名单规范化
    （startupTimeoutSec 秒 → timeout 毫秒）。用户自有的 server 原样保留，不做改写。 */
-import { migrateOneMcpJsonFile } from './mcp-migration.mjs';
+import { migrateOneMcpJsonFile } from '../mcp-migration.mjs';
 
 /* 白名单取自 @google/gemini-cli 的 McpServerConfigSchema：
    url / type('stdio'|'sse'|'http') / trust / includeTools / excludeTools /

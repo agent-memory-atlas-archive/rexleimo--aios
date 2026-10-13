@@ -3,18 +3,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { getClientHomes } from '../../platform/paths.mjs';
-import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from './constants.mjs';
+import { getClientHomes } from '../../../platform/paths.mjs';
+import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../constants.mjs';
 import { BROWSER_MCP_ALIASES, findFirstBrowserServerEntry, removeLegacyBrowserServerEntries } from './mcp-aliases.mjs';
 import { buildAuthToolsMcpServer, buildShellMcpServer } from './mcp-server-builders.mjs';
 import { collectBrowserMcpMigrationTargets } from './mcp-targets.mjs';
-import { migrateOneMcpToml } from './mcp-toml.mjs';
-import { migrateOneMcpOpencodeJson } from './mcp-opencode.mjs';
-import { migrateOneHermesYaml } from './mcp-hermes-yaml.mjs';
-import { migrateOneZcodeJsonFile } from './mcp-zcode.mjs';
-import { migrateOneGeminiJsonFile } from './mcp-gemini.mjs';
-import { resolveLocalBrowserMcpScript } from './runtime-paths.mjs';
-import { browserModeAppliesPlaywright, browserManagedServer, readSettingsFile, resolveBrowserMode } from './mcp-mode.mjs';
+import { migrateOneMcpToml } from './formats/mcp-toml.mjs';
+import { migrateOneMcpOpencodeJson } from './formats/mcp-opencode.mjs';
+import { migrateOneHermesYaml } from './formats/mcp-hermes-yaml.mjs';
+import { migrateOneZcodeJsonFile } from './formats/mcp-zcode.mjs';
+import { migrateOneGeminiJsonFile } from './formats/mcp-gemini.mjs';
+import { resolveLocalBrowserMcpScript } from '../runtime/runtime-paths.mjs';
+import { browserModeAppliesPlaywright, browserManagedServer, readSettingsFile, resolveBrowserMode } from '../modes/mcp-mode.mjs';
 
 /* 中文注释：单文件迁移保持 alias 稳定，只替换 server block 内容，减少客户端侧配置漂移。
    serversKey 支持点路径（如 zcode 的 'mcp.servers'）：逐段下钻并在缺段时创建中间对象。

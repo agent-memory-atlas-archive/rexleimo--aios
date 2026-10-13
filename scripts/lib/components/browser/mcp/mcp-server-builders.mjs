@@ -1,13 +1,13 @@
 /* 中文注释：MCP server block 构建只负责生成配置对象，不读写磁盘。 */
 import path from 'node:path';
 
-import { buildAiosMcpProxyServer } from '../../interception/mcp/proxy-config.mjs';
-import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from './constants.mjs';
+import { buildAiosMcpProxyServer } from '../../../interception/mcp/proxy-config.mjs';
+import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../constants.mjs';
 import {
   resolveDefaultCdpUrl,
   resolveLocalBrowserMcpScript,
   resolvePythonCommand,
-} from './runtime-paths.mjs';
+} from '../runtime/runtime-paths.mjs';
 
 /* 中文注释：当外部 browser-use checkout 不存在时，回退到仓库内的 Playwright MCP。 */
 export function buildLocalBrowserMcpServer(rootDir, existingAlias = {}, runtime = {}) {

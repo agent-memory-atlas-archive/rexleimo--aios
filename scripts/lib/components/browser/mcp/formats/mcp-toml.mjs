@@ -4,10 +4,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from './constants.mjs';
-import { BROWSER_MCP_ALIASES } from './mcp-aliases.mjs';
-import { buildAuthToolsMcpServer, buildShellMcpServer } from './mcp-server-builders.mjs';
-import { browserManagedServer } from './mcp-mode.mjs';
+import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../../constants.mjs';
+import { BROWSER_MCP_ALIASES } from '../mcp-aliases.mjs';
+import { buildAuthToolsMcpServer, buildShellMcpServer } from '../mcp-server-builders.mjs';
+import { browserManagedServer } from '../../modes/mcp-mode.mjs';
 
 // 纯函数：转义 TOML 字符串，避免 Windows 反斜杠与引号破坏配置。
 function escapeTomlString(value) {

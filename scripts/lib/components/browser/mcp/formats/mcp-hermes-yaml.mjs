@@ -11,9 +11,9 @@ import {
   LEGACY_HERMES_BROWSER_ALIASES,
   PRIMARY_BROWSER_ALIAS,
   SHELL_ALIAS,
-} from './constants.mjs';
-import { buildAuthToolsMcpServer, buildShellMcpServer } from './mcp-server-builders.mjs';
-import { browserManagedServer } from './mcp-mode.mjs';
+} from '../../constants.mjs';
+import { buildAuthToolsMcpServer, buildShellMcpServer } from '../mcp-server-builders.mjs';
+import { browserManagedServer } from '../../modes/mcp-mode.mjs';
 
 /** 把 JSON 风格的 MCP server 对象转为 Hermes YAML 兼容的 plain object（剥离 type: 'stdio'，保留 command/args/env） */
 function toHermesMcpEntry(server) {

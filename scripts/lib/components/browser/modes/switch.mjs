@@ -3,9 +3,9 @@
  * 把 mode 选型重新下发到各客户端（互斥三态：none | playwright | bsk）。
  * 本模块读写本地磁盘，调用方需传入 rootDir 与 io。 */
 import { BROWSER_MODES, validateBrowserMode, resolveBrowserMode, setBrowserModeInSettings } from './mcp-mode.mjs';
-import { migrateBrowserMcpConfig } from './mcp-config.mjs';
+import { migrateBrowserMcpConfig } from '../mcp/mcp-config.mjs';
 import { printBskInstallGuide } from './bsk-writer.mjs';
-import { formatErrorMessage } from './shared.mjs';
+import { formatErrorMessage } from '../shared.mjs';
 
 // 切换浏览器选型：先校验原始输入（非法抛错，不让 resolveBrowserMode 隐式归一为 none），
 // 再落 settings（写入失败先抛，避免 materialize 了错误模式），

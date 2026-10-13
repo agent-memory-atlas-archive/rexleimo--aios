@@ -1,4 +1,4 @@
-import { PRIMARY_BROWSER_ALIAS } from './constants.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../constants.mjs';
 
 export const LEGACY_BROWSER_ALIASES = ['puppeteer-stealth', 'playwright-browser-mcp'];
 export const BROWSER_MCP_ALIASES = [PRIMARY_BROWSER_ALIAS, ...LEGACY_BROWSER_ALIASES];

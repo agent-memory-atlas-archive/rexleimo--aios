@@ -2,7 +2,7 @@
    BSK 走真人会话：复用用户已登录的 Chrome + 浏览器扩展 + 本地 daemon，与 Playwright 互斥。
    本模块只产出"三步引导文案 + 工具集转发表 + version_skew 判定"这类纯数据，
    实际 CLI/扩展安装属 owner action（install.ps1 + Chrome 网上应用店扩展），release 不打包。 */
-import { commandExists, captureCommand } from '../../platform/process.mjs';
+import { commandExists, captureCommand } from '../../../platform/process.mjs';
 
 // 三步引导：安装 CLI → 装扩展并连接 → 切换/运行真人会话。文案可被测试注入的 io 消费。
 export const BSK_INSTALL_STEPS = [

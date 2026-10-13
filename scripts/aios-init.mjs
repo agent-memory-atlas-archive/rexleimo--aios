@@ -216,7 +216,7 @@ export async function main(argv = process.argv.slice(2)) {
   console.log('');
   console.log('== MCP Config Migration ==');
   try {
-    const { migrateBrowserMcpConfig } = await import('./lib/components/browser/mcp-migration.mjs');
+    const { migrateBrowserMcpConfig } = await import('./lib/components/browser/mcp/mcp-migration.mjs');
     const mcpResult = await migrateBrowserMcpConfig({ rootDir: workspaceRoot, io: console, dryRun });
     console.log(`  MCP: created=${mcpResult.created} updated=${mcpResult.updated} unchanged=${mcpResult.unchanged} errors=${mcpResult.errors}`);
   } catch (err) {
@@ -281,7 +281,7 @@ export async function main(argv = process.argv.slice(2)) {
         ensurePiMcpAdapter,
         resolvePiMcpJsonPath,
       } = await import('./lib/components/pi/mcp-adapter.mjs');
-      const { isBrowserMcpRuntimeInstalled } = await import('./lib/components/browser/runtime-readiness.mjs');
+      const { isBrowserMcpRuntimeInstalled } = await import('./lib/components/browser/runtime/runtime-readiness.mjs');
       const { execFile } = await import('node:child_process');
       const run = (cmd, args) => new Promise((resolveRun, rejectRun) => {
         // Windows npm shims (pi.cmd/pi.ps1) only resolve through a shell;

@@ -56,7 +56,7 @@ function writeJsonConfig(filePath, raw, parsed, exists, { dryRun = false } = {})
  * namespaceKey 支持点路径（zcode 是 `mcp.servers`，qoder/claude 是单层 `mcpServers`）。
  * 单层取值 `parsed?.['mcp.servers']` 恒为 undefined —— 那会让 zcode 的
  * inject/remove/inspect 全部静默变成 no-op。browser 组件有同语义实现
- * （`components/browser/mcp-migration.mjs` 的 resolveServersBucket），此处保持一致的语义。
+ * （`components/browser/mcp/mcp-migration.mjs` 的 resolveServersBucket），此处保持一致的语义。
  *
  * `create` 为 false 时只读不建（remove/inspect 用），避免为了探测而改写文件。
  */

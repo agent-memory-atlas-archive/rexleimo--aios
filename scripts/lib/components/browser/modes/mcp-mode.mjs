@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { buildPreferredMcpServer } from './mcp-server-builders.mjs';
+import { buildPreferredMcpServer } from '../mcp/mcp-server-builders.mjs';
 
 export const BROWSER_MODES = ['none', 'playwright', 'bsk'];
 export const DEFAULT_BROWSER_MODE = 'none';

@@ -25,15 +25,15 @@ import { installBrowserMcp, migrateBrowserMcpConfig } from '../../../lib/compone
 import {
   renderCdpLaunchAgentPlist,
   resolveCdpServiceLayout,
-} from '../../../lib/components/browser/cdp-service.mjs';
+} from '../../../lib/components/browser/runtime/cdp-service.mjs';
 import {
   commandExists,
   getCommandSpawnSpec,
 } from '../../../lib/platform/process.mjs';
 import { getClientHomes } from '../../../lib/platform/paths.mjs';
-import { buildPreferredMcpServer } from '../../../lib/components/browser/mcp-server-builders.mjs';
+import { buildPreferredMcpServer } from '../../../lib/components/browser/mcp/mcp-server-builders.mjs';
 import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { printSnippet } from '../../../lib/components/browser/mcp-snippet.mjs';
+import { printSnippet } from '../../../lib/components/browser/mcp/mcp-snippet.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));
@@ -729,8 +729,8 @@ test('browser installer runtime files use only repository-local paths', async ()
   const workspaceRoot = process.cwd();
   const files = [
     'scripts/run-local-browser-mcp.mjs',
-    'scripts/lib/components/browser/install.mjs',
-    'scripts/lib/components/browser/mcp-migration.mjs',
+    'scripts/lib/components/browser/lifecycle/install.mjs',
+    'scripts/lib/components/browser/mcp/mcp-migration.mjs',
   ];
 
   for (const relativePath of files) {

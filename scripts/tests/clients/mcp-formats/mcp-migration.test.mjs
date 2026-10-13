@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp-migration.mjs';
+import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp/mcp-migration.mjs';
 import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
 
 async function makeTemp() {

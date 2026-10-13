@@ -12,7 +12,7 @@
 // plus the AIOS-root-resolved aios-memory and aios-bridge stdio servers,
 // all three cwd-less so they follow the Pi session cwd. The browser server
 // joins them once its runtime is installed in this AIOS root (browser
-// readiness has a single owner: components/browser/runtime-readiness.mjs).
+// readiness has a single owner: components/browser/runtime/runtime-readiness.mjs).
 // The headroom server joins once the caller resolves an installed headroom
 // binary behind MCP consent; its env tags the client and disables readback,
 // mirroring headroom-mcp/commands.mjs buildDesiredHeadroomEntry — but Pi
@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { PRIMARY_BROWSER_ALIAS } from '../browser/constants.mjs';
-import { resolveLocalBrowserMcpScript } from '../browser/runtime-paths.mjs';
+import { resolveLocalBrowserMcpScript } from '../browser/runtime/runtime-paths.mjs';
 
 export const PI_MCP_ADAPTER_PACKAGE = 'pi-mcp-adapter';
 export const PI_MCP_ADAPTER_VERSION = '2.33.0';
@@ -82,7 +82,7 @@ export function resolvePiMcpJsonPath(piHome) {
 //
 // `browserRuntime` is an explicit input rather than an fs check here so this
 // module keeps no browser-path knowledge; the readiness fact stays with its
-// owner (components/browser/runtime-readiness.mjs). CDP is not required: an
+// owner (components/browser/runtime/runtime-readiness.mjs). CDP is not required: an
 // unconfigured profile makes the runtime launch its own local Chromium.
 export function buildAiosPiBrowserServer({ aiosRoot = '' } = {}) {
   const root = String(aiosRoot || '').trim();

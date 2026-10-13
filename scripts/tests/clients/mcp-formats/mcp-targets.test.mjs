@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
 
-import { collectClientMcpTargets } from '../../../lib/components/browser/mcp-targets.mjs';
+import { collectClientMcpTargets } from '../../../lib/components/browser/mcp/mcp-targets.mjs';
 
 test('collectClientMcpTargets routes each client to its real location/format with dual-scope support', () => {
   const projectRoot = '/proj';

@@ -4,10 +4,10 @@
    注意：`environment` 字段名依据 opencode 本地 MCP 约定;浏览器 server 需要 env，故必须落到 environment。 */
 import fs from 'node:fs';
 
-import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from './constants.mjs';
-import { findFirstBrowserServerEntry, removeLegacyBrowserServerEntries } from './mcp-aliases.mjs';
-import { buildAuthToolsMcpServer, buildShellMcpServer } from './mcp-server-builders.mjs';
-import { browserManagedServer } from './mcp-mode.mjs';
+import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../../constants.mjs';
+import { findFirstBrowserServerEntry, removeLegacyBrowserServerEntries } from '../mcp-aliases.mjs';
+import { buildAuthToolsMcpServer, buildShellMcpServer } from '../mcp-server-builders.mjs';
+import { browserManagedServer } from '../../modes/mcp-mode.mjs';
 
 function isObjectRecord(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);

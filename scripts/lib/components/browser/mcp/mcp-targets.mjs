@@ -2,8 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ALL_CLIENTS, getClientMcpTarget } from '../../clients/registry.mjs';
-import { resolveUserPath } from './runtime-paths.mjs';
+import { ALL_CLIENTS, getClientMcpTarget } from '../../../clients/registry.mjs';
+import { resolveUserPath } from '../runtime/runtime-paths.mjs';
 
 /* 中文注释：按 registry 的 per-client MCP 落点生成目标（支持双作用域）。
    - codex   → ~/.codex/config.toml + <project>/.codex/config.toml（home+project, TOML）

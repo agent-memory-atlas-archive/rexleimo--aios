@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { captureCommand, commandExists } from '../../platform/process.mjs';
+import { captureCommand, commandExists } from '../../../platform/process.mjs';
 import {
   startBrowserCdpService,
   testPortOpen,
-} from './cdp-service.mjs';
+} from '../runtime/cdp-service.mjs';
 import {
   resolveLocalBrowserMcpScript,
-} from './runtime-paths.mjs';
-import { formatErrorMessage } from './shared.mjs';
+} from '../runtime/runtime-paths.mjs';
+import { formatErrorMessage } from '../shared.mjs';
 
 // 纯函数：合并默认运行时和测试注入，让 doctor 逻辑不直接绑定真实系统命令。
 export function resolveBrowserDoctorRuntime(runtime = {}) {

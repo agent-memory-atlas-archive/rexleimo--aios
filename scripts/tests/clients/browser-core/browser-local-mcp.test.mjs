@@ -7,10 +7,10 @@ import test from 'node:test';
 import {
   buildLocalBrowserMcpServer,
   buildPreferredMcpServer,
-} from '../../../lib/components/browser/mcp-server-builders.mjs';
-import { ensurePiBrowserMcpServer, installBrowserMcp } from '../../../lib/components/browser/install.mjs';
-import { isBrowserMcpRuntimeInstalled } from '../../../lib/components/browser/runtime-readiness.mjs';
-import { resolveLocalBrowserMcpScript } from '../../../lib/components/browser/runtime-paths.mjs';
+} from '../../../lib/components/browser/mcp/mcp-server-builders.mjs';
+import { ensurePiBrowserMcpServer, installBrowserMcp } from '../../../lib/components/browser/lifecycle/install.mjs';
+import { isBrowserMcpRuntimeInstalled } from '../../../lib/components/browser/runtime/runtime-readiness.mjs';
+import { resolveLocalBrowserMcpScript } from '../../../lib/components/browser/runtime/runtime-paths.mjs';
 
 test('local browser MCP uses the platform-neutral Node entrypoint', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-local-browser-mcp-'));

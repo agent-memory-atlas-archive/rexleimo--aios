@@ -1,6 +1,6 @@
-export { migrateBrowserMcpConfig } from './browser/mcp-config.mjs';
-export { installBrowserMcp } from './browser/install.mjs';
-export { switchBrowserMcpMode } from './browser/switch.mjs';
+export { migrateBrowserMcpConfig } from './browser/mcp/mcp-config.mjs';
+export { installBrowserMcp } from './browser/lifecycle/install.mjs';
+export { switchBrowserMcpMode } from './browser/modes/switch.mjs';
 export {
   BSK_INSTALL_STEPS,
   BSK_TOOL_MAP,
@@ -8,11 +8,11 @@ export {
   renderBskInstallGuide,
   printBskInstallGuide,
   checkBskConnect,
-} from './browser/bsk-writer.mjs';
+} from './browser/modes/bsk-writer.mjs';
 export {
   restartBrowserCdpService,
   startBrowserCdpService,
   statusBrowserCdpService,
   stopBrowserCdpService,
-} from './browser/cdp-service.mjs';
-export { doctorBrowserMcp } from './browser/doctor.mjs';
+} from './browser/runtime/cdp-service.mjs';
+export { doctorBrowserMcp } from './browser/lifecycle/doctor.mjs';

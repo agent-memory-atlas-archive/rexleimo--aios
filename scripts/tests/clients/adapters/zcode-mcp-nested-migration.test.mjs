@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp-migration.mjs';
-import { migrateOneZcodeJsonFile, normalizeZcodeServerEntry } from '../../../lib/components/browser/mcp-zcode.mjs';
-import { collectClientMcpTargets } from '../../../lib/components/browser/mcp-targets.mjs';
+import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp/mcp-migration.mjs';
+import { migrateOneZcodeJsonFile, normalizeZcodeServerEntry } from '../../../lib/components/browser/mcp/formats/mcp-zcode.mjs';
+import { collectClientMcpTargets } from '../../../lib/components/browser/mcp/mcp-targets.mjs';
 import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
 import { getClientMcpTarget } from '../../../lib/clients/native/index.mjs';
 

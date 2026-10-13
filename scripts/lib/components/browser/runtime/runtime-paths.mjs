@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   DEFAULT_CDP_SERVICE_PORT,
-} from './constants.mjs';
+} from '../constants.mjs';
 
 export function resolveLocalBrowserMcpScript(rootDir) {
   return path.join(rootDir, 'scripts', 'run-local-browser-mcp.mjs');

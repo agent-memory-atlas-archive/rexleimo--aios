@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { runCommand } from '../../platform/process.mjs';
-import { migrateBrowserMcpConfig, printSnippet } from './mcp-config.mjs';
+import { runCommand } from '../../../platform/process.mjs';
+import { migrateBrowserMcpConfig, printSnippet } from '../mcp/mcp-config.mjs';
 import {
   resolveDefaultCdpUrl,
   resolveLocalBrowserMcpScript,
-} from './runtime-paths.mjs';
-import { PRIMARY_BROWSER_ALIAS } from './constants.mjs';
-import { browserModeAppliesPlaywright, resolveBrowserMode } from './mcp-mode.mjs';
-import { formatErrorMessage, requireCommand } from './shared.mjs';
+} from '../runtime/runtime-paths.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../constants.mjs';
+import { browserModeAppliesPlaywright, resolveBrowserMode } from '../modes/mcp-mode.mjs';
+import { formatErrorMessage, requireCommand } from '../shared.mjs';
 
 export async function installBrowserMcp({
   rootDir,
@@ -26,7 +26,7 @@ export async function installBrowserMcp({
   // 交互提问会把用户选择写入 settings，随后安装按该 mode 走。
   let resolvedMode = typeof mode === 'string' ? mode : null;
   if (!resolvedMode && prompt && !dryRun && process.stdin.isTTY && process.stdout.isTTY) {
-    const { promptBrowserMode } = await import('./prompt.mjs');
+    const { promptBrowserMode } = await import('../modes/prompt.mjs');
     resolvedMode = await promptBrowserMode({ rootDir, io });
   }
   if (!resolvedMode) {
@@ -94,8 +94,8 @@ export async function ensurePiBrowserMcpServer({
   clientHomes = null,
 } = {}) {
   try {
-    const { getClientHomes } = await import('../../platform/paths.mjs');
-    const { buildAiosPiBrowserServer, ensurePiMcpServers, resolvePiMcpJsonPath } = await import('../pi/mcp-adapter.mjs');
+    const { getClientHomes } = await import('../../../platform/paths.mjs');
+    const { buildAiosPiBrowserServer, ensurePiMcpServers, resolvePiMcpJsonPath } = await import('../../pi/mcp-adapter.mjs');
     // Home resolution mirrors migrateBrowserMcpConfig: an injected clientHomes
     // map wins, so isolated callers (tests, dry runs) never reach the real
     // ~/.pi/agent/mcp.json. piHome === '' explicitly means "no Pi home".
