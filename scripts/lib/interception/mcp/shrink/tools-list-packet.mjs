@@ -1,7 +1,7 @@
 /* 中文注释：tools/list 的完整 schema 必须留在本地 ref，返回给模型的只是一份可调用目录。 */
-import { writeMetricsRecord } from '../metrics/metrics-sink.mjs';
-import { estimateTokensFromBytes } from '../metrics/token-estimator.mjs';
-import { writeRawRef } from '../refs/raw-ref-store.mjs';
+import { writeMetricsRecord } from '../../metrics/metrics-sink.mjs';
+import { estimateTokensFromBytes } from '../../metrics/token-estimator.mjs';
+import { writeRawRef } from '../../refs/raw-ref-store.mjs';
 import { shrinkToolsList } from './tools-list-shrink.mjs';
 
 /* 中文注释：构建 MCP-safe AIOS 元数据，同时把完整 catalog 写入 raw ref 供后续精准召回。 */

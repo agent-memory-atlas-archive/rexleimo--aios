@@ -2,8 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ALL_CLIENTS, getClientMcpTarget } from '../../clients/registry.mjs';
-import { PRIMARY_BROWSER_ALIAS } from '../../components/browser/constants.mjs';
+import { ALL_CLIENTS, getClientMcpTarget } from '../../../clients/registry.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../../../components/browser/constants.mjs';
 import { isAiosMcpProxyEntry } from './proxy-config.mjs';
 
 /* 中文注释：检查 project、mcp-server 和各客户端真实落点；落点/格式取自 registry 单一事实来源。

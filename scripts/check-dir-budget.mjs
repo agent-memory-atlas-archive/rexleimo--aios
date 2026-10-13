@@ -80,7 +80,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/harness/groupchat-runtime': 10,
   'mcp-server/src/contextdb/sqlite': 9,
   'scripts/lib/hud': 9,
-  'scripts/lib/interception/mcp': 9,
   'scripts/lib/rl-shell-v1/temp-runner': 9,
   'scripts/lib/specs': 9,
   'scripts/lib/tui-ink/screens': 9,

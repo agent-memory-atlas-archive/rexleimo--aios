@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createJsonRpcProxyHandler } from '../../../../lib/interception/mcp/json-rpc-proxy.mjs';
-import { handleJsonRpcProxyLine } from '../../../../lib/interception/mcp/stdio-proxy.mjs';
+import { createJsonRpcProxyHandler } from '../../../../lib/interception/mcp/proxy/json-rpc-proxy.mjs';
+import { handleJsonRpcProxyLine } from '../../../../lib/interception/mcp/proxy/stdio-proxy.mjs';
 
 const SENTINEL = 'UNIQUE_STDIO_MCP_SENTINEL';
 

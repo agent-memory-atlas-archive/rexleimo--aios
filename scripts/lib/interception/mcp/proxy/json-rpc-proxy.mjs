@@ -1,7 +1,7 @@
 /* 中文注释：MCP 层在 JSON-RPC 边界压缩 tools/list 与 tools/call，同时保持协议兼容。 */
-import { createInterceptionEngine } from '../core/engine.mjs';
-import { extractToolCallText } from './tools-call-shrink.mjs';
-import { buildToolsListPacket } from './tools-list-packet.mjs';
+import { createInterceptionEngine } from '../../core/engine.mjs';
+import { extractToolCallText } from '../shrink/tools-call-shrink.mjs';
+import { buildToolsListPacket } from '../shrink/tools-list-packet.mjs';
 
 /* 中文注释：JSON-RPC proxy 保持标准 MCP result 形状，只把 AIOS 压缩证据附加到 _meta.aios。 */
 export function createJsonRpcProxyHandler({ forward, workspaceRoot, sessionId = 'default', host = 'generic-mcp', thresholds, now, metrics }) {

@@ -23,8 +23,8 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     path: 'scripts/lib/interception/clients/capabilities.mjs',
     maxLines: 120,
     requiredModules: Object.freeze([
-      'scripts/lib/interception/mcp/proxy-config.mjs',
-      'scripts/lib/interception/mcp/proxy-inspector.mjs',
+      'scripts/lib/interception/mcp/proxy/proxy-config.mjs',
+      'scripts/lib/interception/mcp/proxy/proxy-inspector.mjs',
     ]),
   }),
   Object.freeze({

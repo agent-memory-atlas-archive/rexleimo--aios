@@ -8,12 +8,12 @@ export {
   buildAiosMcpProxyServer,
   isAiosMcpProxyEntry,
   unwrapAiosMcpProxyEntry,
-} from '../mcp/proxy-config.mjs';
+} from '../mcp/proxy/proxy-config.mjs';
 export {
   collectInterceptionMcpTargets,
   inspectMcpProxyTarget,
   inspectMcpProxyTargets,
-} from '../mcp/proxy-inspector.mjs';
+} from '../mcp/proxy/proxy-inspector.mjs';
 
 export const INTERCEPTION_LEVELS = Object.freeze(['L0', 'L1', 'L2', 'L3']);
 // CLI 客户端成员来自注册表；aios-harness/cursor/generic-mcp 是注册表外的宿主槽位，能力各自声明在 config/host-capabilities.json。

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { planShellInterception } from '../../../../lib/interception/shell/shell-planner.mjs';
-import { shrinkToolsList } from '../../../../lib/interception/mcp/tools-list-shrink.mjs';
+import { shrinkToolsList } from '../../../../lib/interception/mcp/shrink/tools-list-shrink.mjs';
 
 test('shell planner rewrites broad file reads into compact read strategy', () => {
   const decision = planShellInterception({ command: 'Get-Content huge.log' });

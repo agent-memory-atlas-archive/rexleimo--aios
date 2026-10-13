@@ -1,7 +1,7 @@
 /* 中文注释：MCP server block 构建只负责生成配置对象，不读写磁盘。 */
 import path from 'node:path';
 
-import { buildAiosMcpProxyServer } from '../../../interception/mcp/proxy-config.mjs';
+import { buildAiosMcpProxyServer } from '../../../interception/mcp/proxy/proxy-config.mjs';
 import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../constants.mjs';
 import {
   resolveDefaultCdpUrl,

@@ -1,5 +1,5 @@
 /* 中文注释：Proof 链路用唯一哨兵、raw ref 和 metrics 同时证明压缩真实发生。 */
-import { createJsonRpcProxyHandler } from './mcp/json-rpc-proxy.mjs';
+import { createJsonRpcProxyHandler } from './mcp/proxy/json-rpc-proxy.mjs';
 import { readMetricsRecords } from './metrics/metrics-sink.mjs';
 import { readRawRef } from './refs/raw-ref-store.mjs';
 import { runShellEnvelope } from './shell/shell-wrapper.mjs';

@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { createJsonRpcProxyHandler } from '../../../../lib/interception/mcp/json-rpc-proxy.mjs';
+import { createJsonRpcProxyHandler } from '../../../../lib/interception/mcp/proxy/json-rpc-proxy.mjs';
 import { readMetricsRecords } from '../../../../lib/interception/metrics/metrics-sink.mjs';
 import { readRawRef } from '../../../../lib/interception/refs/raw-ref-store.mjs';
 
