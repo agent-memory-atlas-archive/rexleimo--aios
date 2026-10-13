@@ -17,7 +17,7 @@ import {
   resolvePreset,
   buildPatternList,
   applyPrivacyOverlay,
-} from '../src/browser/privacy-overlay.js';
+} from '../src/browser/capture/privacy-overlay.js';
 
 describe('PII_PATTERNS', () => {
   test('email pattern matches standard addresses', () => {

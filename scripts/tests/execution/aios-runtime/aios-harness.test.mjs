@@ -124,7 +124,7 @@ test('runQualityGate log audit excludes cli entrypoints and tests', async (t) =>
   const rootDir = await makeRootDir();
   await mkdir(path.join(rootDir, 'scripts', 'lib', 'lifecycle'), { recursive: true });
   await mkdir(path.join(rootDir, 'scripts', 'tests'), { recursive: true });
-  await mkdir(path.join(rootDir, 'mcp-server', 'src', 'contextdb'), { recursive: true });
+  await mkdir(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'shell'), { recursive: true });
 
   await writeFile(path.join(rootDir, 'scripts', 'lib', 'bad.mjs'), "console.log('bad runtime log');\n", 'utf8');
   await writeFile(path.join(rootDir, 'scripts', 'tests', 'fixture.test.mjs'), "console.log('fixture log');\n", 'utf8');
@@ -132,7 +132,7 @@ test('runQualityGate log audit excludes cli entrypoints and tests', async (t) =>
   await writeFile(path.join(rootDir, 'scripts', 'ctx-agent-core.mjs'), "console.log('agent output');\n", 'utf8');
   await writeFile(path.join(rootDir, 'scripts', 'doctor-bootstrap-task.mjs'), "console.log('doctor output');\n", 'utf8');
   await writeFile(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'quality-gate.mjs'), "const PATTERN = 'console.log';\n", 'utf8');
-  await writeFile(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'cli.ts'), "console.log('cli output');\n", 'utf8');
+  await writeFile(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts'), "console.log('cli output');\n", 'utf8');
 
   const report = await runQualityGate(
     { mode: 'full' },

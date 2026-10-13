@@ -1,5 +1,5 @@
-import { browserLauncher } from '../launcher.js';
-import { detectAuthRequired, detectChallengeRequired } from '../auth.js';
+import { browserLauncher } from '../session/launcher.js';
+import { detectAuthRequired, detectChallengeRequired } from '../session/auth.js';
 
 export function normalizeRlAuthState(result: {
   auth?: { requiresHumanLogin?: boolean };

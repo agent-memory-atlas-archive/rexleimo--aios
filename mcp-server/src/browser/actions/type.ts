@@ -1,6 +1,6 @@
 // mcp-server/src/browser/actions/type.ts
-import { browserLauncher } from '../launcher.js';
-import { applyActionPacing } from '../pacing.js';
+import { browserLauncher } from '../session/launcher.js';
+import { applyActionPacing } from '../session/pacing.js';
 
 export async function type(selector: string, text: string, profile: string = 'default') {
   const state = browserLauncher.getState(profile);

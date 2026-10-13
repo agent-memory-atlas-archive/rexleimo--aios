@@ -76,7 +76,7 @@ export function runMemoGuiServer(plan) {
   let child = null;
   const promise = new Promise((resolve, reject) => {
     const tsxCli = path.join(plan.aiosRootDir, 'mcp-server', 'node_modules', 'tsx', 'dist', 'cli.mjs');
-    const contextDbCli = path.join(plan.aiosRootDir, 'mcp-server', 'src', 'contextdb', 'cli.ts');
+    const contextDbCli = path.join(plan.aiosRootDir, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts');
     child = spawn(process.execPath, [tsxCli, contextDbCli, ...plan.contextDbArgs], {
       cwd: plan.workspaceRoot,
       env: {

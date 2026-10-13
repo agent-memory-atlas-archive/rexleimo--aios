@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..');
 const TSX_CLI = path.join(REPO_ROOT, 'mcp-server', 'node_modules', 'tsx', 'dist', 'cli.mjs');
-const CONTEXTDB_CLI = path.join(REPO_ROOT, 'mcp-server', 'src', 'contextdb', 'cli.ts');
+const CONTEXTDB_CLI = path.join(REPO_ROOT, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts');
 
 function getCommandFailureDetail(result) {
   if (result?.error) {

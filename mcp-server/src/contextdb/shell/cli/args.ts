@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
-import { resolveWorkspaceRoot, type EventTurnEnvelope } from '../core.js';
+import { resolveWorkspaceRoot, type EventTurnEnvelope } from '../../store/core.js';
 
 export type Options = Record<string, string | boolean>;
 export type VerificationResultOption = 'unknown' | 'passed' | 'failed' | 'partial';

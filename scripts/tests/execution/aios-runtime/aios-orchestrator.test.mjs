@@ -432,7 +432,7 @@ async function writeDispatchEvidence(rootDir, sessionId, {
 
 function runContextDbCli(args, { cwd = process.cwd() } = {}) {
   const tsxCli = path.join(cwd, 'mcp-server', 'node_modules', 'tsx', 'dist', 'cli.mjs');
-  const contextDbCli = path.join(cwd, 'mcp-server', 'src', 'contextdb', 'cli.ts');
+  const contextDbCli = path.join(cwd, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts');
   const result = spawnSync(process.execPath, [tsxCli, contextDbCli, ...args], {
     cwd,
     encoding: 'utf8',

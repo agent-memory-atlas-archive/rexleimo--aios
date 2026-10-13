@@ -2,7 +2,7 @@ import path from 'node:path';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
-import { buildMemoryGenealogyGraph } from '../genealogy.js';
+import { buildMemoryGenealogyGraph } from '../../store/genealogy.js';
 import type { Options } from './args.js';
 import { handleFileApi, handleGenealogyApi, handleSessionsApi, isInsideDirectory } from './genealogy-api.js';
 

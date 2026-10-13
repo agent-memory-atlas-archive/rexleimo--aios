@@ -1,8 +1,8 @@
 import type { Page } from 'playwright';
 
-import { browserLauncher } from '../launcher.js';
-import { detectAuthRequired, detectChallengeRequired } from '../auth.js';
-import { applyActionPacing } from '../pacing.js';
+import { browserLauncher } from '../session/launcher.js';
+import { detectAuthRequired, detectChallengeRequired } from '../session/auth.js';
+import { applyActionPacing } from '../session/pacing.js';
 
 type RegionName = 'header' | 'left-sidebar' | 'main' | 'right-sidebar' | 'modal' | 'footer';
 

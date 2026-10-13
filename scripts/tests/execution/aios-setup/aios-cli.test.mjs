@@ -1390,7 +1390,7 @@ test('memo gui runner forwards termination signals to server process', async () 
   const { runMemoGuiServer } = await import('../../../lib/memo/memo.mjs');
   const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'aios-memo-gui-runner-'));
   const binDir = path.join(tmpRoot, 'mcp-server', 'node_modules', 'tsx', 'dist');
-  const cliDir = path.join(tmpRoot, 'mcp-server', 'src', 'contextdb');
+  const cliDir = path.join(tmpRoot, 'mcp-server', 'src', 'contextdb', 'shell');
   const markerPath = path.join(tmpRoot, 'signal-marker.json');
   const readyPath = path.join(tmpRoot, 'ready');
   await fs.mkdir(binDir, { recursive: true });
@@ -1440,7 +1440,7 @@ setInterval(() => {}, 1000);
     }
     assert.equal(marker.signal, process.platform === 'win32' ? 'started' : 'SIGTERM');
     assert.deepEqual(marker.args, [
-      path.join(tmpRoot, 'mcp-server', 'src', 'contextdb', 'cli.ts'),
+      path.join(tmpRoot, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts'),
       'genealogy:serve',
       '--workspace',
       tmpRoot,

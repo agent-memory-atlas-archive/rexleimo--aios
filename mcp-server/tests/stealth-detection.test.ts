@@ -12,7 +12,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { chromium } from 'playwright';
-import { STEALTH_SCRIPT } from '../src/browser/stealth-script.js';
+import { STEALTH_SCRIPT } from '../src/browser/capture/stealth-script.js';
 
 const STEALTH_ARGS = [
   '--disable-blink-features=AutomationControlled',

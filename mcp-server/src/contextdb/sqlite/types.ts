@@ -1,4 +1,4 @@
-import type { CheckpointTelemetry, EventTurnEnvelope } from '../core.js';
+import type { CheckpointTelemetry, EventTurnEnvelope } from '../store/core.js';
 
 export interface SqliteSessionRow {
   sessionId: string;

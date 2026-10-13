@@ -17,7 +17,7 @@
     "bench:contextdb:refs": "node scripts/with-project-node.mjs ./node_modules/tsx/dist/cli.mjs scripts/contextdb-refs-benchmark.ts",
     "bench:contextdb:refs:ci": "node scripts/with-project-node.mjs ./node_modules/tsx/dist/cli.mjs scripts/contextdb-refs-benchmark.ts --events 1200 --refs-pool 180 --queries 240 --warmup 40 --json-out test-results/contextdb-refs-bench.json",
     "bench:contextdb:refs:gate": "node scripts/with-project-node.mjs ./node_modules/tsx/dist/cli.mjs scripts/contextdb-refs-benchmark-gate.ts --input test-results/contextdb-refs-bench.json",
-    "contextdb": "node scripts/with-project-node.mjs ./node_modules/tsx/dist/cli.mjs src/contextdb/cli.ts"
+    "contextdb": "node scripts/with-project-node.mjs ./node_modules/tsx/dist/cli.mjs src/contextdb/shell/cli.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

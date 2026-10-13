@@ -7,7 +7,7 @@ import type {
   MemoryGenealogyGraph,
   MemoryGenealogyNode,
   MemoryGenealogyRisk,
-} from '../../../../mcp-server/src/contextdb/genealogy.ts';
+} from '../../../../mcp-server/src/contextdb/store/genealogy.ts';
 
 // Note: Full Ink component tests require special terminal handling.
 // These tests verify the modules can be imported correctly.

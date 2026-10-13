@@ -1,6 +1,6 @@
 import type { BrowserProfile, ProfileState } from './types.js';
-import { browserLauncher } from './launcher.js';
-import { profileManager } from './profiles.js';
+import { browserLauncher } from '../session/launcher.js';
+import { profileManager } from '../session/profiles.js';
 
 export interface BrowserHealthProfile {
   name: string;

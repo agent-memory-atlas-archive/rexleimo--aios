@@ -4,7 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 import type { Checkpoint, ContextEvent, SessionMeta } from './core.js';
-import { resolveContextDbRoot, toWorkspaceRelative } from './paths.js';
+import { resolveContextDbRoot, toWorkspaceRelative } from '../query/paths.js';
 
 export type MemoryGenealogyNodeType =
   | 'project'

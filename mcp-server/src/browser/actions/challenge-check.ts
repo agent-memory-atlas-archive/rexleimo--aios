@@ -1,5 +1,5 @@
-import { browserLauncher } from '../launcher.js';
-import { detectChallengeRequired } from '../auth.js';
+import { browserLauncher } from '../session/launcher.js';
+import { detectChallengeRequired } from '../session/auth.js';
 
 export function normalizeRlChallengeState(result: {
   challenge?: { requiresHumanVerification?: boolean };

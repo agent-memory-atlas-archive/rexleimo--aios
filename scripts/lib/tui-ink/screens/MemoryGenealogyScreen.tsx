@@ -13,8 +13,8 @@ import {
   formatRiskSummary,
   type GenealogyRow,
 } from '../views/genealogy-view';
-import { buildMemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/genealogy.ts';
-import type { MemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/genealogy.ts';
+import { buildMemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/store/genealogy.ts';
+import type { MemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/store/genealogy.ts';
 
 interface MemoryGenealogyScreenProps {
   rootDir: string;

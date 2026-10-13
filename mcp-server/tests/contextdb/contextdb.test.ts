@@ -18,9 +18,9 @@ import {
   searchMemory,
   searchEvents,
   writeCheckpoint,
-} from '../../src/contextdb/core.js';
-import { buildMemoryGenealogyGraph } from '../../src/contextdb/genealogy.js';
-import { closeSqliteSidecar, timelineCheckpointRows } from '../../src/contextdb/sqlite.js';
+} from '../../src/contextdb/store/core.js';
+import { buildMemoryGenealogyGraph } from '../../src/contextdb/store/genealogy.js';
+import { closeSqliteSidecar, timelineCheckpointRows } from '../../src/contextdb/store/sqlite.js';
 
 async function makeWorkspace(): Promise<string> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-'));
@@ -31,7 +31,7 @@ async function makeWorkspace(): Promise<string> {
 
 function runContextDbCli(args: string[]) {
   const tsxCli = path.join(process.cwd(), 'node_modules', 'tsx', 'dist', 'cli.mjs');
-  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'cli.ts');
+  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'shell', 'cli.ts');
   return spawnSync(process.execPath, [tsxCli, contextDbCli, ...args], {
     cwd: process.cwd(),
     encoding: 'utf8',
@@ -43,7 +43,7 @@ async function startContextDbServer(args: string[]): Promise<{
   stop: () => Promise<void>;
 }> {
   const tsxCli = path.join(process.cwd(), 'node_modules', 'tsx', 'dist', 'cli.mjs');
-  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'cli.ts');
+  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'shell', 'cli.ts');
   const child = spawn(process.execPath, [tsxCli, contextDbCli, ...args], {
     cwd: process.cwd(),
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -160,7 +160,7 @@ test('buildMemoryGenealogyGraph maps sessions, checkpoints, refs, continuity, an
     sessionId: session.sessionId,
     intent: 'continue memory genealogy',
     summary: 'Continue from the galaxy graph design.',
-    touchedFiles: ['mcp-server/src/contextdb/genealogy.ts'],
+    touchedFiles: ['mcp-server/src/contextdb/store/genealogy.ts'],
     nextActions: ['wire CLI'],
     updatedAt: new Date().toISOString(),
   }, null, 2)}\n`, 'utf8');
@@ -352,7 +352,7 @@ test('buildMemoryGenealogyGraph includes hidden event nodes only when requested'
     role: 'assistant',
     kind: 'response',
     text: 'Detailed raw event text should require explicit expansion.',
-    refs: ['mcp-server/src/contextdb/genealogy.ts'],
+    refs: ['mcp-server/src/contextdb/store/genealogy.ts'],
   });
 
   const hidden = await buildMemoryGenealogyGraph({ workspaceRoot: workspace, project: 'aios' });
@@ -1917,7 +1917,7 @@ test('searchEvents refs filter uses normalized event_refs exact matching', async
     role: 'assistant',
     kind: 'response',
     text: 'primary ref hit',
-    refs: ['mcp-server/src/contextdb/core.ts'],
+    refs: ['mcp-server/src/contextdb/store/core.ts'],
   });
   await appendEvent({
     workspaceRoot: workspace,
@@ -1925,13 +1925,13 @@ test('searchEvents refs filter uses normalized event_refs exact matching', async
     role: 'assistant',
     kind: 'response',
     text: 'similar-looking ref should not match exact filter',
-    refs: ['mcp-server/src/contextdb/core.ts.bak'],
+    refs: ['mcp-server/src/contextdb/store/core.ts.bak'],
   });
 
   const found = await searchEvents({
     workspaceRoot: workspace,
     sessionId: session.sessionId,
-    refs: ['mcp-server/src/contextdb/core.ts'],
+    refs: ['mcp-server/src/contextdb/store/core.ts'],
     limit: 10,
   });
 

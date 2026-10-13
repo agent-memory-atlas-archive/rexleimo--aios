@@ -12,7 +12,7 @@ import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
 
 const REPO = path.resolve(process.cwd());
 const TSX = path.join(REPO, 'mcp-server/node_modules/tsx/dist/cli.mjs');
-const CTXDB = path.join(REPO, 'mcp-server/src/contextdb/cli.ts');
+const CTXDB = path.join(REPO, 'mcp-server/src/contextdb/shell/cli.ts');
 
 function makeFakeClient() {
   return {

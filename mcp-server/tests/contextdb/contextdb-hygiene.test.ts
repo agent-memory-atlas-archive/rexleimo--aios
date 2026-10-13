@@ -9,12 +9,12 @@ import {
   appendEvent,
   createSession,
   writeCheckpoint,
-} from '../../src/contextdb/core.js';
+} from '../../src/contextdb/store/core.js';
 import {
   compactContextDb,
   hygieneStatus,
   pruneNoise,
-} from '../../src/contextdb/hygiene.js';
+} from '../../src/contextdb/query/hygiene.js';
 
 async function makeWorkspace(): Promise<string> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-hygiene-'));
@@ -25,7 +25,7 @@ async function makeWorkspace(): Promise<string> {
 
 function runContextDbCli(args: string[]) {
   const tsxCli = path.join(process.cwd(), 'node_modules', 'tsx', 'dist', 'cli.mjs');
-  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'cli.ts');
+  const contextDbCli = path.join(process.cwd(), 'src', 'contextdb', 'shell', 'cli.ts');
   return spawnSync(process.execPath, [tsxCli, contextDbCli, ...args], {
     cwd: process.cwd(),
     encoding: 'utf8',

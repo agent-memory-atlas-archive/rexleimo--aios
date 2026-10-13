@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { getWorkspace, parseArgs, usage } from './args.js';
 import { runContextDbCommand } from './handlers.js';
 
-const AIOS_ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
+const AIOS_ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', '..');
 
 export async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
   const { command, options } = parseArgs(argv);

@@ -73,7 +73,7 @@ test('extractTouchedFilesFromText canonicalizes common path forms', () => {
     { workspaceRoot },
     'Updated /workspace/project/scripts/ctx-agent-core.mjs and README.md.',
     'diff --git a/scripts/lib/contextdb/registry/continuity.mjs b/scripts/lib/contextdb/registry/continuity.mjs',
-    'Also checked package.json and mcp-server/src/contextdb/core.ts.'
+    'Also checked package.json and mcp-server/src/contextdb/store/core.ts.'
   );
 
   assert.deepEqual(touched, [
@@ -81,6 +81,6 @@ test('extractTouchedFilesFromText canonicalizes common path forms', () => {
     'README.md',
     'scripts/lib/contextdb/registry/continuity.mjs',
     'package.json',
-    'mcp-server/src/contextdb/core.ts',
+    'mcp-server/src/contextdb/store/core.ts',
   ]);
 });

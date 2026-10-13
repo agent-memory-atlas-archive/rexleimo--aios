@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
-import { resolveContextDbRoot, toWorkspaceRelative } from '../paths.js';
+import { resolveContextDbRoot, toWorkspaceRelative } from '../../query/paths.js';
 
 export function resolveOutputPath(workspaceRoot: string, outputPath: string): string {
   return path.isAbsolute(outputPath)

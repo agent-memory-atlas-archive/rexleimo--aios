@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import type { BrowserProfile } from './types.js';
+import type { BrowserProfile } from '../capture/types.js';
 
 function resolveWorkspaceRoot(): string {
   const moduleDir = path.dirname(fileURLToPath(import.meta.url));

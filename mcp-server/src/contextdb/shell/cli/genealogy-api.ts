@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
 import type http from 'node:http';
-import { buildMemoryGenealogyGraph } from '../genealogy.js';
-import { resolveContextDbRoot } from '../paths.js';
+import { buildMemoryGenealogyGraph } from '../../store/genealogy.js';
+import { resolveContextDbRoot } from '../../query/paths.js';
 import { normalizeProjectFilter } from './args.js';
 
 // 纯函数：判断目标路径是否仍在允许目录中，集中防止 GUI 文件读取越界。

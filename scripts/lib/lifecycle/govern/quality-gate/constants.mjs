@@ -6,7 +6,7 @@ export const LOG_AUDIT_EXCLUDE_GLOBS = [
   '!scripts/ctx-agent-core.mjs',
   '!scripts/doctor-bootstrap-task.mjs',
   '!scripts/lib/lifecycle/quality-gate.mjs',
-  '!mcp-server/src/contextdb/cli.ts',
+  '!mcp-server/src/contextdb/shell/cli.ts',
   '!scripts/rl-shell-v1.mjs',
   '!scripts/rl-mixed-v1.mjs',
   '!scripts/generate-rl-shell-v1-benchmark.mjs',

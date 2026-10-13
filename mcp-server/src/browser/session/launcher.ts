@@ -2,9 +2,9 @@
 import { chromium, type Browser, type BrowserContext } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
-import type { BrowserProfile, ProfileState } from './types.js';
+import type { BrowserProfile, ProfileState } from '../capture/types.js';
 import { profileManager } from './profiles.js';
-import { STEALTH_SCRIPT } from './stealth-script.js';
+import { STEALTH_SCRIPT } from '../capture/stealth-script.js';
 
 // 反检测启动参数
 const STEALTH_ARGS = [

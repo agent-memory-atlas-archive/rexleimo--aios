@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
-import { browserLauncher } from '../launcher.js';
-import { applyPrivacyOverlay, type ApplyPrivacyOverlayOptions } from '../privacy-overlay.js';
+import { browserLauncher } from '../session/launcher.js';
+import { applyPrivacyOverlay, type ApplyPrivacyOverlayOptions } from '../capture/privacy-overlay.js';
 
 export interface ScreenshotOptions {
   fullPage?: boolean;

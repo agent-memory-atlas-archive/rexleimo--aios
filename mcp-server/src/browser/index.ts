@@ -1,6 +1,6 @@
 // mcp-server/src/browser/index.ts
-import { profileManager } from './profiles.js';
-import { browserLauncher } from './launcher.js';
+import { profileManager } from './session/profiles.js';
+import { browserLauncher } from './session/launcher.js';
 import { navigate } from './actions/navigate.js';
 import { click } from './actions/click.js';
 import { type } from './actions/type.js';
@@ -10,7 +10,7 @@ import { screenshot } from './actions/screenshot.js';
 import { authCheck, normalizeRlAuthState } from './actions/auth-check.js';
 import { challengeCheck, normalizeRlChallengeState } from './actions/challenge-check.js';
 import { compactRlSnapshot } from './actions/snapshot.js';
-import { getBrowserHealth } from './health.js';
+import { getBrowserHealth } from './capture/health.js';
 
 export {
   profileManager,

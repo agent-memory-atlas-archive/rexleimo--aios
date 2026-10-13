@@ -1,4 +1,4 @@
-import type { CheckpointCost, CheckpointTelemetry, EventTurnEnvelope, VerificationResult } from '../core.js';
+import type { CheckpointCost, CheckpointTelemetry, EventTurnEnvelope, VerificationResult } from '../store/core.js';
 import type { CheckpointSelectRow, EventSelectRow, SqliteCheckpointRow, SqliteEventRow } from './types.js';
 
 // 纯函数：保持 refs_flat 的哨兵格式，兼容历史 LIKE 查询。

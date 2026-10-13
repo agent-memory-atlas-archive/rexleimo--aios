@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { screenshot } from '../../src/browser/actions/screenshot.js';
-import { browserLauncher } from '../../src/browser/launcher.js';
+import { browserLauncher } from '../../src/browser/session/launcher.js';
 
 test('screenshot uses locator capture when selector is provided', async () => {
   let pageScreenshotCalls = 0;

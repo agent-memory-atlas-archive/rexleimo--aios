@@ -13,9 +13,9 @@ import {
   searchMemory,
   syncContextIndex,
   writeCheckpoint,
-} from '../core.js';
-import { buildMemoryGenealogyGraph } from '../genealogy.js';
-import { compactContextDb, hygieneStatus, pruneNoise } from '../hygiene.js';
+} from '../../store/core.js';
+import { buildMemoryGenealogyGraph } from '../../store/genealogy.js';
+import { compactContextDb, hygieneStatus, pruneNoise } from '../../query/hygiene.js';
 import {
   buildTurnEnvelope,
   getOptionalCsv,

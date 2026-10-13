@@ -71,7 +71,7 @@ describe('Local Browser MCP Launcher Files', () => {
 });
 
 describe('Browser Executable Paths — Multi-Platform (static analysis)', () => {
-  const launcherSrc = fs.readFileSync(path.join(rootDir, 'mcp-server', 'src', 'browser', 'launcher.ts'), 'utf8');
+  const launcherSrc = fs.readFileSync(path.join(rootDir, 'mcp-server', 'src', 'browser', 'session', 'launcher.ts'), 'utf8');
 
   it('macOS has Brave and Arc candidates', () => {
     const macSection = launcherSrc.slice(
@@ -164,7 +164,7 @@ describe('REQUIRED: py/py3 — Cross-Platform Safety', () => {
 
 describe('Shell Script Parity — MCP & ContextDB (static analysis)', () => {
   it('contextdb genealogy server has cross-platform browser open', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'cli', 'genealogy-server.ts'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'shell', 'cli', 'genealogy-server.ts'), 'utf8');
     assert.ok(content.includes("platform === 'darwin'"), 'should check darwin');
     assert.ok(content.includes("platform === 'win32'"), 'should check win32');
     assert.ok(content.includes('xdg-open'), 'should have Linux fallback');

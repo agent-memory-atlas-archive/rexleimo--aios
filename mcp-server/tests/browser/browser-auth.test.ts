@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { Page } from 'playwright';
 
-import { detectAuthRequired, detectChallengeRequired } from '../../src/browser/auth.js';
+import { detectAuthRequired, detectChallengeRequired } from '../../src/browser/session/auth.js';
 
 interface MockPageOptions {
   url: string;

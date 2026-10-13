@@ -1,7 +1,7 @@
 // mcp-server/src/browser/actions/navigate.ts
-import { browserLauncher } from '../launcher.js';
-import { detectAuthRequired, detectChallengeRequired } from '../auth.js';
-import { applyActionPacing } from '../pacing.js';
+import { browserLauncher } from '../session/launcher.js';
+import { detectAuthRequired, detectChallengeRequired } from '../session/auth.js';
+import { applyActionPacing } from '../session/pacing.js';
 
 export async function navigate(url: string, profile: string = 'default', newTab: boolean = false) {
   const state = browserLauncher.getState(profile);

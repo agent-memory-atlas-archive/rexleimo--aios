@@ -16,9 +16,9 @@ import {
   upsertEventRow,
   upsertSessionRow,
 } from './sqlite.js';
-import { semanticRerank } from './semantic.js';
-import { buildSearchExplain, type ContextDbSearchExplain } from './explain.js';
-import { resolveAiosStateRoot, resolveContextDbRoot, toWorkspaceRelative } from './paths.js';
+import { semanticRerank } from '../query/semantic.js';
+import { buildSearchExplain, type ContextDbSearchExplain } from '../query/explain.js';
+import { resolveAiosStateRoot, resolveContextDbRoot, toWorkspaceRelative } from '../query/paths.js';
 
 export type SessionStatus = 'running' | 'blocked' | 'done';
 export type EventRole = 'system' | 'user' | 'assistant' | 'tool';

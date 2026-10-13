@@ -7,7 +7,7 @@ import {
   isUserDataDirLockedError,
   resolveLaunchHeadless,
   resolveRequireCdp,
-} from '../../src/browser/launcher.js';
+} from '../../src/browser/session/launcher.js';
 
 test('resolveLaunchHeadless defaults to visible browser', () => {
   const result = resolveLaunchHeadless({}, { name: 'default' }, undefined);

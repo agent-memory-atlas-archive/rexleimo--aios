@@ -8,7 +8,7 @@ import {
   createSession,
   ensureContextDb,
   searchEvents,
-} from '../src/contextdb/core.js';
+} from '../src/contextdb/store/core.js';
 
 interface BenchOptions {
   workspace?: string;

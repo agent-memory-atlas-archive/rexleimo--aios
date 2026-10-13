@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { ensureContextDb } from './core.js';
+import { ensureContextDb } from '../store/core.js';
 import { resolveContextDbRoot } from './paths.js';
 
 export interface ContextDbHygieneStatus {
