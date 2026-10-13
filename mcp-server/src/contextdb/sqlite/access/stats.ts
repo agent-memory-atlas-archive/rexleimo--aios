@@ -1,5 +1,5 @@
 import { getConnection } from './connection.js';
-import { ensureSqliteSidecar } from './schema.js';
+import { ensureSqliteSidecar } from '../tables/schema.js';
 import type { SqliteSessionIndexedSeqs } from './types.js';
 
 export function countSqliteRows(dbPath: string): { sessions: number; events: number; checkpoints: number } {

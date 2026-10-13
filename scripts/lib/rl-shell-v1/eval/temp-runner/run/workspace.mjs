@@ -1,7 +1,7 @@
 ﻿import { access, cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { validateTaskManifest } from '../schema.mjs';
+import { validateTaskManifest } from '../../schema.mjs';
 
 export function createEnv() {
   const env = { ...process.env };

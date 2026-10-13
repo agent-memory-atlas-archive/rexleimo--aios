@@ -2,7 +2,7 @@ import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { collectFailingTests } from '../eval/temp-runner/command.mjs';
+import { collectFailingTests } from '../eval/temp-runner/run/command.mjs';
 import { validateTaskManifest } from '../eval/schema.mjs';
 
 function createDeterministicOrder(items, seed) {

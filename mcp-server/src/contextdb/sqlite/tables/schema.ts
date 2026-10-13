@@ -1,6 +1,6 @@
 import { existsSync, unlinkSync } from 'node:fs';
-import { closeConnection, getConnection, runTransaction, type SqliteDatabase } from './connection.js';
-import { parseJsonStringArray } from './serde.js';
+import { closeConnection, getConnection, runTransaction, type SqliteDatabase } from '../access/connection.js';
+import { parseJsonStringArray } from '../access/serde.js';
 
 function ensureCheckpointTelemetryColumns(db: SqliteDatabase): void {
   const tableInfo = db.prepare('PRAGMA table_info(checkpoints);').all() as unknown as Array<{ name: string }>;

@@ -1,4 +1,4 @@
-﻿import { DEFAULT_POLICY, createDefaultExecutionPolicy } from './policy.mjs';
+﻿import { DEFAULT_POLICY, createDefaultExecutionPolicy } from '../run/policy.mjs';
 
 export function buildNoProgressFingerprint(event) {
   const actionType = event.action?.action || 'unknown';

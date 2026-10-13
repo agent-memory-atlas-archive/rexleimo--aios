@@ -1,7 +1,7 @@
-import { getConnection } from './connection.js';
+import { getConnection } from '../access/connection.js';
 import { ensureSqliteSidecar } from './schema.js';
-import { parseJsonStringArray } from './serde.js';
-import type { SessionSelectRow, SqliteSessionRow } from './types.js';
+import { parseJsonStringArray } from '../access/serde.js';
+import type { SessionSelectRow, SqliteSessionRow } from '../access/types.js';
 
 export function upsertSessionRow(dbPath: string, row: SqliteSessionRow): void {
   ensureSqliteSidecar(dbPath);

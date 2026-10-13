@@ -1,8 +1,8 @@
-import { getConnection, runTransaction } from './connection.js';
+import { getConnection, runTransaction } from '../access/connection.js';
 import { ensureSqliteSidecar } from './schema.js';
-import { toFtsMatchQuery, tokenizeSearchQuery } from './search-query.js';
-import { mapEventRow, refsToFlat } from './serde.js';
-import type { EventSelectRow, SqliteEventRow, SqliteSearchInput, SqliteTimelineInput } from './types.js';
+import { toFtsMatchQuery, tokenizeSearchQuery } from '../access/search-query.js';
+import { mapEventRow, refsToFlat } from '../access/serde.js';
+import type { EventSelectRow, SqliteEventRow, SqliteSearchInput, SqliteTimelineInput } from '../access/types.js';
 
 const EVENT_SELECT_COLUMNS = 'e.event_id, e.session_id, e.seq, e.ts, e.ts_epoch, e.project, e.agent, e.role, e.kind, e.text, e.refs_json, e.turn_json, e.text_hash, e.signature_hash';
 

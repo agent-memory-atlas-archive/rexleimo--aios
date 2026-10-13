@@ -1,6 +1,6 @@
-﻿import { collectFailingTests, computeVerificationStatus, normalizeFailureLabel } from './command.mjs';
-import { createDefaultExecutionPolicy } from './policy.mjs';
-import { executeAction } from './actions.mjs';
+﻿import { collectFailingTests, computeVerificationStatus, normalizeFailureLabel } from '../run/command.mjs';
+import { createDefaultExecutionPolicy } from '../run/policy.mjs';
+import { executeAction } from '../run/actions.mjs';
 
 export async function runBaselineFailureCheck({ workspace, verificationCommand, policy = createDefaultExecutionPolicy() }) {
   const verification = await runVerification({ workspace, verificationCommand, policy });

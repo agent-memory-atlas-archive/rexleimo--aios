@@ -1,13 +1,13 @@
-import { getConnection } from './connection.js';
+import { getConnection } from '../access/connection.js';
 import { ensureSqliteSidecar } from './schema.js';
-import { toFtsMatchQuery, tokenizeSearchQuery } from './search-query.js';
-import { mapCheckpointRow } from './serde.js';
+import { toFtsMatchQuery, tokenizeSearchQuery } from '../access/search-query.js';
+import { mapCheckpointRow } from '../access/serde.js';
 import type {
   CheckpointSelectRow,
   SqliteCheckpointRow,
   SqliteCheckpointSearchInput,
   SqliteTimelineInput,
-} from './types.js';
+} from '../access/types.js';
 
 const CHECKPOINT_SELECT_COLUMNS = 'checkpoint_id, session_id, seq, ts, ts_epoch, project, agent, status, summary, next_actions_json, artifacts_json, verification_result, retry_count, failure_category, elapsed_ms, cost_json, telemetry_json';
 const CHECKPOINT_SELECT_COLUMNS_WITH_ALIAS = 'c.checkpoint_id, c.session_id, c.seq, c.ts, c.ts_epoch, c.project, c.agent, c.status, c.summary, c.next_actions_json, c.artifacts_json, c.verification_result, c.retry_count, c.failure_category, c.elapsed_ms, c.cost_json, c.telemetry_json';

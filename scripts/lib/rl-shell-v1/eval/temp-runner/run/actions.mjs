@@ -1,11 +1,11 @@
 ﻿import { readFile } from 'node:fs/promises';
 
-import { validateStudentAction } from '../../training/action-protocol.mjs';
+import { validateStudentAction } from '../../../training/action-protocol.mjs';
 import { checkForbiddenCommand, runCommand } from './command.mjs';
-import { recordObservation } from './observations.mjs';
+import { recordObservation } from '../observe/observations.mjs';
 import { ensureBudgets, createDefaultExecutionPolicy } from './policy.mjs';
-import { applyPatch } from './patch.mjs';
-import { truncateText } from './text.mjs';
+import { applyPatch } from '../observe/patch.mjs';
+import { truncateText } from '../observe/text.mjs';
 import { ensureWorkspaceReadable, resolveWorkspacePath } from './workspace.mjs';
 
 async function executeReadAction({ workspace, action, policy }) {

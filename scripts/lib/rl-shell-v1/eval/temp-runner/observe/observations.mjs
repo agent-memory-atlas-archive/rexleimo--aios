@@ -1,6 +1,6 @@
 ﻿import { appendFile } from 'node:fs/promises';
 
-import { validateObservationEvent } from '../schema.mjs';
+import { validateObservationEvent } from '../../schema.mjs';
 
 export function makeObservation({ workspace, action, status, errorCode = null, errorMessage = null, payload }) {
   const event = validateObservationEvent({
