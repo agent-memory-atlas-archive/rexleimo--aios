@@ -20,7 +20,7 @@ import {
   setActiveMemoStorage,
   switchMemoStorage,
   writePinnedMemo,
-} from '../../../lib/memo/storage.mjs';
+} from '../../../lib/memory/memo/storage.mjs';
 
 async function withTempRoot(prefix, fn) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

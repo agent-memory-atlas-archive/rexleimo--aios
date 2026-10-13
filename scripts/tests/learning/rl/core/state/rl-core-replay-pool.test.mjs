@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('rl-core replay pool keeps synthetic and real-shadow lanes separate', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/replay-pool.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/replay-pool.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-replay-'));
   const pool = await mod.createReplayPool({ rootDir, namespace: 'rl-core-test' });
 
@@ -33,7 +33,7 @@ test('rl-core replay pool keeps synthetic and real-shadow lanes separate', async
 });
 
 test('rl-core replay pool ignores ineligible and diagnostic-only episodes', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/replay-pool.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/replay-pool.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-replay-'));
   const pool = await mod.createReplayPool({ rootDir, namespace: 'rl-core-test' });
 
@@ -62,7 +62,7 @@ test('rl-core replay pool ignores ineligible and diagnostic-only episodes', asyn
 });
 
 test('rl-core replay pool classifies replay routes from comparison and rollback metadata', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/replay-pool.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/replay-pool.mjs');
 
   assert.equal(
     mod.classifyReplayRoute({
@@ -85,7 +85,7 @@ test('rl-core replay pool classifies replay routes from comparison and rollback 
 });
 
 test('rl-core replay pool keeps legacy shell v0 episodes in diagnostic-only lane', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/replay-pool.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/replay-pool.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-replay-'));
   const pool = await mod.createReplayPool({ rootDir, namespace: 'rl-core-test' });
 

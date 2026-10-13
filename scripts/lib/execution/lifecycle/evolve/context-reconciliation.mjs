@@ -1,0 +1,226 @@
+import { spawnSync } from 'node:child_process';
+import { realpathSync } from 'node:fs';
+import path from 'node:path';
+
+import { resolveAiosStateRoot, resolveContextDbRoot } from '../../../environment/aios/state-root.mjs';
+import { isExecutionContextMutationDeclared } from '../../../memory/contextdb/runtime/execution-context.mjs';
+import { atomicWriteText, sha256Hex } from '../../../memory/memo/storage/base/fs-io.mjs';
+import { normalizeSessionId, readSessionChangedFiles } from '../../session/changed-files.mjs';
+
+function normalizePath(value) {
+  return String(value || '').trim().replace(/\\/gu, '/').replace(/^\.\//u, '').replace(/^\/+/u, '');
+}
+
+/* 中文注释：物理路径解析（best-effort）：macOS /var -> /private/var 之类的符号链接
+   会让词法比较跨命名空间失败；路径不存在时返回 null，由调用方回退到词法行为。 */
+function tryRealpath(value) {
+  try {
+    return realpathSync(value);
+  } catch {
+    return null;
+  }
+}
+
+function comparisonPath(value) {
+  const normalized = normalizePath(value);
+  return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
+}
+
+// D3: workspace-aware comparison so absolute declared targets match
+// relative actual paths (and vice versa). Falls back to comparisonPath for
+// refs that escape the workspace, preserving existing undeclared semantics.
+function normalizeWorkspaceRefLocal(rootDir, value) {
+  const input = String(value || '').trim().replace(/\\/gu, '/').replace(/^\.\//u, '');
+  if (!input) return '';
+  const root = path.resolve(rootDir);
+  const absolute = path.isAbsolute(input) ? path.resolve(input) : path.resolve(root, input);
+  const relative = path.relative(root, absolute);
+  const valid = relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+  if (valid) return String(relative).replace(/\\/gu, '/').replace(/^\.\//u, '');
+  const realRoot = tryRealpath(root);
+  const realAbsolute = tryRealpath(absolute);
+  if (realRoot && realAbsolute) {
+    const realRelative = path.relative(realRoot, realAbsolute);
+    const realValid = realRelative !== '..' && !realRelative.startsWith(`..${path.sep}`) && !path.isAbsolute(realRelative);
+    if (realValid) return String(realRelative).replace(/\\/gu, '/').replace(/^\.\//u, '');
+  }
+  return normalizePath(value);
+}
+
+function comparisonWorkspacePath(rootDir, value) {
+  const normalized = normalizeWorkspaceRefLocal(rootDir, value);
+  return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
+}
+
+function uniqueSorted(values) {
+  return [...new Set(values.map(normalizePath).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function relativeDerivedPrefix(rootDir, absolutePath) {
+  const relative = normalizePath(path.relative(path.resolve(rootDir), path.resolve(absolutePath)));
+  return relative && relative !== '..' && !relative.startsWith('../') ? relative : '';
+}
+
+function outsideDerivedRoots(filePath, prefixes) {
+  return !prefixes.some((prefix) => prefix && (filePath === prefix || filePath.startsWith(`${prefix}/`)));
+}
+
+function gitNameOnly(rootDir, args) {
+  const result = spawnSync('git', args, {
+    cwd: rootDir,
+    encoding: 'utf8',
+    windowsHide: true,
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  return {
+    exitCode: Number.isInteger(result.status) ? result.status : 1,
+    paths: String(result.stdout || '').split('\0').map(normalizePath).filter(Boolean),
+    error: result.error ? String(result.error?.message || result.error) : '',
+    stderr: String(result.stderr || '').trim(),
+  };
+}
+
+function isContainedPath(rootDir, candidate) {
+  const relative = path.relative(path.resolve(rootDir), path.resolve(candidate));
+  return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+}
+
+function normalizeGitIgnoredRoots(rootDir, paths) {
+  const resolvedRoot = path.resolve(rootDir);
+  const candidates = new Map();
+  for (const rawPath of paths) {
+    const relativePath = normalizePath(rawPath).replace(/\/+$/u, '');
+    const candidate = path.resolve(resolvedRoot, relativePath || '.');
+    if (!isContainedPath(resolvedRoot, candidate)) {
+      throw new Error(`git ignored root escapes workspace: ${rawPath}`);
+    }
+    const key = process.platform === 'win32' ? candidate.toLowerCase() : candidate;
+    candidates.set(key, candidate);
+  }
+  const sorted = [...candidates.values()].sort((left, right) => left.length - right.length || left.localeCompare(right));
+  return sorted
+    .filter((candidate) => !sorted.some((ancestor) => ancestor !== candidate && isContainedPath(ancestor, candidate)))
+    .map((candidate) => normalizePath(path.relative(resolvedRoot, candidate)) || '.');
+}
+
+export function collectGitChangedFiles(rootDir) {
+  const observations = [
+    gitNameOnly(rootDir, ['diff', '--name-only', '-z', '--']),
+    gitNameOnly(rootDir, ['diff', '--cached', '--name-only', '-z', '--']),
+    gitNameOnly(rootDir, ['ls-files', '--others', '--exclude-standard', '-z']),
+  ];
+  return {
+    available: observations.every((item) => item.exitCode === 0 && !item.error),
+    paths: uniqueSorted(observations.flatMap((item) => item.paths)),
+    observations,
+  };
+}
+
+export function collectGitIgnoredWorkspaceRoots(rootDir) {
+  const observation = gitNameOnly(rootDir, ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '-z']);
+  if (observation.exitCode !== 0 || observation.error) {
+    return { available: false, roots: [], observation };
+  }
+  try {
+    return {
+      available: true,
+      roots: normalizeGitIgnoredRoots(rootDir, observation.paths),
+      observation,
+    };
+  } catch (error) {
+    return {
+      available: false,
+      roots: [],
+      observation: {
+        ...observation,
+        error: String(error?.message || error),
+      },
+    };
+  }
+}
+
+export async function evaluateContextReconciliation({
+  rootDir,
+  sessionId = 'default',
+  packet,
+  workspaceObservation = null,
+  env = process.env,
+  persist = true,
+  now = new Date(),
+} = {}) {
+  if (!rootDir) throw new Error('evaluateContextReconciliation requires rootDir');
+  if (!packet || packet.kind !== 'contextdb.execution-context-packet') {
+    throw new Error('evaluateContextReconciliation requires an ExecutionContextPacket');
+  }
+  const safeSessionId = normalizeSessionId(sessionId);
+  const ledger = await readSessionChangedFiles({ rootDir, sessionId: safeSessionId, env });
+  const ledgerPaths = uniqueSorted((ledger.files || []).map((file) => file.path));
+  const git = collectGitChangedFiles(rootDir);
+  const derivedPrefixes = uniqueSorted([
+    relativeDerivedPrefix(rootDir, resolveAiosStateRoot(rootDir, { env })),
+    relativeDerivedPrefix(rootDir, resolveContextDbRoot(rootDir, { preferLegacyExisting: true, env })),
+  ]);
+  const gitPaths = git.paths.filter((filePath) => outsideDerivedRoots(filePath, derivedPrefixes));
+  const actualPaths = uniqueSorted([...ledgerPaths, ...gitPaths]);
+  const declaredPaths = uniqueSorted(packet.task?.targets || []);
+  const undeclaredPaths = actualPaths.filter((filePath) => !isExecutionContextMutationDeclared(packet, filePath, { rootDir }));
+  const actualPathKeys = new Set(actualPaths.map((filePath) => comparisonWorkspacePath(rootDir, filePath)));
+  /* 中文注释：missing 判定必须用声明原文做工作区归一化；declaredPaths 是展示归一化
+     （uniqueSorted 会剥掉绝对路径的前导斜杠），用它比较会把绝对声明误判为缺失。 */
+  const rawDeclaredPaths = Array.isArray(packet.task?.targets) ? packet.task.targets : [];
+  const missingDeclaredPaths = uniqueSorted(
+    rawDeclaredPaths.filter((filePath) => !actualPathKeys.has(comparisonWorkspacePath(rootDir, filePath))),
+  );
+  const workspaceObservationUnavailable = workspaceObservation?.available === false;
+  const wouldBlockReasons = [
+    ...(undeclaredPaths.length > 0 ? ['undeclared_target'] : []),
+    ...(workspaceObservationUnavailable ? ['workspace_observation_unavailable'] : []),
+    ...(!git.available ? ['reconciliation_git_unavailable'] : []),
+  ];
+  const generatedAt = new Date(now).toISOString();
+  const decisionDigest = sha256Hex(JSON.stringify({
+    contextRevision: packet.contextRevision,
+    sessionId: safeSessionId,
+    workspaceObservationUnavailable,
+    declaredPaths,
+    derivedPrefixes,
+    ledgerPaths,
+    gitPaths,
+    actualPaths,
+    undeclaredPaths,
+    missingDeclaredPaths,
+    wouldBlockReasons,
+  }));
+  const contextDbRoot = resolveContextDbRoot(rootDir, { preferLegacyExisting: true, env });
+  const receiptPath = path.join(
+    contextDbRoot,
+    'reconciliation',
+    safeSessionId,
+    `${decisionDigest.slice(0, 24)}.json`,
+  );
+  const result = {
+    schemaVersion: 1,
+    kind: 'contextdb.context-reconciliation-receipt',
+    mode: 'shadow',
+    generatedAt,
+    decisionDigest,
+    contextRevision: packet.contextRevision,
+    sessionId: safeSessionId,
+    workspaceObservationUnavailable,
+    declaredPaths,
+    derivedPrefixes,
+    ledgerPaths,
+    gitPaths,
+    actualPaths,
+    undeclaredPaths,
+    missingDeclaredPaths,
+    gitAvailable: git.available,
+    gitObservations: git.observations,
+    wouldBlock: wouldBlockReasons.length > 0,
+    wouldBlockReasons,
+    admissionChanged: false,
+    receiptPath,
+  };
+  if (persist) await atomicWriteText(receiptPath, `${JSON.stringify(result, null, 2)}\n`);
+  return result;
+}

@@ -229,7 +229,7 @@ test('contextdb cli genealogy outputs memory graph json', async () => {
 test('contextdb cli genealogy:serve can use AIOS asset root for project workspace data', async () => {
   const workspace = await makeWorkspace();
   const assetRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-gui-assets-'));
-  const guiDir = path.join(assetRoot, 'scripts', 'lib', 'genealogy-gui');
+  const guiDir = path.join(assetRoot, 'scripts', 'lib', 'memory', 'genealogy-gui');
   await fs.mkdir(guiDir, { recursive: true });
   await fs.writeFile(path.join(guiDir, 'index.html'), '<!doctype html><title>test gui</title>', 'utf8');
 
@@ -277,7 +277,7 @@ test('contextdb cli genealogy:serve keeps browser API scoped to launch workspace
   const workspace = await makeWorkspace();
   const otherWorkspace = await makeWorkspace();
   const assetRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-gui-assets-'));
-  const guiDir = path.join(assetRoot, 'scripts', 'lib', 'genealogy-gui');
+  const guiDir = path.join(assetRoot, 'scripts', 'lib', 'memory', 'genealogy-gui');
   await fs.mkdir(guiDir, { recursive: true });
   await fs.writeFile(path.join(guiDir, 'index.html'), '<!doctype html><title>test gui</title>', 'utf8');
   await fs.mkdir(path.join(workspace, 'docs'), { recursive: true });
@@ -1263,11 +1263,11 @@ test('buildContextPacket balanced token strategy keeps critical error context un
     kind: 'error',
     text: [
       'ERROR: migration failed while updating state table',
-      'at migrate (/repo/scripts/lib/harness/orchestrator.mjs:442:11)',
+      'at migrate (/repo/scripts/lib/execution/harness/orchestrator.mjs:442:11)',
       'at run (/repo/scripts/aios.mjs:77:3)',
       'Caused by: timeout waiting for lock',
     ].join('\n'),
-    refs: ['scripts/lib/harness/orchestrator.mjs'],
+    refs: ['scripts/lib/execution/harness/orchestrator.mjs'],
   });
   await appendEvent({
     workspaceRoot: workspace,

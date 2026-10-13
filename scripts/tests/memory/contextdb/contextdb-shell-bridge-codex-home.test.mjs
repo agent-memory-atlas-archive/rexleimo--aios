@@ -10,11 +10,11 @@ import { fileURLToPath } from 'node:url';
 import {
   applyOpenCodeRuntimeDefaults,
   OPENCODE_DEFAULT_BASH_TIMEOUT_MS,
-} from '../../../lib/opencode/runtime-env.mjs';
+} from '../../../lib/clients/opencode/runtime-env.mjs';
 import {
   buildOpenCodeStrictAgentArgs,
   shouldUseOpenCodePureMode,
-} from '../../../lib/opencode/strict-primary-agent.mjs';
+} from '../../../lib/clients/opencode/strict-primary-agent.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const BRIDGE = path.join(ROOT, 'scripts', 'contextdb-shell-bridge.mjs');

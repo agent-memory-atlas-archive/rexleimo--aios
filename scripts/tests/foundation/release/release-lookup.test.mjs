@@ -5,7 +5,7 @@ import {
   fetchStableReleases,
   pickNewestStableRelease,
   resolveNewestStableRelease,
-} from '../../../lib/lifecycle/release/release-lookup.mjs';
+} from '../../../lib/execution/lifecycle/release/release-lookup.mjs';
 
 function fakeFetch(payload, { ok = true, status = 200 } = {}) {
   const calls = [];

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildCodexOneShotArgs, runOneShotAgent } from '../../../lib/ctx-agent-core/entry/one-shot.mjs';
+import { buildCodexOneShotArgs, runOneShotAgent } from '../../../lib/foundation/ctx-agent-core/entry/one-shot.mjs';
 
 test('ctx-agent one-shot API no longer accepts injected context arguments', () => {
   assert.equal(runOneShotAgent.length, 3);

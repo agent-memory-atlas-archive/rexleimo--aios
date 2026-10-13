@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { syncNativeEnhancements } from './lib/native/synchronize/sync.mjs';
+import { syncNativeEnhancements } from './lib/clients/native/synchronize/sync.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

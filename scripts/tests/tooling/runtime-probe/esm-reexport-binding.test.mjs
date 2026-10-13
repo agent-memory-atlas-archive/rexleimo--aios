@@ -11,9 +11,9 @@ import test from 'node:test';
  * re-exports a name and then calls it locally throws `ReferenceError: x is not defined`
  * on that path. This happened twice and was fixed twice as one-off patches:
  *
- *   - `scripts/lib/rl-orchestrator-v1/decision-runner/shared.mjs` (`normalizeText`, A8,
+ *   - `scripts/lib/learning/rl-orchestrator-v1/decision-runner/shared.mjs` (`normalizeText`, A8,
  *     v6.0.7) — repaired 10 tests.
- *   - `scripts/lib/rl-core/learning/trainer/core.mjs` (`computeHash`, audit F1, v6.0.12) — latent
+ *   - `scripts/lib/learning/rl-core/learning/trainer/core.mjs` (`computeHash`, audit F1, v6.0.12) — latent
  *     because `bandit-state.mjs` seeds `rngState` first, so the branch rarely ran.
  *
  * Repairing instances twice without a guard is what let the class recur, so the rule is

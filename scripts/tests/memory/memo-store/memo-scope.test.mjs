@@ -9,7 +9,7 @@ import {
   appendMemoEvent,
   listMemoEvents,
   searchMemoEvents,
-} from '../../../lib/memo/storage.mjs';
+} from '../../../lib/memory/memo/storage.mjs';
 
 const repoRoot = process.cwd();
 const cliPath = path.join(repoRoot, 'scripts', 'aios.mjs');

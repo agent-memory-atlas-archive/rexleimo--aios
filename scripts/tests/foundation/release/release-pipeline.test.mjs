@@ -105,7 +105,7 @@ async function seedFixtureRepo(rootDir, {
   await writeFixtureFile(rootDir, 'skill-sources/sample-skill/SKILL.md', '# canonical\n');
   await writeFixtureFile(rootDir, 'client-sources/native-base/gemini/project/AIOS.md', '# native gemini\n');
   // A stale ignored directory must never leak an obsolete workflow into a release archive.
-  await writeFixtureFile(rootDir, 'scripts/lib/components/superpowers/legacy.mjs', 'export const legacy = true;\n');
+  await writeFixtureFile(rootDir, 'scripts/lib/tooling/components/superpowers/legacy.mjs', 'export const legacy = true;\n');
   await cp(path.join(workspaceRoot, 'agent-sources'), path.join(rootDir, 'agent-sources'), { recursive: true });
   await writeFixtureFile(rootDir, '.codex/skills/sample-skill/SKILL.md', '# codex\n');
   await writeFixtureFile(rootDir, '.codex/agents/rex.toml', '# codex agent\n');
@@ -143,21 +143,21 @@ if (process.argv.slice(2).join(' ') !== 'skill verify-training --changed --base 
 process.stdout.write('{"status":"verified"}\\n');
 `);
   await writeFixtureFile(rootDir, 'scripts/sync-native.mjs', "console.log('[ok] native sync');\n");
-  await cp(path.join(workspaceRoot, 'scripts', 'lib', 'fs'), path.join(rootDir, 'scripts', 'lib', 'fs'), { recursive: true });
-  await writeFixtureFile(rootDir, 'scripts/lib/skills/frontmatter.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'skills', 'frontmatter.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/source-tree.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'source-tree.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/compat-export.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'compat-export.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/sync.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'sync.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/shared.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'shared.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/claude.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'claude.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/codex.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'codex.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/opencode.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'opencode.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/grok.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'grok.mjs'), 'utf8'));
-  await writeFixtureFile(rootDir, 'scripts/lib/harness/team/orchestrator-agents.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'harness', 'team', 'orchestrator-agents.mjs'), 'utf8'));
-  await cp(path.join(workspaceRoot, 'scripts', 'lib', 'clients'), path.join(rootDir, 'scripts', 'lib', 'clients'), { recursive: true });
-  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json'), 'utf8'));
+  await cp(path.join(workspaceRoot, 'scripts', 'lib', 'environment', 'fs'), path.join(rootDir, 'scripts', 'lib', 'environment', 'fs'), { recursive: true });
+  await writeFixtureFile(rootDir, 'scripts/lib/tooling/skills/frontmatter.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'tooling', 'skills', 'frontmatter.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/source-tree.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'source-tree.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/compat-export.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'compat-export.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/sync.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'sync.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/emitters/shared.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'emitters', 'shared.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/emitters/claude.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'emitters', 'claude.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/emitters/codex.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'emitters', 'codex.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/emitters/opencode.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'emitters', 'opencode.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/foundation/agents/emitters/grok.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'agents', 'emitters', 'grok.mjs'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/execution/harness/team/orchestrator-agents.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'execution', 'harness', 'team', 'orchestrator-agents.mjs'), 'utf8'));
+  await cp(path.join(workspaceRoot, 'scripts', 'lib', 'foundation', 'clients'), path.join(rootDir, 'scripts', 'lib', 'foundation', 'clients'), { recursive: true });
+  await writeFixtureFile(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'tooling', 'specs', 'orchestrator', 'orchestrator-agents.json'), 'utf8'));
 
-  // scripts/lib/agents/emitters/* 和 scripts/lib/ctx-agent-core/entry/args.mjs 依赖 src/shared/ 下的公共工具。
+  // scripts/lib/foundation/agents/emitters/* 和 scripts/lib/foundation/ctx-agent-core/entry/args.mjs 依赖 src/shared/ 下的公共工具。
   await cp(path.join(workspaceRoot, 'src', 'shared'), path.join(rootDir, 'src', 'shared'), { recursive: true });
 
   assertOk(run('git', ['init'], { cwd: rootDir }), 'git init failed');
@@ -204,7 +204,7 @@ test('package-release emits stable assets including the rex-harness planning ker
     'aios.tar.gz should not include legacy JSON role cards'
   );
   await assertFileExists(
-    path.join(extractDir, 'aios', 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json'),
+    path.join(extractDir, 'aios', 'scripts', 'lib', 'tooling', 'specs', 'orchestrator', 'orchestrator-agents.json'),
     'aios.tar.gz did not include bundled runtime specs'
   );
   await assertFileExists(
@@ -265,11 +265,11 @@ test('package-release emits stable assets including the rex-harness planning ker
     );
   }
   await assertFileMissing(
-    path.join(extractDir, 'aios', 'scripts', 'lib', 'components', 'superpowers', 'legacy.mjs'),
+    path.join(extractDir, 'aios', 'scripts', 'lib', 'tooling', 'components', 'superpowers', 'legacy.mjs'),
     'aios.tar.gz must not ship retired Superpowers workflow code'
   );
   await assertFileMissing(
-    path.join(extractDir, 'aios', 'scripts', 'lib', 'components', 'superpowers'),
+    path.join(extractDir, 'aios', 'scripts', 'lib', 'tooling', 'components', 'superpowers'),
     'aios.tar.gz must not ship a retired Superpowers workflow directory'
   );
 
@@ -309,11 +309,11 @@ test('package-release emits stable assets including the rex-harness planning ker
     'aios.zip must not include generated mcp-server/dist output'
   );
   await assertFileMissing(
-    path.join(zipExtractDir, 'aios', 'scripts', 'lib', 'components', 'superpowers', 'legacy.mjs'),
+    path.join(zipExtractDir, 'aios', 'scripts', 'lib', 'tooling', 'components', 'superpowers', 'legacy.mjs'),
     'aios.zip must not ship retired Superpowers workflow code'
   );
   await assertFileMissing(
-    path.join(zipExtractDir, 'aios', 'scripts', 'lib', 'components', 'superpowers'),
+    path.join(zipExtractDir, 'aios', 'scripts', 'lib', 'tooling', 'components', 'superpowers'),
     'aios.zip must not ship a retired Superpowers workflow directory'
   );
 });
@@ -552,8 +552,8 @@ exit 0
   );
   await writeFixtureFile(
     packageRoot,
-    'scripts/lib/powershell/aios-internal-wrapper.ps1',
-    await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'powershell', 'aios-internal-wrapper.ps1'), 'utf8')
+    'scripts/lib/environment/powershell/aios-internal-wrapper.ps1',
+    await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'environment', 'powershell', 'aios-internal-wrapper.ps1'), 'utf8')
   );
 
   const zipResult = run('powershell', [
@@ -602,8 +602,8 @@ exit 0
   );
   await writeFixtureFile(
     packageRoot,
-    'scripts/lib/powershell/aios-internal-wrapper.ps1',
-    await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'powershell', 'aios-internal-wrapper.ps1'), 'utf8')
+    'scripts/lib/environment/powershell/aios-internal-wrapper.ps1',
+    await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'environment', 'powershell', 'aios-internal-wrapper.ps1'), 'utf8')
   );
 
   const zipResult = run('powershell', [
@@ -687,7 +687,7 @@ test('release-preflight fails when generated orchestrator agent export drifts', 
     checkSkillsSyncScript: "console.log('[ok] skills sync clean');\nprocess.exit(0);\n",
     checkNativeSyncScript: "console.log('[ok] native sync clean');\nprocess.exit(0);\n",
   });
-  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json', '{"schemaVersion":1,"roleMap":{},"agents":{}}\n');
+  await writeFixtureFile(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json', '{"schemaVersion":1,"roleMap":{},"agents":{}}\n');
 
   const result = process.platform === 'win32'
     ? runPowerShell('scripts/release-preflight.ps1', ['-Tag', 'v1.2.3'], { cwd: rootDir })

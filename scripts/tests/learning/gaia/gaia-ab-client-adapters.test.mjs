@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildGaiaClientInvocation } from '../../../lib/gaia-ab-eval/client-adapters.mjs';
+import { buildGaiaClientInvocation } from '../../../lib/learning/gaia-ab-eval/client-adapters.mjs';
 
 const task = {
   taskId: 'level-1-task',

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { isMaintenanceRelease } from './lib/release-impact.mjs';
+import { isMaintenanceRelease } from './lib/diagnostics/release-impact.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(scriptDir, '..');
@@ -327,7 +327,7 @@ function findBlogLocaleParityErrors(blogMarkdownFiles, locales = ['zh', 'ja', 'k
   return errors;
 }
 
-/* Repo convention lives in scripts/lib/release-impact.mjs so the llms.txt generator
+/* Repo convention lives in scripts/lib/diagnostics/release-impact.mjs so the llms.txt generator
  * and this gate cannot drift apart: a feature release (minor/major — patch segment 0)
  * announces itself with a blog post in every locale, while a maintenance release
  * (patch > 0) ships changelog-only. A patch release MAY still carry a post (v6.0.1

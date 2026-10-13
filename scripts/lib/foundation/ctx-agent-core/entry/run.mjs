@@ -1,0 +1,534 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../interception/index.mjs';
+import { loadFacade, generateFacadeFromSession } from '../../../memory/contextdb/runtime/facade.mjs';
+import { extractTouchedFilesFromText, writeContinuitySummary } from '../../../memory/contextdb/registry/continuity.mjs';
+import { resolveTasksRoot, toWorkspaceRelative } from '../../../environment/aios/state-root.mjs';
+import { ensureBootstrapTask, isBootstrapEnabled } from '../../../../ctx-bootstrap.mjs';
+import { assertWorkspaceExists } from '../context/common.mjs';
+import { ctx, extractCreatedSessionId, extractLatestSessionId } from '../context/contextdb-cli.mjs';
+import { printStartupSummary } from '../context/startup-summary.mjs';
+import { resolveTaskRouteDecision } from '../routing/routes.mjs';
+import { classifyOneShotFailure, buildRoutedCommandSpec, runOneShotAgent, runRoutedOneShotTask } from './one-shot.mjs';
+import { runInteractiveAgentWithSaveGuard } from './interactive.mjs';
+import { handleWorkspaceCommand, runSaveGuardCheckpoint } from '../routing/workspace-commands.mjs';
+import { parseArgs, resolveInitialWorkspace, validateOpts } from './args.mjs';
+import { buildMemoryDeclarationInstruction } from '../../../memory/memo/flow/declaration.mjs';
+
+async function maybeCreateBootstrapTask(opts) {
+  if (!opts.autoBootstrap || !isBootstrapEnabled(process.env)) return;
+  try {
+    const bootstrapResult = await ensureBootstrapTask(opts.workspaceRoot, { project: opts.project, agent: opts.agent });
+    if (bootstrapResult.created) {
+      const tasksRel = toWorkspaceRelative(opts.workspaceRoot, resolveTasksRoot(opts.workspaceRoot, { preferLegacyExisting: true }));
+      console.log(`Bootstrap task created: ${tasksRel}/${bootstrapResult.taskPath}`);
+    }
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[warn] bootstrap task initialization failed: ${reason}`);
+  }
+}
+
+async function runInteractiveStartup(opts) {
+  if (opts.prompt) return false;
+
+  let sessionId = opts.sessionId || '';
+  let facadeResult = await loadFacade(opts.workspaceRoot);
+  if (!facadeResult.ok) {
+    facadeResult = { ok: true, facade: await generateFacadeFromSession(opts.workspaceRoot, opts.agent, opts.project) };
+  }
+  sessionId = facadeResult.facade?.sessionId || sessionId;
+  await printStartupSummary(opts.workspaceRoot, facadeResult.facade);
+
+  await runInteractiveAgentWithSaveGuard(opts.agent, opts.extraArgs, {
+    ...opts,
+    sessionId,
+  });
+  return true;
+}
+
+function resolveSession(opts) {
+  if (opts.sessionId) return opts.sessionId;
+  const latestJson = ctx(opts.workspaceRoot, 'session:latest', ['--agent', opts.agent, '--project', opts.project]);
+  const latestSessionId = extractLatestSessionId(latestJson);
+  if (latestSessionId) return latestSessionId;
+  const goal = opts.goal || `Shared context session for ${opts.agent} on ${opts.project}`;
+  const createJson = ctx(opts.workspaceRoot, 'session:new', ['--agent', opts.agent, '--project', opts.project, '--goal', goal]);
+  return extractCreatedSessionId(createJson);
+}
+
+async function ensureWorkspaceIndex(opts) {
+  try {
+    const { initWorkspace } = await import('../../../memory/contextdb/runtime/workspace.mjs');
+    const wsResult = await initWorkspace(opts.workspaceRoot);
+    if (wsResult.created) {
+      const { buildSkillIndex, writeSkillIndex } = await import('../../../memory/contextdb/registry/skill-index.mjs');
+      const index = await buildSkillIndex(opts.workspaceRoot);
+      await writeSkillIndex(opts.workspaceRoot, index);
+      console.error(`[aios] Workspace initialized with ${index.skills.length} skills indexed`);
+    }
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[warn] workspace bootstrap skipped: ${reason}`);
+  }
+}
+
+function addPromptEvent(opts, promptTurnId) {
+  ctx(opts.workspaceRoot, 'event:add', ['--session', opts.sessionId, '--role', 'user', '--kind', 'prompt', '--text', opts.prompt, '--turn-id', promptTurnId, '--turn-type', 'main', '--environment', 'cli', '--hindsight-status', 'pending']);
+}
+
+function addResponseEvent(opts, responseTurnId, promptTurnId, output, exitCode) {
+  const maxChars = Number.parseInt(opts.maxLogChars, 10);
+  const logOutput = output.slice(0, Number.isFinite(maxChars) ? maxChars : 8000);
+  ctx(opts.workspaceRoot, 'event:add', [
+    '--session', opts.sessionId, '--role', 'assistant', '--kind', exitCode === 0 ? 'response' : 'error', '--text', logOutput,
+    '--turn-id', responseTurnId, '--parent-turn-id', promptTurnId, '--turn-type', 'main', '--environment', 'cli',
+    '--hindsight-status', 'evaluated', '--outcome', exitCode === 0 ? 'success' : 'retry-needed',
+  ]);
+}
+
+async function writeAutoCheckpoint(opts, routedPrompt, output, responseStatus, elapsedMs, exitCode) {
+  const promptSnippet = opts.prompt.replace(/\n/g, ' ').slice(0, 200);
+  const responseSnippet = output.replace(/\n/g, ' ').slice(0, 300);
+  const summary = `Auto checkpoint: ${opts.agent} one-shot run completed. prompt="${promptSnippet}" response="${responseSnippet}"`;
+  const nextActions = responseStatus === 'blocked' ? 'Inspect error output|Retry with adjusted prompt' : 'Review response|Continue with next prompt';
+  const failureCategory = responseStatus === 'blocked' ? classifyOneShotFailure(output) : undefined;
+  const checkpointArgs = ['--session', opts.sessionId, '--summary', summary, '--status', responseStatus, '--next', nextActions, '--verify-result', 'unknown', '--retry-count', '0', '--elapsed-ms', String(elapsedMs)];
+  if (failureCategory) checkpointArgs.push('--failure-category', failureCategory);
+  ctx(opts.workspaceRoot, 'checkpoint', checkpointArgs);
+  await writeContinuityAndHandoff(opts, routedPrompt, output, summary, nextActions, exitCode);
+}
+
+async function writeContinuityAndHandoff(opts, routedPrompt, output, summary, nextActions, exitCode) {
+  const touchedFiles = extractTouchedFilesFromText({ workspaceRoot: opts.workspaceRoot }, opts.prompt, output);
+  if (opts.continuitySummary) {
+    try {
+      await writeContinuitySummary({ workspaceRoot: opts.workspaceRoot, sessionId: opts.sessionId, intent: routedPrompt, summary, touchedFiles, nextActions: nextActions.split('|') });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      console.warn(`[warn] continuity summary skipped: ${reason}`);
+    }
+  }
+  try {
+    const { normalizeHandoffPacket, writeHandoffPacket } = await import('../../../memory/contextdb/runtime/handoff.mjs');
+    const packet = normalizeHandoffPacket({ fromSessionId: opts.sessionId, agentType: opts.agent, role: 'implementer', intent: routedPrompt, progress: summary, nextActions: nextActions.split('|'), touchedFiles, confidence: exitCode === 0 ? 'high' : 'low' });
+    await writeHandoffPacket(opts.workspaceRoot, opts.sessionId, packet);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[warn] handoff packet skipped: ${reason}`);
+  }
+}
+
+async function executePrompt(opts) {
+  // Parse an explicit execution route first, then let the policy decide whether
+  // this turn is eligible for routing or plan persistence at all.
+  const requestedRoute = resolveTaskRouteDecision({ prompt: opts.prompt, routeMode: opts.routeMode });
+  const explicitIntent = requestedRoute.explicitTrigger && requestedRoute.routeMode !== 'single'
+    ? (requestedRoute.routeMode === 'subagent' ? 'team' : requestedRoute.routeMode)
+    : null;
+  let workflow = null;
+  try {
+    const { runAutoGate } = await import('../../planning/flow/auto-gate.mjs');
+    workflow = runAutoGate({
+      rootDir: opts.workspaceRoot,
+      message: opts.prompt,
+      client: opts.agent || 'cli',
+      sessionId: opts.sessionId || '',
+      source: 'ctx-agent',
+      explicitIntent,
+      dryRun: Boolean(opts.dryRun || opts.routeExecutionMode === 'dry-run'),
+    });
+    console.error(`[aios] workflow: ${workflow.decision.disposition}/${workflow.decision.action} -> ${workflow.plan?.relativePath || 'n/a'}`);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[warn] workflow policy skipped: ${reason}`);
+  }
+
+  let memory = {
+    // Corrections are no longer auto-detected by regex. The agent owns the
+    // judgment "am I correcting a previously recorded fact" and expresses it
+    // through the memory declaration block (verified/supersede path), not a
+    // program guessing at natural language. See memo/flow/declaration.mjs.
+    correction: { status: 'not-run' },
+    recall: { status: 'skipped', reason: 'workflow-unavailable', hits: 0 },
+  };
+  try {
+    const { collectTurnRecallResult } = await import('../../planning/flow/turn-recall.mjs');
+    const recallResult = await collectTurnRecallResult({
+      rootDir: opts.workspaceRoot,
+      message: opts.prompt,
+      decision: workflow?.decision || { disposition: 'direct', continuation: '' },
+      sessionId: opts.sessionId,
+      agent: opts.agent,
+    });
+    memory.recall = recallResult;
+    if (workflow) {
+      workflow.recall = recallResult.text;
+      workflow.memory = memory;
+    }
+    console.error(`[aios] memory.recall status=${recallResult.status} hits=${recallResult.hits} reason=${recallResult.reason || 'none'}`);
+  } catch (error) {
+    memory.recall = {
+      status: 'error',
+      reason: error instanceof Error ? error.message : String(error),
+      hits: 0,
+    };
+    console.warn(`[warn] memory recall skipped: ${memory.recall.reason}`);
+  }
+  if (memory.correction.status !== 'not-detected' && memory.correction.status !== 'not-run') {
+    console.error(`[aios] memory.correction status=${memory.correction.status} targets=${memory.correction.targetIds?.length || 0}`);
+  }
+
+  if (!workflow) {
+    workflow = {
+      decision: { disposition: 'direct', persistence: 'none', action: 'none', continuation: '' },
+      injection: '',
+      plan: null,
+      capabilityCommand: null,
+    };
+  }
+  workflow.recall = memory.recall?.text || '';
+  workflow.memory = memory;
+
+  let routeDecision = requestedRoute;
+  if (workflow?.decision?.disposition !== 'planned') {
+    routeDecision = {
+      ...requestedRoute,
+      routeMode: 'single',
+      reason: `workflow ${workflow?.decision?.disposition || 'direct'}`,
+    };
+  } else if (!requestedRoute.explicitTrigger && ['team', 'harness'].includes(workflow.decision.executionHost)) {
+    routeDecision = {
+      ...requestedRoute,
+      routeMode: workflow.decision.executionHost,
+      reason: `workflow executionHost=${workflow.decision.executionHost}`,
+    };
+  }
+
+  const routedPrompt = String(routeDecision.taskPrompt || '').trim() || String(opts.prompt || '').trim();
+  if (routeDecision.routeMode !== 'single') console.log(`[route] mode=${routeDecision.routeMode} (${routeDecision.reason})`);
+  if (opts.dryRun) {
+    const previewPrompt = attachTurnRecall({
+      prompt: workflow?.injection
+        ? `${workflow.injection}\n## User request\n\n${routedPrompt}\n`
+        : routedPrompt,
+      recall: workflow?.recall,
+      routeMode: routeDecision.routeMode,
+    });
+    return { ...dryRunPrompt(opts, routeDecision, previewPrompt), routedPrompt, workflow };
+  }
+  // single/team/harness 共用同一外层 pre_send；执行宿主不能绕过压缩门或丢失当前 rex Command。
+  const outbound = await compactCtxAgentPreSend({ opts, routedPrompt });
+  let providerPrompt = attachTurnRecall({
+    prompt: workflow?.injection
+      ? `${workflow.injection}\n## User request\n\n${outbound.prompt}\n`
+      : outbound.prompt,
+    recall: workflow?.recall,
+    routeMode: routeDecision.routeMode,
+  });
+  if (workflow?.capabilityCommand?.provider?.kind === 'agent') {
+    const { prepareAiosAgentProviderExecution } = await import('../../../execution/workflows/adapters/rex-agent-provider.mjs');
+    const prepared = await prepareAiosAgentProviderExecution({
+      command: workflow.capabilityCommand,
+      evidenceRoot: opts.workspaceRoot,
+      workflowDirective: workflow.injection,
+      userRequest: outbound.prompt,
+    });
+    providerPrompt = prepared.prompt;
+  }
+
+  let result;
+  if (routeDecision.routeMode === 'single') {
+    result = runOneShotAgent(opts.agent, providerPrompt, opts.extraArgs);
+  } else {
+    result = await runRoutedOneShotTask({
+      ...opts,
+      taskPrompt: providerPrompt,
+      routeMode: routeDecision.routeMode,
+      planPath: workflow?.plan?.absolutePath || '',
+    });
+  }
+  return { ...result, routedPrompt, turnCompression: true, workflow };
+}
+
+async function compactCtxAgentPreSend({ opts, routedPrompt }) {
+  const packet = await requireTurnCompression({
+    workspaceRoot: opts.workspaceRoot,
+    cwd: opts.workspaceRoot,
+    sessionId: opts.sessionId,
+    clientId: opts.agent,
+    hostLevel: 'L2',
+    mode: 'tight',
+    eventKind: 'pre_send',
+    text: routedPrompt,
+    run: () => compressPreSendTurn({
+      workspaceRoot: opts.workspaceRoot,
+      cwd: opts.workspaceRoot,
+      sessionId: opts.sessionId,
+      clientId: opts.agent,
+      hostLevel: 'L2',
+      prompt: routedPrompt,
+      mode: 'tight',
+      metrics: { enabled: true },
+    }),
+  });
+  emitTurnCompressionLog(packet);
+  if (!packet?.refs?.length) {
+    return { prompt: routedPrompt };
+  }
+  return {
+    prompt: [
+      'Use the AIOS compact packet below for this turn. Recall raw refs only if necessary.',
+      '',
+      JSON.stringify(packet, null, 2),
+    ].join('\n'),
+  };
+}
+
+async function compactCtxAgentPostReceive(opts, output) {
+  const packet = await requireTurnCompression({
+    workspaceRoot: opts.workspaceRoot,
+    cwd: opts.workspaceRoot,
+    sessionId: opts.sessionId,
+    clientId: opts.agent,
+    hostLevel: 'L2',
+    mode: 'tight',
+    eventKind: 'post_receive',
+    text: output,
+    run: () => compressPostReceiveTurn({
+      workspaceRoot: opts.workspaceRoot,
+      cwd: opts.workspaceRoot,
+      sessionId: opts.sessionId,
+      clientId: opts.agent,
+      hostLevel: 'L2',
+      output,
+      mode: 'tight',
+      metrics: { enabled: true },
+    }),
+  });
+  emitTurnCompressionLog(packet);
+  return packet?.refs?.length ? JSON.stringify(packet, null, 2) : output;
+}
+
+async function ingestRexProviderEvidence(opts, workflow, output, exitCode) {
+  const command = workflow?.capabilityCommand;
+  const activationId = command?.activationId || workflow?.capabilityActivation?.activationId;
+  if (!activationId || !command) return Object.freeze({ required: false, ingested: true, reason: '' });
+  if (exitCode !== 0) {
+    return Object.freeze({ required: true, ingested: false, reason: 'provider-exit-nonzero' });
+  }
+
+  try {
+    const { ingestCapabilityProviderOutput } = await import('../../../execution/workflows/adapters/rex-capability-runtime.mjs');
+
+    // host 侧判定闸门（opt-in）。默认关闭时 evaluateStageAdvanceGate 立即返回 advance，
+    // 既不解析信封也不出网，rex 行为与引入闸门前一致。它只能收窄：advance | hold。
+    const { evaluateStageAdvanceGate } = await import('../../../learning/judgment/stage-gate.mjs');
+    const gate = await evaluateStageAdvanceGate({ command, output, env: process.env });
+    if (gate.gate !== 'disabled') {
+      console.error(`[aios] judgment gate: ${gate.decision} (${gate.gate}) ${gate.reason}`);
+    }
+    if (gate.decision === 'hold') {
+      console.warn(`[warn] rex stage held by the judgment gate: ${gate.reason}; activation=${activationId}`);
+      return Object.freeze({
+        required: true,
+        ingested: false,
+        reason: `judgment-hold: ${gate.reason}`,
+        judgment: gate.judgment,
+      });
+    }
+
+    const ingestion = ingestCapabilityProviderOutput({
+      rootDir: opts.workspaceRoot,
+      command,
+      output,
+    });
+    if (!ingestion.ingested) {
+      console.warn(`[warn] rex evidence not recorded: ${ingestion.reason}; activation=${activationId}`);
+      return Object.freeze({ required: true, ...ingestion });
+    }
+
+    const result = ingestion.result;
+    const nextCommand = result.command || result.nextCapability?.command || null;
+    console.error([
+      `[aios] rex evidence: ${result.outcome}`,
+      `activation=${activationId}`,
+      `missing=${result.missingEvidence.length}`,
+      `next=${nextCommand?.provider?.id || 'none'}`,
+    ].join(' '));
+    return Object.freeze({ required: true, ...ingestion });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[warn] rex evidence rejected: ${reason}; activation=${activationId}`);
+    return Object.freeze({ required: true, ingested: false, reason });
+  }
+}
+
+export function attachTurnRecall({ prompt = '', recall = '', routeMode = 'single' } = {}) {
+  const recallBlock = String(recall || '').trim();
+  if (!recallBlock || routeMode !== 'single') return prompt;
+  // The recall block carries the memos the agent may reference; the declaration
+  // instruction tells it how to report verified / useful / conclusion so the
+  // harness never has to guess semantics from prose.
+  return `${recallBlock}\n${buildMemoryDeclarationInstruction()}\n${prompt}`;
+}
+
+function dryRunPrompt(opts, routeDecision, routedPrompt) {
+  if (routeDecision.routeMode === 'single') {
+    return { output: `[dry-run] ${opts.agent} would execute prompt without injected context.\nPrompt: ${routedPrompt}`, exitCode: 0 };
+  }
+  const routedSpec = buildRoutedCommandSpec({ ...opts, taskPrompt: routedPrompt, routeMode: routeDecision.routeMode });
+  return { output: `[dry-run] routed task via ${routeDecision.routeMode} (${routedSpec.executionMode})\nCommand: ${routedSpec.preview}\nTask: ${routedPrompt}`, exitCode: 0 };
+}
+
+async function runPromptFlow(opts) {
+  const oneShotTurnSeed = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const promptTurnId = `oneshot:${opts.sessionId}:${oneShotTurnSeed}:prompt`;
+  const responseTurnId = `oneshot:${opts.sessionId}:${oneShotTurnSeed}:response`;
+  addPromptEvent(opts, promptTurnId);
+  const startedAt = Date.now();
+  const {
+    output,
+    protocolOutput = output,
+    exitCode,
+    routedPrompt,
+    workflow,
+  } = await executePrompt(opts);
+  // 先从原始 Provider 输出摄取证据，再执行 post_receive 压缩；压缩结果不能作为状态机输入。
+  const ingestion = await ingestRexProviderEvidence(opts, workflow, protocolOutput, exitCode);
+  const effectiveExitCode = exitCode === 0 && ingestion.required && !ingestion.ingested ? 1 : exitCode;
+  const blockedOutput = effectiveExitCode !== exitCode
+    ? `${output}${output.endsWith('\n') ? '' : '\n'}[aios] blocked: rex Provider evidence contract failed (${ingestion.reason}).\n`
+    : output;
+  const compactOutput = await compactCtxAgentPostReceive(opts, blockedOutput);
+  const elapsedMs = Date.now() - startedAt;
+  process.stdout.write(compactOutput.endsWith('\n') ? compactOutput : `${compactOutput}\n`);
+  const responseStatus = effectiveExitCode !== 0 ? 'blocked' : opts.checkpointStatus;
+  addResponseEvent(opts, responseTurnId, promptTurnId, compactOutput, effectiveExitCode);
+
+  let memoryWrite = { status: 'not-run' };
+  try {
+    const { parseMemoryDeclaration } = await import('../../../memory/memo/flow/declaration.mjs');
+    const declaration = parseMemoryDeclaration(output || protocolOutput || compactOutput);
+
+    // Soft-trigger: the harness never decides whether a turn is worth keeping.
+    // Only when the model itself declared verified=yes (this turn produced a
+    // confirmed, durable fact) do we persist it. A missing declaration or an
+    // explicit verified=no means "not worth recording" and we skip the write —
+    // the program executes the model's judgment instead of making one.
+    if (!declaration.found) {
+      memoryWrite = { status: 'skipped', reason: 'no-declaration' };
+    } else if (declaration.verified !== true) {
+      memoryWrite = { status: 'skipped', reason: `declared-verified=${String(declaration.verified)}` };
+    } else {
+      const { recordAutomaticMemory } = await import('../../../memory/memo/flow/autopilot.mjs');
+      const refs = extractTouchedFilesFromText({ workspaceRoot: opts.workspaceRoot }, opts.prompt, output || protocolOutput || compactOutput);
+      memoryWrite = await recordAutomaticMemory({
+        workspaceRoot: opts.workspaceRoot,
+        sessionId: opts.sessionId,
+        agent: opts.agent,
+        turnId: responseTurnId,
+        runId: promptTurnId,
+        prompt: opts.prompt,
+        response: output || protocolOutput || compactOutput,
+        outcome: responseStatus === 'blocked' ? 'failed' : 'success',
+        refs,
+        verified: true,
+        declaredConclusion: declaration.conclusion || '',
+        sourceRef: `contextdb:${opts.sessionId}#${responseTurnId}`,
+      });
+    }
+    console.error(`[aios] memory.write status=${memoryWrite.status} scope=${memoryWrite.scope || 'none'} event=${memoryWrite.eventId || 'none'} reason=${memoryWrite.reason || 'none'}`);
+  } catch (error) {
+    memoryWrite = {
+      status: 'error',
+      reason: error instanceof Error ? error.message : String(error),
+    };
+    console.warn(`[warn] automatic memory write skipped: ${memoryWrite.reason}`);
+  }
+  if (workflow?.memory && typeof workflow.memory === 'object') workflow.memory.write = memoryWrite;
+
+  // Recall feedback, adoption side: a successful turn whose response restates
+  // Recall feedback, adoption side: the agent declares in its memory block
+  // which recalled memos it actually used; those get marked useful. Best-effort
+  // — must never fail the turn.
+  try {
+    const { inferUsefulRecallEventIds } = await import('../../planning/flow/turn-recall.mjs');
+    const { markMemoUseful } = await import('../../../memory/memo/flow/autopilot.mjs');
+    const usefulIds = effectiveExitCode === 0
+      ? inferUsefulRecallEventIds({
+        results: memory.recall?.results || [],
+        response: output || protocolOutput || compactOutput,
+      })
+      : [];
+    if (usefulIds.length > 0) {
+      const feedback = await markMemoUseful({
+        workspaceRoot: opts.workspaceRoot,
+        eventIds: usefulIds,
+        query: opts.prompt,
+        sessionId: opts.sessionId,
+        agent: opts.agent,
+      });
+      console.error(`[aios] memory.useful count=${feedback.recorded || 0}`);
+    }
+  } catch (error) {
+    console.warn(`[warn] memory useful feedback skipped: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  if (opts.autoCheckpoint) await writeAutoCheckpoint(opts, routedPrompt, compactOutput, responseStatus, elapsedMs, effectiveExitCode);
+  if (effectiveExitCode !== 0) process.exitCode = effectiveExitCode;
+}
+
+export async function runCtxAgent(argv = process.argv.slice(2)) {
+  const firstArg = argv[0];
+  if (['workspace-init', 'workspace-sync', 'workspace-doctor'].includes(firstArg)) {
+    await handleWorkspaceCommand(firstArg, resolveInitialWorkspace({ workspaceRoot: '' }));
+    return;
+  }
+
+  // H1 production entry: tiered AgentView for humans and orchestrators.
+  // Deliberately NOT auto-injected into startup prompts (see
+  // aios-long-running-harness SKILL policy) — it is a pull-based read.
+  if (firstArg === 'workspace-view') {
+    const { handleWorkspaceViewCommand } = await import('../routing/workspace-commands.mjs');
+    await handleWorkspaceViewCommand(argv.slice(1), resolveInitialWorkspace({ workspaceRoot: '' }));
+    return;
+  }
+
+  const opts = parseArgs(argv);
+  validateOpts(opts);
+  opts.workspaceRoot = path.resolve(resolveInitialWorkspace(opts));
+  assertWorkspaceExists(opts.workspaceRoot);
+  if (!opts.project) opts.project = path.basename(opts.workspaceRoot);
+  if (opts.saveGuard) { runSaveGuardCheckpoint(opts); return; }
+
+  // 启动门禁：CRG 缺失就地补装（只管从无到有，陈旧由 doctor 管；
+  // 失败只告警不阻塞；AIOS_CODEMAP_AUTO_INSTALL=0 可关）。放在 saveGuard
+  // 分流之后，使交互与单发两种模式共用同一入口。
+  try {
+    const { ensureCodemapInstalled } = await import('../../../tooling/components/codemap/codemap.mjs');
+    const { ROOT_DIR } = await import('../context/common.mjs');
+    await ensureCodemapInstalled({
+      projectRoot: opts.workspaceRoot,
+      rootDir: ROOT_DIR,
+      io: console,
+      env: process.env,
+    });
+  } catch (error) {
+    console.warn(`[warn] codemap startup check skipped: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  if (opts.prompt) {
+    await maybeCreateBootstrapTask(opts);
+  }
+  if (await runInteractiveStartup(opts)) return;
+
+  ctx(opts.workspaceRoot, 'init', []);
+  opts.sessionId = resolveSession(opts);
+  if (!opts.sessionId) throw new Error('Failed to resolve session id from contextdb output');
+  await ensureWorkspaceIndex(opts);
+
+  console.error(`[aios] Session: ${opts.sessionId}`);
+  console.error(`[aios] Context: none (no prompt injection) | Route: ${opts.routeMode}`);
+  if (opts.prompt) { await runPromptFlow(opts); return; }
+}

@@ -2,7 +2,7 @@
 import { readFile } from 'node:fs/promises';
 
 import { createCliParser } from '../src/shared/cli-parser.mjs';
-import { buildGaiaAbDryRunSummary, parseGaiaAbManifest } from './lib/gaia-ab-eval/manifest.mjs';
+import { buildGaiaAbDryRunSummary, parseGaiaAbManifest } from './lib/learning/gaia-ab-eval/manifest.mjs';
 
 const cli = createCliParser({
   name: 'gaia-ab-eval',

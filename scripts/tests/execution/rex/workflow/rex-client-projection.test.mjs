@@ -8,12 +8,12 @@ import test from 'node:test';
 import {
   installRexClientProjections,
   resolveRexProjectionClients,
-} from '../../../../lib/rex-harness/client-projection.mjs';
+} from '../../../../lib/clients/rex-harness/client-projection.mjs';
 import {
   installRexClientSkills,
   parseRexClientProjectionArgs,
 } from '../../../../install-rex-client-projections.mjs';
-import { ALL_CLIENTS, CLIENT_DEFINITIONS } from '../../../../lib/clients/selection/core/definitions.mjs';
+import { ALL_CLIENTS, CLIENT_DEFINITIONS } from '../../../../lib/foundation/clients/selection/core/definitions.mjs';
 
 // 期望的客户端与落点全部取自注册表：新增客户端（pi/zcode/workbuddy）时不再写死过期清单，
 // 但仍断言「投影覆盖面 == 注册表客户端全集」。

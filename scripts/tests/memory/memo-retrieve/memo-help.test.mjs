@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 const aiosCli = path.join(repoRoot, 'scripts', 'aios.mjs');

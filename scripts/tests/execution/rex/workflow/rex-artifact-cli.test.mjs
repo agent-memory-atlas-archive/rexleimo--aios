@@ -4,13 +4,13 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parsePlanArgs } from '../../../../lib/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../../lib/planning/ops/cli.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 import {
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-activation-store.mjs';
 
 const WAYFINDER_ARTIFACT = Object.freeze({
   schemaVersion: 1,
@@ -27,7 +27,7 @@ const WAYFINDER_ARTIFACT = Object.freeze({
       id: 'node-cli',
       question: 'where is the artifact read?',
       decision: 'read it from the selected workspace only',
-      evidenceRefs: ['path:scripts/lib/planning/ops/cli.mjs'],
+      evidenceRefs: ['path:scripts/lib/foundation/planning/ops/cli.mjs'],
     }],
     edges: [],
   },
@@ -37,7 +37,7 @@ const WAYFINDER_ARTIFACT = Object.freeze({
     facts: ['the CLI has a selected workspace root'],
     decision: 'resolve artifact files inside that root',
     consequences: ['outside files are rejected'],
-    evidenceRefs: ['path:scripts/lib/planning/ops/cli.mjs'],
+    evidenceRefs: ['path:scripts/lib/foundation/planning/ops/cli.mjs'],
   },
   nextSlice: {
     id: 'slice-cli-artifact',

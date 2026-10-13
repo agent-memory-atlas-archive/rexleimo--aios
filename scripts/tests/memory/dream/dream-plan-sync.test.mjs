@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { syncDreamLinesToActivePlan } from '../../../lib/lifecycle/evolve/dream/export-to.mjs';
-import { readActivePlan, startPlan } from '../../../lib/planning/contract/contract.mjs';
+import { syncDreamLinesToActivePlan } from '../../../lib/execution/lifecycle/evolve/dream/export-to.mjs';
+import { readActivePlan, startPlan } from '../../../lib/foundation/planning/contract/contract.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

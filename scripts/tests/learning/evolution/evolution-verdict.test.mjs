@@ -13,7 +13,7 @@ import {
   listVerdicts,
   HARD_CHECKS,
   DECISION_VALUES,
-} from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
+} from '../../../lib/execution/lifecycle/evolve/evolution/verdict.mjs';
 
 async function withWorkspace(prefix, fn) {
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

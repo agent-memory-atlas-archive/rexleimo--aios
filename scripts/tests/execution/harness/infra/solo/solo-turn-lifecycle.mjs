@@ -7,7 +7,7 @@ import { mkdtemp, rm, os, path } from '../support.mjs';
    干净超时才允许 infra-retry，操作者中止按 stopped 结算并透传 abort signal。 */
 
 test('buildProductionExecuteTurn fail-closes when a timed-out process tree survives', async () => {
-  const { buildProductionExecuteTurn } = await import('../../../../../lib/lifecycle/run/harness/execution/execute-turn.mjs');
+  const { buildProductionExecuteTurn } = await import('../../../../../lib/execution/lifecycle/run/harness/execution/execute-turn.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-turn-orphan-'));
   let captured = null;
   try {
@@ -53,7 +53,7 @@ test('buildProductionExecuteTurn fail-closes when a timed-out process tree survi
 });
 
 test('buildProductionExecuteTurn keeps infra-retry when the timed-out tree is fully cleaned', async () => {
-  const { buildProductionExecuteTurn } = await import('../../../../../lib/lifecycle/run/harness/execution/execute-turn.mjs');
+  const { buildProductionExecuteTurn } = await import('../../../../../lib/execution/lifecycle/run/harness/execution/execute-turn.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-turn-clean-'));
   let captured = null;
   try {
@@ -88,7 +88,7 @@ test('buildProductionExecuteTurn keeps infra-retry when the timed-out tree is fu
 });
 
 test('buildProductionExecuteTurn maps operator abort to stopped and passes the abort signal through', async () => {
-  const { buildProductionExecuteTurn } = await import('../../../../../lib/lifecycle/run/harness/execution/execute-turn.mjs');
+  const { buildProductionExecuteTurn } = await import('../../../../../lib/execution/lifecycle/run/harness/execution/execute-turn.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-turn-abort-'));
   const controller = new AbortController();
   let captured = null;

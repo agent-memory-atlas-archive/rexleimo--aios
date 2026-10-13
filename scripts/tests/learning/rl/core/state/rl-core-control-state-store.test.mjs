@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('rl-core control state ignores duplicate event ids', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/control-state-store.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/control-state-store.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-control-store-'));
   const store = await mod.createControlStateStore({ rootDir, namespace: 'rl-core-tests' });
   const event = {
@@ -26,7 +26,7 @@ test('rl-core control state ignores duplicate event ids', async () => {
 });
 
 test('rl-core control state persists frozen_failure snapshots for restart recovery', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/control-state-store.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/control-state-store.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-control-store-'));
   const store = await mod.createControlStateStore({ rootDir, namespace: 'rl-core-tests' });
 

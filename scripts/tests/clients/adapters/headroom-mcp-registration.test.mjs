@@ -8,18 +8,18 @@ import {
   buildDesiredHeadroomEntry,
   buildHeadroomMcpAddInvocation,
   buildHeadroomMcpRemoveInvocation,
-} from '../../../lib/aios-init/headroom-mcp/commands.mjs';
+} from '../../../lib/environment/aios-init/headroom-mcp/commands.mjs';
 import {
   ensureHeadroomMcpRegistration,
   removeOwnedHeadroomMcp,
-} from '../../../lib/aios-init/headroom-mcp/lifecycle.mjs';
+} from '../../../lib/environment/aios-init/headroom-mcp/lifecycle.mjs';
 import {
   classifyHeadroomOwnership,
   fingerprintHeadroomEntry,
   readHeadroomLedger,
   resolveHeadroomLedgerPath,
   writeHeadroomLedger,
-} from '../../../lib/aios-init/headroom-mcp/ownership.mjs';
+} from '../../../lib/environment/aios-init/headroom-mcp/ownership.mjs';
 
 test('official MCP add commands preserve the absolute executable as one argv item', () => {
   const executable = '/Users/test/Headroom Tools/headroom';

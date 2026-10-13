@@ -8,8 +8,8 @@ import {
   buildNativeOutputPlan,
   loadNativeSyncManifest,
   resolveNativeClients,
-} from '../../../lib/native/source-tree.mjs';
-import { NATIVE_SYNC_META_FILE } from '../../../lib/native/install-metadata.mjs';
+} from '../../../lib/clients/native/source-tree.mjs';
+import { NATIVE_SYNC_META_FILE } from '../../../lib/clients/native/install-metadata.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

@@ -20,7 +20,7 @@
  * - trustedCoreFixture()      candidate touching trusted-core files
  */
 
-import { sha256Hex } from '../../../lib/memo/storage/base/fs-io.mjs';
+import { sha256Hex } from '../../../lib/memory/memo/storage/base/fs-io.mjs';
 
 const BASELINE_CONTENT = 'Always run the test suite before claiming a task is complete.';
 
@@ -183,6 +183,6 @@ export function trustedCoreFixture(baseline = baselineFixture()) {
     ...goodCandidateFixture(baseline),
     candidateId: 'cand-trusted-core-001',
     version: 'candidate-trusted',
-    touchedFiles: ['scripts/lib/lifecycle/evolve/evolution/verdict.mjs'],
+    touchedFiles: ['scripts/lib/execution/lifecycle/evolve/evolution/verdict.mjs'],
   };
 }

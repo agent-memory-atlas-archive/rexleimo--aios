@@ -18,7 +18,7 @@ async function makeGitRepo() {
 }
 
 test('worktree runner creates and destroys an isolated git worktree for one episode', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/training/worktree-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/training/worktree-runner.mjs');
   const rootDir = await makeGitRepo();
   const workspace = await mod.createEpisodeWorktree({
     rootDir,

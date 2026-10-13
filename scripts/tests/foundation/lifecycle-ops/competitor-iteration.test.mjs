@@ -8,18 +8,18 @@ import {
   applyMcpToolDescriptionMode,
   compactToolDescription,
   resolveMcpDescMode,
-} from '../../../lib/planning/ops/mcp-compact.mjs';
+} from '../../../lib/foundation/planning/ops/mcp-compact.mjs';
 import {
   collectDurableMemoLines,
   writeAgentsDreamBlock,
   AGENTS_DREAM_BEGIN,
-} from '../../../lib/lifecycle/evolve/dream/export-to.mjs';
+} from '../../../lib/execution/lifecycle/evolve/dream/export-to.mjs';
 import {
   buildDeathNotice,
   writeDeathNotice,
   readDeathNotices,
   hasDuplicateNotice,
-} from '../../../lib/lifecycle/evolve/death-notice.mjs';
+} from '../../../lib/execution/lifecycle/evolve/death-notice.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

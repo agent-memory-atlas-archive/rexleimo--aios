@@ -9,7 +9,7 @@ import {
   createJsonlFramer,
   createPiRpcSession,
   defaultUiApprover,
-} from '../../../lib/pi/rpc-client.mjs';
+} from '../../../lib/clients/pi/rpc-client.mjs';
 
 test('framer splits on LF only and tolerates CRLF', () => {
   const records = [];

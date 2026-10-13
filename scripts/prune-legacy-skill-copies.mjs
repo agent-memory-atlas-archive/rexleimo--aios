@@ -5,9 +5,9 @@ import { fileURLToPath } from 'node:url';
 import {
   removeLegacyPiSkillRootInstalls,
   removeLegacySharedRootInstalls,
-} from './lib/components/skills/lifecycle/doctor.mjs';
-import { getAgentsHome } from './lib/platform/paths.mjs';
-import { isDirectModuleInvocation } from './lib/platform/module-entry.mjs';
+} from './lib/tooling/components/skills/lifecycle/doctor.mjs';
+import { getAgentsHome } from './lib/foundation/platform/paths.mjs';
+import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 const SCRIPT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

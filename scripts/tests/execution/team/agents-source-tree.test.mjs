@@ -13,7 +13,7 @@ let canonicalRoleCache = null;
 
 async function loadCanonicalRoleFixtures() {
   if (!canonicalRoleCache) {
-    const sourceTree = await import('../../../lib/agents/source-tree.mjs');
+    const sourceTree = await import('../../../lib/foundation/agents/source-tree.mjs');
     const source = await sourceTree.loadCanonicalAgents({ rootDir: resolveRepoRoot() });
     canonicalRoleCache = {
       planner: source.agentsById['rex-planner'],
@@ -195,7 +195,7 @@ test('loadCanonicalAgents validates manifest and returns four role-bound agents'
   const rootDir = await makeRootDir();
   await writeCanonicalFixture(rootDir);
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   const result = await mod.loadCanonicalAgents({ rootDir });
 
   assert.equal(result.manifest.schemaVersion, 1);
@@ -212,7 +212,7 @@ test('loadCanonicalAgents reads ECC-style markdown frontmatter role sources', as
   const rootDir = await makeRootDir();
   await writeCanonicalFixture(rootDir);
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   const result = await mod.loadCanonicalAgents({ rootDir });
 
   assert.equal(result.agentsById['rex-planner'].id, 'rex-planner');
@@ -238,7 +238,7 @@ test('loadCanonicalAgents preserves legacy JSON role source compatibility', asyn
   const rootDir = await makeRootDir();
   await writeCanonicalFixture(rootDir, {}, 'json');
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   const result = await mod.loadCanonicalAgents({ rootDir, allowLegacyJsonRoles: true });
 
   assert.equal(result.agentsById['rex-reviewer'].role, 'reviewer');
@@ -248,7 +248,7 @@ test('loadCanonicalAgents rejects legacy JSON role sources by default', async ()
   const rootDir = await makeRootDir();
   await writeCanonicalFixture(rootDir, {}, 'json');
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   await assert.rejects(
     () => mod.loadCanonicalAgents({ rootDir }),
     /legacy JSON role sources require allowLegacyJsonRoles/i
@@ -261,7 +261,7 @@ test('loadCanonicalAgents rejects duplicate markdown and JSON source for one rol
   await writeCanonicalFixture(rootDir, {}, 'json');
   await writeRoleMarkdown(rootDir, 'agent-sources/roles/rex-planner.md', base.planner);
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   await assert.rejects(
     () => mod.loadCanonicalAgents({ rootDir, allowLegacyJsonRoles: true }),
     /duplicate source/i
@@ -277,7 +277,7 @@ test('loadCanonicalAgents allows multiline systemPrompt content', async () => {
     },
   });
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   const result = await mod.loadCanonicalAgents({ rootDir });
 
   assert.match(result.agentsById['rex-planner'].systemPrompt, /Additional handoff line two/);
@@ -291,7 +291,7 @@ test('loadCanonicalAgents rejects unknown keys and unexpected files', async () =
     plannerOverride: { extra: true },
   });
 
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   await assert.rejects(
     () => mod.loadCanonicalAgents({ rootDir }),
     /unknown key|unexpected file/i
@@ -299,7 +299,7 @@ test('loadCanonicalAgents rejects unknown keys and unexpected files', async () =
 });
 
 test('loadCanonicalAgents rejects duplicate ids, duplicate roles, missing required roles, filename mismatch, multiline scalar fields, and managed-marker injection', async () => {
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
 
   await assert.rejects(async () => mod.loadCanonicalAgents({ rootDir: await makeFixtureWithDuplicateId() }), /duplicate id/i);
   await assert.rejects(async () => mod.loadCanonicalAgents({ rootDir: await makeFixtureWithDuplicateRole() }), /duplicate role/i);
@@ -310,7 +310,7 @@ test('loadCanonicalAgents rejects duplicate ids, duplicate roles, missing requir
 });
 
 test('loadCanonicalAgents rejects uppercase ids, uppercase roles, and non-string tool items', async () => {
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
 
   await assert.rejects(async () => mod.loadCanonicalAgents({ rootDir: await makeFixtureWithUppercaseId() }), /kebab-case/i);
   await assert.rejects(async () => mod.loadCanonicalAgents({ rootDir: await makeFixtureWithUppercaseRole() }), /role must be one of/i);

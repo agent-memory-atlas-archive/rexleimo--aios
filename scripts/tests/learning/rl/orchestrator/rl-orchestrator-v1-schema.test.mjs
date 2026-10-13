@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('orchestrator schema validates task, evidence, and holdout payloads', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/schema.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/schema.mjs');
 
   assert.doesNotThrow(() => mod.validateOrchestratorTask({
     task_id: 'orch-dispatch-001',

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('validateMixedEpisode accepts environment-tagged replay-addressable episodes', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/schema.mjs');
 
   assert.doesNotThrow(() => mod.validateMixedEpisode({
     schema_version: 1,
@@ -21,7 +21,7 @@ test('validateMixedEpisode accepts environment-tagged replay-addressable episode
 });
 
 test('validateMixedEpisode forces comparison_failed episodes into diagnostic_only routing', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/schema.mjs');
 
   assert.throws(
     () => mod.validateMixedEpisode({
@@ -43,7 +43,7 @@ test('validateMixedEpisode forces comparison_failed episodes into diagnostic_onl
 });
 
 test('validateHoldoutValidationResult accepts normalized mixed holdout payloads', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/schema.mjs');
 
   assert.doesNotThrow(() => mod.validateHoldoutValidationResult({
     environment: 'browser',

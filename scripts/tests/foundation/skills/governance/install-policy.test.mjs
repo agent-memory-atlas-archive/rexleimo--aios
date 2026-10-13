@@ -13,7 +13,7 @@ import {
   policyFilePath,
   policyDenialError,
   DEFAULT_POLICY,
-} from '../../../../lib/skills/install/install-policy.mjs';
+} from '../../../../lib/tooling/skills/install/install-policy.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

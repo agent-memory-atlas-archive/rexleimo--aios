@@ -119,7 +119,7 @@ never a content waiver — all four sections stay mandatory.
 ### Verdict validator
 
 Completeness is machine-checkable with no LLM calls. The validator lives at
-`scripts/lib/skills/verdict-schema.mjs` and exposes two functions:
+`scripts/lib/tooling/skills/verdict-schema.mjs` and exposes two functions:
 
 - `parseVerdictText(text)` → extracts the four sections from a verdict block and
   records which headers were present.

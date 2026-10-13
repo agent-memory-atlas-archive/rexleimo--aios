@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('mixed campaign reports multi-environment batches and deterministic epoch outcomes', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const result = await mod.runMixedCampaign({
@@ -67,7 +67,7 @@ test('mixed campaign reports multi-environment batches and deterministic epoch o
 });
 
 test('mixed campaign computes orchestrator bandit reward from success, rollback, and human handoff rates', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const reward = mod.computeOrchestratorBanditReward({
     episode: {
       environment: 'orchestrator',
@@ -94,7 +94,7 @@ test('mixed campaign computes orchestrator bandit reward from success, rollback,
 });
 
 test('mixed campaign exposes rollback and resume drills', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const rollback = await mod.runMixedCampaign({
@@ -119,7 +119,7 @@ test('mixed campaign exposes rollback and resume drills', async () => {
 });
 
 test('mixed campaign persists and reloads contextual bandit policy checkpoints', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const first = await mod.runMixedCampaign({
@@ -155,7 +155,7 @@ test('mixed campaign persists and reloads contextual bandit policy checkpoints',
 });
 
 test('mixed campaign safely cold-starts when policy checkpoint is corrupted', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const first = await mod.runMixedCampaign({
@@ -185,7 +185,7 @@ test('mixed campaign safely cold-starts when policy checkpoint is corrupted', as
 });
 
 test('mixed campaign can resume from last-good version target for policy rollback', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const first = await mod.runMixedCampaign({
@@ -219,7 +219,7 @@ test('mixed campaign can resume from last-good version target for policy rollbac
 });
 
 test('mixed campaign writes OPE metrics into checkpoint versions and summary', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const result = await mod.runMixedCampaign({
@@ -246,7 +246,7 @@ test('mixed campaign writes OPE metrics into checkpoint versions and summary', a
 });
 
 test('mixed campaign can consume orchestrator live task collector for real traffic sampling', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
   const liveTasks = [
     {
@@ -285,7 +285,7 @@ test('mixed campaign can consume orchestrator live task collector for real traff
 });
 
 test('mixed campaign supports reward weight override and auto tuning persistence', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const result = await mod.runMixedCampaign({
@@ -320,7 +320,7 @@ test('mixed campaign supports reward weight override and auto tuning persistence
 });
 
 test('mixed campaign guardrails emit drift alerts and auto rollback degraded policy versions', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const seeded = await mod.runMixedCampaign({
@@ -370,7 +370,7 @@ test('mixed campaign guardrails emit drift alerts and auto rollback degraded pol
 });
 
 test('mixed campaign accepts real orchestrator harness mode for trajectory collection', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/run/run-orchestrator.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/run/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-'));
 
   const result = await mod.runMixedCampaign({

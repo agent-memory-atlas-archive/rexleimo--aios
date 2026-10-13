@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('browser holdout returns normalized metrics with zero schema failures on fixture driver', async () => {
-  const evalMod = await import('../../../../lib/rl-browser-v1/eval-harness.mjs');
-  const regMod = await import('../../../../lib/rl-browser-v1/task-registry.mjs');
+  const evalMod = await import('../../../../lib/learning/rl-browser-v1/eval-harness.mjs');
+  const regMod = await import('../../../../lib/learning/rl-browser-v1/task-registry.mjs');
 
   const result = await evalMod.runBrowserHoldout({
     tasks: regMod.loadBrowserTasks({ count: 20 }).slice(0, 20),

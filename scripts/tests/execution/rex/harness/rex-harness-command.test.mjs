@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createRexCommandRunner } from '../../../../lib/rex-harness/command.mjs';
+import { createRexCommandRunner } from '../../../../lib/clients/rex-harness/command.mjs';
 
 test('aios rex forwards arguments to the managed rex-harness executable', async () => {
   const calls = [];

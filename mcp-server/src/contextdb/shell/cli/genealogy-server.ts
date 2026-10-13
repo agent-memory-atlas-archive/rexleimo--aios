@@ -16,7 +16,7 @@ export function resolveGenealogyGuiPaths(
   defaultAiosRootDir: string
 ): { assetsRoot: string; guiDir: string; guiHtml: string } {
   const assetsRoot = resolvePathOption(options['assets-root'], process.env.AIOS_ROOT_DIR || defaultAiosRootDir);
-  const guiDir = path.join(assetsRoot, 'scripts', 'lib', 'genealogy-gui');
+  const guiDir = path.join(assetsRoot, 'scripts', 'lib', 'memory', 'genealogy-gui');
   return { assetsRoot, guiDir, guiHtml: path.join(guiDir, 'index.html') };
 }
 

@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveMemoRoot } from '../../../lib/aios/state-root.mjs';
-import { runDream, readDreamArchivedEventIds } from '../../../lib/lifecycle/evolve/dream/index.mjs';
-import { appendMemoEvent, listMemoEvents, searchMemoEvents, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
+import { resolveMemoRoot } from '../../../lib/environment/aios/state-root.mjs';
+import { runDream, readDreamArchivedEventIds } from '../../../lib/execution/lifecycle/evolve/dream/index.mjs';
+import { appendMemoEvent, listMemoEvents, searchMemoEvents, setActiveMemoStorage } from '../../../lib/memory/memo/storage.mjs';
 
 const ARCHIVED_TEXT = 'archive index secret memo text';
 const RECEIPT_SECRET = 'archive index receipt secret';

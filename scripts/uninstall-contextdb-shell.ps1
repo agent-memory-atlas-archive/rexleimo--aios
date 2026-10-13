@@ -10,7 +10,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot 'lib/powershell/aios-internal-wrapper.ps1')
+. (Join-Path $PSScriptRoot 'lib/environment/powershell/aios-internal-wrapper.ps1')
 
 $passArgs = ConvertTo-AiosCanonicalArgumentList -Mode $Mode -RcFile $RcFile -Force:$Force -Args $Args
 Invoke-AiosInternalCommand -ScriptRoot $PSScriptRoot -Target 'shell' -Action 'uninstall' -Arguments $passArgs | Out-Null

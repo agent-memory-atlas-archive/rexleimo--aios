@@ -11,7 +11,7 @@
  * (missing input), which callers treat as "cannot prove" rather than "passed".
  */
 import fs from 'node:fs';
-import { evaluateSubmoduleReleaseGate } from './lib/release-submodule-gate.mjs';
+import { evaluateSubmoduleReleaseGate } from './lib/diagnostics/release-submodule-gate.mjs';
 
 function parseArgs(argv) {
   const args = { commit: '', tagsFile: '' };

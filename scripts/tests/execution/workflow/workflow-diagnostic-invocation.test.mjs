@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildWorkflowDiagnosticInvocation } from '../../../lib/workflow-diagnostic/invocation.mjs';
+import { buildWorkflowDiagnosticInvocation } from '../../../lib/execution/workflow-diagnostic/invocation.mjs';
 
 const SENTINEL = 'SENTINEL-EXPECTED-ANSWER-MUST-NOT-LEAK';
 

@@ -6,11 +6,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { MANAGED_RUNNER } from '../../../../lib/evidence/live-execution.mjs';
+import { MANAGED_RUNNER } from '../../../../lib/memory/evidence/live-execution.mjs';
 import {
   prepareAiosAgentProviderExecution,
   resolveAiosAgentProvider,
-} from '../../../../lib/workflows/adapters/rex-agent-provider.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-agent-provider.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../..');
 

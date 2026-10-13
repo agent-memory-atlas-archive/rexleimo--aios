@@ -13,10 +13,10 @@ import {
   resolveRoutedSubagentClient,
   resolveTaskRouteDecision,
 } from '../../../ctx-agent-core.mjs';
-import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
-import { readRawRef } from '../../../lib/interception/observability/refs/raw-ref-store.mjs';
-import { runAutoGate } from '../../../lib/planning/flow/auto-gate.mjs';
-import { advanceStoredAiosCapabilityActivation } from '../../../lib/workflows/adapters/rex-activation-store.mjs';
+import { runContextDbCli } from '../../../lib/memory/contextdb-cli.mjs';
+import { readRawRef } from '../../../lib/foundation/interception/observability/refs/raw-ref-store.mjs';
+import { runAutoGate } from '../../../lib/foundation/planning/flow/auto-gate.mjs';
+import { advanceStoredAiosCapabilityActivation } from '../../../lib/execution/workflows/adapters/rex-activation-store.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 
 const CTX_AGENT_CLI = path.resolve('scripts', 'ctx-agent.mjs');
@@ -645,7 +645,7 @@ test('ctx-agent one-shot compresses prompt before client stdin and compacts rece
 
   try {
     const fakeCodex = path.join(binDir, process.platform === 'win32' ? 'codex-fake.mjs' : 'codex');
-    await writeFile(fakeCodex, `#!/usr/bin/env node\nimport { readFileSync, writeFileSync } from 'node:fs';\nconst input = readFileSync(0, 'utf8');\nwriteFileSync(process.env.AIOS_TEST_CAPTURE_PATH, input);\nprocess.stdout.write('${POST_SENTINEL}'.repeat(160) + '\\nscripts/lib/ctx-agent-core/entry/run.mjs:211\\n');\n`, 'utf8');
+    await writeFile(fakeCodex, `#!/usr/bin/env node\nimport { readFileSync, writeFileSync } from 'node:fs';\nconst input = readFileSync(0, 'utf8');\nwriteFileSync(process.env.AIOS_TEST_CAPTURE_PATH, input);\nprocess.stdout.write('${POST_SENTINEL}'.repeat(160) + '\\nscripts/lib/foundation/ctx-agent-core/entry/run.mjs:211\\n');\n`, 'utf8');
     await chmod(fakeCodex, 0o755);
     if (process.platform === 'win32') {
       await writeFile(path.join(binDir, 'codex.cmd'), `@echo off\r\nnode "${fakeCodex}" %*\r\n`, 'utf8');
@@ -668,7 +668,7 @@ test('ctx-agent one-shot compresses prompt before client stdin and compacts rece
         '--workspace', workspaceRoot,
         '--project', 'tmp-project',
         '--session', sessionId,
-        '--prompt', `${PRE_SENTINEL.repeat(160)}\nscripts/lib/ctx-agent-core/entry/run.mjs:189`,
+        '--prompt', `${PRE_SENTINEL.repeat(160)}\nscripts/lib/foundation/ctx-agent-core/entry/run.mjs:189`,
         '--no-bootstrap',
         '--no-auto-checkpoint',
       ],
@@ -819,7 +819,7 @@ test('ctx-agent one-shot executes a promoted rex Agent Provider and adapts its J
     assert.equal(command.provider.kind, 'agent');
     assert.equal(command.provider.id, agentId);
 
-    const { prepareAiosAgentProviderExecution } = await import('../../../lib/workflows/adapters/rex-agent-provider.mjs');
+    const { prepareAiosAgentProviderExecution } = await import('../../../lib/execution/workflows/adapters/rex-agent-provider.mjs');
     const prepared = await prepareAiosAgentProviderExecution({
       command,
       evidenceRoot: workspaceRoot,
@@ -831,7 +831,7 @@ test('ctx-agent one-shot executes a promoted rex Agent Provider and adapts its J
     assert.match(prepared.prompt, /rex-security-reviewer/u);
     assert.doesNotMatch(prepared.prompt, /AIOS_REX_EVIDENCE=/u);
 
-    const { ingestCapabilityProviderOutput } = await import('../../../lib/workflows/adapters/rex-capability-runtime.mjs');
+    const { ingestCapabilityProviderOutput } = await import('../../../lib/execution/workflows/adapters/rex-capability-runtime.mjs');
     const handoff = {
       schemaVersion: 1,
       agentId: 'rex-security-reviewer',

@@ -10,7 +10,7 @@ import {
   getNativeRepair,
   listNativeRepairs,
   rollbackNativeRepair,
-} from '../../../lib/native/repair/repairs.mjs';
+} from '../../../lib/clients/native/repair/repairs.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

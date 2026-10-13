@@ -8,9 +8,9 @@ import {
   collectDashboardData,
   renderDashboardHtml,
   writeHarnessDashboard,
-} from '../../../../../lib/harness/ops/dashboard.mjs';
-import { initSoloRunJournal } from '../../../../../lib/harness/solo/solo-journal.mjs';
-import { writeSoloRunSummary } from '../../../../../lib/harness/solo/solo-journal/content/summary.mjs';
+} from '../../../../../lib/execution/harness/ops/dashboard.mjs';
+import { initSoloRunJournal } from '../../../../../lib/execution/harness/solo/solo-journal.mjs';
+import { writeSoloRunSummary } from '../../../../../lib/execution/harness/solo/solo-journal/content/summary.mjs';
 
 async function withRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

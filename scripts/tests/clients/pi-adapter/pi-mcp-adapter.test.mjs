@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveLocalBrowserMcpScript } from '../../../lib/components/browser/runtime/runtime-paths.mjs';
+import { resolveLocalBrowserMcpScript } from '../../../lib/tooling/components/browser/runtime/runtime-paths.mjs';
 import {
   PI_BUILTIN_MCP_SINCE,
   PI_MCP_ADAPTER_PACKAGE,
@@ -20,7 +20,7 @@ import {
   piMcpAdapterSpec,
   resolvePiMcpJsonPath,
   resolvePiMcpMode,
-} from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
+} from '../../../lib/tooling/components/integrations/pi/mcp-adapter.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

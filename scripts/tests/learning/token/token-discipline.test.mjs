@@ -5,17 +5,17 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { runDoctorSuite } from '../../../lib/doctor/aggregate.mjs';
-import { planSetup } from '../../../lib/lifecycle/setup/setup.mjs';
-import { planUpdate } from '../../../lib/lifecycle/setup/update.mjs';
-import { syncNativeEnhancements } from '../../../lib/native/synchronize/sync.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
+import { runDoctorSuite } from '../../../lib/environment/doctor/aggregate.mjs';
+import { planSetup } from '../../../lib/execution/lifecycle/setup/setup.mjs';
+import { planUpdate } from '../../../lib/execution/lifecycle/setup/update.mjs';
+import { syncNativeEnhancements } from '../../../lib/clients/native/synchronize/sync.mjs';
 import {
   inspectTokenDiscipline,
   loadTokenDisciplineConfig,
   planTokenDiscipline,
   planClientCostSettings,
-} from '../../../lib/token-discipline/index.mjs';
+} from '../../../lib/execution/token-discipline/index.mjs';
 
 function resolveRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('rl-core campaign controller opens first collection epoch and triggers update after four admitted trajectories', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-campaign-'));
   const result = await mod.runOnlineCampaign({
     config: {
@@ -33,7 +33,7 @@ test('rl-core campaign controller opens first collection epoch and triggers upda
 });
 
 test('rl-core campaign controller reopens monitoring after replay_only without promoting a new batch', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-campaign-'));
   let counter = 0;
   const result = await mod.runOnlineCampaign({
@@ -74,7 +74,7 @@ test('rl-core campaign controller reopens monitoring after replay_only without p
 });
 
 test('rl-core campaign controller auto-rolls back after three worse outcomes without an intervening better', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-campaign-'));
   let counter = 0;
   const result = await mod.runOnlineCampaign({
@@ -113,7 +113,7 @@ test('rl-core campaign controller auto-rolls back after three worse outcomes wit
 });
 
 test('rl-core campaign controller resumes from persisted control snapshot without reapplying duplicate events', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-campaign-'));
   let counter = 0;
   const deps = {
@@ -165,7 +165,7 @@ test('rl-core campaign controller resumes from persisted control snapshot withou
 });
 
 test('rl-core campaign controller enters frozen_failure mode when rollback fails and blocks further updates', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-campaign-'));
   let counter = 0;
   const result = await mod.runOnlineCampaign({

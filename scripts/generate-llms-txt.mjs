@@ -27,7 +27,7 @@
 
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 
-import { isMaintenanceRelease } from './lib/release-impact.mjs';
+import { isMaintenanceRelease } from './lib/diagnostics/release-impact.mjs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

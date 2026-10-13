@@ -23,15 +23,15 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { atomicTempPath, writeFileAtomic } from '../../../lib/fs/atomic-write.mjs';
-import { sanitizeFileSegment } from '../../../lib/fs/file-segment.mjs';
-import { createVerdict, readVerdict, writeVerdict } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
+import { atomicTempPath, writeFileAtomic } from '../../../lib/environment/fs/atomic-write.mjs';
+import { sanitizeFileSegment } from '../../../lib/environment/fs/file-segment.mjs';
+import { createVerdict, readVerdict, writeVerdict } from '../../../lib/execution/lifecycle/evolve/evolution/verdict.mjs';
 import {
   createPromotion,
   listPromotions,
   readPromotion,
   writePromotion,
-} from '../../../lib/lifecycle/evolve/evolution/promotion.mjs';
+} from '../../../lib/execution/lifecycle/evolve/evolution/promotion.mjs';
 
 const ILLEGAL = /[<>:"/\\|?*\u0000-\u001f]/;
 

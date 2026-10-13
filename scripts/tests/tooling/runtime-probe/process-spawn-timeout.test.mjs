@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { spawnCommand, spawnCommandWithInput } from '../../../lib/platform/process.mjs';
+import { spawnCommand, spawnCommandWithInput } from '../../../lib/foundation/platform/process.mjs';
 
 async function waitForExit(pid, timeoutMs = 1000) {
   const deadline = Date.now() + timeoutMs;

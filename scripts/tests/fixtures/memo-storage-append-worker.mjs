@@ -1,4 +1,4 @@
-import { appendMemoEvent } from '../../lib/memo/storage.mjs';
+import { appendMemoEvent } from '../../lib/memory/memo/storage.mjs';
 
 const [workspaceRoot, storage, text] = process.argv.slice(2);
 const event = await appendMemoEvent({ workspaceRoot, storage, text });

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 
 import { createCliParser } from '../src/shared/cli-parser.mjs';
-import { buildWorkflowDiagnosticDryRun, parseWorkflowDiagnosticManifest } from './lib/workflow-diagnostic/manifest.mjs';
+import { buildWorkflowDiagnosticDryRun, parseWorkflowDiagnosticManifest } from './lib/execution/workflow-diagnostic/manifest.mjs';
 
 const execFileAsync = promisify(execFile);
 

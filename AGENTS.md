@@ -41,7 +41,7 @@ Code may verify objective facts; code must never guess model or user intent.
 ## Project Structure & Module Organization
 This repository is AIOS — a local-first orchestration control plane that gives coding clients (codex / claude / gemini / opencode / hermes / grok / workbuddy / pi / zcode / qoder) project memory, adaptive workflow routing, multi-agent teams, resumable long-running tasks, and verifiable evidence. The browser MCP is a legacy component inside it, not the project's center.
 
-- `scripts/`: AIOS core runtime — workflow policy, rex capability routing, team/harness orchestration, ContextDB CLI, and the skill/projection system; runtime specs live in `scripts/lib/specs/`.
+- `scripts/`: AIOS core runtime — workflow policy, rex capability routing, team/harness orchestration, ContextDB CLI, and the skill/projection system; runtime specs live in `scripts/lib/tooling/specs/`.
 - `rex-harness/`: submodule implementing the Fact → Capability → Evidence control plane.
 - `mcp-server/`: TypeScript MCP servers, including ContextDB and a legacy Playwright browser runtime (`mcp-server/src/index.ts` entry, `mcp-server/src/browser/` runtime).
 - `scripts/run-local-browser-mcp.mjs`: legacy launcher for the repository-local Node/Playwright browser MCP.

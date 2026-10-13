@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   applyProjectRootFlag,
   resolveProjectRoot,
-} from '../../../lib/cli/project-root.mjs';
+} from '../../../lib/tooling/cli/project-root.mjs';
 
 const SCRIPT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -81,20 +81,20 @@ test('applyProjectRootFlag rewrites the dispatch context only when the flag is p
 test('the project root channel is declared in the parser, specs, and help text', () => {
   const read = (relativePath) => fs.readFileSync(path.join(SCRIPT_ROOT, relativePath), 'utf8');
   for (const relativePath of [
-    'lib/cli/parse-args/top-level.mjs',
-    'lib/cli/parse-args/platform/internal.mjs',
-    'lib/cli/commander/specs/core/lifecycle.mjs',
-    'lib/cli/commander/specs/io/internal.mjs',
-    'lib/cli/help/commands/basic.mjs',
+    'lib/tooling/cli/parse-args/top-level.mjs',
+    'lib/tooling/cli/parse-args/platform/internal.mjs',
+    'lib/tooling/cli/commander/specs/core/lifecycle.mjs',
+    'lib/tooling/cli/commander/specs/io/internal.mjs',
+    'lib/tooling/cli/help/commands/basic.mjs',
   ]) {
     assert.match(read(relativePath), /--project-root <path>/u, `${relativePath} must document the flag`);
   }
-  assert.match(read('lib/cli/dispatch/dispatch.mjs'), /applyProjectRootFlag\(context, parsed\.options\)/u);
+  assert.match(read('lib/tooling/cli/dispatch/dispatch.mjs'), /applyProjectRootFlag\(context, parsed\.options\)/u);
   assert.match(read('aios.mjs'), /resolveProjectRoot\(\{ env: process\.env \}\)/u);
 });
 
 test('the parsers map --project-root into the dispatch options', async () => {
-  const { parseArgs } = await import('../../../lib/cli/parse-args.mjs');
+  const { parseArgs } = await import('../../../lib/tooling/cli/parse-args.mjs');
 
   const internal = await parseArgs(['internal', 'skills', 'doctor', '--project-root', '/tmp/declared']);
   assert.equal(internal.options.projectRoot, '/tmp/declared');

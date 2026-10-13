@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('browser schema validates controlled task, evidence, and holdout payloads', async () => {
-  const mod = await import('../../../../lib/rl-browser-v1/schema.mjs');
+  const mod = await import('../../../../lib/learning/rl-browser-v1/schema.mjs');
 
   assert.doesNotThrow(() => mod.validateBrowserTask({
     task_id: 'browser-publish-001',

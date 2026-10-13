@@ -5,12 +5,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { autoMemoSessionClose, sessionCloseCandidatePath } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
+import { autoMemoSessionClose, sessionCloseCandidatePath } from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
 import {
   appendMemoEvent,
   listMemoEvents,
   setActiveMemoStorage,
-} from '../../../lib/memo/storage.mjs';
+} from '../../../lib/memory/memo/storage.mjs';
 import {
   expireMemoryCandidate,
   foldCandidateTerminalStates,
@@ -19,7 +19,7 @@ import {
   promoteMemoryCandidate,
   readCandidateGovernanceReceipts,
   rejectMemoryCandidate,
-} from '../../../lib/memo/storage/govern/candidates.mjs';
+} from '../../../lib/memory/memo/storage/govern/candidates.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

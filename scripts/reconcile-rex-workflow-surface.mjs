@@ -2,8 +2,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { prepareRexWorkflowSurface } from './lib/workflows/surface/rex-workflow-surface-lifecycle.mjs';
-import { isDirectModuleInvocation } from './lib/platform/module-entry.mjs';
+import { prepareRexWorkflowSurface } from './lib/execution/workflows/surface/rex-workflow-surface-lifecycle.mjs';
+import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 const SCRIPT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

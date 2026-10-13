@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { migrateOneGeminiJsonFile, normalizeGeminiServerEntry } from '../../../lib/components/browser/mcp/formats/mcp-gemini.mjs';
-import { getClientMcpTarget } from '../../../lib/clients/registry.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../../../lib/tooling/components/browser/constants.mjs';
+import { migrateOneGeminiJsonFile, normalizeGeminiServerEntry } from '../../../lib/tooling/components/browser/mcp/formats/mcp-gemini.mjs';
+import { getClientMcpTarget } from '../../../lib/foundation/clients/registry.mjs';
 
 /* gemini 的真实 schema 取自 @google/gemini-cli bundle 的 McpServerConfigSchema。
    注意 timeout 的单位是毫秒（"Timeout in milliseconds for MCP requests."），

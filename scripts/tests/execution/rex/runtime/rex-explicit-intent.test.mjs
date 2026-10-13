@@ -5,8 +5,8 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { runStart } from '../../../../../rex-harness/src/cli/start.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
-import { runAutoGate } from '../../../../lib/planning/flow/auto-gate.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
+import { runAutoGate } from '../../../../lib/foundation/planning/flow/auto-gate.mjs';
 
 function tempRoot(prefix) {
   return mkdtempSync(path.join(os.tmpdir(), prefix));

@@ -12,9 +12,9 @@ import {
   printBskInstallGuide,
   checkBskConnect,
   resolveBskRuntime,
-} from '../../../lib/components/browser/modes/bsk-writer.mjs';
-import { switchBrowserMcpMode } from '../../../lib/components/browser/modes/switch.mjs';
-import { resolveBrowserMode } from '../../../lib/components/browser/modes/mcp-mode.mjs';
+} from '../../../lib/tooling/components/browser/modes/bsk-writer.mjs';
+import { switchBrowserMcpMode } from '../../../lib/tooling/components/browser/modes/switch.mjs';
+import { resolveBrowserMode } from '../../../lib/tooling/components/browser/modes/mcp-mode.mjs';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';

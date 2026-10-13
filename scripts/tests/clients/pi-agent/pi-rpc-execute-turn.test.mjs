@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildPiRpcExecuteTurn } from '../../../lib/lifecycle/run/harness/execution/execute-turn-pi-rpc.mjs';
+import { buildPiRpcExecuteTurn } from '../../../lib/execution/lifecycle/run/harness/execution/execute-turn-pi-rpc.mjs';
 
 const VALID_CONTRACT = JSON.stringify({
   outcome: 'done',

@@ -5,7 +5,7 @@ import {
   evaluateWorkflowPolicy,
   isSameSessionPlan,
   isTerminalPlan,
-} from '../../../lib/planning/contract/workflow-policy.mjs';
+} from '../../../lib/foundation/planning/contract/workflow-policy.mjs';
 
 function activePlan(overrides = {}) {
   return {
@@ -68,7 +68,7 @@ test('unknown, review-without-diff, and debug-without-failure intents block fail
 });
 
 test('planning public index exposes the workflow policy API', async () => {
-  const planning = await import('../../../lib/planning/index.mjs');
+  const planning = await import('../../../lib/foundation/planning/index.mjs');
   assert.equal(typeof planning.evaluateWorkflowPolicy, 'function');
   assert.equal(typeof planning.isTerminalPlan, 'function');
   assert.equal(typeof planning.evaluateAutoGateDecision, 'function');

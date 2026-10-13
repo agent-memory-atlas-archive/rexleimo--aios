@@ -8,7 +8,7 @@ import {
   ensureHeadroomInstalled,
   isSupportedHeadroomVersion,
   parseHeadroomVersion,
-} from '../../../lib/aios-init/headroom-installer.mjs';
+} from '../../../lib/environment/aios-init/headroom-installer.mjs';
 
 test('Headroom version and installer policy is fixed to 0.31.x in an isolated tool env', () => {
   assert.equal(HEADROOM_PACKAGE_SPEC, 'headroom-ai[all]>=0.31.0,<0.32.0');

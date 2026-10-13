@@ -14,8 +14,8 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
-import { createPiRpcSession } from '../lib/pi/rpc-client.mjs';
-import { createLedgerUsageTap } from '../lib/pi/usage-tap.mjs';
+import { createPiRpcSession } from '../lib/clients/pi/rpc-client.mjs';
+import { createLedgerUsageTap } from '../lib/clients/pi/usage-tap.mjs';
 
 const DEFAULT_TASKS_DIR = path.resolve(import.meta.dirname, '..', 'fixtures', 'token-bench', 'tasks');
 

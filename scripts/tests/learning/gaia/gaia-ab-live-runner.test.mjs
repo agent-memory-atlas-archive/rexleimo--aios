@@ -5,9 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parseGaiaLiveManifest } from '../../../lib/gaia-ab-eval/live-manifest.mjs';
-import { runGaiaLiveEvaluation } from '../../../lib/gaia-ab-eval/live-runner.mjs';
-import { summarizeGaiaScores } from '../../../lib/gaia-ab-eval/scorer.mjs';
+import { parseGaiaLiveManifest } from '../../../lib/learning/gaia-ab-eval/live-manifest.mjs';
+import { runGaiaLiveEvaluation } from '../../../lib/learning/gaia-ab-eval/live-runner.mjs';
+import { summarizeGaiaScores } from '../../../lib/learning/gaia-ab-eval/scorer.mjs';
 
 const TASK_DIGEST = 'a'.repeat(64);
 

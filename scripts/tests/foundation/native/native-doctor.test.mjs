@@ -5,10 +5,10 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { runDoctorSuite } from '../../../lib/doctor/aggregate.mjs';
-import { rollbackNativeRepair } from '../../../lib/native/repair/repairs.mjs';
-import { syncRouteTriggerCommands } from '../../../lib/native/routing/route-commands.mjs';
-import { syncNativeEnhancements } from '../../../lib/native/synchronize/sync.mjs';
+import { runDoctorSuite } from '../../../lib/environment/doctor/aggregate.mjs';
+import { rollbackNativeRepair } from '../../../lib/clients/native/repair/repairs.mjs';
+import { syncRouteTriggerCommands } from '../../../lib/clients/native/routing/route-commands.mjs';
+import { syncNativeEnhancements } from '../../../lib/clients/native/synchronize/sync.mjs';
 
 function resolveRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

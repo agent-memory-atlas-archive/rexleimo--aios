@@ -5,10 +5,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { encodeEnvelope, decodeEnvelope } from '../../../../lib/interception/runtime/core/envelope.mjs';
-import { runShellEnvelope } from '../../../../lib/interception/transport/shell/shell-wrapper.mjs';
-import { readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
-import { readRawRef } from '../../../../lib/interception/observability/refs/raw-ref-store.mjs';
+import { encodeEnvelope, decodeEnvelope } from '../../../../lib/foundation/interception/runtime/core/envelope.mjs';
+import { runShellEnvelope } from '../../../../lib/foundation/interception/transport/shell/shell-wrapper.mjs';
+import { readMetricsRecords } from '../../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs';
+import { readRawRef } from '../../../../lib/foundation/interception/observability/refs/raw-ref-store.mjs';
 
 const SENTINEL = 'UNIQUE_SHELL_GATEWAY_SENTINEL';
 

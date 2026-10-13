@@ -2,13 +2,13 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { renderCompatibilityExport } from './lib/agents/compat-export.mjs';
-import { loadCanonicalAgents } from './lib/agents/source-tree.mjs';
-import { writeFileAtomic } from './lib/fs/atomic-write.mjs';
-import { syncGeneratedAgents } from './lib/harness/team/orchestrator-agents.mjs';
+import { renderCompatibilityExport } from './lib/foundation/agents/compat-export.mjs';
+import { loadCanonicalAgents } from './lib/foundation/agents/source-tree.mjs';
+import { writeFileAtomic } from './lib/environment/fs/atomic-write.mjs';
+import { syncGeneratedAgents } from './lib/execution/harness/team/orchestrator-agents.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const exportPath = path.join(rootDir, 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json');
+const exportPath = path.join(rootDir, 'scripts', 'lib', 'tooling', 'specs', 'orchestrator', 'orchestrator-agents.json');
 
 function hasFlag(flag) {
   return process.argv.slice(2).includes(flag);

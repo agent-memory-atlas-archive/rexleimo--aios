@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { partitionSupersedes } from '../../../lib/memo/storage/govern/temporal.mjs';
+import { partitionSupersedes } from '../../../lib/memory/memo/storage/govern/temporal.mjs';
 
 function sourceEvent(overrides = {}) {
   return {

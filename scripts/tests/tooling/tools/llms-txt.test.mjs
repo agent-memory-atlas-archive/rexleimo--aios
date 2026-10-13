@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import { generateLlmsTxt } from '../../../generate-llms-txt.mjs';
-import { isMaintenanceRelease } from '../../../lib/release-impact.mjs';
+import { isMaintenanceRelease } from '../../../lib/diagnostics/release-impact.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 

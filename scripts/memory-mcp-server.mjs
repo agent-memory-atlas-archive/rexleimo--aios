@@ -67,7 +67,7 @@ function clip(text, max = 1600) {
 }
 
 async function handleMemoryRecall(args = {}) {
-  const { searchAiosProject } = await import('./lib/search/unified-search.mjs');
+  const { searchAiosProject } = await import('./lib/memory/search/unified-search.mjs');
   const query = String(args.query || '').trim();
   if (!query) throw new Error('query is required');
   /* 中文注释：searchAiosProject 返回 { query, sources, results } 包装对象，取 .results */
@@ -89,12 +89,12 @@ async function handleMemoryRecall(args = {}) {
 }
 
 async function getActiveStorage(root) {
-  const { getActiveMemoStorage } = await import('./lib/memo/storage/base/config.mjs');
+  const { getActiveMemoStorage } = await import('./lib/memory/memo/storage/base/config.mjs');
   return await getActiveMemoStorage(root);
 }
 
 async function handleMemoryWrite(args = {}) {
-  const { appendMemoEvent } = await import('./lib/memo/storage/events/events-write.mjs');
+  const { appendMemoEvent } = await import('./lib/memory/memo/storage/events/events-write.mjs');
   const text = String(args.text || '').trim();
   if (!text) throw new Error('text is required');
   const root = resolveWorkspaceRoot();
@@ -116,7 +116,7 @@ async function handleMemoryWrite(args = {}) {
 }
 
 async function handleMemoryCheckpoint(args = {}) {
-  const { appendPinnedMemo } = await import('./lib/memo/storage/govern/pinned.mjs');
+  const { appendPinnedMemo } = await import('./lib/memory/memo/storage/govern/pinned.mjs');
   const text = String(args.text || '').trim();
   if (!text) throw new Error('text is required');
   const root = resolveWorkspaceRoot();

@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { doctorPiBridge } from '../../../lib/components/integrations/pi/doctor.mjs';
-import { buildAiosPiMcpServers, resolvePiMcpJsonPath } from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
+import { doctorPiBridge } from '../../../lib/tooling/components/integrations/pi/doctor.mjs';
+import { buildAiosPiMcpServers, resolvePiMcpJsonPath } from '../../../lib/tooling/components/integrations/pi/mcp-adapter.mjs';
 
 async function withPiHome(prefix, fn) {
   const home = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

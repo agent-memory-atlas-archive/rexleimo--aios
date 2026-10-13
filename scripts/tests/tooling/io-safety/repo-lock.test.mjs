@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveRepoLockPath, withRepoLock } from '../../../lib/fs/repo-lock.mjs';
+import { resolveRepoLockPath, withRepoLock } from '../../../lib/environment/fs/repo-lock.mjs';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

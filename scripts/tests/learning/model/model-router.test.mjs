@@ -10,7 +10,7 @@ import {
   resolveModelRoutingForTask,
   scoreTaskSignals,
   classifyTaskIntent,
-} from '../../../lib/model-router.mjs';
+} from '../../../lib/tooling/model-router.mjs';
 
 const registry = defaultModelRegistry();
 
@@ -134,10 +134,10 @@ test('model-router reports render Chinese headers without mojibake', () => {
 });
 
 test('model-router entrypoint stays a thin facade over focused modules', async () => {
-  const root = path.resolve('scripts', 'lib');
+  const root = path.resolve('scripts', 'lib', 'tooling');
   const entry = await readFile(path.join(root, 'model-router.mjs'), 'utf8');
   const entryLines = entry.split(/\r?\n/u).length;
-  assert.equal(entryLines <= 180, true, `model-router.mjs is ${entryLines} lines; split responsibilities into scripts/lib/model-router/*`);
+  assert.equal(entryLines <= 180, true, `model-router.mjs is ${entryLines} lines; split responsibilities into scripts/lib/tooling/model-router/*`);
 
   for (const moduleName of [
     'entry/shared.mjs',

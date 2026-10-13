@@ -10,7 +10,7 @@ import {
   ensureRexHarness,
   inspectRexHarness,
   isAiosRuntimeRoot,
-} from '../../../../lib/rex-harness/runtime.mjs';
+} from '../../../../lib/clients/rex-harness/runtime.mjs';
 
 async function makeRoot(prefix = 'rex-runtime-') {
   return mkdtemp(path.join(os.tmpdir(), prefix));

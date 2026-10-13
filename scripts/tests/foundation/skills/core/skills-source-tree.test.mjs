@@ -9,8 +9,8 @@ import {
   loadSkillsSyncManifest,
   materializeSkillTree,
   resolveGeneratedTargetPath,
-} from '../../../../lib/skills/source-tree.mjs';
-import { parseFrontmatter, stripAiosFrontmatter } from '../../../../lib/skills/frontmatter.mjs';
+} from '../../../../lib/tooling/skills/source-tree.mjs';
+import { parseFrontmatter, stripAiosFrontmatter } from '../../../../lib/tooling/skills/frontmatter.mjs';
 import { readProjectedSkill } from '../../../fixtures/skill-projection.mjs';
 
 async function makeTemp(prefix) {

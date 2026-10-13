@@ -9,8 +9,8 @@ import {
   markPlanTaskInProgress,
   syncPlanWithIterationOutcome,
   attachPlanVerificationEvidence,
-} from '../../../lib/planning/ops/plan-runtime.mjs';
-import { startPlan, readActivePlan, evaluateDoneGate } from '../../../lib/planning/contract/contract.mjs';
+} from '../../../lib/foundation/planning/ops/plan-runtime.mjs';
+import { startPlan, readActivePlan, evaluateDoneGate } from '../../../lib/foundation/planning/contract/contract.mjs';
 
 async function makeTemp() {
   return mkdtemp(path.join(os.tmpdir(), 'aios-plan-runtime-'));

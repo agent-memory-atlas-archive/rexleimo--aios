@@ -6,9 +6,9 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { buildMemoAuthority } from '../../../lib/memo/storage/govern/provenance.mjs';
-import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
-import { promoteMemoryCandidate } from '../../../lib/memo/storage/govern/candidates.mjs';
+import { buildMemoAuthority } from '../../../lib/memory/memo/storage/govern/provenance.mjs';
+import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memory/memo/storage.mjs';
+import { promoteMemoryCandidate } from '../../../lib/memory/memo/storage/govern/candidates.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -111,10 +111,10 @@ test('governance denials are identical under poisoned runtime env', async () => 
 
 test('authority-sensitive sources never reference AIOS_RUNTIME_*', async () => {
   const files = [
-    '../../../lib/memo/storage/govern/provenance.mjs',
-    '../../../lib/memo/storage/govern/candidates.mjs',
-    '../../../lib/memo/storage/events/events-write.mjs',
-    '../../../lib/memo/cli/commands/ops/events.mjs',
+    '../../../lib/memory/memo/storage/govern/provenance.mjs',
+    '../../../lib/memory/memo/storage/govern/candidates.mjs',
+    '../../../lib/memory/memo/storage/events/events-write.mjs',
+    '../../../lib/memory/memo/cli/commands/ops/events.mjs',
   ];
   for (const relative of files) {
     const content = await readFile(path.resolve(here, relative), 'utf8');

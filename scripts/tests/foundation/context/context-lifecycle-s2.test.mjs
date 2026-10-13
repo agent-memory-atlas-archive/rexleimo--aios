@@ -9,15 +9,15 @@ import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
   updateExecutionContextExpectedHash,
-} from '../../../lib/contextdb/runtime/execution-context.mjs';
+} from '../../../lib/memory/contextdb/runtime/execution-context.mjs';
 import {
   evaluateHandoffLineage,
   normalizeHandoffPacket,
   renderHandoffInjection,
-} from '../../../lib/contextdb/runtime/handoff.mjs';
-import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
-import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
-import { readSessionChangedFiles, recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
+} from '../../../lib/memory/contextdb/runtime/handoff.mjs';
+import { evaluateContextReconciliation } from '../../../lib/execution/lifecycle/evolve/context-reconciliation.mjs';
+import { buildStructuredPlanState } from '../../../lib/foundation/planning/contract/schema.mjs';
+import { readSessionChangedFiles, recordSessionChangedFile } from '../../../lib/execution/session/changed-files.mjs';
 
 async function withRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

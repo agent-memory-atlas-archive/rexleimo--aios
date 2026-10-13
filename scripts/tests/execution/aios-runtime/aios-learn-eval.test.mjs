@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { buildLearnEvalReport, renderLearnEvalReport } from '../../../lib/harness/quality/learn-eval.mjs';
-import { planLearnEval, runLearnEval } from '../../../lib/lifecycle/evolve/learn-eval.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
+import { buildLearnEvalReport, renderLearnEvalReport } from '../../../lib/execution/harness/quality/learn-eval.mjs';
+import { planLearnEval, runLearnEval } from '../../../lib/execution/lifecycle/evolve/learn-eval.mjs';
 
 async function makeRootDir() {
   return await fs.mkdtemp(path.join(os.tmpdir(), 'aios-learn-eval-'));

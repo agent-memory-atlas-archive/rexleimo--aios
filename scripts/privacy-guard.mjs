@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// scripts/privacy-guard.mjs — 薄壳入口，逻辑在 scripts/lib/privacy-guard/
+// scripts/privacy-guard.mjs — 薄壳入口，逻辑在 scripts/lib/environment/privacy-guard/
 import {
   commandInit,
   commandStatus,
   commandSet,
   commandRedact,
-} from './lib/privacy-guard/commands.mjs';
+} from './lib/environment/privacy-guard/commands.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

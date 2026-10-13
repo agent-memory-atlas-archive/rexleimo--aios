@@ -2,8 +2,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { installRexClientProjections } from './lib/rex-harness/client-projection.mjs';
-import { isDirectModuleInvocation } from './lib/platform/module-entry.mjs';
+import { installRexClientProjections } from './lib/clients/rex-harness/client-projection.mjs';
+import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 const SCRIPT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

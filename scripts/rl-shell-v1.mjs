@@ -2,12 +2,12 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { generateBenchmark } from './lib/rl-shell-v1/registry/task-registry.mjs';
-import { runTrainingRun, runCampaign, runPhase3Campaign, runRealShadowEval } from './lib/rl-shell-v1/eval/run-orchestrator.mjs';
-import { loadPolicyCheckpoint } from './lib/rl-shell-v1/training/student-policy.mjs';
-import { loadTaskRegistry } from './lib/rl-shell-v1/registry/task-registry.mjs';
-import { evaluatePhase3Run, runHeldOutEval } from './lib/rl-shell-v1/eval/eval-harness.mjs';
-import { buildRunSummaryPayload, writeRunSummary } from './lib/rl-shell-v1/eval/contextdb-summary.mjs';
+import { generateBenchmark } from './lib/learning/rl-shell-v1/registry/task-registry.mjs';
+import { runTrainingRun, runCampaign, runPhase3Campaign, runRealShadowEval } from './lib/learning/rl-shell-v1/eval/run-orchestrator.mjs';
+import { loadPolicyCheckpoint } from './lib/learning/rl-shell-v1/training/student-policy.mjs';
+import { loadTaskRegistry } from './lib/learning/rl-shell-v1/registry/task-registry.mjs';
+import { evaluatePhase3Run, runHeldOutEval } from './lib/learning/rl-shell-v1/eval/eval-harness.mjs';
+import { buildRunSummaryPayload, writeRunSummary } from './lib/learning/rl-shell-v1/eval/contextdb-summary.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

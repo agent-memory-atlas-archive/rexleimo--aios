@@ -14,10 +14,10 @@ import {
   selectNextRoundSpeakers,
   checkTermination,
   buildRolePrompt,
-} from '../../../lib/harness/team/groupchat-runtime.mjs';
+} from '../../../lib/execution/harness/team/groupchat-runtime.mjs';
 
-import { normalizeHandoffPayload } from '../../../lib/harness/solo/handoff.mjs';
-import { readMetricsRecords } from '../../../lib/interception/observability/metrics/metrics-sink.mjs';
+import { normalizeHandoffPayload } from '../../../lib/execution/harness/solo/handoff.mjs';
+import { readMetricsRecords } from '../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -379,7 +379,7 @@ test('buildRolePrompt includes work items when provided', () => {
 // ---------------------------------------------------------------------------
 
 test('executeRound invokes spawnFn for each speaker and returns entries', async () => {
-  const { executeRound } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { executeRound } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   const history = new ConversationHistory();
   let callCount = 0;
@@ -416,7 +416,7 @@ test('executeRound invokes spawnFn for each speaker and returns entries', async 
 });
 
 test('executeRound respects concurrency limit', async () => {
-  const { executeRound } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { executeRound } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   const history = new ConversationHistory();
   const running = new Set();
@@ -457,7 +457,7 @@ test('executeRound respects concurrency limit', async () => {
 });
 
 test('executeRound marks failed spawn as blocked entry', async () => {
-  const { executeRound } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { executeRound } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   const history = new ConversationHistory();
 
@@ -499,7 +499,7 @@ test('executeRound marks failed spawn as blocked entry', async () => {
 // ---------------------------------------------------------------------------
 
 test('runGroupChat completes full conversation for feature blueprint (simulated)', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   const spawnFn = async ({ role, conversationHistory }) => {
     // Simulate realistic progression
@@ -577,7 +577,7 @@ test('runGroupChat completes full conversation for feature blueprint (simulated)
 });
 
 test('runGroupChat handles re-plan when implementer is blocked', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   let plannerCalls = 0;
   const spawnFn = async ({ role }) => {
@@ -641,7 +641,7 @@ test('runGroupChat handles re-plan when implementer is blocked', async () => {
 
 
 test('runGroupChat passes model-router context to each speaker prompt', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
   const captured = [];
   const spawnFn = async (args) => {
     captured.push(args);
@@ -675,7 +675,7 @@ test('runGroupChat passes model-router context to each speaker prompt', async ()
 });
 
 test('runGroupChat stops at maxRounds', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   const spawnFn = async ({ role }) => ({
     exitCode: 0,
@@ -701,7 +701,7 @@ test('runGroupChat stops at maxRounds', async () => {
 });
 
 test('runGroupChat expands implementer into parallel work items from planner findings', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
 
   let implementerCallCount = 0;
   const spawnFn = async ({ role, workItems }) => {
@@ -754,7 +754,7 @@ test('runGroupChat expands implementer into parallel work items from planner fin
 
 
 test('runGroupChat compresses large pre-send prompts and post-receive raw output at the AIOS turn boundary', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-groupchat-turn-'));
   const PRE_SENTINEL = 'GROUPCHAT_PRE_SEND_SENTINEL';
   const POST_SENTINEL = 'GROUPCHAT_POST_RECEIVE_SENTINEL';
@@ -766,14 +766,14 @@ test('runGroupChat compresses large pre-send prompts and post-receive raw output
       return {
         exitCode: 0,
         handoff: makeHandoff({ fromRole: args.role, toRole: 'done', findings: ['done'] }),
-        rawOutput: `${POST_SENTINEL.repeat(120)}\nERROR issue at scripts/lib/harness/team/groupchat-runtime/run/run.mjs:25`,
+        rawOutput: `${POST_SENTINEL.repeat(120)}\nERROR issue at scripts/lib/execution/harness/team/groupchat-runtime/run/run.mjs:25`,
         elapsedMs: 1,
       };
     };
 
     const result = await runGroupChat({
       taskTitle: 'Compress groupchat turn',
-      contextSummary: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/harness/team/groupchat-runtime/run/run.mjs:25`,
+      contextSummary: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/execution/harness/team/groupchat-runtime/run/run.mjs:25`,
       blueprint: 'bugfix',
       spawnFn,
       rootDir,
@@ -795,7 +795,7 @@ test('runGroupChat compresses large pre-send prompts and post-receive raw output
 });
 
 test('runGroupChat records redacted runtime delivery before send without changing the model prompt', async () => {
-  const { runGroupChat } = await import('../../../lib/harness/team/groupchat-runtime.mjs');
+  const { runGroupChat } = await import('../../../lib/execution/harness/team/groupchat-runtime.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-groupchat-runtime-context-'));
   const secret = 'GROUPCHAT_RUNTIME_CONTEXT_SECRET';
   const captured = [];

@@ -32,7 +32,7 @@ import {
   listRepoTestFiles,
   selectAffectedTests,
   SUITE_TOOLING_FILES,
-} from '../../../lib/test-impact.mjs';
+} from '../../../lib/tooling/test-impact.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
@@ -144,7 +144,7 @@ test('I6 a docs-only change selects nothing', () => {
 test('I7 the selector never invents files outside pool plus changed tests', () => {
   const suite = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'test-suites.json'), 'utf8')).regression.files;
   const index = buildImpactIndex({ rootDir: ROOT, testFiles: suite });
-  const changed = listRepoTestFiles({ rootDir: ROOT }).slice(0, 3).concat(['scripts/lib/platform/paths.mjs']);
+  const changed = listRepoTestFiles({ rootDir: ROOT }).slice(0, 3).concat(['scripts/lib/foundation/platform/paths.mjs']);
   const allowed = new Set([...index.testFiles, ...changed.filter(isTestFile)]);
   for (const file of selectAffectedTests({ changedFiles: changed, index }).files) {
     assert.equal(allowed.has(file), true, `unexpected file ${file}`);
@@ -174,6 +174,6 @@ test('I8 the on-disk scanner still resolves hub modules and the real test univer
   const index = buildImpactIndex({ rootDir: ROOT, testFiles: universe });
   assert.deepEqual(index.unreadable, [], 'every scanned file must be readable');
   // 客户端注册表是全仓枢纽：扫描器一旦改坏，这里会立刻掉到 0，而不是静默漏测。
-  assert.equal(index.dependents.get('scripts/lib/clients/selection/core/definitions.mjs').length > 80, true);
-  assert.equal(index.dependents.get('scripts/lib/platform/paths.mjs').length > 30, true);
+  assert.equal(index.dependents.get('scripts/lib/foundation/clients/selection/core/definitions.mjs').length > 80, true);
+  assert.equal(index.dependents.get('scripts/lib/foundation/platform/paths.mjs').length > 30, true);
 });

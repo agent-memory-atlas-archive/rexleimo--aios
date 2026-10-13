@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 
-import { suiteSpec } from './lib/test-suite-runner.mjs';
+import { suiteSpec } from './lib/tooling/test-suite-runner.mjs';
 
 async function testFiles(roots) {
   const files = [];

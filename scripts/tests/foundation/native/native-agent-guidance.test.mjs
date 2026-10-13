@@ -5,13 +5,13 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { resolveNativeClients } from '../../../lib/native/source-tree.mjs';
-import { composeNativeMarkdown } from '../../../lib/native/distribution/emitters/compose.mjs';
-import { renderCodexNativeOutputs } from '../../../lib/native/distribution/emitters/codex.mjs';
-import { renderGrokNativeOutputs } from '../../../lib/native/distribution/emitters/grok.mjs';
-import { makeInstructionMarkdownEmitter } from '../../../lib/native/distribution/emitters/instruction-markdown.mjs';
-import { renderOpencodeNativeOutputs } from '../../../lib/native/distribution/emitters/opencode.mjs';
-import { readNativePartials, bakeRuntimeCliValues, readClientJsonSource } from '../../../lib/native/distribution/emitters/shared.mjs';
+import { resolveNativeClients } from '../../../lib/clients/native/source-tree.mjs';
+import { composeNativeMarkdown } from '../../../lib/clients/native/distribution/emitters/compose.mjs';
+import { renderCodexNativeOutputs } from '../../../lib/clients/native/distribution/emitters/codex.mjs';
+import { renderGrokNativeOutputs } from '../../../lib/clients/native/distribution/emitters/grok.mjs';
+import { makeInstructionMarkdownEmitter } from '../../../lib/clients/native/distribution/emitters/instruction-markdown.mjs';
+import { renderOpencodeNativeOutputs } from '../../../lib/clients/native/distribution/emitters/opencode.mjs';
+import { readNativePartials, bakeRuntimeCliValues, readClientJsonSource } from '../../../lib/clients/native/distribution/emitters/shared.mjs';
 
 const AGENTS_CLIENTS = Object.freeze(['codex', 'opencode', 'hermes', 'grok']);
 const LEGACY_ALWAYS_LOADED_PARTIALS = Object.freeze([

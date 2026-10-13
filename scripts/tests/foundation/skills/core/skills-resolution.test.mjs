@@ -5,15 +5,15 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { ALL_CLIENTS } from '../../../../lib/clients/registry.mjs';
-import { analyzeCatalogEntries, resolveCatalogEntries } from '../../../../lib/components/skills/catalog.mjs';
+import { ALL_CLIENTS } from '../../../../lib/foundation/clients/registry.mjs';
+import { analyzeCatalogEntries, resolveCatalogEntries } from '../../../../lib/tooling/components/skills/catalog.mjs';
 import {
   collectLegacyPiSkillRootInstalls,
   doctorContextDbSkills,
   removeLegacyPiSkillRootInstalls,
   removeLegacySharedRootInstalls,
-} from '../../../../lib/components/skills/lifecycle/doctor.mjs';
-import { assertProjectScopeAllowed, isSourceRepoProjectRoot } from '../../../../lib/components/skills/safety.mjs';
+} from '../../../../lib/tooling/components/skills/lifecycle/doctor.mjs';
+import { assertProjectScopeAllowed, isSourceRepoProjectRoot } from '../../../../lib/tooling/components/skills/safety.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

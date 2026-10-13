@@ -8,7 +8,7 @@ import {
   ensurePiExtensionRegistered,
   resolveBundledPiExtensionPath,
   resolvePiSettingsPath,
-} from '../../../lib/components/integrations/pi/extension-settings.mjs';
+} from '../../../lib/tooling/components/integrations/pi/extension-settings.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

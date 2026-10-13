@@ -6,15 +6,15 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { createDispatchRuntimeRegistry } from '../../../lib/harness/orchestration/orchestrator-runtimes.mjs';
-import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
-import { startPlan } from '../../../lib/planning/contract/contract.mjs';
+import { createDispatchRuntimeRegistry } from '../../../lib/execution/harness/orchestration/orchestrator-runtimes.mjs';
+import { runOrchestrate } from '../../../lib/execution/lifecycle/run/orchestrate.mjs';
+import { startPlan } from '../../../lib/foundation/planning/contract/contract.mjs';
 import {
   captureSessionWorkspaceSnapshot,
   recordSessionWorkspaceChanges,
   SESSION_WORKSPACE_SNAPSHOT_LIMIT_CODE,
   SESSION_WORKSPACE_SNAPSHOT_ROOT_CODE,
-} from '../../../lib/session/changed-files.mjs';
+} from '../../../lib/execution/session/changed-files.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

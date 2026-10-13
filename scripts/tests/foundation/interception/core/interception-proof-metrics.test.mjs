@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { createInterceptionEngine, readRawRef } from '../../../../lib/interception/index.mjs';
-import { metricsSessionPath, readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
+import { createInterceptionEngine, readRawRef } from '../../../../lib/foundation/interception/index.mjs';
+import { metricsSessionPath, readMetricsRecords } from '../../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs';
 
 const SENTINEL = 'UNIQUE_PROOF_SENTINEL';
 

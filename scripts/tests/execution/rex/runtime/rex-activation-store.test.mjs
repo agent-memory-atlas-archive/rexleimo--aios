@@ -13,14 +13,14 @@ import test from 'node:test';
 
 import { captureStandaloneExecutionReceipt } from '../../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
-import { runAutoGate } from '../../../../lib/planning/flow/auto-gate.mjs';
+import { runAutoGate } from '../../../../lib/foundation/planning/flow/auto-gate.mjs';
 import { findStandaloneWorkflow } from '../../../../../rex-harness/src/index.mjs';
 import {
   advanceStoredAiosCapabilityActivation,
   continueStoredAiosSoftwareWorkflow,
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-activation-store.mjs';
 
 const SCENARIO_GREEN_MARKER = '.rex-scenario-green';
 const SCENARIO_ARGS = Object.freeze([

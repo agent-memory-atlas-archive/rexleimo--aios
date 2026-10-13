@@ -42,4 +42,4 @@ ls ~/.claude/skills/caveman/ 2>/dev/null || ls .claude/skills/caveman/ 2>/dev/nu
 | `scripts/hooks/claude/aios-rewrite.sh` | deprecated，保留不维护 |
 | `config/aios-interception.json` | deprecated，不再被读取 |
 | `.aios/interception/metrics/` | 可清理，不影响功能 |
-| `scripts/lib/interception/` | deprecated，保留不维护 |
+| `scripts/lib/foundation/interception/` | deprecated，保留不维护 |

@@ -4,10 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { reconcileUnclosedSessions } from '../../../lib/lifecycle/run/session-hooks/reconcile.mjs';
-import { claimSessionOwner } from '../../../lib/harness/solo/solo-journal/content/owner.mjs';
-import { getSoloHarnessPaths } from '../../../lib/harness/solo/solo-journal/plumbing/paths.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+import { reconcileUnclosedSessions } from '../../../lib/execution/lifecycle/run/session-hooks/reconcile.mjs';
+import { claimSessionOwner } from '../../../lib/execution/harness/solo/solo-journal/content/owner.mjs';
+import { getSoloHarnessPaths } from '../../../lib/execution/harness/solo/solo-journal/plumbing/paths.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

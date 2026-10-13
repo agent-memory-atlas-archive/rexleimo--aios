@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { checkNativeEnhancementsSync } from './lib/native/health/doctor.mjs';
-import { syncNativeEnhancements } from './lib/native/synchronize/sync.mjs';
+import { checkNativeEnhancementsSync } from './lib/clients/native/health/doctor.mjs';
+import { syncNativeEnhancements } from './lib/clients/native/synchronize/sync.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

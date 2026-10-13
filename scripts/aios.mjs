@@ -2,11 +2,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createAiosProgram } from './lib/cli/commander/commander-app.mjs';
-import { createAiosDispatch } from './lib/cli/dispatch/dispatch.mjs';
-import { getRuntimeVersion } from './lib/cli/dispatch/runtime.mjs';
-import { getRootHelpText } from './lib/cli/help/help.mjs';
-import { resolveProjectRoot } from './lib/cli/project-root.mjs';
+import { createAiosProgram } from './lib/tooling/cli/commander/commander-app.mjs';
+import { createAiosDispatch } from './lib/tooling/cli/dispatch/dispatch.mjs';
+import { getRuntimeVersion } from './lib/tooling/cli/dispatch/runtime.mjs';
+import { getRootHelpText } from './lib/tooling/cli/help/help.mjs';
+import { resolveProjectRoot } from './lib/tooling/cli/project-root.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** cwd 只是兜底：AIOS_PROJECT_ROOT 让 wrapper / CI 能显式声明目标项目。 */

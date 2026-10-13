@@ -5,12 +5,12 @@ import {
   VERDICT_SECTIONS,
   parseVerdictText,
   validateVerdictCompleteness,
-} from '../../../../lib/skills/verdict-schema.mjs';
+} from '../../../../lib/tooling/skills/verdict-schema.mjs';
 
 const VALID_VERDICT = `VERDICT:
 FILES_REVIEWED:
   - skill-sources/verification-loop/SKILL.md: lines 1-80 (changed)
-  - scripts/lib/skills/verdict-schema.mjs: lines 1-120 (new)
+  - scripts/lib/tooling/skills/verdict-schema.mjs: lines 1-120 (new)
 CHECKS:
   - typecheck: PASS
   - test suite: PASS (8/8)

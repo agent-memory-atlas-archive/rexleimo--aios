@@ -5,19 +5,19 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runAutoGate } from '../../../../lib/planning/flow/auto-gate.mjs';
+import { runAutoGate } from '../../../../lib/foundation/planning/flow/auto-gate.mjs';
 import {
   ingestCapabilityProviderOutput,
   ingestCapabilityEvidenceOutput,
   parseAgentProviderHandoff,
   parseCapabilityEvidenceEnvelope,
   recordAiosCapabilityEvidence,
-} from '../../../../lib/workflows/adapters/rex-capability-runtime.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-capability-runtime.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 import {
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-activation-store.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
 

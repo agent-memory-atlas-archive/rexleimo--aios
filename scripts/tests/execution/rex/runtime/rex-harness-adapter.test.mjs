@@ -9,7 +9,7 @@ import {
   startSoftwareWorkflow,
   supportedClients,
 } from '../../../../../rex-harness/src/index.mjs';
-import { resolveClientsWithCapability } from '../../../../lib/clients/reporting/capabilities/index.mjs';
+import { resolveClientsWithCapability } from '../../../../lib/foundation/clients/reporting/capabilities/index.mjs';
 import {
   AIOS_REX_PROVIDER_BINDINGS,
   advanceAiosSoftwareWorkflow,
@@ -17,7 +17,7 @@ import {
   evaluateAiosSoftwareRequest,
   startAiosCapabilityActivation,
   startAiosSoftwareWorkflow,
-} from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
+} from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
 
 const ADAPTER_PARITY_SCENARIO = Object.freeze({

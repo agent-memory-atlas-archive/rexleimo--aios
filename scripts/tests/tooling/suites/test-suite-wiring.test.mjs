@@ -58,7 +58,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { suiteSpec } from '../../../lib/test-suite-runner.mjs';
+import { suiteSpec } from '../../../lib/tooling/test-suite-runner.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const TESTS_DIR = path.join(ROOT, 'scripts', 'tests');

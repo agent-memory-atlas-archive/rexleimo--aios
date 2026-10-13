@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
 
-import { collectClientMcpTargets } from '../../../lib/components/browser/mcp/mcp-targets.mjs';
+import { collectClientMcpTargets } from '../../../lib/tooling/components/browser/mcp/mcp-targets.mjs';
 
 test('collectClientMcpTargets routes each client to its real location/format with dual-scope support', () => {
   const projectRoot = '/proj';
@@ -69,8 +69,8 @@ test('collectClientMcpTargets includes project-scoped fallbacks when home is una
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 
-import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { inspectMcpProxyTarget } from '../../../lib/interception/transport/mcp/proxy/proxy-inspector.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../../../lib/tooling/components/browser/constants.mjs';
+import { inspectMcpProxyTarget } from '../../../lib/foundation/interception/transport/mcp/proxy/proxy-inspector.mjs';
 
 function proxiedEntry(rootDir, alias = PRIMARY_BROWSER_ALIAS) {
   return {

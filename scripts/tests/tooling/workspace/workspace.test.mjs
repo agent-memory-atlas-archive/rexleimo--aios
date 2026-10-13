@@ -14,7 +14,7 @@ import {
   writeConflictMarker,
   readConflictMarkers,
   buildAgentView,
-} from '../../../lib/contextdb/runtime/workspace.mjs';
+} from '../../../lib/memory/contextdb/runtime/workspace.mjs';
 
 test('initWorkspace creates meta.json with version 1', async (t) => {
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'workspace-test-'));
@@ -194,7 +194,7 @@ test('buildAgentView assembles view from workspace and session data', async () =
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'workspace-test-'));
   try {
     await initWorkspace(tmpDir);
-    const { writeSkillIndex } = await import('../../../lib/contextdb/registry/skill-index.mjs');
+    const { writeSkillIndex } = await import('../../../lib/memory/contextdb/registry/skill-index.mjs');
     await writeSkillIndex(tmpDir, {
       skills: [
         { name: '发布笔记', file: '.codex/skills/发布笔记/SKILL.md', keywords: ['发布'], taskTypes: ['content-publish'], version: 1 },

@@ -5,12 +5,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildAgentCatalogue } from '../../../lib/agents/catalogue.mjs';
-import { buildClientCapabilityReport } from '../../../lib/clients/reporting/capability-report.mjs';
-import { buildAiosStatus } from '../../../lib/lifecycle/fleet/status.mjs';
-import { buildWorkflowDryRun, listWorkflowRecipes } from '../../../lib/workflows/recipes.mjs';
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { getCommandHelpText } from '../../../lib/cli/help/help.mjs';
+import { buildAgentCatalogue } from '../../../lib/foundation/agents/catalogue.mjs';
+import { buildClientCapabilityReport } from '../../../lib/foundation/clients/reporting/capability-report.mjs';
+import { buildAiosStatus } from '../../../lib/execution/lifecycle/fleet/status.mjs';
+import { buildWorkflowDryRun, listWorkflowRecipes } from '../../../lib/execution/workflows/recipes.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
+import { getCommandHelpText } from '../../../lib/tooling/cli/help/help.mjs';
 
 async function writeAgentEvidence(rootDir, agentId, {
   smokeStatus = 'pass',
@@ -273,7 +273,7 @@ test('projected agents stay workflow-blocked until local smoke and metrics evide
 });
 
 test('canonical default agents use ECC-aligned rich prompts, not short role labels', async () => {
-  const { loadCanonicalAgents, validateCanonicalAgent } = await import('../../../lib/agents/source-tree.mjs');
+  const { loadCanonicalAgents, validateCanonicalAgent } = await import('../../../lib/foundation/agents/source-tree.mjs');
   const source = await loadCanonicalAgents({ rootDir: process.cwd() });
 
   for (const agent of Object.values(source.agentsById)) {

@@ -162,7 +162,7 @@ test('runSoloHarnessLoop writes stage checkpoint evidence through checkpoint wri
         stage: 'validation',
         summary: 'validated harness stage evidence',
         evidence: ['node --test scripts/tests/harness-runtime.test.mjs'],
-        keyChanges: ['scripts/lib/harness/solo/solo-runtime.mjs'],
+        keyChanges: ['scripts/lib/execution/harness/solo/solo-runtime.mjs'],
         keyLearnings: [],
         nextAction: 'ship',
         shouldStop: true,
@@ -216,7 +216,7 @@ test('writeSoloIterationCheckpoint persists stage telemetry into ContextDB when 
       stage: 'validation',
       summary: 'validated stage checkpoint persistence',
       evidence: ['node --test scripts/tests/harness-runtime.test.mjs'],
-      keyChanges: ['scripts/lib/harness/solo/solo-runtime.mjs'],
+      keyChanges: ['scripts/lib/execution/harness/solo/solo-runtime.mjs'],
       nextAction: 'continue',
       shouldStop: true,
       failureClass: 'none',
@@ -241,7 +241,7 @@ test('writeSoloIterationCheckpoint persists stage telemetry into ContextDB when 
     assert.match(checkpoint.telemetry.verification.evidence, /stage=validation/);
     assert.deepEqual(checkpoint.artifacts, [
       'node --test scripts/tests/harness-runtime.test.mjs',
-      'scripts/lib/harness/solo/solo-runtime.mjs',
+      'scripts/lib/execution/harness/solo/solo-runtime.mjs',
     ]);
   } finally {
     await rm(rootDir, { recursive: true, force: true });

@@ -5,12 +5,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 import {
   createLocalDispatchExecutorRegistry,
   resolveLocalDispatchExecutor,
   selectLocalDispatchExecutor,
-} from '../../../lib/harness/orchestration/orchestrator-executors.mjs';
+} from '../../../lib/execution/harness/orchestration/orchestrator-executors.mjs';
 import {
   buildExecutorCapabilityManifest,
   buildDecomposedWorkItems,
@@ -20,17 +20,17 @@ import {
   getOrchestratorBlueprint,
   mergeParallelHandoffs,
   renderOrchestrationReport,
-} from '../../../lib/harness/orchestration/orchestrator.mjs';
-import { evaluateClarityGate } from '../../../lib/harness/quality/clarity-gate.mjs';
-import { buildDispatchInsights } from '../../../lib/harness/team/dispatch-insights.mjs';
-import { persistDispatchEvidence } from '../../../lib/harness/orchestration/orchestrator-evidence.mjs';
-import { buildWorkItemTelemetry } from '../../../lib/harness/orchestration/work-item-telemetry.mjs';
-import { executeMergeGateJob } from '../../../lib/harness/team/subagent-runtime/state/merge-gate.mjs';
-import { planOrchestrate, runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
+} from '../../../lib/execution/harness/orchestration/orchestrator.mjs';
+import { evaluateClarityGate } from '../../../lib/execution/harness/quality/clarity-gate.mjs';
+import { buildDispatchInsights } from '../../../lib/execution/harness/team/dispatch-insights.mjs';
+import { persistDispatchEvidence } from '../../../lib/execution/harness/orchestration/orchestrator-evidence.mjs';
+import { buildWorkItemTelemetry } from '../../../lib/execution/harness/orchestration/work-item-telemetry.mjs';
+import { executeMergeGateJob } from '../../../lib/execution/harness/team/subagent-runtime/state/merge-gate.mjs';
+import { planOrchestrate, runOrchestrate } from '../../../lib/execution/lifecycle/run/orchestrate.mjs';
 
 async function importDispatchRuntimes() {
   try {
-    return await import('../../../lib/harness/orchestration/orchestrator-runtimes.mjs');
+    return await import('../../../lib/execution/harness/orchestration/orchestrator-runtimes.mjs');
   } catch {
     return null;
   }
@@ -38,7 +38,7 @@ async function importDispatchRuntimes() {
 
 async function importDispatchRuntimeSpec() {
   try {
-    return await import('../../../lib/specs/orchestrator/orchestrator-runtimes.json', { with: { type: 'json' } });
+    return await import('../../../lib/tooling/specs/orchestrator/orchestrator-runtimes.json', { with: { type: 'json' } });
   } catch {
     return null;
   }
@@ -46,7 +46,7 @@ async function importDispatchRuntimeSpec() {
 
 async function importWorkItemTelemetrySpec() {
   try {
-    return await import('../../../lib/specs/orchestrator/orchestrator-work-item-telemetry.schema.json', { with: { type: 'json' } });
+    return await import('../../../lib/tooling/specs/orchestrator/orchestrator-work-item-telemetry.schema.json', { with: { type: 'json' } });
   } catch {
     return null;
   }

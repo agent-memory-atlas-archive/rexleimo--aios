@@ -9,8 +9,8 @@ import {
   buildRTKInitCommandForAgent,
   ensureCompressionTools,
   getCavemanVerificationPaths,
-} from '../../../lib/aios-init/compression-tools.mjs';
-import { buildCommandRewriteHookCommand, buildSaveGuardCommand, ensureHook } from '../../../lib/aios-init/hooks.mjs';
+} from '../../../lib/environment/aios-init/compression-tools.mjs';
+import { buildCommandRewriteHookCommand, buildSaveGuardCommand, ensureHook } from '../../../lib/environment/aios-init/hooks.mjs';
 import { ensureAiosPlanningKernel, installRexWorkflowSkills } from '../../../aios-init.mjs';
 
 function normalizeSlashes(value) {

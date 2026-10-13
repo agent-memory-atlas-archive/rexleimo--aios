@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runUpdate } from '../../../../lib/lifecycle/setup/update.mjs';
+import { runUpdate } from '../../../../lib/execution/lifecycle/setup/update.mjs';
 
 function fingerprintProjection(entry) {
   return createHash('sha256').update(JSON.stringify({
@@ -213,7 +213,7 @@ async function createAgentLegacySkillFixture() {
 async function runIsolatedUpdateReconciliation({ reconcileOptions, adoptLegacySuperpowers = false }) {
   const runtimeRoot = await mkdtemp(path.join(os.tmpdir(), 'aios-update-rex-'));
   const reports = [];
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   try {
     await mkdir(path.join(runtimeRoot, 'scripts'), { recursive: true });
     await writeFile(path.join(runtimeRoot, 'scripts', 'aios.mjs'), '#!/usr/bin/env node\n', 'utf8');
@@ -299,7 +299,7 @@ test('reconciliation retires an explicitly adopted historical AIOS Superpowers s
     legacySourceRoot,
     options,
   } = await createHistoricalAiosSuperpowersFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -340,7 +340,7 @@ test('reconciliation preserves a historical router with unrecognized extra files
     generatedAt: '2026-06-18T23:47:44.303Z',
   }, null, 2)}\n`);
   await writeFile(path.join(legacyRouter, 'user-note.txt'), 'do not delete user content\n');
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -374,7 +374,7 @@ test('reconciliation removes a historical router with exact AIOS install metadat
     catalogSource: 'skill-sources/aios-workflow-router',
     generatedAt: '2026-06-18T23:47:44.303Z',
   }, null, 2)}\n`);
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -387,7 +387,7 @@ test('reconciliation removes a historical router with exact AIOS install metadat
 
 test('reconciliation preserves an unmarked exact legacy Superpowers link until ownership is proven', async () => {
   const { ledgerPath, managedProjection, options, sourceSkills } = await createUnmarkedLegacyLinkFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface(options);
 
@@ -405,7 +405,7 @@ test('reconciliation preserves an unmarked exact legacy Superpowers link until o
 test('reconciliation removes an exact legacy Superpowers link after explicit ownership adoption', async () => {
   const { managedProjection, options, sourceSkills } = await createUnmarkedLegacyLinkFixture();
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
   assert.equal(report.status, 'removed');
@@ -419,7 +419,7 @@ test('reconciliation removes an exact legacy Superpowers link after explicit own
 
 test('explicit ownership adoption dry-run neither records nor removes an exact legacy Superpowers link', async () => {
   const { ledgerPath, managedProjection, options, sourceSkills } = await createUnmarkedLegacyLinkFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({
     ...options,
@@ -437,7 +437,7 @@ test('explicit ownership adoption dry-run neither records nor removes an exact l
 
 test('reconciliation removes an exact Claude legacy Superpowers skill link after explicit ownership adoption', async () => {
   const { managedProjection, options, sourceSkills } = await createClaudeLegacySkillFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -450,7 +450,7 @@ test('reconciliation removes an exact Claude legacy Superpowers skill link after
 });
 
 test('reconciliation reports but preserves unrecognized Superpowers-style skill links', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   for (const linkKind of ['external', 'relative', 'dangling']) {
     const { managedProjection, options } = await createClaudeLegacySkillFixture();
@@ -486,7 +486,7 @@ test('reconciliation reports but preserves unrecognized Superpowers-style skill 
 });
 
 test('reconciliation removes exact Claude repo and plugin Superpowers skill links after explicit ownership adoption', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   for (const sourceKind of ['repo', 'plugin']) {
     const { ledgerPath, managedProjection, options, sourceSkills } = await createClaudeLegacySkillFixture({ sourceKind });
@@ -512,7 +512,7 @@ test('reconciliation removes exact Claude repo and plugin Superpowers skill link
 
 test('reconciliation removes exact legacy Superpowers skill links from every native client root after explicit ownership adoption', async () => {
   const { legacySourceRoot, options, projections } = await createAllClientLegacySkillFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -528,7 +528,7 @@ test('reconciliation removes exact legacy Superpowers skill links from every nat
 
 test('reconciliation removes exact legacy Superpowers skill links from the shared agent root after explicit ownership adoption', async () => {
   const { legacySourceRoot, options, projections } = await createAgentLegacySkillFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });
 
@@ -579,7 +579,7 @@ test('update preserves unproven Superpowers links by default and removes adopted
 
 test('reconciliation reports but preserves an unrecognized shared-agent Superpowers-style skill link', async () => {
   const { legacySourceRoot, options, projections } = await createAgentLegacySkillFixture();
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const managedProjection = projections['writing-plans'];
   const externalSource = path.join(
     path.dirname(options.env.AGENTS_HOME),
@@ -607,7 +607,7 @@ test('reconciliation reports but preserves an unrecognized shared-agent Superpow
 });
 
 test('reconciliation fails closed for foreign, basename-mismatched, missing-source, or directory Claude skill paths', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   {
     const { managedProjection, options, sourceSkills } = await createClaudeLegacySkillFixture();
@@ -651,7 +651,7 @@ test('reconciliation fails closed for foreign, basename-mismatched, missing-sour
 test('reconciliation removes one ledger-owned link, retires its source, and is idempotent', async () => {
   const { managedProjection, options, sourceSkills } = await createOwnedProjectionFixture();
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const removed = await reconcileRexWorkflowSurface(options);
   assert.equal(removed.status, 'removed');
@@ -675,7 +675,7 @@ test('reconciliation dry-run reports an owned projection without mutating it', a
   const { ledgerPath, managedProjection, options, sourceSkills } = await createOwnedProjectionFixture();
   const ledgerBefore = await readFile(ledgerPath, 'utf8');
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const report = await reconcileRexWorkflowSurface({ ...options, dryRun: true });
 
   assert.equal(report.status, 'would-remove');
@@ -799,7 +799,7 @@ test('reconciliation durably recovers a stale owned ledger after the projection 
   const { ledgerPath, managedProjection, options, sourceSkills } = await createOwnedProjectionFixture();
   await unlink(managedProjection);
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const recovered = await reconcileRexWorkflowSurface(options);
   assert.equal(recovered.status, 'removed');
@@ -834,7 +834,7 @@ test('reconciliation preserves a same-target replacement of a ledger-owned link'
   await rename(managedProjection, originalProjection);
   await symlink(sourceSkills, managedProjection, 'dir');
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const report = await reconcileRexWorkflowSurface(options);
 
   assert.equal(report.status, 'legacy-workflow-conflict');
@@ -873,7 +873,7 @@ test('reconciliation preserves incomplete and corrupt ownership records', async 
     },
   ];
 
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   for (const scenario of cases) {
     const { ledgerPath, managedProjection, options, sourceSkills } = await createOwnedProjectionFixture();
     if (scenario.mutate) {
@@ -893,7 +893,7 @@ test('reconciliation preserves incomplete and corrupt ownership records', async 
 });
 
 test('reconciliation fails closed for directory, foreign-link, dangling-source, and inspection-error states', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   {
     const { managedProjection, options, sourceSkills } = await createOwnedProjectionFixture();
@@ -947,7 +947,7 @@ test('reconciliation fails closed for directory, foreign-link, dangling-source, 
 
 test('reconciliation resolves fallback homes without reading developer environment variables', async () => {
   const { managedProjection, options, sourceSkills } = await createOwnedProjectionFixture({ useFallbackHomes: true });
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
 
   const report = await reconcileRexWorkflowSurface(options);
 
@@ -959,7 +959,7 @@ test('reconciliation resolves fallback homes without reading developer environme
 });
 
 test('workflow preflight uses the same Rex workflow-surface reconciliation seam', async () => {
-  const { runWorkflowCommand } = await import('../../../../lib/lifecycle/run/workflow.mjs');
+  const { runWorkflowCommand } = await import('../../../../lib/execution/lifecycle/run/workflow.mjs');
   const calls = [];
   let output = '';
 
@@ -1005,7 +1005,7 @@ async function createDanglingLegacyLinkFixture() {
 }
 
 test('dangling legacy superpowers projection is inert instead of a permanent conflict', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const { managedProjection, options } = await createDanglingLegacyLinkFixture();
 
   const report = await reconcileRexWorkflowSurface({ ...options, dryRun: true });
@@ -1017,7 +1017,7 @@ test('dangling legacy superpowers projection is inert instead of a permanent con
 });
 
 test('operator-authorized cleanup unlinks a dangling legacy projection without needing the removed source', async () => {
-  const { reconcileRexWorkflowSurface } = await import('../../../../lib/workflows/surface/rex-workflow-surface-reconciliation.mjs');
+  const { reconcileRexWorkflowSurface } = await import('../../../../lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs');
   const { managedProjection, options } = await createDanglingLegacyLinkFixture();
 
   const report = await reconcileRexWorkflowSurface({ ...options, adoptLegacySuperpowers: true });

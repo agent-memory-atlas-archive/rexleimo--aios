@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('mixed context summary writer persists per-environment counts and drill evidence', async () => {
-  const mod = await import('../../../../lib/rl-mixed-v1/evidence/contextdb-summary.mjs');
+  const mod = await import('../../../../lib/learning/rl-mixed-v1/evidence/contextdb-summary.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-mixed-summary-'));
   const payload = {
     status: 'ok',

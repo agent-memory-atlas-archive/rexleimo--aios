@@ -40,10 +40,8 @@ export const EXEMPT_DIRS = Object.freeze({
 });
 
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
-// codemap/ 已拆完（16→7），故不在此列。
+// 2026-10-13 已清零：所有超标目录要么已语义拆分，要么落入上面的豁免面。
 export const BASELINE_COUNTS = Object.freeze({
-  'scripts/lib': 55,
-  'skill-sources/rexai-image-generation/scripts': 9,
 });
 
 export function countDirEntries(trackedFiles) {

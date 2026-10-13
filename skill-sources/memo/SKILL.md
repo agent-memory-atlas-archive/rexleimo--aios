@@ -80,7 +80,7 @@ Example entry:
 fact: "Windows-only sha256 drift-guard failures were CRLF checkout artifacts, fixed by .gitattributes eol=lf"
 entities: [drift-guard, .gitattributes, CRLF]
 date: 2026-09-06
-evidence_ref: "scripts/lib/specs/orchestrator-agents.json:272"
+evidence_ref: "scripts/lib/tooling/specs/orchestrator-agents.json:272"
 confidence: high
 ```
 

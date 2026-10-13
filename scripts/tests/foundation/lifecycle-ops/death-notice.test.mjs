@@ -11,8 +11,8 @@ import {
   readDeathNotices,
   hasDuplicateNotice,
   VALID_DEATH_REASONS,
-} from '../../../lib/lifecycle/evolve/death-notice.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/execution/lifecycle/evolve/death-notice.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 /* ================================================================
    Notice schema tests

@@ -12,15 +12,15 @@ import {
   handlePlanStart,
   resolvePlanningArtifactParam,
 } from '../../../aios-mcp-server.mjs';
-import { parsePlanArgs } from '../../../lib/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../lib/planning/ops/cli.mjs';
+import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../lib/workflows/adapters/rex-harness-adapter.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 import {
   advanceStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../lib/workflows/adapters/rex-activation-store.mjs';
+} from '../../../lib/execution/workflows/adapters/rex-activation-store.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

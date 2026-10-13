@@ -4,11 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { formatNodeId, parseNodeId, isNodeId, hashInput, nextNodeId } from '../../../lib/offload/node-id.mjs';
-import { writeRef, readRef, grepRefs, listRefs, pruneRefs, refFilePath } from '../../../lib/offload/refs-store.mjs';
-import { addNode, loadCanvas, canvasToMermaid, getCanvasPaths } from '../../../lib/offload/mermaid-canvas.mjs';
-import { shouldOffload, resolveConfig, resolveStorage, capture } from '../../../lib/offload/tool-offload.mjs';
-import { backfillFromJsonl, normalizeBackfillRecord } from '../../../lib/offload/backfill.mjs';
+import { formatNodeId, parseNodeId, isNodeId, hashInput, nextNodeId } from '../../../lib/memory/offload/node-id.mjs';
+import { writeRef, readRef, grepRefs, listRefs, pruneRefs, refFilePath } from '../../../lib/memory/offload/refs-store.mjs';
+import { addNode, loadCanvas, canvasToMermaid, getCanvasPaths } from '../../../lib/memory/offload/mermaid-canvas.mjs';
+import { shouldOffload, resolveConfig, resolveStorage, capture } from '../../../lib/memory/offload/tool-offload.mjs';
+import { backfillFromJsonl, normalizeBackfillRecord } from '../../../lib/memory/offload/backfill.mjs';
 
 // ── node-id ──
 

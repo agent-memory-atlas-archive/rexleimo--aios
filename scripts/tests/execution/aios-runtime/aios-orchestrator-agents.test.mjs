@@ -7,11 +7,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { buildLocalDispatchPlan, buildOrchestrationPlan } from '../../../lib/harness/orchestration/orchestrator.mjs';
+import { buildLocalDispatchPlan, buildOrchestrationPlan } from '../../../lib/execution/harness/orchestration/orchestrator.mjs';
 
 async function importAgentModule() {
   try {
-    return await import('../../../lib/harness/team/orchestrator-agents.mjs');
+    return await import('../../../lib/execution/harness/team/orchestrator-agents.mjs');
   } catch {
     return null;
   }
@@ -52,7 +52,7 @@ async function replaceInFile(rootDir, relativePath, search, replacement) {
 }
 
 async function loadCanonicalFixture() {
-  const sourceTree = await import('../../../lib/agents/source-tree.mjs');
+  const sourceTree = await import('../../../lib/foundation/agents/source-tree.mjs');
   return sourceTree.loadCanonicalAgents({ rootDir: resolveRepoRoot() });
 }
 
@@ -94,7 +94,7 @@ test('renderAgentMarkdown emits YAML frontmatter and a managed marker', async ()
 
 test('renderCompatibilityExport preserves current orchestrator agent shape', async () => {
   const source = await loadCanonicalFixture();
-  const mod = await import('../../../lib/agents/compat-export.mjs');
+  const mod = await import('../../../lib/foundation/agents/compat-export.mjs');
   const text = mod.renderCompatibilityExport(source);
   const parsed = JSON.parse(text);
 
@@ -111,12 +111,12 @@ test('renderCompatibilityExport preserves current orchestrator agent shape', asy
 
 test('generateCompatibilityExport stays in sync with canonical markdown sources', async () => {
   const source = await loadCanonicalFixture();
-  const compat = await import('../../../lib/agents/compat-export.mjs');
+  const compat = await import('../../../lib/foundation/agents/compat-export.mjs');
   const fs = await import('node:fs/promises');
   const path = await import('node:path');
 
   const rendered = compat.renderCompatibilityExport(source);
-  const actual = await fs.readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
+  const actual = await fs.readFile(path.join(resolveRepoRoot(), 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   // Line endings are enforced by git config (.gitattributes text eol=lf on
   // canonical sources and generated specs); the guard compares bytes exactly.
@@ -125,7 +125,7 @@ test('generateCompatibilityExport stays in sync with canonical markdown sources'
 
 test('canonical agents support ECC-style native pack metadata and token/smoke roles', async () => {
   const source = await loadCanonicalFixture();
-  const mod = await import('../../../lib/agents/compat-export.mjs');
+  const mod = await import('../../../lib/foundation/agents/compat-export.mjs');
   const text = mod.renderCompatibilityExport(source);
   const parsed = JSON.parse(text);
 
@@ -158,8 +158,8 @@ test('canonical agents support ECC-style native pack metadata and token/smoke ro
 
 test('turn compression metrics preserve agent_id for catalogue promotion evidence', async () => {
   const rootDir = await makeRootDir();
-  const { compressPreSendTurn, compressPostReceiveTurn } = await import('../../../lib/interception/runtime/turn/turn-gateway.mjs');
-  const { readMetricsRecords } = await import('../../../lib/interception/observability/metrics/metrics-sink.mjs');
+  const { compressPreSendTurn, compressPostReceiveTurn } = await import('../../../lib/foundation/interception/runtime/turn/turn-gateway.mjs');
+  const { readMetricsRecords } = await import('../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs');
   const common = {
     workspaceRoot: rootDir,
     cwd: rootDir,
@@ -183,8 +183,8 @@ test('agents smoke --dry-run covers every canonical role without writing evidenc
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
 
-  const { parseArgs } = await import('../../../lib/cli/parse-args.mjs');
-  const { runAgentsCommand } = await import('../../../lib/lifecycle/fleet/agents.mjs');
+  const { parseArgs } = await import('../../../lib/tooling/cli/parse-args.mjs');
+  const { runAgentsCommand } = await import('../../../lib/execution/lifecycle/fleet/agents.mjs');
   const parsed = parseArgs(['agents', 'smoke', '--dry-run', '--json']);
   assert.equal(parsed.options.subcommand, 'smoke');
   assert.equal(parsed.options.dryRun, true);
@@ -210,8 +210,8 @@ test('agents smoke requires explicit live execution before it can record promoti
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
 
-  const { parseArgs } = await import('../../../lib/cli/parse-args.mjs');
-  const { runAgentsCommand } = await import('../../../lib/lifecycle/fleet/agents.mjs');
+  const { parseArgs } = await import('../../../lib/tooling/cli/parse-args.mjs');
+  const { runAgentsCommand } = await import('../../../lib/execution/lifecycle/fleet/agents.mjs');
   const parsed = parseArgs(['agents', 'smoke', '--json']);
   assert.equal(parsed.options.subcommand, 'smoke');
   assert.equal(parsed.options.dryRun, false);
@@ -241,9 +241,9 @@ test('agents smoke requires explicit live execution before it can record promoti
 test('agents smoke emits schema-v2 evidence only from a managed live invocation', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
-  const { readMetricsRecords } = await import('../../../lib/interception/observability/metrics/metrics-sink.mjs');
-  const { buildAgentCatalogue } = await import('../../../lib/agents/catalogue.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
+  const { readMetricsRecords } = await import('../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs');
+  const { buildAgentCatalogue } = await import('../../../lib/foundation/agents/catalogue.mjs');
   const stdout = `AIOS_AGENT_SMOKE_OK ${'planner-audit-payload '.repeat(96)}`;
   const result = await runAgentsSmoke({
     rootDir,
@@ -295,7 +295,7 @@ test('agents smoke emits schema-v2 evidence only from a managed live invocation'
 test('agents smoke does not mint promotion files when a live result lacks managed invocation proof', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
   const result = await runAgentsSmoke({
     rootDir,
     roles: ['planner'],
@@ -318,7 +318,7 @@ test('agents smoke does not mint promotion files when a live result lacks manage
 test('agents smoke accepts an ACK wrapped inside output-contract JSON', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
   const result = await runAgentsSmoke({
     rootDir,
     roles: ['planner'],
@@ -353,7 +353,7 @@ test('agents smoke accepts an ACK wrapped inside output-contract JSON', async ()
 test('agents smoke prompt overrides the JSON output contract for probes', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
   let seenPrompt = '';
   await runAgentsSmoke({
     rootDir,
@@ -382,7 +382,7 @@ test('agents smoke prompt overrides the JSON output contract for probes', async 
 test('agents smoke escalates timeout on transient slow probes and recovers', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
   const seenTimeouts = [];
   const result = await runAgentsSmoke({
     rootDir,
@@ -422,7 +422,7 @@ test('agents smoke escalates timeout on transient slow probes and recovers', asy
 test('agents smoke blocks with recovery hint after exhausting all timeout escalations', async () => {
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
-  const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
+  const { runAgentsSmoke } = await import('../../../lib/foundation/agents/smoke.mjs');
   const seenTimeouts = [];
   const result = await runAgentsSmoke({
     rootDir,

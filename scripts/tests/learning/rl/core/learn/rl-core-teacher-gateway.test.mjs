@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('rl-core teacher gateway falls back and returns deterministic failure defaults when all backends fail', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/teacher-gateway.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/teacher-gateway.mjs');
   const result = await mod.callTeacher({
     primary: 'codex-cli',
     fallbacks: ['claude-code'],
@@ -20,7 +20,7 @@ test('rl-core teacher gateway falls back and returns deterministic failure defau
 });
 
 test('rl-core teacher gateway normalizes successful fallback responses', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/teacher-gateway.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/teacher-gateway.mjs');
   const attempts = [];
   const result = await mod.callTeacher({
     primary: 'codex-cli',

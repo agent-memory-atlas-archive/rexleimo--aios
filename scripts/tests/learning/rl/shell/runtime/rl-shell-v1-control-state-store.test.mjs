@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('applyControlEvent ignores duplicate event ids', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/control-state-store.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/control-state-store.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v1-control-store-'));
   const store = await mod.createControlStateStore({ rootDir });
   const event = {
@@ -27,7 +27,7 @@ test('applyControlEvent ignores duplicate event ids', async () => {
 });
 
 test('writeControlSnapshot persists and reloads the latest checkpoint snapshot', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/control-state-store.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/control-state-store.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v1-control-store-'));
   const store = await mod.createControlStateStore({ rootDir });
 
@@ -47,7 +47,7 @@ test('writeControlSnapshot persists and reloads the latest checkpoint snapshot',
 });
 
 test('writeControlSnapshot preserves frozen_failure mode for restart recovery', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/control-state-store.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/control-state-store.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v1-control-store-'));
   const store = await mod.createControlStateStore({ rootDir });
 

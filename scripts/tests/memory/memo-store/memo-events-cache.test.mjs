@@ -4,16 +4,16 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
+import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memory/memo/storage.mjs';
 import {
   clearMemoEventsCache,
   collectEvents,
   memoEventsCacheStats,
   readJsonlEvents,
   readSplitEvents,
-} from '../../../lib/memo/storage/events/events-read.mjs';
-import { fileEventsPath } from '../../../lib/memo/storage/base/paths.mjs';
-import { searchMemoEvents } from '../../../lib/memo/storage/views/query.mjs';
+} from '../../../lib/memory/memo/storage/events/events-read.mjs';
+import { fileEventsPath } from '../../../lib/memory/memo/storage/base/paths.mjs';
+import { searchMemoEvents } from '../../../lib/memory/memo/storage/views/query.mjs';
 
 async function withTempRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

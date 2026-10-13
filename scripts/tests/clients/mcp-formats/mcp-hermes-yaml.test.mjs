@@ -6,8 +6,8 @@ import test from 'node:test';
 
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 
-import { migrateOneHermesYaml } from '../../../lib/components/browser/mcp/formats/mcp-hermes-yaml.mjs';
-import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../../../lib/components/browser/constants.mjs';
+import { migrateOneHermesYaml } from '../../../lib/tooling/components/browser/mcp/formats/mcp-hermes-yaml.mjs';
+import { AUTH_TOOLS_ALIAS, PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../../../lib/tooling/components/browser/constants.mjs';
 
 const rootDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../../..');
 
@@ -115,7 +115,7 @@ test('migrateOneHermesYaml adds mcp_servers to existing config with pre-existing
 
 test('collectClientMcpTargets includes hermes home scope with createIfMissing', async () => {
   // Dynamic import to avoid hoisting issues
-  const { collectClientMcpTargets } = await import('../../../lib/components/browser/mcp/mcp-targets.mjs');
+  const { collectClientMcpTargets } = await import('../../../lib/tooling/components/browser/mcp/mcp-targets.mjs');
 
   const targets = collectClientMcpTargets({
     projectRoot: '/tmp/test-project',

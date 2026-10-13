@@ -5,26 +5,26 @@ import path from 'node:path';
 import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
-import { doctorCodemap, installCodemap } from '../../../lib/components/codemap/codemap.mjs';
+import { doctorCodemap, installCodemap } from '../../../lib/tooling/components/codemap/codemap.mjs';
 import {
   collectCodemapMcpTargets,
   inspectCodemapMcpTarget,
   injectCrgIntoClientTarget,
   removeCrgFromClientTarget,
-} from '../../../lib/components/codemap/targets/mcp-targets.mjs';
+} from '../../../lib/tooling/components/codemap/targets/mcp-targets.mjs';
 import {
   collectCodemapInstructionFiles,
   getCodemapInstructionSection,
   injectCrgIntoInstructionFiles,
-} from '../../../lib/components/codemap/targets/instructions.mjs';
-import { AGENTS_MD_MARKERS } from '../../../lib/components/codemap/constants.mjs';
-import { evaluateGraphFreshness, inspectGraphFreshness } from '../../../lib/components/codemap/graph/freshness.mjs';
-import { ensureOpencodePlugin } from '../../../lib/components/codemap/targets/opencode-plugin.mjs';
-import { getCodemapHelpText } from '../../../lib/cli/help/codemap.mjs';
-import { buildCrgEntryForTarget } from '../../../lib/components/codemap/targets/mcp-targets/entries.mjs';
-import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../../../lib/clients/integration/mcp/zcode-schema.mjs';
-import { buildAiosPiMcpServers } from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
-import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../../../lib/clients/registry.mjs';
+} from '../../../lib/tooling/components/codemap/targets/instructions.mjs';
+import { AGENTS_MD_MARKERS } from '../../../lib/tooling/components/codemap/constants.mjs';
+import { evaluateGraphFreshness, inspectGraphFreshness } from '../../../lib/tooling/components/codemap/graph/freshness.mjs';
+import { ensureOpencodePlugin } from '../../../lib/tooling/components/codemap/targets/opencode-plugin.mjs';
+import { getCodemapHelpText } from '../../../lib/tooling/cli/help/codemap.mjs';
+import { buildCrgEntryForTarget } from '../../../lib/tooling/components/codemap/targets/mcp-targets/entries.mjs';
+import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../../../lib/foundation/clients/integration/mcp/zcode-schema.mjs';
+import { buildAiosPiMcpServers } from '../../../lib/tooling/components/integrations/pi/mcp-adapter.mjs';
+import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../../../lib/foundation/clients/registry.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));
@@ -326,17 +326,17 @@ test('codemap doctor reports missing per-client MCP config and --fix heals it', 
 });
 
 test('codemap component keeps client config responsibilities in focused modules', async () => {
-  const entry = await readFile(path.resolve('scripts/lib/components/codemap/codemap.mjs'), 'utf8');
+  const entry = await readFile(path.resolve('scripts/lib/tooling/components/codemap/codemap.mjs'), 'utf8');
   const entryLines = entry.trim().split(/\r?\n/u).length;
   assert.equal(entryLines <= 360, true, `codemap.mjs is ${entryLines} lines; keep config/state/docs/plugins split under components/codemap/*`);
 
   const modules = [
-    { file: 'scripts/lib/components/codemap/constants.mjs', exports: ['CRG_MCP_ALIAS', 'CRG_DATA_DIR'] },
-    { file: 'scripts/lib/components/codemap/graph/crg.mjs', exports: ['captureCrgCommand', 'runCrgCommand'] },
-    { file: 'scripts/lib/components/codemap/targets/instructions.mjs', exports: ['injectCrgIntoInstructionFiles', 'removeCrgFromInstructionFiles'] },
-    { file: 'scripts/lib/components/codemap/targets/mcp-targets.mjs', exports: ['collectCodemapMcpTargets', 'injectCrgIntoClientTarget'] },
-    { file: 'scripts/lib/components/codemap/targets/opencode-plugin.mjs', exports: ['ensureOpencodePlugin', 'removeOpencodePlugin'] },
-    { file: 'scripts/lib/components/codemap/state-store.mjs', exports: ['readState', 'writeState', 'removeState'] },
+    { file: 'scripts/lib/tooling/components/codemap/constants.mjs', exports: ['CRG_MCP_ALIAS', 'CRG_DATA_DIR'] },
+    { file: 'scripts/lib/tooling/components/codemap/graph/crg.mjs', exports: ['captureCrgCommand', 'runCrgCommand'] },
+    { file: 'scripts/lib/tooling/components/codemap/targets/instructions.mjs', exports: ['injectCrgIntoInstructionFiles', 'removeCrgFromInstructionFiles'] },
+    { file: 'scripts/lib/tooling/components/codemap/targets/mcp-targets.mjs', exports: ['collectCodemapMcpTargets', 'injectCrgIntoClientTarget'] },
+    { file: 'scripts/lib/tooling/components/codemap/targets/opencode-plugin.mjs', exports: ['ensureOpencodePlugin', 'removeOpencodePlugin'] },
+    { file: 'scripts/lib/tooling/components/codemap/state-store.mjs', exports: ['readState', 'writeState', 'removeState'] },
   ];
 
   for (const moduleDef of modules) {
@@ -480,7 +480,7 @@ test('codemap graph freshness detects a graph that fell behind HEAD', async () =
 });
 
 test('codemap startup gate detects readiness without side effects', async () => {
-  const { isCodemapReady, isCodemapAutoInstallEnabled } = await import('../../../lib/components/codemap/ensure.mjs'
+  const { isCodemapReady, isCodemapAutoInstallEnabled } = await import('../../../lib/tooling/components/codemap/ensure.mjs'
   );
   const empty = await makeTemp('aios-codemap-ensure-empty-');
   assert.equal(isCodemapReady(empty), false, '无 state 无图 → 未就绪');
@@ -500,7 +500,7 @@ test('codemap startup gate detects readiness without side effects', async () => 
 });
 
 test('codemap startup gate installs when missing, never throws', async () => {
-  const { ensureCodemapInstalled } = await import('../../../lib/components/codemap/ensure.mjs');
+  const { ensureCodemapInstalled } = await import('../../../lib/tooling/components/codemap/ensure.mjs');
   const logs = [];
   const io = { log: (line) => logs.push(String(line)), warn: (line) => logs.push(String(line)) };
 

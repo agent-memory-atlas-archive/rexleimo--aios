@@ -50,7 +50,7 @@ async function runWrapper(scriptPath, args) {
 
 async function runPowerShellWrapper(scriptName, args) {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'aios-ps-wrapper-test-'));
-  const helperDir = path.join(tempDir, 'lib', 'powershell');
+  const helperDir = path.join(tempDir, 'lib', 'environment', 'powershell');
   const captureFile = path.join(tempDir, 'capture.txt');
 
   await mkdir(helperDir, { recursive: true });
@@ -59,7 +59,7 @@ async function runPowerShellWrapper(scriptName, args) {
     path.join(tempDir, scriptName)
   );
   await copyFile(
-    path.join(repoRoot, 'scripts', 'lib', 'powershell', 'aios-internal-wrapper.ps1'),
+    path.join(repoRoot, 'scripts', 'lib', 'environment', 'powershell', 'aios-internal-wrapper.ps1'),
     path.join(helperDir, 'aios-internal-wrapper.ps1')
   );
 

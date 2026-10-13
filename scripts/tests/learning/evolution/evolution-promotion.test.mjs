@@ -14,8 +14,8 @@ import {
   isTransitionAllowed,
   VALID_TRANSITIONS,
   TRUSTED_CORE_FILES,
-} from '../../../lib/lifecycle/evolve/evolution/promotion.mjs';
-import { createVerdict, writeVerdict } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
+} from '../../../lib/execution/lifecycle/evolve/evolution/promotion.mjs';
+import { createVerdict, writeVerdict } from '../../../lib/execution/lifecycle/evolve/evolution/verdict.mjs';
 
 async function withWorkspace(prefix, fn) {
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
@@ -247,7 +247,7 @@ test('promoteFromVerdict: trusted core modification is blocked', async () => {
       candidateVersion: 'v2',
       checks: GOOD_CHECKS,
       metrics: GOOD_METRICS,
-      evidenceRefs: ['scripts/lib/lifecycle/evolve/evolution/verdict.mjs'],
+      evidenceRefs: ['scripts/lib/execution/lifecycle/evolve/evolution/verdict.mjs'],
     });
     await writeVerdict(rootDir, verdict);
 

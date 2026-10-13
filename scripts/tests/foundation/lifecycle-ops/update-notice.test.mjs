@@ -16,7 +16,7 @@ import {
   readCurrentVersion,
   UPDATE_STATES,
   DEFAULT_POLICY,
-} from '../../../lib/lifecycle/setup/update-notice.mjs';
+} from '../../../lib/execution/lifecycle/setup/update-notice.mjs';
 
 async function withWorkspace(prefix, fn) {
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

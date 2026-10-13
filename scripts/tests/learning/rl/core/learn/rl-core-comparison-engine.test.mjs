@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('rl-core comparison engine normalizes episode comparison results', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/comparison-engine.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/comparison-engine.mjs');
 
   assert.deepEqual(
     mod.normalizeEpisodeComparison({
@@ -19,7 +19,7 @@ test('rl-core comparison engine normalizes episode comparison results', async ()
 });
 
 test('rl-core comparison engine tracks degradation streak and ignores comparison_failed rows', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/comparison-engine.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/comparison-engine.mjs');
 
   assert.equal(
     mod.computeDegradationStreak([
@@ -34,7 +34,7 @@ test('rl-core comparison engine tracks degradation streak and ignores comparison
 });
 
 test('rl-core comparison engine summarizes comparison counts by outcome', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/comparison-engine.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/comparison-engine.mjs');
 
   assert.deepEqual(
     mod.summarizeComparisonResults([

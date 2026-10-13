@@ -5,14 +5,14 @@ import path from 'node:path';
 import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
-import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
-import { buildHindsightEval } from '../../../lib/harness/quality/hindsight-eval.mjs';
-import { initSoloRunJournal, writeSoloControl } from '../../../lib/harness/solo/solo-journal.mjs';
-import { readHudDispatchSummary, readHudState, selectHudSessionId } from '../../../lib/hud/state.mjs';
-import { renderHud } from '../../../lib/hud/render.mjs';
-import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/hud/watch/watch.mjs';
-import { runHud } from '../../../lib/lifecycle/fleet/hud.mjs';
-import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
+import { runContextDbCli } from '../../../lib/memory/contextdb-cli.mjs';
+import { buildHindsightEval } from '../../../lib/execution/harness/quality/hindsight-eval.mjs';
+import { initSoloRunJournal, writeSoloControl } from '../../../lib/execution/harness/solo/solo-journal.mjs';
+import { readHudDispatchSummary, readHudState, selectHudSessionId } from '../../../lib/execution/hud/state.mjs';
+import { renderHud } from '../../../lib/execution/hud/render.mjs';
+import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/execution/hud/watch/watch.mjs';
+import { runHud } from '../../../lib/execution/lifecycle/fleet/hud.mjs';
+import { runOrchestrate } from '../../../lib/execution/lifecycle/run/orchestrate.mjs';
 import {
   createStatusWatchStallTracker,
   resolveStatusSkillCandidateOptions,
@@ -20,7 +20,7 @@ import {
   runTeamSkillCandidatesList,
   runTeamSkillCandidatesExport,
   runTeamStatus,
-} from '../../../lib/lifecycle/fleet/team-ops.mjs';
+} from '../../../lib/execution/lifecycle/fleet/team-ops.mjs';
 
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -48,7 +48,7 @@ function makeSessionMeta({ sessionId, agent, updatedAt }) {
 }
 
 test('hud state entrypoint delegates state, artifact, and command responsibilities to focused modules', async () => {
-  const root = path.resolve('scripts/lib/hud');
+  const root = path.resolve('scripts/lib/execution/hud');
   const entry = await fs.readFile(path.join(root, 'state.mjs'), 'utf8');
   const entryLines = entry.split(/\r?\n/u).length;
   assert.equal(entryLines <= 260, true, `hud/state.mjs is ${entryLines} lines; keep session, artifact, IO, and command logic split under hud/state/*`);

@@ -23,8 +23,8 @@ test('buildIterationPrompt injects offload canvas as compact resume context', ()
 
 
 test('buildProductionExecuteTurn compresses solo harness prompts before provider launch and compacts received output', async () => {
-  const { buildProductionExecuteTurn } = await import('../../../../../lib/lifecycle/run/harness/execution/execute-turn.mjs');
-  const { readMetricsRecords } = await import('../../../../../lib/interception/observability/metrics/metrics-sink.mjs');
+  const { buildProductionExecuteTurn } = await import('../../../../../lib/execution/lifecycle/run/harness/execution/execute-turn.mjs');
+  const { readMetricsRecords } = await import('../../../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-turn-'));
   const PRE_SENTINEL = 'SOLO_HARNESS_PRE_SEND_SENTINEL';
   const POST_SENTINEL = 'SOLO_HARNESS_POST_RECEIVE_SENTINEL';
@@ -35,7 +35,7 @@ test('buildProductionExecuteTurn compresses solo harness prompts before provider
       rootDir,
       aiosRootDir: rootDir,
       sessionId: 'solo-turn',
-      objective: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/lifecycle/run/harness/execution/execute-turn.mjs:11`,
+      objective: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/execution/lifecycle/run/harness/execution/execute-turn.mjs:11`,
       provider: 'codex',
       spawnCommandImpl: async (command, args, options) => {
         captured = { command, args, options };
@@ -43,7 +43,7 @@ test('buildProductionExecuteTurn compresses solo harness prompts before provider
           status: 0,
           stdout: JSON.stringify({
             outcome: 'success',
-            summary: `${POST_SENTINEL.repeat(120)}\nscripts/lib/lifecycle/run/harness/execution/execute-turn.mjs:33`,
+            summary: `${POST_SENTINEL.repeat(120)}\nscripts/lib/execution/lifecycle/run/harness/execution/execute-turn.mjs:33`,
             keyChanges: [],
             keyLearnings: [],
             nextAction: 'stop',

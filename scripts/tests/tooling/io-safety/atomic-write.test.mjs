@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { writeFileAtomic } from '../../../lib/fs/atomic-write.mjs';
+import { writeFileAtomic } from '../../../lib/environment/fs/atomic-write.mjs';
 
 test('writeFileAtomic replaces content without leaving temp files behind', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-atomic-write-'));

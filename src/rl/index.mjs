@@ -14,30 +14,30 @@ export {
   HOLDOUT_VALIDATION_STATUSES,
   EPOCH_OUTCOMES,
   TEACHER_TRIGGER_REASONS,
-} from '../../scripts/lib/rl-core/contracts.mjs';
+} from '../../scripts/lib/learning/rl-core/state/contracts.mjs';
 
 export {
   applyPointerTransition,
-} from '../../scripts/lib/rl-core/checkpoint-registry.mjs';
+} from '../../scripts/lib/learning/rl-core/state/checkpoint-registry.mjs';
 
 export {
   normalizeEpisodeComparison,
   computeDegradationStreak,
   reduceDegradationStreak,
   summarizeComparisonResults,
-} from '../../scripts/lib/rl-core/comparison-engine.mjs';
+} from '../../scripts/lib/learning/rl-core/learning/comparison-engine.mjs';
 
 export {
   createControlStateStore,
   readControlSnapshot,
   writeControlSnapshot,
   applyControlEvent,
-} from '../../scripts/lib/rl-core/control-state-store.mjs';
+} from '../../scripts/lib/learning/rl-core/control/control-state-store.mjs';
 
 // === rl-orchestrator-v1: 编排器适配器（被 lifecycle/release-status 引用）===
 export {
   normalizePolicyReleaseConfig,
-} from '../../scripts/lib/rl-orchestrator-v1/policy-release-gate.mjs';
+} from '../../scripts/lib/learning/rl-orchestrator-v1/policy-release-gate.mjs';
 
 // === rl-shell-v1: Shell 任务执行 ===
 // === rl-browser-v1: 浏览器任务执行 ===

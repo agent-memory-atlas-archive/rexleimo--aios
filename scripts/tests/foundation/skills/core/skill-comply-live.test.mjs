@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runSkillComply } from '../../../../lib/skills/compliance/compliance.mjs';
-import { evaluateSkillComplianceLive } from '../../../../lib/skills/compliance/compliance-live.mjs';
+import { runSkillComply } from '../../../../lib/tooling/skills/compliance/compliance.mjs';
+import { evaluateSkillComplianceLive } from '../../../../lib/tooling/skills/compliance/compliance-live.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

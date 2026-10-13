@@ -18,8 +18,8 @@ function makeTask(overrides = {}) {
 }
 
 test('browser adapter returns normalized episode and comparison payloads', async () => {
-  const mod = await import('../../../../lib/rl-browser-v1/adapter.mjs');
-  const runnerMod = await import('../../../../lib/rl-browser-v1/browser-runner.mjs');
+  const mod = await import('../../../../lib/learning/rl-browser-v1/adapter.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-browser-v1/browser-runner.mjs');
   const task = makeTask();
   const browserDriver = runnerMod.createFixtureBrowserDriver();
 
@@ -56,7 +56,7 @@ test('browser adapter returns normalized episode and comparison payloads', async
 });
 
 test('browser comparison falls back to comparison_failed after one automatic retry', async () => {
-  const mod = await import('../../../../lib/rl-browser-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-browser-v1/adapter.mjs');
   const calls = [];
   const driver = {
     async executeFlow({ attempt, checkpointId }) {
@@ -97,8 +97,8 @@ test('browser comparison falls back to comparison_failed after one automatic ret
 });
 
 test('browser adapter returns auth failures in-band and throws only on infrastructure faults', async () => {
-  const mod = await import('../../../../lib/rl-browser-v1/adapter.mjs');
-  const runnerMod = await import('../../../../lib/rl-browser-v1/browser-runner.mjs');
+  const mod = await import('../../../../lib/learning/rl-browser-v1/adapter.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-browser-v1/browser-runner.mjs');
 
   const authEpisode = await mod.runBrowserEpisode({
     task: makeTask({ requireHumanReauth: true }),

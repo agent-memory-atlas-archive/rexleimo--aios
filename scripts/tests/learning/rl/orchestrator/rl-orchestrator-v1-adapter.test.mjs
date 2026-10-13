@@ -19,8 +19,8 @@ function makeTask(overrides = {}) {
 }
 
 test('orchestrator adapter returns normalized episode, comparison, replay, and evidence payloads', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
   const task = makeTask();
   const harness = runnerMod.createCiFixtureOrchestratorHarness();
   const policy = { seed: 13 };
@@ -70,8 +70,8 @@ test('orchestrator adapter returns normalized episode, comparison, replay, and e
 });
 
 test('orchestrator adapter handles comparison_failed and teacher trigger classification', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
   const harness = runnerMod.createCiFixtureOrchestratorHarness();
 
   const comparison = await mod.compareOrchestratorAgainstReference({
@@ -98,7 +98,7 @@ test('orchestrator adapter handles comparison_failed and teacher trigger classif
 });
 
 test('orchestrator adapter throws only on harness infrastructure faults', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
 
   await assert.rejects(
     () => mod.runOrchestratorEpisode({
@@ -115,7 +115,7 @@ test('orchestrator adapter throws only on harness infrastructure faults', async 
 });
 
 test('orchestrator adapter supports real harness mode with dry-run trajectories', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const adapter = mod.createOrchestratorAdapter({
     tasks: [makeTask({ task_id: 'orch-real-001' })],
     harnessMode: 'real',
@@ -141,7 +141,7 @@ test('orchestrator adapter supports real harness mode with dry-run trajectories'
 });
 
 test('orchestrator adapter can sample tasks from live collector for real traffic integration', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const samples = [];
   const adapter = mod.createOrchestratorAdapter({
     harnessMode: 'fixture',
@@ -177,7 +177,7 @@ test('orchestrator adapter can sample tasks from live collector for real traffic
 });
 
 test('real orchestrator harness policy release canary holdout routes non-sampled traffic to baseline mode', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-canary-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const executionModes = [];
@@ -230,7 +230,7 @@ test('real orchestrator harness policy release canary holdout routes non-sampled
 });
 
 test('real orchestrator harness binds routed policy executor into orchestrate dispatch options', async () => {
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-routing-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const orchestrateCalls = [];
@@ -283,7 +283,7 @@ test('real orchestrator harness binds routed policy executor into orchestrate di
 });
 
 test('real orchestrator harness treats policy executor fallback as baseline route for release state', async () => {
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-fallback-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const harness = runnerMod.createRealOrchestratorHarness({
@@ -341,7 +341,7 @@ test('real orchestrator harness treats policy executor fallback as baseline rout
 });
 
 test('real orchestrator harness policy release auto-promotes canary to full after stable policy successes', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-promotion-canary-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const adapter = mod.createOrchestratorAdapter({
@@ -409,7 +409,7 @@ test('real orchestrator harness policy release auto-promotes canary to full afte
 });
 
 test('real orchestrator harness policy release auto-promotes observe to canary after stable baseline runs', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-promotion-observe-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const adapter = mod.createOrchestratorAdapter({
@@ -470,7 +470,7 @@ test('real orchestrator harness policy release auto-promotes observe to canary a
 });
 
 test('real orchestrator harness policy release auto-downgrades after policy-routed failures', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-release-gate-'));
   const statePath = path.join(rootDir, 'orchestrator-policy-release.state.json');
   const executionModes = [];
@@ -535,7 +535,7 @@ test('real orchestrator harness policy release auto-downgrades after policy-rout
 });
 
 test('real orchestrator harness retries live with dry-run fallback when live dispatch evidence is unavailable', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
   const executionModes = [];
   const adapter = mod.createOrchestratorAdapter({
     tasks: [makeTask({ task_id: 'orch-real-live-fallback-001' })],
@@ -585,8 +585,8 @@ test('real orchestrator harness retries live with dry-run fallback when live dis
 });
 
 test('real orchestrator harness falls back to fixture evidence on orchestration faults', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/adapter.mjs');
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/adapter.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
   const adapter = mod.createOrchestratorAdapter({
     tasks: [makeTask({ task_id: 'orch-real-fallback-001' })],
     harnessMode: 'real',

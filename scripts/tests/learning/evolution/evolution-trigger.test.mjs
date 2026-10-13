@@ -11,10 +11,10 @@ import {
   readTriggerState,
   updatePendingCount,
   EVOLUTION_TRIGGER_DEFAULTS,
-} from '../../../lib/lifecycle/evolve/evolution/trigger.mjs';
-import { getEvolutionStatus } from '../../../lib/lifecycle/evolve/evolution/status.mjs';
-import { autoMemoSessionClose } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/execution/lifecycle/evolve/evolution/trigger.mjs';
+import { getEvolutionStatus } from '../../../lib/execution/lifecycle/evolve/evolution/status.mjs';
+import { autoMemoSessionClose } from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

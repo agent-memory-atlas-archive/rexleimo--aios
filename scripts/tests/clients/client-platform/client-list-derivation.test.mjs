@@ -14,12 +14,12 @@ import {
   CLIENT_DEFINITIONS,
   getClientInstructionFileName,
   orderByPriority,
-} from '../../../lib/clients/registry.mjs';
-import { CLIENT_ORDER } from '../../../lib/interception/transport/clients/capabilities.mjs';
-import { CLIENT_INSTRUCTION_FILES } from '../../../lib/components/codemap/constants.mjs';
-import { AGENTS_MD_COWRITERS } from '../../../lib/native/distribution/emitters/shared.mjs';
-import { EMITTERS } from '../../../lib/native/synchronize/sync/constants.mjs';
-import { readSkillFrontmatter } from '../../../lib/skills/frontmatter.mjs';
+} from '../../../lib/foundation/clients/registry.mjs';
+import { CLIENT_ORDER } from '../../../lib/foundation/interception/transport/clients/capabilities.mjs';
+import { CLIENT_INSTRUCTION_FILES } from '../../../lib/tooling/components/codemap/constants.mjs';
+import { AGENTS_MD_COWRITERS } from '../../../lib/clients/native/distribution/emitters/shared.mjs';
+import { EMITTERS } from '../../../lib/clients/native/synchronize/sync/constants.mjs';
+import { readSkillFrontmatter } from '../../../lib/tooling/skills/frontmatter.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const NON_CLI_HOST_IDS = Object.freeze(['aios-harness', 'cursor', 'generic-mcp']);

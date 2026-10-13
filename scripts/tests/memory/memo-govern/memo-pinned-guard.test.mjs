@@ -9,7 +9,7 @@ import {
   pinnedContentHash,
   readPinnedMemo,
   writePinnedMemo,
-} from '../../../lib/memo/storage/govern/pinned.mjs';
+} from '../../../lib/memory/memo/storage/govern/pinned.mjs';
 
 async function withTempRoot(fn) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'memo-pinned-guard-'));

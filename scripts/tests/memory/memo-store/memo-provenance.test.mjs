@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { appendMemoEvent, listMemoEvents } from '../../../lib/memo/storage.mjs';
-import { createMemoEvent } from '../../../lib/memo/storage/events/events-write.mjs';
+import { appendMemoEvent, listMemoEvents } from '../../../lib/memory/memo/storage.mjs';
+import { createMemoEvent } from '../../../lib/memory/memo/storage/events/events-write.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildRecallQueries, collectTurnRecall, collectTurnRecallResult, inferUsefulRecallEventIds, shouldCollectTurnRecall } from '../../../lib/planning/flow/turn-recall.mjs';
+import { buildRecallQueries, collectTurnRecall, collectTurnRecallResult, inferUsefulRecallEventIds, shouldCollectTurnRecall } from '../../../lib/foundation/planning/flow/turn-recall.mjs';
 
 test('recall query ladder starts verbatim and adds content-word + token rungs', () => {
   const ladders = buildRecallQueries('Continue the checkout validation work in order-service');

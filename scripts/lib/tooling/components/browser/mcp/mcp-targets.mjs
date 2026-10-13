@@ -1,0 +1,65 @@
+/* 中文注释：MCP 目标收集只决定”哪些文件可能要迁移”，落点/格式全部取自 registry 的单一事实来源。 */
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { ALL_CLIENTS, getClientMcpTarget } from '../../../../foundation/clients/registry.mjs';
+import { resolveUserPath } from '../runtime/runtime-paths.mjs';
+
+/* 中文注释：按 registry 的 per-client MCP 落点生成目标（支持双作用域）。
+   - codex   → ~/.codex/config.toml + <project>/.codex/config.toml（home+project, TOML）
+   - claude  → <project>/.mcp.json + ~/.claude/.mcp.json（project+home, JSON mcpServers）
+   - gemini  → <project>/.gemini/settings.json + ~/.gemini/settings.json（project+home, JSON mcpServers）
+   - opencode→ ~/.config/opencode/opencode.json（home, opencode-json mcp 命名空间）
+   - hermes  → <project>/.mcp.json + ~/.hermes/config.yaml（project+home, JSON mcpServers / YAML mcp_servers）
+   - grok    → ~/.grok/config.toml + <project>/.grok/config.toml（home+project, TOML）
+   createIfMissing 策略：project 作用域可安全创建；home 作用域默认不创建（需 scopeEntry 显式声明 createIfMissing: true）。 */
+export function collectClientMcpTargets({ projectRoot, clientHomes = {} } = {}) {
+  const targets = [];
+  const seen = new Set();
+
+  for (const client of ALL_CLIENTS) {
+    const desc = getClientMcpTarget(client);
+    for (const scopeEntry of desc.scopes) {
+      let absPath = '';
+      if (scopeEntry.scope === 'home') {
+        const home = resolveUserPath(clientHomes[client]);
+        if (!home) continue;
+        absPath = path.resolve(path.join(home, scopeEntry.file));
+      } else {
+        if (!projectRoot) continue;
+        absPath = path.resolve(path.join(projectRoot, scopeEntry.file));
+      }
+      if (seen.has(absPath)) continue;
+      seen.add(absPath);
+      targets.push({
+        path: absPath,
+        client,
+        scope: scopeEntry.scope,
+        format: scopeEntry.format || desc.format,
+        namespace: scopeEntry.namespace || desc.namespace,
+        createIfMissing: scopeEntry.createIfMissing ?? (scopeEntry.scope === 'project'),
+      });
+    }
+  }
+
+  return targets;
+}
+
+/* 中文注释：迁移顺序先仓库内 mcp-server 自带配置，再各客户端落点。 */
+export function collectBrowserMcpMigrationTargets({ rootDir, clientHomes = {} } = {}) {
+  const candidates = [
+    { path: path.join(rootDir, 'mcp-server', '.mcp.json'), createIfMissing: true, format: 'json', namespace: 'mcpServers', client: 'mcp-server' },
+    ...collectClientMcpTargets({ projectRoot: rootDir, clientHomes }),
+  ];
+
+  const seen = new Set();
+  return candidates
+    .filter((candidate) => {
+      if (!candidate.path) return false;
+      const abs = path.resolve(candidate.path);
+      if (seen.has(abs)) return false;
+      seen.add(abs);
+      return candidate.createIfMissing || fs.existsSync(abs);
+    })
+    .map((candidate) => ({ ...candidate, path: path.resolve(candidate.path) }));
+}

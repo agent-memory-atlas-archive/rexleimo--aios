@@ -5,14 +5,14 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { appendMemoEvent, listMemoEvents } from '../../../lib/memo/storage.mjs';
+import { appendMemoEvent, listMemoEvents } from '../../../lib/memory/memo/storage.mjs';
 import {
   MEMO_STORAGE_LOCK_TIMEOUT_CODE,
   inspectMemoRootLocks,
   recoverStaleMemoRootLock,
   resolveMemoStorageLockPath,
   withMemoStorageLock,
-} from '../../../lib/memo/storage/base/lock.mjs';
+} from '../../../lib/memory/memo/storage/base/lock.mjs';
 
 const workerPath = path.resolve(process.cwd(), 'scripts', 'tests', 'fixtures', 'memo-storage-append-worker.mjs');
 

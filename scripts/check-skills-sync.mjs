@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { checkGeneratedSkillsSync, syncGeneratedSkills } from './lib/skills/install/sync.mjs';
+import { checkGeneratedSkillsSync, syncGeneratedSkills } from './lib/tooling/skills/install/sync.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -4,19 +4,19 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { runContextDbCli } from '../../../lib/memory/contextdb-cli.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 import {
   getDisabledGateIds,
   isHarnessGateEnabled,
   normalizeHarnessProfile,
-} from '../../../lib/harness/ops/profile.mjs';
-import { renderHandoffMarkdown, validateHandoffPayload } from '../../../lib/harness/solo/handoff.mjs';
-import { planDoctor } from '../../../lib/lifecycle/govern/doctor.mjs';
-import { executeEntropyGc } from '../../../lib/lifecycle/govern/entropy-gc.mjs';
-import { planQualityGate, runQualityGate } from '../../../lib/lifecycle/govern/quality-gate.mjs';
-import { DEFAULT_ARCHITECTURE_RULES, evaluateArchitectureGovernance } from '../../../lib/architecture/governance.mjs';
-import { commandExists } from '../../../lib/platform/process.mjs';
+} from '../../../lib/execution/harness/ops/profile.mjs';
+import { renderHandoffMarkdown, validateHandoffPayload } from '../../../lib/execution/harness/solo/handoff.mjs';
+import { planDoctor } from '../../../lib/execution/lifecycle/govern/doctor.mjs';
+import { executeEntropyGc } from '../../../lib/execution/lifecycle/govern/entropy-gc.mjs';
+import { planQualityGate, runQualityGate } from '../../../lib/execution/lifecycle/govern/quality-gate.mjs';
+import { DEFAULT_ARCHITECTURE_RULES, evaluateArchitectureGovernance } from '../../../lib/foundation/architecture/governance.mjs';
+import { commandExists } from '../../../lib/foundation/platform/process.mjs';
 
 async function makeRootDir() {
   return await mkdtemp(path.join(os.tmpdir(), 'aios-quality-gate-'));
@@ -122,7 +122,7 @@ test('runQualityGate log audit excludes cli entrypoints and tests', async (t) =>
   }
 
   const rootDir = await makeRootDir();
-  await mkdir(path.join(rootDir, 'scripts', 'lib', 'lifecycle'), { recursive: true });
+  await mkdir(path.join(rootDir, 'scripts', 'lib', 'execution', 'lifecycle'), { recursive: true });
   await mkdir(path.join(rootDir, 'scripts', 'tests'), { recursive: true });
   await mkdir(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'shell'), { recursive: true });
 
@@ -131,7 +131,7 @@ test('runQualityGate log audit excludes cli entrypoints and tests', async (t) =>
   await writeFile(path.join(rootDir, 'scripts', 'contextdb-shell-bridge.mjs'), "console.log('bridge output');\n", 'utf8');
   await writeFile(path.join(rootDir, 'scripts', 'ctx-agent-core.mjs'), "console.log('agent output');\n", 'utf8');
   await writeFile(path.join(rootDir, 'scripts', 'doctor-bootstrap-task.mjs'), "console.log('doctor output');\n", 'utf8');
-  await writeFile(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'quality-gate.mjs'), "const PATTERN = 'console.log';\n", 'utf8');
+  await writeFile(path.join(rootDir, 'scripts', 'lib', 'execution', 'lifecycle', 'quality-gate.mjs'), "const PATTERN = 'console.log';\n", 'utf8');
   await writeFile(path.join(rootDir, 'mcp-server', 'src', 'contextdb', 'shell', 'cli.ts'), "console.log('cli output');\n", 'utf8');
 
   const report = await runQualityGate(
@@ -661,7 +661,7 @@ test('renderHandoffMarkdown renders the shared schema', () => {
     taskTitle: 'Implement harness profiles',
     contextSummary: 'Profiles and quality gate landed; review integration risks.',
     findings: ['doctor now supports --profile'],
-    filesTouched: ['scripts/lib/harness/ops/profile.mjs'],
+    filesTouched: ['scripts/lib/execution/harness/ops/profile.mjs'],
     recommendations: ['run quality-gate pre-pr'],
   });
 

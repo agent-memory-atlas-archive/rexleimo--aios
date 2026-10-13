@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { verifySkillTrainingGate } from '../../lib/skills/training/training-gate.mjs';
+import { verifySkillTrainingGate } from '../../lib/tooling/skills/training/training-gate.mjs';
 
 export function skillSourcePath(skillId) {
   return path.posix.join('rex-harness', 'skill-sources', skillId, 'SKILL.md');

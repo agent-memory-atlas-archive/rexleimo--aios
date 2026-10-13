@@ -10,7 +10,7 @@ import {
   codexHomeDir,
   stripManagedTables,
   syncCodexHomeConfig,
-} from '../../../lib/native/distribution/emitters/codex-config.mjs';
+} from '../../../lib/clients/native/distribution/emitters/codex-config.mjs';
 
 const ROOT = path.resolve('E:/coding/harness-cli');
 

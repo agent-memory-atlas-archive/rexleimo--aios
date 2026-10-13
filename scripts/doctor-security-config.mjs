@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runSecurityConfigDoctor } from './lib/doctor/security-config/run.mjs';
+import { runSecurityConfigDoctor } from './lib/environment/doctor/security-config/run.mjs';
 
 try {
   process.exit(runSecurityConfigDoctor({

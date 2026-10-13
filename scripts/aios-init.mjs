@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-// scripts/aios-init.mjs — 薄壳入口，逻辑在 scripts/lib/aios-init/
+// scripts/aios-init.mjs — 薄壳入口，逻辑在 scripts/lib/environment/aios-init/
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { initWorkspace } from './lib/contextdb/runtime/workspace.mjs';
-import { buildSkillIndex, writeSkillIndex } from './lib/contextdb/registry/skill-index.mjs';
-import { ensurePersonaLayer } from './lib/memo/care/persona.mjs';
-import { ensureWorkspaceMemorySession } from './lib/memo/care/workspace-memory.mjs';
-import { AGENT_CONFIG, detectAgents, ensureMarker } from './lib/aios-init/agent-config.mjs';
-import { ensureHook } from './lib/aios-init/hooks.mjs';
-import { ensureCompressionTools } from './lib/aios-init/compression-tools.mjs';
-import { ensureRexHarness } from './lib/rex-harness/runtime.mjs';
-import { reconcileLegacyWorkflowSurface } from './lib/workflows/surface/rex-workflow-surface-lifecycle.mjs';
+import { initWorkspace } from './lib/memory/contextdb/runtime/workspace.mjs';
+import { buildSkillIndex, writeSkillIndex } from './lib/memory/contextdb/registry/skill-index.mjs';
+import { ensurePersonaLayer } from './lib/memory/memo/care/persona.mjs';
+import { ensureWorkspaceMemorySession } from './lib/memory/memo/care/workspace-memory.mjs';
+import { AGENT_CONFIG, detectAgents, ensureMarker } from './lib/environment/aios-init/agent-config.mjs';
+import { ensureHook } from './lib/environment/aios-init/hooks.mjs';
+import { ensureCompressionTools } from './lib/environment/aios-init/compression-tools.mjs';
+import { ensureRexHarness } from './lib/clients/rex-harness/runtime.mjs';
+import { reconcileLegacyWorkflowSurface } from './lib/execution/workflows/surface/rex-workflow-surface-lifecycle.mjs';
 
 const AIOS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -95,7 +95,7 @@ export async function installRexWorkflowSkills({
   }
 
   const installRexClientProjections = installRexClientProjectionsImpl
-    ?? (await import('./lib/rex-harness/client-projection.mjs')).installRexClientProjections;
+    ?? (await import('./lib/clients/rex-harness/client-projection.mjs')).installRexClientProjections;
   return installRexClientProjections({
     rootDir,
     projectRoot: workspaceRoot,
@@ -216,7 +216,7 @@ export async function main(argv = process.argv.slice(2)) {
   console.log('');
   console.log('== MCP Config Migration ==');
   try {
-    const { migrateBrowserMcpConfig } = await import('./lib/components/browser/mcp/mcp-migration.mjs');
+    const { migrateBrowserMcpConfig } = await import('./lib/tooling/components/browser/mcp/mcp-migration.mjs');
     const mcpResult = await migrateBrowserMcpConfig({ rootDir: workspaceRoot, io: console, dryRun });
     console.log(`  MCP: created=${mcpResult.created} updated=${mcpResult.updated} unchanged=${mcpResult.unchanged} errors=${mcpResult.errors}`);
   } catch (err) {
@@ -231,7 +231,7 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('');
     console.log('== Global Skill Install ==');
     try {
-      const { installContextDbSkills } = await import('./lib/components/skills/lifecycle/install.mjs');
+      const { installContextDbSkills } = await import('./lib/tooling/components/skills/lifecycle/install.mjs');
       await installContextDbSkills({
         // 中文注释：rootDir 必须是 AIOS 安装根（catalog 与 skill-sources 所在），
         // 不能传客户端工作区——否则 manifest 永远找不到，全局 skill 目录静默失败。
@@ -252,12 +252,12 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('');
     console.log('== Pi Extension ==');
     try {
-      const { getClientHomes } = await import('./lib/platform/paths.mjs');
+      const { getClientHomes } = await import('./lib/foundation/platform/paths.mjs');
       const {
         ensurePiExtensionRegistered,
         resolveBundledPiExtensionPath,
         resolvePiSettingsPath,
-      } = await import('./lib/components/integrations/pi/extension-settings.mjs');
+      } = await import('./lib/tooling/components/integrations/pi/extension-settings.mjs');
       const result = ensurePiExtensionRegistered({
         settingsPath: resolvePiSettingsPath(getClientHomes(process.env).pi),
         extensionPath: resolveBundledPiExtensionPath(AIOS_ROOT),
@@ -275,13 +275,13 @@ export async function main(argv = process.argv.slice(2)) {
     // on the adapter). Network failures stay warnings: offline machines keep
     // the extension + project .mcp.json path.
     try {
-      const { getClientHomes } = await import('./lib/platform/paths.mjs');
+      const { getClientHomes } = await import('./lib/foundation/platform/paths.mjs');
       const {
         buildAiosPiMcpServers,
         ensurePiMcpAdapter,
         resolvePiMcpJsonPath,
-      } = await import('./lib/components/integrations/pi/mcp-adapter.mjs');
-      const { isBrowserMcpRuntimeInstalled } = await import('./lib/components/browser/runtime/runtime-readiness.mjs');
+      } = await import('./lib/tooling/components/integrations/pi/mcp-adapter.mjs');
+      const { isBrowserMcpRuntimeInstalled } = await import('./lib/tooling/components/browser/runtime/runtime-readiness.mjs');
       const { execFile } = await import('node:child_process');
       const run = (cmd, args) => new Promise((resolveRun, rejectRun) => {
         // Windows npm shims (pi.cmd/pi.ps1) only resolve through a shell;
@@ -302,7 +302,7 @@ export async function main(argv = process.argv.slice(2)) {
       // install stays owned by ensureCompressionTools.
       let headroomExecutable = '';
       if (yesHeadroomMcp) {
-        const { resolveHeadroomExecutable } = await import('./lib/aios-init/headroom-installer.mjs');
+        const { resolveHeadroomExecutable } = await import('./lib/environment/aios-init/headroom-installer.mjs');
         headroomExecutable = await resolveHeadroomExecutable({});
       }
       const mcp = await ensurePiMcpAdapter({
@@ -344,8 +344,8 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('');
     console.log('== ZCode Agents Plugin ==');
     try {
-      const { getClientHomes } = await import('./lib/platform/paths.mjs');
-      const { installAiosZcodeAgentsPlugin } = await import('./lib/components/integrations/zcode/agents-plugin.mjs');
+      const { getClientHomes } = await import('./lib/foundation/platform/paths.mjs');
+      const { installAiosZcodeAgentsPlugin } = await import('./lib/tooling/components/integrations/zcode/agents-plugin.mjs');
       const result = installAiosZcodeAgentsPlugin({
         aiosRoot: AIOS_ROOT,
         zcodeHome: getClientHomes(process.env).zcode,

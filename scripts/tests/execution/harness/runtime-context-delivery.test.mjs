@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildOrchestrationPlan } from '../../../lib/harness/orchestration/orchestrator.mjs';
-import { buildRolePrompt } from '../../../lib/harness/team/groupchat-runtime/dialogue/prompts.mjs';
-import { buildSystemPrompt, buildUserPrompt } from '../../../lib/harness/team/subagent-runtime/context/prompts.mjs';
-import { redactExecutionContextText, redactExecutionContextValue } from '../../../lib/harness/ops/runtime-context-redaction.mjs';
+import { buildOrchestrationPlan } from '../../../lib/execution/harness/orchestration/orchestrator.mjs';
+import { buildRolePrompt } from '../../../lib/execution/harness/team/groupchat-runtime/dialogue/prompts.mjs';
+import { buildSystemPrompt, buildUserPrompt } from '../../../lib/execution/harness/team/subagent-runtime/context/prompts.mjs';
+import { redactExecutionContextText, redactExecutionContextValue } from '../../../lib/execution/harness/ops/runtime-context-redaction.mjs';
 
 const deliveredText = '[context ref=docs/contract.md representation=full sha256=abc]\nRUNTIME ONLY SECRET CONTRACT';
 const executionContext = {

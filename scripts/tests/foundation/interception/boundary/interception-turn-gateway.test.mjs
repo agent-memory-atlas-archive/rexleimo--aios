@@ -14,10 +14,10 @@ import {
   recordUncontrolledTurn,
   requireTurnCompression,
   runTurnCompressionMatrixProof,
-} from '../../../../lib/interception/index.mjs';
-import { CLIENT_ORDER } from '../../../../lib/interception/transport/clients/capabilities.mjs';
-import { readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
-import { ALL_CLIENTS } from '../../../../lib/clients/selection/core/definitions.mjs';
+} from '../../../../lib/foundation/interception/index.mjs';
+import { CLIENT_ORDER } from '../../../../lib/foundation/interception/transport/clients/capabilities.mjs';
+import { readMetricsRecords } from '../../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs';
+import { ALL_CLIENTS } from '../../../../lib/foundation/clients/selection/core/definitions.mjs';
 
 const PRE_SEND_SENTINEL = 'UNIQUE_PRE_SEND_AGENT_PROMPT_SENTINEL';
 const POST_RECEIVE_SENTINEL = 'UNIQUE_POST_RECEIVE_AGENT_OUTPUT_SENTINEL';
@@ -29,7 +29,7 @@ test('turn gateway compresses pre-send prompts before they enter the target clie
   try {
     const rawPrompt = [
       'You are an AIOS worker. Follow the objective and include exact paths.',
-      'Relevant file: scripts/lib/lifecycle/run/harness/execution/execute-turn.mjs:42',
+      'Relevant file: scripts/lib/execution/lifecycle/run/harness/execution/execute-turn.mjs:42',
       PRE_SEND_SENTINEL.repeat(50),
       'Next action: implement the missing turn gateway.',
     ].join('\n');
@@ -78,7 +78,7 @@ test('turn gateway compresses post-receive assistant output before it is accepte
   try {
     const rawOutput = [
       'Agent result: reviewed interception runtime.',
-      'ERROR actionable issue at scripts/lib/interception/runtime/core/engine.mjs:77',
+      'ERROR actionable issue at scripts/lib/foundation/interception/runtime/core/engine.mjs:77',
       POST_RECEIVE_SENTINEL.repeat(50),
       'Handoff: wire metrics event kinds next.',
     ].join('\n');

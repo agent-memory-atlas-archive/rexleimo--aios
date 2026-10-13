@@ -142,8 +142,8 @@ mkdir -p "$tar_stage/aios"
     --exclude='mcp-server/.mcp.json' \
     --exclude='rex-harness/.git' \
     --exclude='rex-harness/.git/*' \
-    --exclude='scripts/lib/components/superpowers' \
-    --exclude='scripts/lib/components/superpowers/*' \
+    --exclude='scripts/lib/tooling/components/superpowers' \
+    --exclude='scripts/lib/tooling/components/superpowers/*' \
     --exclude='mcp-server/dist' \
     --exclude='mcp-server/dist/*' \
     --exclude='__pycache__' \
@@ -159,7 +159,7 @@ if [[ ! -f "$tar_stage/aios/rex-harness/src/index.mjs" ]]; then
 fi
 # A deleted legacy directory can remain ignored in a developer worktree. Do not
 # preserve its empty directory entry in either release archive.
-rmdir "$tar_stage/aios/scripts/lib/components/superpowers" 2>/dev/null || true
+rmdir "$tar_stage/aios/scripts/lib/tooling/components/superpowers" 2>/dev/null || true
 (
   cd "$tar_stage"
   tar -czf "$OUT_DIR/aios.tar.gz" aios
@@ -181,7 +181,7 @@ else
     cd "$tar_stage"
     "$ZIP_BIN" -r "$OUT_DIR/aios.zip" \
       aios \
-      -x '*.pyc' -x '*/__pycache__/*' -x '*/node_modules/*' -x '*/mcp-server/.npm-cache/*' -x '*/scripts/lib/components/superpowers' -x '*/scripts/lib/components/superpowers/*' -x '*/mcp-server/dist' -x '*/mcp-server/dist/*' -x '*/.git/*' -x '*/rex-harness/.git/*' -x '*/.aios/*' -x '*/.mypy_cache/*' -x '*/.DS_Store'
+      -x '*.pyc' -x '*/__pycache__/*' -x '*/node_modules/*' -x '*/mcp-server/.npm-cache/*' -x '*/scripts/lib/tooling/components/superpowers' -x '*/scripts/lib/tooling/components/superpowers/*' -x '*/mcp-server/dist' -x '*/mcp-server/dist/*' -x '*/.git/*' -x '*/rex-harness/.git/*' -x '*/.aios/*' -x '*/.mypy_cache/*' -x '*/.DS_Store'
   )
 fi
 if [[ ! -s "$OUT_DIR/aios.zip" ]]; then

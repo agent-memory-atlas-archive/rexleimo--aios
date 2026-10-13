@@ -5,9 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runShellEnvelope } from '../../../../lib/interception/transport/shell/shell-wrapper.mjs';
-import { readInterceptionRef, grepInterceptionRefs } from '../../../../lib/interception/observability/refs/index.mjs';
-import { readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
+import { runShellEnvelope } from '../../../../lib/foundation/interception/transport/shell/shell-wrapper.mjs';
+import { readInterceptionRef, grepInterceptionRefs } from '../../../../lib/foundation/interception/observability/refs/index.mjs';
+import { readMetricsRecords } from '../../../../lib/foundation/interception/observability/metrics/metrics-sink.mjs';
 
 const SENTINEL = 'UNIQUE_GOAL_CHAIN_SENTINEL';
 

@@ -10,7 +10,7 @@ function makeState() {
 }
 
 test('checkpoint registry applies update.completed atomically', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/active-checkpoint-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/active-checkpoint-registry.mjs');
   const next = mod.applyPointerTransition(makeState(), {
     type: 'update.completed',
     new_active_checkpoint_id: 'ckpt-b',
@@ -23,7 +23,7 @@ test('checkpoint registry applies update.completed atomically', async () => {
 });
 
 test('checkpoint registry covers promotion close, update failure, and rollback completion', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/active-checkpoint-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/active-checkpoint-registry.mjs');
   const monitoring = {
     active_checkpoint_id: 'ckpt-b',
     pre_update_ref_checkpoint_id: 'ckpt-a',
@@ -55,7 +55,7 @@ test('checkpoint registry covers promotion close, update failure, and rollback c
 });
 
 test('checkpoint registry rejects invalid transitions', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/active-checkpoint-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/active-checkpoint-registry.mjs');
 
   assert.throws(
     () =>

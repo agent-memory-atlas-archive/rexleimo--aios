@@ -6,7 +6,7 @@
  *   node scripts/run-affected-tests.mjs --list          # 只打印选中的文件
  *   node scripts/run-affected-tests.mjs --dry-run       # 打印决策，不起测试进程
  *
- * 这里刻意不 import 产品代码（scripts/lib/platform 等会拉起客户端注册表）：测试入口必须
+ * 这里刻意不 import 产品代码（scripts/lib/foundation/platform 等会拉起客户端注册表）：测试入口必须
  * 在产品代码坏掉的时候仍然能跑，否则最需要它的场景恰恰用不了。
  */
 import { spawnSync } from 'node:child_process';
@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildImpactIndex, selectAffectedTests } from './lib/test-impact.mjs';
+import { buildImpactIndex, selectAffectedTests } from './lib/tooling/test-impact.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST = path.join(ROOT, 'scripts', 'test-suites.json');

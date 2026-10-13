@@ -1,0 +1,180 @@
+import {
+  resolveClientHarnessProviders,
+  resolveClientTeamProviders,
+} from '../../../../foundation/clients/registry.mjs';
+
+/* 中文注释：provider 清单来自能力注册表，新增客户端时 help 自动跟上。 */
+const TEAM_PROVIDERS_FLAG = resolveClientTeamProviders('all').join('|');
+const HARNESS_PROVIDERS_FLAG = resolveClientHarnessProviders('all').join('|');
+
+export function getWorkflowCommandHelpText(command) {
+  switch (command) {
+    case 'workflow':
+      return `Usage:
+  aios workflow list [options]
+  aios workflow run <workflowId> --dry-run [options]
+
+Description:
+  List and dry-run aios.workflow-recipe.v1 recipes. Workflow recipes are the
+  AIOS-native equivalent of ECC orchestrate/plan/tdd/loop commands: they bind
+  default agents to ordered stages and block live execution until evidence exists.
+
+Options:
+  --task <title>       (run) Task title recorded in the dry-run
+  --dry-run            Required for workflow run until managed live evidence gates pass
+  --format <text|json>
+  --json
+  -h, --help
+`;
+    case 'orchestrate':
+      return `Usage:
+  aios orchestrate [feature|bugfix|refactor|security] [options]
+  aios orchestrate --session <id> [options]
+
+Options:
+  --task <title>
+  --context <summary>
+  --plan <path>                 Plan artifact required by --preflight auto readiness checks
+  --session <id>                 Load structured learn-eval recommendations for this session
+  --limit <n>                   Number of checkpoints to inspect when loading learn-eval
+  --recommendation <targetId>   Pin a specific learn-eval recommendation to the overlay
+  --dispatch <none|local>       Build a local dispatch skeleton (defaults to local when omitted)
+  --execute <none|dry-run|live> Execute dispatch through the selected runtime (defaults to dry-run; live is opt-in via AIOS_EXECUTE_LIVE=1 + AIOS_SUBAGENT_CLIENT=<codex-cli|claude-code|gemini-cli>)
+  --force                       Override live safety guards (retry-blocked instability and unknown capability surfaces)
+  --preflight <none|auto>       Run supported local gate/runbook actions before final DAG selection
+  AIOS_SUBAGENT_PRE_MUTATION_SNAPSHOT=1 (env) In live mode, capture pre-mutation backups for editable phase owned paths before each subagent run
+  --format <text|json>
+  -h, --help
+`;
+    case 'team':
+      return `Usage:
+  aios team [<workers:provider>] [task] [options]
+  aios team status [options]
+  aios team watchdog [options]
+  aios team history [options]
+  aios team skill-candidates [list|export] [options]
+
+Examples:
+  aios team 3:codex "Ship X"
+  aios team 2:claude --session <id>
+  aios team --resume <id> --retry-blocked --provider codex --workers 2
+  aios team --provider gemini --workers 2 --task "Refactor Y" --dry-run
+  aios team status --provider codex --watch
+  aios team watchdog --session <id> --json
+  aios team status --session <id> --show-skill-candidates detail --export-skill-candidate-patch-template
+  aios team history --provider claude --limit 10
+  aios team skill-candidates list --session <id> --draft-id <targetId> --json
+  aios team skill-candidates export --session <id> --draft-id <targetId>
+
+Options:
+  --workers <n>                 Team worker concurrency (default: 3)
+  --provider <${TEAM_PROVIDERS_FLAG}>
+  --blueprint <feature|bugfix|refactor|security>
+  --task <title>
+  --context <summary>
+  --plan <path>                 Plan artifact required by --preflight auto readiness checks
+  --session <id>
+  --resume <id>                 Resume from a prior orchestration session
+  --limit <n>
+  --recommendation <targetId>
+  --preflight <none|auto>
+  --retry-blocked               Replay only blocked jobs from latest dispatch artifact in the session
+  --force                       Override live safety guards (retry-blocked instability and unknown capability surfaces)
+  --format <text|json>
+  --dry-run                     Local dispatch dry-run (no model calls)
+  --live                        Force live execution (default)
+  --watch                       (team status) Refresh display on an interval (TTY-only)
+  --json                        (team status/history/skill-candidates list|export) Output structured JSON instead of text
+  --watchdog                    (team status) Include watchdog recovery decision in JSON/text state
+  --concurrency <n>             (team history) Process sessions concurrently (default: 4)
+  --fast                        (team history) Skip dispatch hindsight evaluation for faster scans
+  --show-skill-candidates [inline|detail] (team status) Show skill-candidate artifact rows (default mode: inline; "detail" prints candidate view directly)
+  --skill-candidate-view <inline|detail> (team status) Explicitly choose how skill candidates are rendered
+  --skill-candidate-limit <n>   (team status/hud/skill-candidates export) Cap detailed skill-candidate rows (implies --show-skill-candidates; default 6, team status --watch --fast defaults to 3)
+  --draft-id <targetId>          (team status/history/hud/skill-candidates export) Filter skill-candidate rows/export by sourceDraftTargetId
+  --output <path>               (team skill-candidates export) Write patch-template artifact to an explicit path
+  --export-skill-candidate-patch-template (team status/hud) Export apply_patch templates derived from surfaced skill-candidate artifacts
+  --quality-failed-only         (team history) Only include sessions with failed quality-gate outcomes
+  --quality-category <name>     (team history) Only include sessions with failed quality-gate category match
+  --quality-category-prefix <name> (team history) Only include sessions with failed quality-gate category prefix match (comma-separated)
+  --quality-category-prefix-mode <any|all> (team history) Prefix matching mode (default: any)
+  --fast                        (team status/hud) In --watch + minimal preset, skip heavy reads and throttle state refresh to ~1s
+  --no-fast                     (team status/hud) Force disable fast mode (overrides auto-fast)
+  --since <iso>                 (team history) Only include sessions updated at/after ISO timestamp
+  --status <value>              (team history) Only include sessions with matching meta.status
+  --preset <minimal|focused|full> (team status) Rendering preset (default: focused; with --watch defaults to minimal unless --preset provided)
+  --interval-ms <n|auto>        (team status) Watch refresh interval (default: 1000; use "auto" for 250-2000ms adaptive cadence; auto-fast enabled when <=500 or auto with watch+minimal)
+  AIOS_WATCH_STALLED_MS=<ms>    (env) Mark watch output as stalled when job/tool progress is unchanged beyond threshold (default: 30000)
+  -h, --help
+`;
+    case 'harness':
+      return `Usage:
+  aios harness run --objective <text> [options]
+  aios harness status --session <id> [options]
+  aios harness resume --session <id> [options]
+  aios harness stop --session <id> [options]
+
+Examples:
+  aios harness run --objective "Ship release checklist" --worktree
+  aios harness run --objective "Draft tomorrow handoff" --session demo-session --dry-run --json
+  aios harness status --session demo-session --json
+  aios harness resume --session demo-session
+  aios harness stop --session demo-session
+
+Options:
+  --objective <text>            (run) Required objective for a new solo harness run
+  --session <id>                Explicit ContextDB session id
+  --workspace <path>            Workspace root for ContextDB session artifacts (default: current directory)
+  --provider <${HARNESS_PROVIDERS_FLAG}> (run) Provider used by the solo harness
+  --transport <one-shot|rpc>    (run/resume) Provider transport: one-shot (default) or rpc (long-lived managed pi session)
+  --profile <minimal|standard|strict> (run) Harness profile for surrounding checks
+  --worktree                    (run) Execute inside an isolated git worktree
+  --base-ref <ref>              (run) Git ref used to seed worktree mode (default: HEAD)
+  --max-iterations <n>          (run/resume) Iteration budget for the solo loop (default: 20)
+  --turn-timeout-ms <n>         (run/resume) Per-turn provider timeout before staged process-tree kill (default: 1800000)
+  --hooks / --no-hooks          (run/resume) Enable or disable lifecycle hook evidence logging (default: enabled)
+  --reason <text>               (stop) Operator note recorded in control.json
+  --dry-run                     (run) Create/update the journal without invoking a provider
+  --json                        Output structured JSON instead of text
+  -h, --help
+`;
+    case 'hud':
+      return `Usage:
+  aios hud [options]
+
+Options:
+  --session <id>                Explicit ContextDB session id
+  --workspace <path>            Workspace root for ContextDB session artifacts (default: current directory)
+  --provider <${TEAM_PROVIDERS_FLAG}>
+  --preset <minimal|focused|full> Rendering preset (default: focused; with --watch defaults to minimal unless --preset provided)
+  --watch                       Refresh display on an interval (TTY-only)
+  --fast                        In --watch + minimal preset, skip heavy reads and throttle state refresh to ~1s
+  --no-fast                     Force disable fast mode (overrides auto-fast)
+  --watchdog                    Include watchdog decision + readiness (computed from worker signals)
+  --show-skill-candidates [inline|detail] Show skill-candidate artifact rows (default mode: inline; "detail" prints candidate view directly)
+  --skill-candidate-view <inline|detail> Explicitly choose how skill candidates are rendered
+  --skill-candidate-limit <n>   Cap detailed skill-candidate rows (implies --show-skill-candidates, default 6)
+  --draft-id <targetId>         Filter skill-candidate rows/export by sourceDraftTargetId
+  --export-skill-candidate-patch-template Export apply_patch templates derived from surfaced skill-candidate artifacts
+  --interval-ms <n|auto>        Watch refresh interval (default: 1000; use "auto" for 250-2000ms adaptive cadence; auto-fast enabled when <=500 or auto with watch+minimal)
+  AIOS_WATCH_STALLED_MS=<ms>    (env) Mark watch output as stalled when job/tool progress is unchanged beyond threshold (default: 30000)
+  --json                        Output structured JSON instead of text
+  -h, --help
+`;
+    case 'learn-eval':
+      return `Usage:
+  aios learn-eval [options]
+
+Options:
+  --session <id>
+  --limit <n>
+  --format <text|json>
+  --apply-draft <targetId>      Apply a single draft.* recommendation action
+  --apply-drafts                Apply all draft.* recommendation actions in priority order
+  --apply-dry-run               Preview draft actions without executing
+  -h, --help
+`;
+    default:
+      return '';
+  }
+}

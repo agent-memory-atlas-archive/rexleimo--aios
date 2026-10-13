@@ -10,7 +10,7 @@ import {
   readSkillIndex,
   findSkillsByKeywords,
   findSkillsByTaskType
-} from '../../../../lib/contextdb/registry/skill-index.mjs';
+} from '../../../../lib/memory/contextdb/registry/skill-index.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const testRoot = path.join(__dirname, '..', '..', '..', '..', '..', 'temp');

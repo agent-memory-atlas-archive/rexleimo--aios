@@ -8,11 +8,11 @@ import {
   reconcileUnclosedSessions,
   interruptionPath,
   DEFAULT_STALE_AFTER_MS,
-} from '../../../lib/lifecycle/run/session-hooks/reconcile.mjs';
-import { readSessionCloseCandidate } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
-import { getSoloHarnessPaths } from '../../../lib/harness/solo/solo-journal/plumbing/paths.mjs';
-import { claimSessionOwner } from '../../../lib/harness/solo/solo-journal/content/owner.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/execution/lifecycle/run/session-hooks/reconcile.mjs';
+import { readSessionCloseCandidate } from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
+import { getSoloHarnessPaths } from '../../../lib/execution/harness/solo/solo-journal/plumbing/paths.mjs';
+import { claimSessionOwner } from '../../../lib/execution/harness/solo/solo-journal/content/owner.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

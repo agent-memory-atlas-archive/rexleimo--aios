@@ -28,7 +28,7 @@ async function copyCanonicalSource(rootDir) {
 }
 
 async function loadCanonicalFixture(rootDir = resolveRepoRoot()) {
-  const mod = await import('../../../lib/agents/source-tree.mjs');
+  const mod = await import('../../../lib/foundation/agents/source-tree.mjs');
   return mod.loadCanonicalAgents({ rootDir });
 }
 
@@ -38,7 +38,7 @@ async function canonicalAgent(role) {
 }
 
 async function renderManagedAgent(agent, name = agent.name) {
-  const mod = await import('../../../lib/harness/team/orchestrator-agents.mjs');
+  const mod = await import('../../../lib/execution/harness/team/orchestrator-agents.mjs');
   return mod.renderAgentMarkdown({
     ...agent,
     name,
@@ -50,8 +50,8 @@ async function seedManagedTargets(rootDir, { extraManagedFile = null } = {}) {
   await copyCanonicalSource(rootDir);
   await writeText(
     rootDir,
-    'scripts/lib/specs/orchestrator/orchestrator-agents.json',
-    await readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs/orchestrator', 'orchestrator-agents.json'), 'utf8')
+    'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json',
+    await readFile(path.join(resolveRepoRoot(), 'scripts/lib/tooling/specs/orchestrator', 'orchestrator-agents.json'), 'utf8')
   );
 
   for (const agent of Object.values(source.agentsById)) {
@@ -60,7 +60,7 @@ async function seedManagedTargets(rootDir, { extraManagedFile = null } = {}) {
       path.join('.claude/agents', `${agent.name}.md`),
       await renderManagedAgent(agent)
     );
-    const { renderCodexAgent } = await import('../../../lib/agents/emitters/codex.mjs');
+    const { renderCodexAgent } = await import('../../../lib/foundation/agents/emitters/codex.mjs');
     const rendered = renderCodexAgent(agent);
     await writeText(rootDir, rendered.targetRelPath, rendered.content);
   }
@@ -95,7 +95,7 @@ function assertRichAgentInstructions(content, label) {
 
 test('renderClaudeAgent matches the normative template', async () => {
   const source = await canonicalAgent('planner');
-  const mod = await import('../../../lib/agents/emitters/claude.mjs');
+  const mod = await import('../../../lib/foundation/agents/emitters/claude.mjs');
   const rendered = mod.renderClaudeAgent(source);
   const md = rendered.content;
 
@@ -108,7 +108,7 @@ test('renderClaudeAgent matches the normative template', async () => {
 
 test('renderCodexAgent matches Codex TOML role contract', async () => {
   const source = await canonicalAgent('planner');
-  const mod = await import('../../../lib/agents/emitters/codex.mjs');
+  const mod = await import('../../../lib/foundation/agents/emitters/codex.mjs');
   const rendered = mod.renderCodexAgent(source);
   const md = rendered.content;
 
@@ -125,10 +125,10 @@ test('renderCodexAgent matches Codex TOML role contract', async () => {
 test('all client agent emitters preserve rich ECC role cards in generated outputs', async () => {
   const source = await canonicalAgent('reviewer');
   const emitters = [
-    ['claude', '../../../lib/agents/emitters/claude.mjs', 'renderClaudeAgent', extractMarkdownAgentBody],
-    ['codex', '../../../lib/agents/emitters/codex.mjs', 'renderCodexAgent', extractCodexDeveloperInstructions],
-    ['opencode', '../../../lib/agents/emitters/opencode.mjs', 'renderOpencodeAgent', extractMarkdownAgentBody],
-    ['grok', '../../../lib/agents/emitters/grok.mjs', 'renderGrokAgent', extractMarkdownAgentBody],
+    ['claude', '../../../lib/foundation/agents/emitters/claude.mjs', 'renderClaudeAgent', extractMarkdownAgentBody],
+    ['codex', '../../../lib/foundation/agents/emitters/codex.mjs', 'renderCodexAgent', extractCodexDeveloperInstructions],
+    ['opencode', '../../../lib/foundation/agents/emitters/opencode.mjs', 'renderOpencodeAgent', extractMarkdownAgentBody],
+    ['grok', '../../../lib/foundation/agents/emitters/grok.mjs', 'renderGrokAgent', extractMarkdownAgentBody],
   ];
 
   for (const [client, modulePath, exportName, extractor] of emitters) {
@@ -143,7 +143,7 @@ test('syncCanonicalAgents aborts before write on unmanaged conflict', async () =
   await copyCanonicalSource(rootDir);
   await writeText(rootDir, '.claude/agents/rex-planner.md', 'manual\n');
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   await assert.rejects(() => mod.syncCanonicalAgents({ rootDir, targets: ['claude'] }), /unmanaged conflict/i);
 });
 
@@ -156,10 +156,10 @@ test('syncCanonicalAgents rolls back replacements when final export write fails'
     (await renderManagedAgent(await canonicalAgent('planner'))).replace('Role: planner', 'Role: planner (stale)')
   );
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   const beforeClaude = await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8');
   const beforeCodex = await readFile(path.join(rootDir, '.codex/agents/rex-planner.toml'), 'utf8');
-  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
+  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   await assert.rejects(
     () => mod.syncCanonicalAgents({
@@ -176,14 +176,14 @@ test('syncCanonicalAgents rolls back replacements when final export write fails'
 
   assert.equal(await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8'), beforeClaude);
   assert.equal(await readFile(path.join(rootDir, '.codex/agents/rex-planner.toml'), 'utf8'), beforeCodex);
-  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
+  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
 });
 
 test('syncCanonicalAgents rolls back when stale managed backup move fails', async () => {
   const rootDir = await makeRootDir();
   await seedManagedTargets(rootDir, { extraManagedFile: '.claude/agents/old-agent.md' });
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   const beforePlanner = await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8');
   const beforeStale = await readFile(path.join(rootDir, '.claude/agents/old-agent.md'), 'utf8');
 
@@ -213,9 +213,9 @@ test('syncCanonicalAgents rolls back when target replacement fails during commit
     (await renderManagedAgent(await canonicalAgent('planner'))).replace('Role: planner', 'Role: planner (stale)')
   );
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   const beforePlanner = await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8');
-  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
+  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   await assert.rejects(
     () => mod.syncCanonicalAgents({
@@ -231,11 +231,11 @@ test('syncCanonicalAgents rolls back when target replacement fails during commit
   );
 
   assert.equal(await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8'), beforePlanner);
-  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
+  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/tooling/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
 });
 
 test('syncCanonicalAgents detects collisions before any file is written', async () => {
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
 
   await assert.rejects(
     () => mod.syncCanonicalAgents({
@@ -254,7 +254,7 @@ test('syncCanonicalAgents removes stale managed files after successful sync', as
   const rootDir = await makeRootDir();
   await seedManagedTargets(rootDir, { extraManagedFile: '.claude/agents/old-agent.md' });
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   await mod.syncCanonicalAgents({ rootDir, targets: ['claude'] });
 
   await assert.rejects(() => readFile(path.join(rootDir, '.claude/agents/old-agent.md'), 'utf8'));
@@ -264,7 +264,7 @@ test('syncCanonicalAgents migrates stale Codex markdown agents to TOML role file
   const rootDir = await makeRootDir();
   await seedManagedTargets(rootDir);
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   await mod.syncCanonicalAgents({ rootDir, targets: ['codex'] });
 
   const content = await readFile(path.join(rootDir, '.codex/agents/rex-planner.toml'), 'utf8');
@@ -281,12 +281,12 @@ test('syncCanonicalAgents rejects malformed marker-bearing files', async () => {
     '<!-- AIOS-GENERATED: orchestrator-agents v1 -->\nmanual\n'
   );
 
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   await assert.rejects(() => mod.syncCanonicalAgents({ rootDir, targets: ['claude'] }), /malformed managed file/i);
 });
 
 test('isManagedAgentMarkdown enforces the full ownership predicate', async () => {
-  const mod = await import('../../../lib/agents/sync.mjs');
+  const mod = await import('../../../lib/foundation/agents/sync.mjs');
   const valid = await renderManagedAgent(await canonicalAgent('planner'));
 
   assert.equal(mod.isManagedAgentMarkdown(valid, 'rex-planner'), true);

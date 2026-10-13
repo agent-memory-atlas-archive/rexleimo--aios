@@ -5,12 +5,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 import {
   appendMemoEvent,
   writePinnedMemo,
-} from '../../../lib/memo/storage.mjs';
-import { searchAiosProject } from '../../../lib/search/unified-search.mjs';
+} from '../../../lib/memory/memo/storage.mjs';
+import { searchAiosProject } from '../../../lib/memory/search/unified-search.mjs';
 
 const repoRoot = process.cwd();
 const cliPath = path.join(repoRoot, 'scripts', 'aios.mjs');

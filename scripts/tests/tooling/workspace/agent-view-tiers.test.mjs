@@ -11,9 +11,9 @@ import {
   initWorkspace,
   workspaceDir,
   writeKnowledgeSnapshot,
-} from '../../../lib/contextdb/runtime/workspace.mjs';
-import { writeSkillIndex } from '../../../lib/contextdb/registry/skill-index.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/memory/contextdb/runtime/workspace.mjs';
+import { writeSkillIndex } from '../../../lib/memory/contextdb/registry/skill-index.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CTX_AGENT_CLI = path.resolve(HERE, '..', '..', '..', 'ctx-agent.mjs');
@@ -45,7 +45,7 @@ async function makeViewFixture() {
     progress: ['landed hygiene command'],
     nextActions: [],
     blockers: [],
-    touchedFiles: ['scripts/lib/memo/care/hygiene.mjs'],
+    touchedFiles: ['scripts/lib/memory/memo/care/hygiene.mjs'],
   }), 'utf8');
   return rootDir;
 }

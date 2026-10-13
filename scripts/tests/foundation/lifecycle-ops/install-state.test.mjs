@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import { markComponentCompleted, readInstallState, writeInstallState } from '../../../lib/lifecycle/setup/install-state.mjs';
+import { markComponentCompleted, readInstallState, writeInstallState } from '../../../lib/execution/lifecycle/setup/install-state.mjs';
 
 function makeTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));

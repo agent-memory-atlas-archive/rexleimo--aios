@@ -26,7 +26,7 @@ export {
   tasksRelativePath,
   memoRelativePath,
   workspaceStateRelativePath,
-} from '../../scripts/lib/aios/state-root.mjs';
+} from '../../scripts/lib/environment/aios/state-root.mjs';
 
 // === 平台路径（home/xdg/client homes）===
 export {
@@ -38,14 +38,14 @@ export {
   resolvePowerShellProfilePaths,
   resolvePowerShellProfilePath,
   getAgentsHome,
-} from '../../scripts/lib/platform/paths.mjs';
+} from '../../scripts/lib/foundation/platform/paths.mjs';
 
 // === 进程执行（commandExists/captureCommand/runCommand）===
 export {
   commandExists,
   captureCommand,
   runCommand,
-} from '../../scripts/lib/platform/process.mjs';
+} from '../../scripts/lib/foundation/platform/process.mjs';
 
 // === 文件系统工具 ===
 export {
@@ -59,18 +59,18 @@ export {
   isManagedLink,
   ensureManagedLink,
   removeManagedLink,
-} from '../../scripts/lib/platform/fs.mjs';
+} from '../../scripts/lib/foundation/platform/fs.mjs';
 
 // === 原子写入 ===
 export {
   writeFileAtomic,
-} from '../../scripts/lib/fs/atomic-write.mjs';
+} from '../../scripts/lib/environment/fs/atomic-write.mjs';
 
 // === 仓库锁 ===
 export {
   resolveRepoLockPath,
   withRepoLock,
-} from '../../scripts/lib/fs/repo-lock.mjs';
+} from '../../scripts/lib/environment/fs/repo-lock.mjs';
 
 // === 共享工具（Phase 1 提取）===
 export {

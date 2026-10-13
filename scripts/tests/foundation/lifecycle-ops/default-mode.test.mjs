@@ -10,8 +10,8 @@ import {
   getModePreset,
   resolveDefaultModeInjections,
   writeAiosConfig,
-} from '../../../lib/lifecycle/govern/options/default-mode.mjs';
-import { resolveRuntimeDirectiveInjections } from '../../../lib/lifecycle/run/harness/support/directive-inject.mjs';
+} from '../../../lib/execution/lifecycle/govern/options/default-mode.mjs';
+import { resolveRuntimeDirectiveInjections } from '../../../lib/execution/lifecycle/run/harness/support/directive-inject.mjs';
 
 test('readAiosConfig returns null when config file does not exist', async () => {
   const tmpDir = await mkdtemp();

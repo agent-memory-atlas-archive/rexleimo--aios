@@ -4,15 +4,15 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { readHudState } from '../../../lib/hud/state.mjs';
-import { runTeamStatus } from '../../../lib/lifecycle/fleet/team-ops.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
+import { readHudState } from '../../../lib/execution/hud/state.mjs';
+import { runTeamStatus } from '../../../lib/execution/lifecycle/fleet/team-ops.mjs';
 import {
   collectWatchdogSignals,
   buildWatchdogReadiness,
   decideWatchdogRecovery,
   runTeamWatchdog,
-} from '../../../lib/lifecycle/fleet/watchdog.mjs';
+} from '../../../lib/execution/lifecycle/fleet/watchdog.mjs';
 
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });

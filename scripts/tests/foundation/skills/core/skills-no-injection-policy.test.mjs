@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 
-import { loadSkillsSyncManifest } from '../../../../lib/skills/source-tree.mjs';
+import { loadSkillsSyncManifest } from '../../../../lib/tooling/skills/source-tree.mjs';
 import { readProjectedSkill } from '../../../fixtures/skill-projection.mjs';
 
 const rootDir = process.cwd();

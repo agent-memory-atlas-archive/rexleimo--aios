@@ -6,9 +6,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { normalizeAuditRecord, utcDateHourFromTs, hourKeyFromRecord, AUDIT_RECORD_FIELDS } from '../../../../lib/interception/observability/audit/schema.mjs';
-import { runAuditAggregation, auditHourlyPath } from '../../../../lib/interception/observability/audit/aggregate.mjs';
-import { runAuditQuery } from '../../../../lib/interception/observability/audit/query.mjs';
+import { normalizeAuditRecord, utcDateHourFromTs, hourKeyFromRecord, AUDIT_RECORD_FIELDS } from '../../../../lib/foundation/interception/observability/audit/schema.mjs';
+import { runAuditAggregation, auditHourlyPath } from '../../../../lib/foundation/interception/observability/audit/aggregate.mjs';
+import { runAuditQuery } from '../../../../lib/foundation/interception/observability/audit/query.mjs';
 
 /* 中文注释：测试用临时 workspace，模拟 metrics 目录结构。 */
 async function makeTempWorkspace() {

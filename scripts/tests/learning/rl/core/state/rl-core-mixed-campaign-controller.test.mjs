@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('computeEpochOutcome returns replay_only when active-environment coverage is insufficient', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
 
   const outcome = mod.computeEpochOutcome({
     activeEnvironments: ['shell', 'browser', 'orchestrator'],
@@ -21,7 +21,7 @@ test('computeEpochOutcome returns replay_only when active-environment coverage i
 });
 
 test('computeEpochOutcome does not evaluate shell safety gate unless promotion is otherwise eligible', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   let gateCalled = false;
 
   const outcome = mod.computeEpochOutcome({
@@ -42,7 +42,7 @@ test('computeEpochOutcome does not evaluate shell safety gate unless promotion i
 });
 
 test('reduceDegradationStreak triggers rollback after three ordered degradations', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
 
   const outcome = mod.reduceDegradationStreak([
     { comparison_status: 'completed', relative_outcome: 'worse' },
@@ -56,7 +56,7 @@ test('reduceDegradationStreak triggers rollback after three ordered degradations
 });
 
 test('computeEpochOutcome gives rollback precedence over coverage and shell-safety replay_only paths', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
 
   const outcome = mod.computeEpochOutcome({
     activeEnvironments: ['shell', 'browser'],
@@ -72,7 +72,7 @@ test('computeEpochOutcome gives rollback precedence over coverage and shell-safe
 });
 
 test('runOnlineCampaign exits no_work_available after exhausting the idle backoff budget', async () => {
-  const mod = await import('../../../../../lib/rl-core/control/campaign-controller.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/control/campaign-controller.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-core-idle-'));
 
   const result = await mod.runOnlineCampaign({

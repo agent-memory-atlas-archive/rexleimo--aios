@@ -5,8 +5,8 @@
  * 迁移指南见 .claude/skills/aios-interception-runtime/SKILL.md
  */
 /* 中文注释：MCP server 代理入口在客户端和上游服务之间插入 AIOS 压缩数据面。 */
-import { createJsonRpcProxyHandler } from './lib/interception/transport/mcp/proxy/json-rpc-proxy.mjs';
-import { runJsonRpcStdioProxy } from './lib/interception/transport/mcp/proxy/stdio-proxy.mjs';
+import { createJsonRpcProxyHandler } from './lib/foundation/interception/transport/mcp/proxy/json-rpc-proxy.mjs';
+import { runJsonRpcStdioProxy } from './lib/foundation/interception/transport/mcp/proxy/stdio-proxy.mjs';
 
 export { createJsonRpcProxyHandler, runJsonRpcStdioProxy };
 

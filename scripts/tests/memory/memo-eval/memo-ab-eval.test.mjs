@@ -10,7 +10,7 @@ import {
   buildCorpusEvents,
   formatReport,
   runArm,
-} from '../../../lib/memo/eval/recall-ab.mjs';
+} from '../../../lib/memory/memo/eval/recall-ab.mjs';
 
 async function withTempRoot(fn) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'memo-ab-eval-'));

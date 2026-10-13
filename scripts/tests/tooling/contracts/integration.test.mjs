@@ -5,19 +5,19 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { CLIENT_DEFINITIONS } from '../../../lib/clients/selection/core/definitions.mjs';
+import { CLIENT_DEFINITIONS } from '../../../lib/foundation/clients/selection/core/definitions.mjs';
 import {
   INTEGRATION_CLIENT_TABLE,
   formatInvocation,
   getIntegrationClientEntry,
   resolveIntegrationClientCommand,
   resolveIntegrationClientOrder,
-} from '../../../lib/integrations/clients.mjs';
+} from '../../../lib/clients/integrations/clients.mjs';
 import {
   checkSkillPlane,
   checkEnvVars,
   runIntegrationDoctor,
-} from '../../../lib/integrations/doctor.mjs';
+} from '../../../lib/clients/integrations/doctor.mjs';
 import {
   classifyIntegrationOwnership,
   fingerprintMcpEntry,
@@ -25,22 +25,22 @@ import {
   normalizeMcpEntry,
   readIntegrationLedger,
   writeIntegrationLedger,
-} from '../../../lib/integrations/ledger.mjs';
+} from '../../../lib/clients/integrations/ledger.mjs';
 import {
   buildCatalogSkillContent,
   installSkillToCatalog,
   stagedFilesMatch,
   verifySkillFiles,
-} from '../../../lib/integrations/skill.mjs';
-import { upsertConfigEntry, readConfigEntryFor, buildDesiredMcpEntry } from '../../../lib/integrations/mcp.mjs';
-import { defaultCommandExistsImpl } from '../../../lib/integrations/install.mjs';
+} from '../../../lib/clients/integrations/skill.mjs';
+import { upsertConfigEntry, readConfigEntryFor, buildDesiredMcpEntry } from '../../../lib/clients/integrations/mcp.mjs';
+import { defaultCommandExistsImpl } from '../../../lib/clients/integrations/install.mjs';
 import {
   IntegrationRegistryError,
   normalizeIntegrationRegistry,
   resolveIntegration,
-} from '../../../lib/integrations/registry.mjs';
-import { stripAiosFrontmatter } from '../../../lib/skills/frontmatter.mjs';
-import { parseIntegrationArgs } from '../../../lib/cli/parse-args/platform/integration.mjs';
+} from '../../../lib/clients/integrations/registry.mjs';
+import { stripAiosFrontmatter } from '../../../lib/tooling/skills/frontmatter.mjs';
+import { parseIntegrationArgs } from '../../../lib/tooling/cli/parse-args/platform/integration.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..', '..', '..');
 const UPSTREAM_SKILL_MD = `---

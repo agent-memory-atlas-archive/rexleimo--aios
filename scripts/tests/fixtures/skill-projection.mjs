@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { materializeSkillTree } from '../../lib/skills/source-tree.mjs';
+import { materializeSkillTree } from '../../lib/tooling/skills/source-tree.mjs';
 
 /**
  * Read exactly what the sync/installer projects for a client surface, without

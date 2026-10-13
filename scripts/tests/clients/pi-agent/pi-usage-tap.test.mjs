@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createLedgerUsageTap, extractUsageFromRecord } from '../../../lib/pi/usage-tap.mjs';
+import { createLedgerUsageTap, extractUsageFromRecord } from '../../../lib/clients/pi/usage-tap.mjs';
 
 const assistantMessageEnd = {
   type: 'message_end',

@@ -17,26 +17,26 @@ import {
   resolveVendorConfig,
   validateVendorConfig,
   writeJudgmentConfig,
-} from '../../../lib/judgment/config.mjs';
+} from '../../../lib/learning/judgment/config.mjs';
 import {
   askJudgment,
   createJudgmentSession,
   validateAnswer,
   validateQuestions,
-} from '../../../lib/judgment/jev-client.mjs';
-import { judgeVerdict, resolveFloors } from '../../../lib/judgment/verdict.mjs';
-import { runJudgmentCommand } from '../../../lib/judgment/cli.mjs';
+} from '../../../lib/learning/judgment/jev-client.mjs';
+import { judgeVerdict, resolveFloors } from '../../../lib/learning/judgment/verdict.mjs';
+import { runJudgmentCommand } from '../../../lib/learning/judgment/cli.mjs';
 import {
   JUDGMENT_TOOL_NAME,
   handleJudgmentTool,
   withJudgmentTool,
-} from '../../../lib/judgment/mcp-tool.mjs';
+} from '../../../lib/learning/judgment/mcp-tool.mjs';
 import {
   STAGE_GATE_QUESTION_ID,
   buildStageGateQuestions,
   evaluateStageAdvanceGate,
   precheckStageEvidence,
-} from '../../../lib/judgment/stage-gate.mjs';
+} from '../../../lib/learning/judgment/stage-gate.mjs';
 import { handleMessage } from '../../../aios-mcp-server.mjs';
 
 function tempConfigPath() {

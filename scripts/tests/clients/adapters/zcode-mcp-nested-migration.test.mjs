@@ -4,11 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp/mcp-migration.mjs';
-import { migrateOneZcodeJsonFile, normalizeZcodeServerEntry } from '../../../lib/components/browser/mcp/formats/mcp-zcode.mjs';
-import { collectClientMcpTargets } from '../../../lib/components/browser/mcp/mcp-targets.mjs';
-import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { getClientMcpTarget } from '../../../lib/clients/integration/native/index.mjs';
+import { migrateOneMcpJsonFile } from '../../../lib/tooling/components/browser/mcp/mcp-migration.mjs';
+import { migrateOneZcodeJsonFile, normalizeZcodeServerEntry } from '../../../lib/tooling/components/browser/mcp/formats/mcp-zcode.mjs';
+import { collectClientMcpTargets } from '../../../lib/tooling/components/browser/mcp/mcp-targets.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../../../lib/tooling/components/browser/constants.mjs';
+import { getClientMcpTarget } from '../../../lib/foundation/clients/integration/native/index.mjs';
 
 async function makeTemp() {
   return mkdtemp(path.join(os.tmpdir(), 'aios-zcode-mcp-'));

@@ -4,12 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { installNativeEnhancements } from '../../../lib/components/native.mjs';
+import { installNativeEnhancements } from '../../../lib/tooling/components/native.mjs';
 import {
   buildRouteTriggerCommandTargets,
   checkRouteTriggerCommandsSync,
   syncRouteTriggerCommands,
-} from '../../../lib/native/routing/route-commands.mjs';
+} from '../../../lib/clients/native/routing/route-commands.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

@@ -4,10 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { bindPhaseJobRexActivation, executePhaseJob } from '../../../../lib/harness/team/subagent-runtime/phases/phase-job.mjs';
-import { evaluatePhaseFilePolicy } from '../../../../lib/harness/team/subagent-runtime/context/file-policy.mjs';
+import { bindPhaseJobRexActivation, executePhaseJob } from '../../../../lib/execution/harness/team/subagent-runtime/phases/phase-job.mjs';
+import { evaluatePhaseFilePolicy } from '../../../../lib/execution/harness/team/subagent-runtime/context/file-policy.mjs';
 import { findStandaloneWorkflow } from '../../../../../rex-harness/src/index.mjs';
-import { buildSystemPrompt } from '../../../../lib/harness/team/subagent-runtime/context/prompts.mjs';
+import { buildSystemPrompt } from '../../../../lib/execution/harness/team/subagent-runtime/context/prompts.mjs';
 
 function job(itemId, prefixes) {
   return {
@@ -156,7 +156,7 @@ test('editable phase job does not launch when rex bind fails', async () => {
 
 test('file policy rejects touches outside the work item prefix', () => {
   const phase = { canEditFiles: true, ownedPathPrefixes: ['scripts/'] };
-  const inside = evaluatePhaseFilePolicy({ filesTouched: ['scripts/lib/planning/flow/auto-gate.mjs'] }, phase);
+  const inside = evaluatePhaseFilePolicy({ filesTouched: ['scripts/lib/foundation/planning/flow/auto-gate.mjs'] }, phase);
   const outside = evaluatePhaseFilePolicy({ filesTouched: ['mcp-server/src/index.ts'] }, phase);
   assert.equal(inside.ok, true);
   assert.equal(outside.ok, false);

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { runDoctorChecks } from '../../../lib/contextdb/doctor.mjs';
+import { runDoctorChecks } from '../../../lib/memory/contextdb/doctor.mjs';
 
 async function makeTmp() {
   return mkdtemp(path.join(os.tmpdir(), 'doctor-test-'));

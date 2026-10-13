@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { doctorBrowserMcp } from '../../../lib/components/browser/browser.mjs';
-import { countEffectiveWarnLines, runDoctorSuite } from '../../../lib/doctor/aggregate.mjs';
+import { doctorBrowserMcp } from '../../../lib/tooling/components/browser/browser.mjs';
+import { countEffectiveWarnLines, runDoctorSuite } from '../../../lib/environment/doctor/aggregate.mjs';
 
 test('countEffectiveWarnLines ignores missing codex/claude/gemini path warnings', () => {
   const count = countEffectiveWarnLines([

@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('orchestrator holdout returns gate metrics with zero schema failures on fixture harness', async () => {
-  const evalMod = await import('../../../../lib/rl-orchestrator-v1/eval-harness.mjs');
-  const regMod = await import('../../../../lib/rl-orchestrator-v1/task-registry.mjs');
-  const runnerMod = await import('../../../../lib/rl-orchestrator-v1/decision-runner.mjs');
+  const evalMod = await import('../../../../lib/learning/rl-orchestrator-v1/eval-harness.mjs');
+  const regMod = await import('../../../../lib/learning/rl-orchestrator-v1/task-registry.mjs');
+  const runnerMod = await import('../../../../lib/learning/rl-orchestrator-v1/decision-runner.mjs');
 
   const holdout = await evalMod.runOrchestratorHoldout({
     tasks: regMod.loadRealOrchestratorTasks().slice(0, 20),
@@ -21,8 +21,8 @@ test('orchestrator holdout returns gate metrics with zero schema failures on fix
 });
 
 test('orchestrator holdout can run with real harness mode and execution-mode fallback', async () => {
-  const evalMod = await import('../../../../lib/rl-orchestrator-v1/eval-harness.mjs');
-  const regMod = await import('../../../../lib/rl-orchestrator-v1/task-registry.mjs');
+  const evalMod = await import('../../../../lib/learning/rl-orchestrator-v1/eval-harness.mjs');
+  const regMod = await import('../../../../lib/learning/rl-orchestrator-v1/task-registry.mjs');
 
   const executionModes = [];
   const holdout = await evalMod.runOrchestratorHoldout({

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
 
-import { verifySkillTrainingGate } from '../../../../lib/skills/training/training-gate.mjs';
+import { verifySkillTrainingGate } from '../../../../lib/tooling/skills/training/training-gate.mjs';
 import { createSkillTrainingGateFixture } from '../../../fixtures/skill-training-gate.mjs';
 
 const ROOT = process.cwd();

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('browser task registry samples deterministically and rejects inadmissible tasks', async () => {
-  const mod = await import('../../../../lib/rl-browser-v1/task-registry.mjs');
+  const mod = await import('../../../../lib/learning/rl-browser-v1/task-registry.mjs');
 
   const tasks = mod.loadBrowserTasks({
     tasks: [

@@ -4,13 +4,13 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { loadCanonicalAgents } from '../../../../lib/agents/source-tree.mjs';
-import { parseArgs } from '../../../../lib/cli/parse-args.mjs';
-import { getCommandHelpText } from '../../../../lib/cli/help/help.mjs';
-import { CLIENT_CAPABILITIES, CLIENT_DEFINITIONS } from '../../../../lib/clients/selection/core/definitions.mjs';
-import { runDoctorSuite } from '../../../../lib/doctor/aggregate.mjs';
-import { normalizeComponents } from '../../../../lib/lifecycle/govern/options.mjs';
-import { listWorkflowRecipes } from '../../../../lib/workflows/recipes.mjs';
+import { loadCanonicalAgents } from '../../../../lib/foundation/agents/source-tree.mjs';
+import { parseArgs } from '../../../../lib/tooling/cli/parse-args.mjs';
+import { getCommandHelpText } from '../../../../lib/tooling/cli/help/help.mjs';
+import { CLIENT_CAPABILITIES, CLIENT_DEFINITIONS } from '../../../../lib/foundation/clients/selection/core/definitions.mjs';
+import { runDoctorSuite } from '../../../../lib/environment/doctor/aggregate.mjs';
+import { normalizeComponents } from '../../../../lib/execution/lifecycle/govern/options.mjs';
+import { listWorkflowRecipes } from '../../../../lib/execution/workflows/recipes.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', '..');
 
@@ -45,12 +45,12 @@ test('AIOS exposes only the Rex workflow surface', async () => {
   }
 
   const uiFiles = [
-    'scripts/lib/tui-ink/views/types.ts',
-    'scripts/lib/tui-ink/hooks/useSetupOptions.ts',
-    'scripts/lib/tui-ink/screens/setup/SetupScreen.tsx',
-    'scripts/lib/tui-ink/screens/setup/UpdateScreen.tsx',
-    'scripts/lib/tui-ink/screens/setup/UninstallScreen.tsx',
-    'scripts/lib/tui-ink/screens/ops/DoctorScreen.tsx',
+    'scripts/lib/execution/tui-ink/views/types.ts',
+    'scripts/lib/execution/tui-ink/hooks/useSetupOptions.ts',
+    'scripts/lib/execution/tui-ink/screens/setup/SetupScreen.tsx',
+    'scripts/lib/execution/tui-ink/screens/setup/UpdateScreen.tsx',
+    'scripts/lib/execution/tui-ink/screens/setup/UninstallScreen.tsx',
+    'scripts/lib/execution/tui-ink/screens/ops/DoctorScreen.tsx',
   ];
   for (const relativePath of uiFiles) {
     const source = await readFile(path.join(rootDir, relativePath), 'utf8');

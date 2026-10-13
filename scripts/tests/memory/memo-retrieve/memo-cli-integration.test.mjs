@@ -216,16 +216,16 @@ test('aios memo recall emits readable digest from active storage records', async
 
 /* ── Session close auto-memo & start timeline tests ── */
 
-import { appendMemoEvent } from '../../../lib/memo/storage/events/events-write.mjs';
-import { listMemoEvents } from '../../../lib/memo/storage/views/query.mjs';
+import { appendMemoEvent } from '../../../lib/memory/memo/storage/events/events-write.mjs';
+import { listMemoEvents } from '../../../lib/memory/memo/storage/views/query.mjs';
 import {
   autoMemoSessionClose,
   readSessionCloseCandidate,
   sessionCloseCandidatePath,
-} from '../../../lib/lifecycle/run/session-hooks/close.mjs';
-import { renderActivityTimeline } from '../../../lib/lifecycle/run/session-hooks/start-timeline.mjs';
-import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
+import { renderActivityTimeline } from '../../../lib/execution/lifecycle/run/session-hooks/start-timeline.mjs';
+import { recordSessionChangedFile } from '../../../lib/execution/session/changed-files.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 function ensureDirSync(dir) {
   return fs.mkdir(dir, { recursive: true });

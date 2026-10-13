@@ -155,7 +155,7 @@ try {
   }
 
   # Generated client projections and retired workflow code are materialized at install time.
-  $legacySuperpowersArchive = Join-Path $extractDir "aios/scripts/lib/components/superpowers"
+  $legacySuperpowersArchive = Join-Path $extractDir "aios/scripts/lib/tooling/components/superpowers"
   if (Test-Path -LiteralPath $legacySuperpowersArchive) {
     Remove-Item -LiteralPath $legacySuperpowersArchive -Recurse -Force
   }

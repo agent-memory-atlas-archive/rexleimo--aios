@@ -5,8 +5,8 @@
  * 迁移指南见 .claude/skills/aios-interception-runtime/SKILL.md
  */
 /* 中文注释：CLI 网关把普通命令包成 envelope，统一进入 interception shell 链路。 */
-import { decodeEnvelope } from './lib/interception/runtime/core/envelope.mjs';
-import { runShellEnvelope } from './lib/interception/transport/shell/shell-wrapper.mjs';
+import { decodeEnvelope } from './lib/foundation/interception/runtime/core/envelope.mjs';
+import { runShellEnvelope } from './lib/foundation/interception/transport/shell/shell-wrapper.mjs';
 
 const args = process.argv.slice(2);
 const mode = args[0];

@@ -1,9 +1,9 @@
-// scripts/ctx-bootstrap.mjs — 薄壳入口，逻辑在 scripts/lib/ctx-bootstrap/
+// scripts/ctx-bootstrap.mjs — 薄壳入口，逻辑在 scripts/lib/foundation/ctx-bootstrap/
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { resolveTasksRoot } from './lib/aios/state-root.mjs';
-import { buildTaskId, buildTaskJson, buildBootstrapPrd, isBootstrapEnabled } from './lib/ctx-bootstrap/tasks.mjs';
-import { readTextIfExists, hasPendingEntries } from './lib/ctx-bootstrap/io.mjs';
+import { resolveTasksRoot } from './lib/environment/aios/state-root.mjs';
+import { buildTaskId, buildTaskJson, buildBootstrapPrd, isBootstrapEnabled } from './lib/foundation/ctx-bootstrap/tasks.mjs';
+import { readTextIfExists, hasPendingEntries } from './lib/foundation/ctx-bootstrap/io.mjs';
 
 export { isBootstrapEnabled };
 

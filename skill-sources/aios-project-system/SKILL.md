@@ -24,7 +24,7 @@ Use this skill as the repository map for `aios`. It explains where state lives, 
 - `skill-sources/*/SKILL.md`: canonical skill sources (edit here, never edit generated copies).
 - Generated repo-local skills per client: `.codex/skills`, `.claude/skills`, `.gemini/skills`, `.opencode/skills`, `.agents/skills` — emitted from `skill-sources/` via `config/skills-sync-manifest.json`.
 - Agent promotion and workflow enablement are evidence-gated: use `agents smoke` for core-risk rollout evidence, then `skill verify-training` to block changed skills until SkillOpt training is accepted.
-- `scripts/lib/specs/*.json`: runtime specifications and limits.
+- `scripts/lib/tooling/specs/*.json`: runtime specifications and limits.
 - `tasks/{pending,done,failed}`: task queue and outcomes.
 - `scripts/run-browser-use-mcp.sh`: default browser MCP launcher (bridges to `ai-browser-book/mcp-browser-use`).
 - `mcp-server/`: legacy Playwright MCP implementation retained for compatibility workflows.
@@ -38,7 +38,7 @@ Use this skill as the repository map for `aios`. It explains where state lives, 
 - Repo-local skill `SKILL.md` files can drift from site UI; treat them as runbooks that require live verification.
 - Prefer `page.extract_text` / `page.get_html` evidence before using `page.screenshot`.
 - Repo-local discoverable skills are generated under each client's skill root (`.codex/skills`, `.claude/skills`, `.gemini/skills`, `.opencode/skills`, `.agents/skills`) from `skill-sources/` — do not create ad-hoc skill roots such as `.baoyu-skills/*/SKILL.md`. `.baoyu-skills/` is extension-config territory, not a skill root. Edit canonical sources under `skill-sources/`, then run skill sync.
-- Keep safety constraints aligned with `scripts/lib/specs` and the `skill-constraints` skill.
+- Keep safety constraints aligned with `scripts/lib/tooling/specs` and the `skill-constraints` skill.
 
 ## Resources
 - `references/system-map.md`: concise architecture and data flow map.

@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { syncGeneratedSkills } from './lib/skills/install/sync.mjs';
+import { syncGeneratedSkills } from './lib/tooling/skills/install/sync.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

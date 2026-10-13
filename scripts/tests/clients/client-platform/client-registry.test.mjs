@@ -8,28 +8,28 @@ import {
   ALL_CLIENTS,
   CLIENT_CAPABILITIES,
   CLIENT_SELECTIONS,
-} from '../../../lib/clients/selection/core/definitions.mjs';
+} from '../../../lib/foundation/clients/selection/core/definitions.mjs';
 import {
   getClientCapability,
   resolveClientsWithCapability,
   supportsClientCapability,
-} from '../../../lib/clients/reporting/capabilities/index.mjs';
+} from '../../../lib/foundation/clients/reporting/capabilities/index.mjs';
 import {
   assertKnownCapability,
   assertKnownClient,
   isKnownCapability,
   isKnownClient,
   resolveClientSelection,
-} from '../../../lib/clients/selection/core/selection.mjs';
+} from '../../../lib/foundation/clients/selection/core/selection.mjs';
 import {
   getClientAgentTargetRoot,
   resolveClientSkillRoots,
-} from '../../../lib/clients/integration/paths/index.mjs';
+} from '../../../lib/foundation/clients/integration/paths/index.mjs';
 import {
   getClientInstructionFileName,
   getClientMcpTarget,
   resolveClientMcpTargetPath,
-} from '../../../lib/clients/integration/native/index.mjs';
+} from '../../../lib/foundation/clients/integration/native/index.mjs';
 import {
   buildRuntimeClientProviderMap,
   buildRuntimeClientModelArgs,
@@ -41,13 +41,13 @@ import {
   resolveClientFromRuntimeId,
   resolveClientCommandNames,
   resolveClientRuntimeIds,
-} from '../../../lib/clients/execution/runtime/index.mjs';
+} from '../../../lib/foundation/clients/execution/runtime/index.mjs';
 import {
   buildTeamProviderRuntimeClientMap,
   resolveClientHarnessProviders,
   resolveClientTeamProviders,
-} from '../../../lib/clients/integration/providers/index.mjs';
-import * as registry from '../../../lib/clients/registry.mjs';
+} from '../../../lib/foundation/clients/integration/providers/index.mjs';
+import * as registry from '../../../lib/foundation/clients/registry.mjs';
 
 function resolveRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

@@ -7,9 +7,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { compressPreSendTurn } from '../../../../lib/interception/index.mjs';
-import { buildClaudePreToolUseRewriteResponse, rewriteShellCommand } from '../../../../lib/interception/index.mjs';
-import { decodeEnvelope } from '../../../../lib/interception/runtime/core/envelope.mjs';
+import { compressPreSendTurn } from '../../../../lib/foundation/interception/index.mjs';
+import { buildClaudePreToolUseRewriteResponse, rewriteShellCommand } from '../../../../lib/foundation/interception/index.mjs';
+import { decodeEnvelope } from '../../../../lib/foundation/interception/runtime/core/envelope.mjs';
 
 const cli = path.join(process.cwd(), 'scripts', 'aios.mjs');
 

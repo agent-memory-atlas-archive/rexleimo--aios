@@ -1,6 +1,6 @@
 // Test fixture: hermetic environment for tests that spawn the AIOS agent runtime.
 //
-// Why this exists: the opt-in judgment stage gate (scripts/lib/judgment/*) reads
+// Why this exists: the opt-in judgment stage gate (scripts/lib/learning/judgment/*) reads
 // `~/.aios/judgment/config.json` from the *operator's* machine. When a developer
 // has enabled it, every spawned ctx-agent run consults a judgment provider and a
 // low score holds the stage — so a test that asserts `result.status === 0` fails

@@ -6,15 +6,15 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { resolveContextDbRoot } from '../lib/aios/state-root.mjs';
-import { autoMemoSessionClose } from '../lib/lifecycle/run/session-hooks/close.mjs';
-import { runDream } from '../lib/lifecycle/evolve/dream/index.mjs';
-import { runReadinessCheck } from '../lib/lifecycle/govern/preflight-contracts.mjs';
-import { appendMemoEvent } from '../lib/memo/storage/events/events-write.mjs';
-import { listMemoEvents } from '../lib/memo/storage/views/query.mjs';
-import { buildStructuredPlanState } from '../lib/planning/contract/schema.mjs';
-import { evaluateWorkflowPolicy } from '../lib/planning/contract/workflow-policy.mjs';
-import { readSessionChangedFiles, recordSessionChangedFile } from '../lib/session/changed-files.mjs';
+import { resolveContextDbRoot } from '../lib/environment/aios/state-root.mjs';
+import { autoMemoSessionClose } from '../lib/execution/lifecycle/run/session-hooks/close.mjs';
+import { runDream } from '../lib/execution/lifecycle/evolve/dream/index.mjs';
+import { runReadinessCheck } from '../lib/execution/lifecycle/govern/preflight-contracts.mjs';
+import { appendMemoEvent } from '../lib/memory/memo/storage/events/events-write.mjs';
+import { listMemoEvents } from '../lib/memory/memo/storage/views/query.mjs';
+import { buildStructuredPlanState } from '../lib/foundation/planning/contract/schema.mjs';
+import { evaluateWorkflowPolicy } from '../lib/foundation/planning/contract/workflow-policy.mjs';
+import { readSessionChangedFiles, recordSessionChangedFile } from '../lib/execution/session/changed-files.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PROFILES = new Set(['baseline', 's0', 's1', 's2']);
@@ -411,7 +411,7 @@ async function cl05() {
     let repeat = null;
     let moduleError = '';
     try {
-      const { buildExecutionContextPacket } = await import('../lib/contextdb/runtime/execution-context.mjs');
+      const { buildExecutionContextPacket } = await import('../lib/memory/contextdb/runtime/execution-context.mjs');
       observation = await buildExecutionContextPacket({
         rootDir: workspaceRoot,
         plan,
@@ -506,7 +506,7 @@ async function cl06() {
         buildExecutionContextPacket,
         evaluateExecutionContextPreflight,
         updateExecutionContextExpectedHash,
-      } = await import('../lib/contextdb/runtime/execution-context.mjs');
+      } = await import('../lib/memory/contextdb/runtime/execution-context.mjs');
       if (typeof evaluateExecutionContextPreflight !== 'function'
           || typeof updateExecutionContextExpectedHash !== 'function') {
         throw new Error('S2 preflight API missing');
@@ -621,8 +621,8 @@ async function cl07() {
     let result = null;
     let moduleError = '';
     try {
-      const { buildExecutionContextPacket } = await import('../lib/contextdb/runtime/execution-context.mjs');
-      const { evaluateContextReconciliation } = await import('../lib/lifecycle/evolve/context-reconciliation.mjs');
+      const { buildExecutionContextPacket } = await import('../lib/memory/contextdb/runtime/execution-context.mjs');
+      const { evaluateContextReconciliation } = await import('../lib/execution/lifecycle/evolve/context-reconciliation.mjs');
       const observed = await buildExecutionContextPacket({
         rootDir: workspaceRoot,
         plan,
@@ -707,7 +707,7 @@ async function cl08() {
     let repeat = null;
     let moduleError = '';
     try {
-      const { projectContextItems } = await import('../lib/contextdb/runtime/execution-context.mjs');
+      const { projectContextItems } = await import('../lib/memory/contextdb/runtime/execution-context.mjs');
       projection = await projectContextItems({ rootDir: workspaceRoot, items, budgetUnits: 40 });
       repeat = await projectContextItems({ rootDir: workspaceRoot, items, budgetUnits: 40 });
     } catch (error) {
@@ -764,7 +764,7 @@ async function cl09() {
         evaluateHandoffLineage,
         normalizeHandoffPacket,
         renderHandoffInjection,
-      } = await import('../lib/contextdb/runtime/handoff.mjs');
+      } = await import('../lib/memory/contextdb/runtime/handoff.mjs');
       if (typeof evaluateHandoffLineage !== 'function') throw new Error('handoff lineage API missing');
       v2 = normalizeHandoffPacket({
         fromSessionId: 'session-v2',
@@ -871,7 +871,7 @@ async function cl12() {
     let ledger = [];
     let moduleError = '';
     try {
-      const { assembleExecutionContext, evaluateExecutionContextPreflight } = await import('../lib/contextdb/runtime/execution-context.mjs');
+      const { assembleExecutionContext, evaluateExecutionContextPreflight } = await import('../lib/memory/contextdb/runtime/execution-context.mjs');
       if (typeof evaluateExecutionContextPreflight !== 'function') throw new Error('S2 preflight API missing');
       observation = await assembleExecutionContext({
         rootDir: workspaceRoot,

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 
-import { suiteSpec } from '../../../lib/test-suite-runner.mjs';
+import { suiteSpec } from '../../../lib/tooling/test-suite-runner.mjs';
 
 const MANIFEST = JSON.parse(fs.readFileSync('scripts/test-suites.json', 'utf8'));
 

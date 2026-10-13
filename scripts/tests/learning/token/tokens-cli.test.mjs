@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 import { buildExecutionPlan, loadTaskSet, main, validateTask } from '../../../token-bench/run.mjs';
 
 test('parseArgs routes the tokens command through the passthrough shape', () => {

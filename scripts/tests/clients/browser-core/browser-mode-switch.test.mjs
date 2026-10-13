@@ -7,9 +7,9 @@ import path from 'node:path';
 import os from 'node:os';
 import test from 'node:test';
 
-import { BROWSER_MODES, DEFAULT_BROWSER_MODE, resolveBrowserMode } from '../../../lib/components/browser/modes/mcp-mode.mjs';
-import { switchBrowserMcpMode } from '../../../lib/components/browser/modes/switch.mjs';
-import { promptBrowserMode, selectBrowserMode } from '../../../lib/components/browser/modes/prompt.mjs';
+import { BROWSER_MODES, DEFAULT_BROWSER_MODE, resolveBrowserMode } from '../../../lib/tooling/components/browser/modes/mcp-mode.mjs';
+import { switchBrowserMcpMode } from '../../../lib/tooling/components/browser/modes/switch.mjs';
+import { promptBrowserMode, selectBrowserMode } from '../../../lib/tooling/components/browser/modes/prompt.mjs';
 
 async function tmpRoot() {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'aios-switch-'));

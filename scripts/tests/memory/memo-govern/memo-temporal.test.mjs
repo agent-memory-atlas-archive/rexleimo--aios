@@ -6,7 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { appendMemoEvent, listMemoEvents } from '../../../lib/memo/storage.mjs';
+import { appendMemoEvent, listMemoEvents } from '../../../lib/memory/memo/storage.mjs';
 import {
   canSupersedeEvent,
   DEFAULT_HINT_THRESHOLD,
@@ -18,7 +18,7 @@ import {
   partitionSupersedes,
   proposeSupersedes,
   toSupersedes,
-} from '../../../lib/memo/storage/govern/temporal.mjs';
+} from '../../../lib/memory/memo/storage/govern/temporal.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const cliPath = path.resolve(here, '..', '..', '..', 'aios.mjs');

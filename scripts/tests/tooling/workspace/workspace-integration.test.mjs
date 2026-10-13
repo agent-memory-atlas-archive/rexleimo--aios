@@ -4,10 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { initWorkspace, buildAgentView } from '../../../lib/contextdb/runtime/workspace.mjs';
-import { buildSkillIndex, writeSkillIndex } from '../../../lib/contextdb/registry/skill-index.mjs';
-import { normalizeHandoffPacket, writeHandoffPacket } from '../../../lib/contextdb/runtime/handoff.mjs';
-import { runDoctorChecks } from '../../../lib/contextdb/doctor.mjs';
+import { initWorkspace, buildAgentView } from '../../../lib/memory/contextdb/runtime/workspace.mjs';
+import { buildSkillIndex, writeSkillIndex } from '../../../lib/memory/contextdb/registry/skill-index.mjs';
+import { normalizeHandoffPacket, writeHandoffPacket } from '../../../lib/memory/contextdb/runtime/handoff.mjs';
+import { runDoctorChecks } from '../../../lib/memory/contextdb/doctor.mjs';
 
 test('full lifecycle: two agents share workspace and handoff', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-integ-'));

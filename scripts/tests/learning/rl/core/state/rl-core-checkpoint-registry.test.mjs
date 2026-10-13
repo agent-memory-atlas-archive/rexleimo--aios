@@ -10,7 +10,7 @@ function makeState() {
 }
 
 test('rl-core checkpoint registry applies update completion atomically', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/checkpoint-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/checkpoint-registry.mjs');
   const next = mod.applyPointerTransition(makeState(), {
     type: 'update.completed',
     previous_active_checkpoint_id: 'ckpt-a',
@@ -23,7 +23,7 @@ test('rl-core checkpoint registry applies update completion atomically', async (
 });
 
 test('rl-core checkpoint registry covers epoch close, update failure, and rollback', async () => {
-  const mod = await import('../../../../../lib/rl-core/state/checkpoint-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/state/checkpoint-registry.mjs');
   const monitoring = {
     active_checkpoint_id: 'ckpt-b',
     pre_update_ref_checkpoint_id: 'ckpt-a',

@@ -88,7 +88,7 @@ aios/
 
 - `config/settings.json` - Assistant configuration (limits, behavior, Chrome options)
 - `.codex/skills/*/SKILL.md` and `.claude/skills/*/SKILL.md` - discoverable repo-local skills
-- `scripts/lib/specs/*.json` - packaged runtime specs
+- `scripts/lib/tooling/specs/*.json` - packaged runtime specs
 - `docs/plans/*.md` - Design and implementation documentation
 
 ## Commands & Operations

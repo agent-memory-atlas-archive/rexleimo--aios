@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('student policy returns deterministic logits and token sampling under a fixed seed', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
   const policy = mod.createStudentPolicy({ seed: 7 });
 
   const first = mod.sampleNextToken(policy, {
@@ -25,7 +25,7 @@ test('student policy returns deterministic logits and token sampling under a fix
 });
 
 test('student policy checkpoints round-trip through json files', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
   const checkpointDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v1-policy-'));
   const checkpointPath = path.join(checkpointDir, 'policy.json');
   const policy = mod.createStudentPolicy({
@@ -45,7 +45,7 @@ test('student policy checkpoints round-trip through json files', async () => {
 });
 
 test('student runner emits stop_reason=budget_exhausted when no steps remain', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/training/student-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/training/student-runner.mjs');
   const result = await mod.requestStudentAction({
     policy: { seed: 1 },
     trace: [],
@@ -58,7 +58,7 @@ test('student runner emits stop_reason=budget_exhausted when no steps remain', a
 });
 
 test('student runner builds a bounded step prompt from the latest observation trace', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/training/student-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/training/student-runner.mjs');
   const prompt = mod.buildStudentStepPrompt({
     trace: [
       {
@@ -106,8 +106,8 @@ test('student runner builds a bounded step prompt from the latest observation tr
 });
 
 test('student runner emits one valid json action with token ids and logprobs', async () => {
-  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
-  const runnerMod = await import('../../../../../lib/rl-shell-v1/training/student-runner.mjs');
+  const policyMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
+  const runnerMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-runner.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 5 });
 
   const result = await runnerMod.requestStudentAction({
@@ -131,8 +131,8 @@ test('student runner emits one valid json action with token ids and logprobs', a
 });
 
 test('student runner uses latest observation trace when generating the next action', async () => {
-  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
-  const runnerMod = await import('../../../../../lib/rl-shell-v1/training/student-runner.mjs');
+  const policyMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
+  const runnerMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-runner.mjs');
 
   const initial = await runnerMod.requestStudentAction({
     policy: policyMod.createStudentPolicy({ seed: 5 }),

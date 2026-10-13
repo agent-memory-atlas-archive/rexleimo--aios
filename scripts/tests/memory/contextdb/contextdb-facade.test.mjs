@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { loadFacade, FACADE_FILENAME, generateFacadeFromSession } from '../../../lib/contextdb/runtime/facade.mjs';
+import { loadFacade, FACADE_FILENAME, generateFacadeFromSession } from '../../../lib/memory/contextdb/runtime/facade.mjs';
 
 test('loadFacade returns facade when file exists and is fresh', async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'facade-test-'));
@@ -89,7 +89,7 @@ test('loadFacade overlays continuity sidecar for fresh cached facade', async () 
       sessionId,
       intent: 'continue from cached facade',
       summary: 'Fresh continuity should be exposed without bootstrap refresh.',
-      touchedFiles: ['scripts/lib/contextdb/runtime/facade.mjs'],
+      touchedFiles: ['scripts/lib/memory/contextdb/runtime/facade.mjs'],
       nextActions: ['resume from sidecar'],
       updatedAt: '2026-04-25T00:00:00.000Z',
     }),
@@ -128,7 +128,7 @@ test('generateFacadeFromSession extracts header from latest session', async () =
       sessionId,
       intent: 'continue facade test',
       summary: 'Facade should expose continuity.',
-      touchedFiles: ['scripts/lib/contextdb/runtime/facade.mjs'],
+      touchedFiles: ['scripts/lib/memory/contextdb/runtime/facade.mjs'],
       nextActions: ['show explicit resume summary'],
       updatedAt: '2026-04-25T00:00:00.000Z',
     }),

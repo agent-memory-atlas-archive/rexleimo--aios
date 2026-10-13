@@ -9,8 +9,8 @@ import {
   formatSmokeEvidence,
   runClientSmoke,
   runClientTriggerLiveSmoke,
-} from '../../../lib/clients/smoke.mjs';
-import { runClientsCommand } from '../../../lib/lifecycle/fleet/clients.mjs';
+} from '../../../lib/foundation/clients/smoke.mjs';
+import { runClientsCommand } from '../../../lib/execution/lifecycle/fleet/clients.mjs';
 
 test('buildSmokeInvocation throws for unknown client', () => {
   assert.throws(() => buildSmokeInvocation('nope'), /unknown smoke client/i);

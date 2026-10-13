@@ -6,7 +6,7 @@ import { rmSync, writeFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { evaluateSubmoduleReleaseGate, parseTagRefs } from '../../../lib/release-submodule-gate.mjs';
+import { evaluateSubmoduleReleaseGate, parseTagRefs } from '../../../lib/diagnostics/release-submodule-gate.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const CHECKER = path.join(repoRoot, 'scripts', 'check-release-submodule.mjs');

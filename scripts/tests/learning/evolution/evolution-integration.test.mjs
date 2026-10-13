@@ -10,11 +10,11 @@ import {
   promoteSessionCandidate,
   syncPromotionGovernance,
   getUnifiedCandidateView,
-} from '../../../lib/lifecycle/evolve/evolution/integration.mjs';
-import { readPromotion, listPromotions } from '../../../lib/lifecycle/evolve/evolution/promotion.mjs';
-import { readVerdict, listVerdicts } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
-import { autoMemoSessionClose } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
-import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
+} from '../../../lib/execution/lifecycle/evolve/evolution/integration.mjs';
+import { readPromotion, listPromotions } from '../../../lib/execution/lifecycle/evolve/evolution/promotion.mjs';
+import { readVerdict, listVerdicts } from '../../../lib/execution/lifecycle/evolve/evolution/verdict.mjs';
+import { autoMemoSessionClose } from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
+import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), prefix));

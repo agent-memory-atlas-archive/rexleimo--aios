@@ -12,7 +12,7 @@
 
 ## Adjust operational behavior
 - `.codex/skills/*/SKILL.md`
-- `scripts/lib/specs/*.json`
+- `scripts/lib/tooling/specs/*.json`
 - `.codex/skills/skill-constraints/SKILL.md`
 
 ## Diagnose and document failures

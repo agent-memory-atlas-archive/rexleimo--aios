@@ -8,7 +8,7 @@ import {
   extractTouchedFilesFromText,
   readContinuitySummary,
   writeContinuitySummary,
-} from '../../../lib/contextdb/registry/continuity.mjs';
+} from '../../../lib/memory/contextdb/registry/continuity.mjs';
 
 test('writeContinuitySummary writes markdown and json artifacts', async () => {
   const workspaceRoot = await mkdtemp(path.join(os.tmpdir(), 'aios-continuity-'));
@@ -20,7 +20,7 @@ test('writeContinuitySummary writes markdown and json artifacts', async () => {
       sessionId,
       intent: 'continue implementation',
       summary: 'Implemented the parser and still need focused tests.',
-      touchedFiles: ['scripts/ctx-agent-core.mjs', 'scripts/lib/contextdb/registry/continuity.mjs'],
+      touchedFiles: ['scripts/ctx-agent-core.mjs', 'scripts/lib/memory/contextdb/registry/continuity.mjs'],
       nextActions: ['run focused tests', 'update docs'],
       updatedAt: '2026-04-25T00:00:00.000Z',
     });
@@ -53,7 +53,7 @@ test('readContinuitySummary exposes compact continuity artifact data', async () 
       sessionId,
       intent: 'continue implementation',
       summary: 'Carry forward PR-3 state.',
-      touchedFiles: ['scripts/lib/contextdb/registry/continuity.mjs'],
+      touchedFiles: ['scripts/lib/memory/contextdb/registry/continuity.mjs'],
       nextActions: ['wire explicit resume artifact'],
       updatedAt: '2026-04-25T00:00:00.000Z',
     });
@@ -72,14 +72,14 @@ test('extractTouchedFilesFromText canonicalizes common path forms', () => {
   const touched = extractTouchedFilesFromText(
     { workspaceRoot },
     'Updated /workspace/project/scripts/ctx-agent-core.mjs and README.md.',
-    'diff --git a/scripts/lib/contextdb/registry/continuity.mjs b/scripts/lib/contextdb/registry/continuity.mjs',
+    'diff --git a/scripts/lib/memory/contextdb/registry/continuity.mjs b/scripts/lib/memory/contextdb/registry/continuity.mjs',
     'Also checked package.json and mcp-server/src/contextdb/store/core.ts.'
   );
 
   assert.deepEqual(touched, [
     'scripts/ctx-agent-core.mjs',
     'README.md',
-    'scripts/lib/contextdb/registry/continuity.mjs',
+    'scripts/lib/memory/contextdb/registry/continuity.mjs',
     'package.json',
     'mcp-server/src/contextdb/store/core.ts',
   ]);

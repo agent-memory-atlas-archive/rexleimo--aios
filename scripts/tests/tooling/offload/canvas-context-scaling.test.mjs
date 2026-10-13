@@ -5,7 +5,7 @@ import {
   computeCompactAction,
   parseContextWindowTokens,
   resolveCanvasThresholds,
-} from '../../../lib/offload/mermaid-canvas.mjs';
+} from '../../../lib/memory/offload/mermaid-canvas.mjs';
 
 const NO_ENV = {};
 

@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   truncateToCharBudget,
   applyRecallBudget,
-} from '../../../lib/search/budget.mjs';
+} from '../../../lib/memory/search/budget.mjs';
 
 /* ── truncateToCharBudget ─────────────────────────────────── */
 

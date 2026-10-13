@@ -8,7 +8,7 @@ import path from 'node:path';
 import { describe, test } from 'node:test';
 import { spawnSync } from 'node:child_process';
 
-import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
+import { runContextDbCli } from '../../../lib/memory/contextdb-cli.mjs';
 
 const REPO = path.resolve(process.cwd());
 const TSX = path.join(REPO, 'mcp-server/node_modules/tsx/dist/cli.mjs');
@@ -126,7 +126,7 @@ describe('automatic memory loop end-to-end', () => {
       writeFileSync(path.join(sessionDir, 'continuity.json'), JSON.stringify({ summary: 'Explored retry behavior under load; awaiting verification.' }));
       // finalizeSession must still produce the governed session-close candidate
       // (review/promotion required) WITHOUT a parallel agent-private auto memo.
-      const { finalizeSession } = await import('../../../lib/lifecycle/run/session-hooks/finalize.mjs');
+      const { finalizeSession } = await import('../../../lib/execution/lifecycle/run/session-hooks/finalize.mjs');
       const candidate = await finalizeSession({
         rootDir: tmp,
         sessionId: 'e2e-automem-interactive',

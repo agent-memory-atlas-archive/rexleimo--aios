@@ -10,9 +10,9 @@ import {
   parseExternalFacts,
   parseRooModes,
   splitMarkdownFacts,
-} from '../../../lib/memo/flow/import-external.mjs';
-import { importExternalMemories } from '../../../lib/memo/flow/import-external.mjs';
-import { collectEvents } from '../../../lib/memo/storage/events/events-read.mjs';
+} from '../../../lib/memory/memo/flow/import-external.mjs';
+import { importExternalMemories } from '../../../lib/memory/memo/flow/import-external.mjs';
+import { collectEvents } from '../../../lib/memory/memo/storage/events/events-read.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CLI_PATH = path.resolve(HERE, '..', '..', '..', 'aios.mjs');

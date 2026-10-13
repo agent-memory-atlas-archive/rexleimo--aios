@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { supportedClients } from '../../../../../rex-harness/src/index.mjs';
-import { createAiosRexProviderBindings, evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
+import { createAiosRexProviderBindings, evaluateAiosSoftwareRequest } from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 
 const EXPECTED_CLIENT_ROOTS = Object.freeze({
   codex: '.codex/skills',

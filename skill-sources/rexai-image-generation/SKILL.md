@@ -23,10 +23,10 @@ Use RexAI's async image API to create images and return usable local files.
    - Text-to-image: `gpt-image-2`.
    - Image-to-image: **the same `gpt-image-2` product with the `-Image` parameter** — the relay selects the image-to-image route when the body carries `images`. `gpt-image-2-i2i` does NOT exist (`404 image_product_not_found`); do not use it.
 3. Pick the executor — **prefer Python on every platform** (the shell script's silent poll loop reads as a hang):
-   - Any platform with python3 (**default choice**): use `scripts/rexai-image.py`; stdlib only. It prints live poll progress every poll (agents can watch it run), reports the job id on submit/timeout, auto-resubmits on relay circuit-breaker/429 failures (bounded to 3 attempts), tolerates transient 5xx/network errors during polling, and **always exits within the per-job `--timeout` (default 600s) — it cannot hang**. If the agent's shell tool has its own timeout, pass a matching `--timeout` so the script self-reports the job id instead of being killed mid-poll.
-   - Windows without Python: use `scripts/rexai-image.ps1`; it only needs built-in PowerShell/.NET.
-   - macOS/Linux without Python: use `scripts/rexai-image-macos.sh`; it uses common system tools (`bash`, `curl`, `perl`, `base64`). Pass `--timeout-ms 600000` for large sizes.
-4. Use `scripts/rexai-image.mjs` only when Node is already available.
+   - Any platform with python3 (**default choice**): use `scripts/impl/rexai-image.py`; stdlib only. It prints live poll progress every poll (agents can watch it run), reports the job id on submit/timeout, auto-resubmits on relay circuit-breaker/429 failures (bounded to 3 attempts), tolerates transient 5xx/network errors during polling, and **always exits within the per-job `--timeout` (default 600s) — it cannot hang**. If the agent's shell tool has its own timeout, pass a matching `--timeout` so the script self-reports the job id instead of being killed mid-poll.
+   - Windows without Python: use `scripts/impl/rexai-image.ps1`; it only needs built-in PowerShell/.NET.
+   - macOS/Linux without Python: use `scripts/impl/rexai-image-macos.sh`; it uses common system tools (`bash`, `curl`, `perl`, `base64`). Pass `--timeout-ms 600000` for large sizes.
+4. Use `scripts/impl/rexai-image.mjs` only when Node is already available.
 5. Report the local file path, job id, source URL if present, and expiry time if present.
 
 Read `references/api.md` when you need endpoint details, supported sizes, error codes, or examples.
@@ -79,7 +79,7 @@ Python (preferred, all platforms):
 
 ```bash
 export REXAI_API_KEY="cr_xxx"
-python3 skill-sources/rexai-image-generation/scripts/rexai-image.py \
+python3 skill-sources/rexai-image-generation/scripts/impl/rexai-image.py \
   --model gpt-image-2 \
   --prompt "A cozy orange cat sleeping in warm sunlight" \
   --size 1024x1024 \
@@ -90,7 +90,7 @@ Windows/Codex:
 
 ```powershell
 $env:REXAI_API_KEY = "cr_xxx"
-powershell -NoProfile -ExecutionPolicy Bypass -File skill-sources/rexai-image-generation/scripts/rexai-image.ps1 `
+powershell -NoProfile -ExecutionPolicy Bypass -File skill-sources/rexai-image-generation/scripts/impl/rexai-image.ps1 `
   -Model gpt-image-2 `
   -Prompt "A cozy orange cat sleeping in warm sunlight" `
   -Size 1024x1024 `
@@ -101,7 +101,7 @@ macOS/Linux:
 
 ```bash
 export REXAI_API_KEY="cr_xxx"
-bash skill-sources/rexai-image-generation/scripts/rexai-image-macos.sh \
+bash skill-sources/rexai-image-generation/scripts/impl/rexai-image-macos.sh \
   --model gpt-image-2 \
   --prompt "A cozy orange cat sleeping in warm sunlight" \
   --size 1024x1024 \
@@ -116,7 +116,7 @@ Windows/Codex:
 
 ```powershell
 $env:REXAI_API_KEY = "cr_xxx"
-powershell -NoProfile -ExecutionPolicy Bypass -File skill-sources/rexai-image-generation/scripts/rexai-image.ps1 `
+powershell -NoProfile -ExecutionPolicy Bypass -File skill-sources/rexai-image-generation/scripts/impl/rexai-image.ps1 `
   -Model gpt-image-2 `
   -Prompt "Convert this image to watercolor style" `
   -Image path/to/source.png `
@@ -127,7 +127,7 @@ macOS/Linux:
 
 ```bash
 export REXAI_API_KEY="cr_xxx"
-bash skill-sources/rexai-image-generation/scripts/rexai-image-macos.sh \
+bash skill-sources/rexai-image-generation/scripts/impl/rexai-image-macos.sh \
   --model gpt-image-2 \
   --prompt "Convert this image to watercolor style" \
   --image path/to/source.png \
@@ -141,7 +141,7 @@ The script converts local files to `data:image/...;base64,...` before submitting
 If Node is already installed, this equivalent script is available:
 
 ```bash
-node skill-sources/rexai-image-generation/scripts/rexai-image.mjs \
+node skill-sources/rexai-image-generation/scripts/impl/rexai-image.mjs \
   --model gpt-image-2 \
   --prompt "A cozy orange cat sleeping in warm sunlight" \
   --size 1024x1024 \
@@ -174,7 +174,7 @@ A failed job's `error` in the DB is often just `upstream_failed` + `Request fail
 
 ## Verification (no-hang guarantees)
 
-The Python executor's hang-safety is covered by `scripts/rexai-image.py.test.py` (stdlib only, run with `python3`): transient 5xx absorption, hard `--timeout` exit bound, bounded resubmission (≤3 submits), and immediate 4xx death. Other executors: `node rexai-image.test.mjs && node rexai-image.skill.test.mjs`, `bash rexai-image-macos.test.sh`, `powershell -File rexai-image.ps1.test.ps1`.
+The Python executor's hang-safety is covered by `scripts/impl/rexai-image.py.test.py` (stdlib only, run with `python3`): transient 5xx absorption, hard `--timeout` exit bound, bounded resubmission (≤3 submits), and immediate 4xx death. Other executors: `node rexai-image.test.mjs && node rexai-image.skill.test.mjs`, `bash rexai-image-macos.test.sh`, `powershell -File rexai-image.ps1.test.ps1`.
 
 ## Script Output
 

@@ -5,7 +5,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { ARMS, formatReport, runArm } from './lib/memo/eval/recall-ab.mjs';
+import { ARMS, formatReport, runArm } from './lib/memory/memo/eval/recall-ab.mjs';
 
 async function main() {
   const asJson = process.argv.includes('--json');

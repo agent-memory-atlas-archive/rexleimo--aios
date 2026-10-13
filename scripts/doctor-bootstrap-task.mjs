@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// scripts/doctor-bootstrap-task.mjs — 薄壳入口，逻辑在 scripts/lib/bootstrap-doctor/
+// scripts/doctor-bootstrap-task.mjs — 薄壳入口，逻辑在 scripts/lib/environment/bootstrap-doctor/
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { resolveTasksRoot, toWorkspaceRelative } from './lib/aios/state-root.mjs';
-import { normalizeTaskRef, readTextIfExists, listNonHiddenEntries } from './lib/bootstrap-doctor/task-utils.mjs';
+import { resolveTasksRoot, toWorkspaceRelative } from './lib/environment/aios/state-root.mjs';
+import { normalizeTaskRef, readTextIfExists, listNonHiddenEntries } from './lib/environment/bootstrap-doctor/task-utils.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

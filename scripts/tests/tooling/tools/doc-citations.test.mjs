@@ -45,10 +45,10 @@ test('doc citations fail on ambiguous basenames', () => {
 test('doc citations resolve component-relative paths by unique suffix', () => {
   const ok = resolveCitationFile('packets/compact-packet.mjs', {
     rootDir: '/repo',
-    trackedFiles: ['scripts/lib/interception/runtime/packets/compact-packet.mjs'],
+    trackedFiles: ['scripts/lib/foundation/interception/runtime/packets/compact-packet.mjs'],
   });
   assert.equal(ok.status, 'ok');
-  assert.equal(ok.rel, 'scripts/lib/interception/runtime/packets/compact-packet.mjs');
+  assert.equal(ok.rel, 'scripts/lib/foundation/interception/runtime/packets/compact-packet.mjs');
 
   const dup = resolveCitationFile('sub/p.mjs', {
     rootDir: '/repo',

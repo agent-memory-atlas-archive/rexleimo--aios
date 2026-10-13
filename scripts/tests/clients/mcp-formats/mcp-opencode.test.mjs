@@ -4,12 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { migrateOneMcpOpencodeJson } from '../../../lib/components/browser/mcp/formats/mcp-opencode.mjs';
+import { migrateOneMcpOpencodeJson } from '../../../lib/tooling/components/browser/mcp/formats/mcp-opencode.mjs';
 import {
   AUTH_TOOLS_ALIAS,
   PRIMARY_BROWSER_ALIAS,
   SHELL_ALIAS,
-} from '../../../lib/components/browser/constants.mjs';
+} from '../../../lib/tooling/components/browser/constants.mjs';
 
 async function makeTemp() {
   return mkdtemp(path.join(os.tmpdir(), 'aios-mcp-opencode-'));

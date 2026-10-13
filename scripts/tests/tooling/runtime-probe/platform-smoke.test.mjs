@@ -15,11 +15,11 @@ function countSourceLines(source) {
 }
 
 describe('MCP Server Config - Local Runtime (static analysis)', () => {
-  const browserFacadeSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'browser.mjs');
-  const browserRuntimePathsSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'runtime-paths.mjs');
-  const browserMcpBuilderSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'mcp', 'mcp-server-builders.mjs');
-  const browserCdpServiceSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'cdp-service.mjs');
-  const browserDoctorSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'lifecycle', 'doctor.mjs');
+  const browserFacadeSrc = readRepoSource('scripts', 'lib', 'tooling', 'components', 'browser', 'browser.mjs');
+  const browserRuntimePathsSrc = readRepoSource('scripts', 'lib', 'tooling', 'components', 'browser', 'runtime', 'runtime-paths.mjs');
+  const browserMcpBuilderSrc = readRepoSource('scripts', 'lib', 'tooling', 'components', 'browser', 'mcp', 'mcp-server-builders.mjs');
+  const browserCdpServiceSrc = readRepoSource('scripts', 'lib', 'tooling', 'components', 'browser', 'runtime', 'cdp-service.mjs');
+  const browserDoctorSrc = readRepoSource('scripts', 'lib', 'tooling', 'components', 'browser', 'lifecycle', 'doctor.mjs');
 
   it('browser component entrypoint stays a thin facade over focused modules', () => {
     assert.equal(countSourceLines(browserFacadeSrc) <= 40, true,
@@ -133,12 +133,12 @@ describe('REQUIRED: py/py3 — Cross-Platform Safety', () => {
   });
 
   it('self-update.mjs uses USERPROFILE fallback', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'execution', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
     assert.ok(content.includes('USERPROFILE'), 'should reference USERPROFILE');
   });
 
   it('self-update.mjs enables TLS 1.2 before Windows release installer request', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'execution', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
     // The installer command (preferred local path, remote `irm` fetch as
     // fallback) is composed into one PowerShell script. The security contract
     // is that the TLS assignment is the FIRST statement of that script, so it
@@ -155,7 +155,7 @@ describe('REQUIRED: py/py3 — Cross-Platform Safety', () => {
   it('dispatch starts TUI through local tsx cli instead of npx shell', () => {
     // TUI startup moved out of dispatch.mjs into dispatch/helpers.mjs when the
     // 425-line barrel was split; assert against the module that owns the launch.
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'cli', 'dispatch', 'helpers.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'tooling', 'cli', 'dispatch', 'helpers.mjs'), 'utf8');
     assert.ok(content.includes("node_modules', 'tsx', 'dist', 'cli.mjs'"), 'should resolve local tsx cli');
     assert.ok(content.includes('spawnSync(process.execPath'), 'should launch local tsx with node');
     assert.ok(!content.includes('npx tsx'), 'should not depend on npx for TUI startup');
@@ -171,7 +171,7 @@ describe('Shell Script Parity — MCP & ContextDB (static analysis)', () => {
   });
 
   it('shell.mjs buildPowerShellBlock exists alongside buildPosixBlock', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'components', 'shell.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'tooling', 'components', 'shell.mjs'), 'utf8');
     assert.ok(content.includes('buildPowerShellBlock'), 'should have PS block builder');
     assert.ok(content.includes('buildPosixBlock'), 'should have POSIX block builder');
   });

@@ -6,25 +6,25 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runDream } from '../../../lib/lifecycle/evolve/dream/index.mjs';
+import { runDream } from '../../../lib/execution/lifecycle/evolve/dream/index.mjs';
 import {
   appendMemoEvent,
   setActiveMemoStorage,
-} from '../../../lib/memo/storage.mjs';
+} from '../../../lib/memory/memo/storage.mjs';
 import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
-} from '../../../lib/contextdb/runtime/execution-context.mjs';
-import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
-import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
+} from '../../../lib/memory/contextdb/runtime/execution-context.mjs';
+import { evaluateContextReconciliation } from '../../../lib/execution/lifecycle/evolve/context-reconciliation.mjs';
+import { recordSessionChangedFile } from '../../../lib/execution/session/changed-files.mjs';
 import {
   readCandidateGovernanceReceipts,
-} from '../../../lib/memo/storage/govern/candidates.mjs';
+} from '../../../lib/memory/memo/storage/govern/candidates.mjs';
 import {
   gcDreamProposal,
   readDreamGovernanceReceipts,
-} from '../../../lib/lifecycle/evolve/dream/governance.mjs';
-import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
+} from '../../../lib/execution/lifecycle/evolve/dream/governance.mjs';
+import { buildStructuredPlanState } from '../../../lib/foundation/planning/contract/schema.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('orchestrator task registry keeps only hard-verifiable control tasks and samples deterministically', async () => {
-  const mod = await import('../../../../lib/rl-orchestrator-v1/task-registry.mjs');
+  const mod = await import('../../../../lib/learning/rl-orchestrator-v1/task-registry.mjs');
 
   const tasks = mod.loadRealOrchestratorTasks({ countPerType: 1 });
   assert.deepEqual(

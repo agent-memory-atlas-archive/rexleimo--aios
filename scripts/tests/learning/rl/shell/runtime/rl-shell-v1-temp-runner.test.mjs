@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { validateTaskManifest, validateObservationEvent } from '../../../../../lib/rl-shell-v1/eval/schema.mjs';
+import { validateTaskManifest, validateObservationEvent } from '../../../../../lib/learning/rl-shell-v1/eval/schema.mjs';
 
 async function writeJson(filePath, value) {
   await mkdir(path.dirname(filePath), { recursive: true });
@@ -74,7 +74,7 @@ function defaultPolicy(mod, overrides = {}) {
 }
 
 test('temp runner rejects path escapes and command redirects outside the temp workspace', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval/temp-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/eval/temp-runner.mjs');
   const { workspace } = await createFixtureWorkspace(mod);
 
   await assert.rejects(
@@ -98,7 +98,7 @@ test('temp runner rejects path escapes and command redirects outside the temp wo
 });
 
 test('temp runner replays baseline failing tests before student actions and cleans up isolated workspaces', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval/temp-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/eval/temp-runner.mjs');
   const { workspace } = await createFixtureWorkspace(mod);
 
   const baseline = await mod.runBaselineFailureCheck({
@@ -150,7 +150,7 @@ test('temp runner replays baseline failing tests before student actions and clea
 });
 
 test('temp runner collects default Node test failures from the standard reporter output', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval/temp-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/eval/temp-runner.mjs');
   const failures = mod.collectFailingTests([
     '✖ addition returns the sum (1.0466ms)',
     'AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:',
@@ -162,7 +162,7 @@ test('temp runner collects default Node test failures from the standard reporter
 });
 
 test('temp runner flags repeated identical failed actions as repeated_no_progress', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval/temp-runner.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/eval/temp-runner.mjs');
   const { workspace } = await createFixtureWorkspace(mod);
   const policy = defaultPolicy(mod, { no_progress_window: 3 });
   const invalidPatch = {

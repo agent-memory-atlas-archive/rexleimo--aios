@@ -141,7 +141,7 @@ async function writeTinyBenchmark(rootDir) {
 test('generateBenchmark writes at least 48 tasks and fixed train/held-out splits', async () => {
   const rootDir = await makeRootDir();
   await writeSeedCorpus(rootDir);
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/task-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/task-registry.mjs');
   const result = await mod.generateBenchmark({ rootDir, seed: 17 });
 
   assert.equal(result.generatedTasks.length >= 48, true);
@@ -152,7 +152,7 @@ test('generateBenchmark writes at least 48 tasks and fixed train/held-out splits
 test('loadTaskRegistry rejects benchmark configs with too few valid tasks', async () => {
   const rootDir = await makeRootDir();
   await writeTinyBenchmark(rootDir);
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/task-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/task-registry.mjs');
 
   await assert.rejects(
     () => mod.loadTaskRegistry({ rootDir, configPath: EXPERIMENT_CONFIG_PATH }),
@@ -163,7 +163,7 @@ test('loadTaskRegistry rejects benchmark configs with too few valid tasks', asyn
 test('generateBenchmark is deterministic for the same seed and sampleTrainingTask is deterministic for seed plus attempt', async () => {
   const rootDir = await makeRootDir();
   await writeSeedCorpus(rootDir);
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/task-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/task-registry.mjs');
 
   const first = await mod.generateBenchmark({ rootDir, seed: 17 });
   const second = await mod.generateBenchmark({ rootDir, seed: 17 });
@@ -180,7 +180,7 @@ test('generateBenchmark is deterministic for the same seed and sampleTrainingTas
 test('sampleTrainingTask never returns held-out tasks and invalid-task exclusions are persisted', async () => {
   const rootDir = await makeRootDir();
   await writeSeedCorpus(rootDir);
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/task-registry.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/task-registry.mjs');
 
   await mod.generateBenchmark({ rootDir, seed: 17 });
   const registry = await mod.loadTaskRegistry({ rootDir, configPath: EXPERIMENT_CONFIG_PATH });

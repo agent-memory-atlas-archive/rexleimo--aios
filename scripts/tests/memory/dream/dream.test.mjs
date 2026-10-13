@@ -4,11 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { classifyEvent, isExpired, TAXONOMY_CLASSES } from '../../../lib/lifecycle/evolve/dream/taxonomy.mjs';
-import { textSimilarity, textTokens, findDuplicateClusters, pickKeepWinner, dedupDecisions } from '../../../lib/lifecycle/evolve/dream/dedup.mjs';
-import { runDream } from '../../../lib/lifecycle/evolve/dream/index.mjs';
-import { appendMemoEvent } from '../../../lib/memo/storage/events/events-write.mjs';
-import { setActiveMemoStorage } from '../../../lib/memo/storage/base/config.mjs';
+import { classifyEvent, isExpired, TAXONOMY_CLASSES } from '../../../lib/execution/lifecycle/evolve/dream/taxonomy.mjs';
+import { textSimilarity, textTokens, findDuplicateClusters, pickKeepWinner, dedupDecisions } from '../../../lib/execution/lifecycle/evolve/dream/dedup.mjs';
+import { runDream } from '../../../lib/execution/lifecycle/evolve/dream/index.mjs';
+import { appendMemoEvent } from '../../../lib/memory/memo/storage/events/events-write.mjs';
+import { setActiveMemoStorage } from '../../../lib/memory/memo/storage/base/config.mjs';
 
 // ----------------------------------------------------------------------------
 // Helpers

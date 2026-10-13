@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('rl-core ope eval returns IPS and DR close to logged reward when target matches logging policy', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/ope-eval.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/ope-eval.mjs');
   const events = [
     {
       context_key: 'ctx-a',
@@ -51,7 +51,7 @@ test('rl-core ope eval returns IPS and DR close to logged reward when target mat
 });
 
 test('rl-core ope eval reflects higher estimated value for a better target policy', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/ope-eval.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/ope-eval.mjs');
   const events = [];
   for (let index = 0; index < 200; index += 1) {
     const selected = index % 2 === 0 ? 'exec-a' : 'exec-b';
@@ -78,7 +78,7 @@ test('rl-core ope eval reflects higher estimated value for a better target polic
 });
 
 test('rl-core policy distribution computes softmax from contextual bandit preferences', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/ope-eval.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/ope-eval.mjs');
   const policy = {
     contextualBandit: {
       contexts: {

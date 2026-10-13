@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('epoch closes as replay_only when any comparison fails', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/epoch-ledger.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/epoch-ledger.mjs');
   const epoch = mod.recordComparisonResults(mod.seedEpoch(), [
     { comparison_status: 'completed', relative_outcome: 'better' },
     { comparison_status: 'comparison_failed', relative_outcome: null },
@@ -15,7 +15,7 @@ test('epoch closes as replay_only when any comparison fails', async () => {
 });
 
 test('epoch transitions to collection after update_failed and to monitoring after replay_only', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/registry/epoch-ledger.mjs');
+  const mod = await import('../../../../../lib/learning/rl-shell-v1/registry/epoch-ledger.mjs');
   const updateFailed = mod.reopenEpoch(mod.seedEpoch({ phase: 'online-update' }), 'update_failed');
   assert.equal(updateFailed.phase, 'collection');
 

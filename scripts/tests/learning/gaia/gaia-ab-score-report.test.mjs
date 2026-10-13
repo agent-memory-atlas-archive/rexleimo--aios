@@ -4,8 +4,8 @@ import test from 'node:test';
 import {
   isGaiaAnswerCorrect,
   summarizeGaiaScores,
-} from '../../../lib/gaia-ab-eval/scorer.mjs';
-import { buildGaiaAbReports } from '../../../lib/gaia-ab-eval/report.mjs';
+} from '../../../lib/learning/gaia-ab-eval/scorer.mjs';
+import { buildGaiaAbReports } from '../../../lib/learning/gaia-ab-eval/report.mjs';
 
 function answer(taskId, level, expected, actual) {
   return { taskId, level, expected, actual };

@@ -8,7 +8,7 @@ import test from 'node:test';
 import {
   createInterceptionEngine,
   readRawRef,
-} from '../../../../lib/interception/index.mjs';
+} from '../../../../lib/foundation/interception/index.mjs';
 
 const SENTINEL = 'UNIQUE_RAW_PAYLOAD_SENTINEL';
 

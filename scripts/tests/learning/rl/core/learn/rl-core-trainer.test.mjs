@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('rl-core trainer computes advantages from multi-step reward sequences', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const { advantages } = mod.computeAdvantages({ rewards: [0, 0.25, 1] });
   assert.deepEqual(advantages, [1.25, 1.25, 1]);
 });
 
 test('rl-core trainer computes total loss with rl, distill, and kl components', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const result = mod.computeLosses({
     rlLoss: 0.6,
     distillLoss: 0.5,
@@ -20,7 +20,7 @@ test('rl-core trainer computes total loss with rl, distill, and kl components', 
 });
 
 test('rl-core trainer zeros distillation weight when distillation was skipped', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const result = mod.computeLosses({
     rlLoss: 0.6,
     distillLoss: 99,
@@ -32,8 +32,8 @@ test('rl-core trainer zeros distillation weight when distillation was skipped', 
 });
 
 test('rl-core trainer updates policy from multi-step trajectories', async () => {
-  const trainerMod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
+  const trainerMod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
+  const policyMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 7 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);
 
@@ -59,7 +59,7 @@ test('rl-core trainer updates policy from multi-step trajectories', async () => 
 });
 
 test('rl-core trainer applies contextual bandit updates for orchestrator routing', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const policy = { seed: 21 };
   const referencePolicy = mod.createReferencePolicyFrom(policy);
 
@@ -99,7 +99,7 @@ test('rl-core trainer applies contextual bandit updates for orchestrator routing
 });
 
 test('rl-core trainer refreshes the frozen reference policy every configured interval', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const policy = { weights: { feature: [1, 2, 3] } };
   const reference = { weights: { feature: [0, 0, 0] } };
 
@@ -115,7 +115,7 @@ test('rl-core trainer refreshes the frozen reference policy every configured int
 });
 
 test('rl-core trainer prefers qualified real-shadow samples in mixed replay batches', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const batch = mod.buildMixedReplayBatch({
     pool: {
       realShadow: {
@@ -141,7 +141,7 @@ test('rl-core trainer prefers qualified real-shadow samples in mixed replay batc
 });
 
 test('rl-core trainer backs off toward synthetic when real-shadow replay is too duplicated', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const batch = mod.buildMixedReplayBatch({
     pool: {
       realShadow: {
@@ -169,9 +169,9 @@ test('rl-core trainer backs off toward synthetic when real-shadow replay is too 
 });
 
 test('rl-core trainer returns validated online update metadata', async () => {
-  const trainerMod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
-  const schemaMod = await import('../../../../../lib/rl-core/state/schema.mjs');
+  const trainerMod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
+  const policyMod = await import('../../../../../lib/learning/rl-shell-v1/training/student-policy.mjs');
+  const schemaMod = await import('../../../../../lib/learning/rl-core/state/schema.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 9 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);
 
@@ -203,7 +203,7 @@ test('rl-core trainer returns validated online update metadata', async () => {
 });
 
 test('rl-core trainer routes mixed trajectories through applyTrajectoryUpdate', async () => {
-  const mod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const mod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const policy = { seed: 5 };
   const referencePolicy = mod.createReferencePolicyFrom(policy);
 
@@ -232,7 +232,7 @@ test('rl-core trainer routes mixed trajectories through applyTrajectoryUpdate', 
 });
 
 test('rl-core trainer surfaces update failures without mutating checkpoint ids', async () => {
-  const trainerMod = await import('../../../../../lib/rl-core/learning/trainer.mjs');
+  const trainerMod = await import('../../../../../lib/learning/rl-core/learning/trainer.mjs');
   const result = trainerMod.runOnlineUpdateBatch({
     batchId: 'batch-002',
     checkpointId: 'ckpt-a',

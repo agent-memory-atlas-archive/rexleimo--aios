@@ -4,12 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { planDoctor } from '../../../lib/lifecycle/govern/doctor.mjs';
-import { planEntropyGc } from '../../../lib/lifecycle/govern/entropy-gc.mjs';
-import { planReleaseStatus } from '../../../lib/lifecycle/release/release-status.mjs';
-import { planSetup, runSetup } from '../../../lib/lifecycle/setup/setup.mjs';
-import { planUninstall } from '../../../lib/lifecycle/setup/uninstall.mjs';
-import { planUpdate, runUpdate } from '../../../lib/lifecycle/setup/update.mjs';
+import { planDoctor } from '../../../lib/execution/lifecycle/govern/doctor.mjs';
+import { planEntropyGc } from '../../../lib/execution/lifecycle/govern/entropy-gc.mjs';
+import { planReleaseStatus } from '../../../lib/execution/lifecycle/release/release-status.mjs';
+import { planSetup, runSetup } from '../../../lib/execution/lifecycle/setup/setup.mjs';
+import { planUninstall } from '../../../lib/execution/lifecycle/setup/uninstall.mjs';
+import { planUpdate, runUpdate } from '../../../lib/execution/lifecycle/setup/update.mjs';
 
 test('planSetup defaults to Rex-only workflow components', () => {
   const plan = planSetup();

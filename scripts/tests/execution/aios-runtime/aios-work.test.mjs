@@ -6,9 +6,9 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { normalizeWorkOptions, buildWorkRuntimeEnv } from '../../../lib/lifecycle/run/work/options.mjs';
-import { runWorkCommand } from '../../../lib/lifecycle/run/work.mjs';
-import { parseArgs } from '../../../lib/cli/parse-args.mjs';
+import { normalizeWorkOptions, buildWorkRuntimeEnv } from '../../../lib/execution/lifecycle/run/work/options.mjs';
+import { runWorkCommand } from '../../../lib/execution/lifecycle/run/work.mjs';
+import { parseArgs } from '../../../lib/tooling/cli/parse-args.mjs';
 
 const TEST_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const EMPTY_ENV = {};

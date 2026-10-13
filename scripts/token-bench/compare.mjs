@@ -7,7 +7,7 @@
 import path from 'node:path';
 import process from 'node:process';
 
-import { readLedgerRecords } from '../lib/interception/observability/metrics/ledger.mjs';
+import { readLedgerRecords } from '../lib/foundation/interception/observability/metrics/ledger.mjs';
 
 export function diffSessions(recordsOff, recordsOn) {
   const perTask = (records) => {

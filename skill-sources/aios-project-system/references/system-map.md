@@ -7,7 +7,7 @@ AIOS is a browser-automation assistant for Xiaohongshu operations plus related c
 User intent -> skill retrieval (repo-local skill roots) -> repository-local Node/Playwright MCP actions -> platform result -> evidence capture -> memory/docs updates.
 
 ## Main State Surfaces
-- Process memory: repo-local skills, runtime specs in `scripts/lib/specs`, memo records in `.aios/memo`, and ContextDB state in `.aios/context-db`
+- Process memory: repo-local skills, runtime specs in `scripts/lib/tooling/specs`, memo records in `.aios/memo`, and ContextDB state in `.aios/context-db`
 - Task lifecycle: `.aios/tasks/pending`, `.aios/tasks/done`, `.aios/tasks/failed`
 - Artifact output: `images/`, `temp/`
 - Automation engine: repository-local Node/Playwright MCP launcher (`scripts/run-local-browser-mcp.mjs`) with local launch and external CDP attachment modes

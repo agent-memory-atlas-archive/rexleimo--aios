@@ -5,7 +5,7 @@ import test from 'node:test';
 import {
   readHeadroomEntry,
   resolveHeadroomConfigTargets,
-} from '../../../lib/aios-init/headroom-mcp/config-readers.mjs';
+} from '../../../lib/environment/aios-init/headroom-mcp/config-readers.mjs';
 
 test('readHeadroomEntry normalizes Gemini JSON, Hermes YAML and Grok TOML', async () => {
   const gemini = await readHeadroomEntry(

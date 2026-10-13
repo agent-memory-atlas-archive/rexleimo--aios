@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
-import { promoteMemoryCandidate } from '../../../lib/memo/storage/govern/candidates.mjs';
+import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memory/memo/storage.mjs';
+import { promoteMemoryCandidate } from '../../../lib/memory/memo/storage/govern/candidates.mjs';
 
 async function withRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));
