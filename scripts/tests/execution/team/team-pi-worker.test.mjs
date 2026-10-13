@@ -12,13 +12,13 @@ import {
   buildTeamProviderRuntimeClientMap,
   resolveClientTeamProviders,
 } from '../../../lib/clients/registry.mjs';
-import { CLIENT_COMMAND } from '../../../lib/harness/subagent-runtime/constants.mjs';
-import { buildOneShotInvocation } from '../../../lib/harness/subagent-clients/one-shot.mjs';
+import { CLIENT_COMMAND } from '../../../lib/harness/team/subagent-runtime/constants.mjs';
+import { buildOneShotInvocation } from '../../../lib/harness/team/subagent-clients/one-shot.mjs';
 import {
   commandExists,
   getCommandSpawnSpec,
 } from '../../../lib/platform/process/spawn.mjs';
-import { runOneShot } from '../../../lib/harness/subagent-runtime/one-shot-runner.mjs';
+import { runOneShot } from '../../../lib/harness/team/subagent-runtime/one-shot-runner.mjs';
 
 test('pi is declared a team provider and maps to its runtime client id', () => {
   assert.ok(resolveClientTeamProviders('all').includes('pi'));

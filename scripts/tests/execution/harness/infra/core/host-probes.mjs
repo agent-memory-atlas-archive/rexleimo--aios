@@ -5,7 +5,7 @@ import {
   HOST_PROBE_REGISTRY,
   listProbedHosts,
   probeHost,
-} from '../../../../../lib/harness/host-probes.mjs';
+} from '../../../../../lib/harness/team/host-probes.mjs';
 
 function fakeRun(script) {
   return (executable, args) => {

@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { prepareSoloWorktree } from '../../../harness/solo-worktree.mjs';
+import { prepareSoloWorktree } from '../../../harness/solo/solo-worktree.mjs';
 
 export async function resolveResumeWorktree({ rootDir, summary } = {}) {
   const existing = summary?.worktree && typeof summary.worktree === 'object'

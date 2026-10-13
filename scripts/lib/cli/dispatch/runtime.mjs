@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
-import { buildDispatchRuntimeEnv } from '../../harness/orchestrator-runtimes/env.mjs';
+import { buildDispatchRuntimeEnv } from '../../harness/orchestration/orchestrator-runtimes/env.mjs';
 
 const WORKSPACE_SCOPED_COMMANDS = new Set([
   'plan',

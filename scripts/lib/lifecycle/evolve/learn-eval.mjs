@@ -1,6 +1,6 @@
 import { createDefaultLearnEvalOptions, normalizeLearnEvalFormat } from '../govern/options.mjs';
-import { buildLearnEvalReport, renderLearnEvalReport } from '../../harness/learn-eval.mjs';
-import { persistLearnEvalHindsightEvidence } from '../../harness/learn-eval-evidence.mjs';
+import { buildLearnEvalReport, renderLearnEvalReport } from '../../harness/quality/learn-eval.mjs';
+import { persistLearnEvalHindsightEvidence } from '../../harness/quality/learn-eval-evidence.mjs';
 import { executeDraftRecommendations, normalizeDraftTargetId, renderDraftApplySummary, selectDraftRecommendations } from './learn-eval/draft-apply.mjs';
 export function normalizeLearnEvalOptions(rawOptions = {}) {
   const defaults = createDefaultLearnEvalOptions();

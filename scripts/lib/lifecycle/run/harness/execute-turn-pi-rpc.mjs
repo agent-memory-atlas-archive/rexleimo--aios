@@ -5,7 +5,7 @@
    与 one-shot 超时后 fail-closed 的取向一致。 */
 import { createPiRpcSession } from '../../../pi/rpc-client.mjs';
 import { createLedgerUsageTap } from '../../../pi/usage-tap.mjs';
-import { classifySoloFailure } from '../../../harness/solo-runtime.mjs';
+import { classifySoloFailure } from '../../../harness/solo/solo-runtime.mjs';
 import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../interception/index.mjs';
 import { normalizeTurnTimeoutMs } from './execute-turn.mjs';
 import { buildIterationPrompt, parseHarnessJsonOutput } from './prompt.mjs';

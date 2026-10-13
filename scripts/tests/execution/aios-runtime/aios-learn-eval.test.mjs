@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { buildLearnEvalReport, renderLearnEvalReport } from '../../../lib/harness/learn-eval.mjs';
+import { buildLearnEvalReport, renderLearnEvalReport } from '../../../lib/harness/quality/learn-eval.mjs';
 import { planLearnEval, runLearnEval } from '../../../lib/lifecycle/evolve/learn-eval.mjs';
 
 async function makeRootDir() {

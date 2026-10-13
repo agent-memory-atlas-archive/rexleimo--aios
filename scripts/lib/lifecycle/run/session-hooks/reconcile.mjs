@@ -12,9 +12,9 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 import { atomicWriteText } from '../../../memo/storage/fs-io.mjs';
-import { getSoloHarnessPaths } from '../../../harness/solo-journal/paths.mjs';
-import { readSoloRunSummary } from '../../../harness/solo-journal/summary.mjs';
-import { isProcessAlive, readSessionOwner } from '../../../harness/solo-journal/owner.mjs';
+import { getSoloHarnessPaths } from '../../../harness/solo/solo-journal/paths.mjs';
+import { readSoloRunSummary } from '../../../harness/solo/solo-journal/summary.mjs';
+import { isProcessAlive, readSessionOwner } from '../../../harness/solo/solo-journal/owner.mjs';
 import { autoMemoSessionClose, readSessionCloseCandidate } from './close.mjs';
 
 const INTERRUPTION_FILE = 'session-interruption.json';

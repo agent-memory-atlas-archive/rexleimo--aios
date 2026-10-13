@@ -93,7 +93,7 @@ test('runSoloHarnessLoop emits lifecycle hook evidence and iteration hook logs',
       executeTurn: async () => ({
         outcome: 'success',
         summary: 'done with hooks',
-        keyChanges: ['scripts/lib/harness/solo-runtime.mjs'],
+        keyChanges: ['scripts/lib/harness/solo/solo-runtime.mjs'],
         keyLearnings: [],
         nextAction: 'none',
         shouldStop: true,
@@ -147,7 +147,7 @@ test('runSoloHarnessLoop emits lifecycle hook evidence and iteration hook logs',
 });
 
 test('classifySoloFailure does not treat search results mentioning ownership as an ownership gate', async () => {
-  const { classifySoloFailure } = await import('../../../../../lib/harness/solo-runtime.mjs');
+  const { classifySoloFailure } = await import('../../../../../lib/harness/solo/solo-runtime.mjs');
   const detail = 'docs/plans/plan-ownership-preflight-gates.md\nSearch result mentions ownership, but no gate was raised.';
   assert.equal(classifySoloFailure(detail), 'runtime-error');
 });

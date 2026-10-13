@@ -5,13 +5,13 @@ import {
   buildLocalDispatchPlan,
   buildOrchestrationPlan,
   renderOrchestrationReport,
-} from '../../harness/orchestrator.mjs';
+} from '../../harness/orchestration/orchestrator.mjs';
 import {
   createDispatchRuntimeRegistry,
   normalizeDispatchRuntimeResult,
   resolveDispatchRuntime,
-} from '../../harness/orchestrator-runtimes.mjs';
-import { buildLearnEvalReport } from '../../harness/learn-eval.mjs';
+} from '../../harness/orchestration/orchestrator-runtimes.mjs';
+import { buildLearnEvalReport } from '../../harness/quality/learn-eval.mjs';
 import {
   buildRetryBlockedRecoveryCommands,
   extractDispatchHindsightSummary,

@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 import { runContextDbCli } from '../../../contextdb-cli.mjs';
-import { resolveSoloHarnessProfile } from '../../../harness/solo-profiles.mjs';
+import { resolveSoloHarnessProfile } from '../../../harness/solo/solo-profiles.mjs';
 import { normalizeText } from './shared.mjs';
 
 function createSessionId(provider = 'codex') {

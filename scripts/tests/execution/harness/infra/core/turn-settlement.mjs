@@ -6,7 +6,7 @@ import {
   mapIterationToTurnContract,
   settleTurnEnvelope,
   verifyTurnEnvelope,
-} from '../../../../../lib/harness/turn-settlement.mjs';
+} from '../../../../../lib/harness/solo/turn-settlement.mjs';
 
 function fakeRexRunner(script = []) {
   const calls = [];

@@ -1,8 +1,8 @@
 /* 中文注释：Harness 单轮执行汇总 CLI 调用与证据路径，是长任务压缩闭环的关键边界。 */
 import path from 'node:path';
 import { spawnCommand } from '../../../platform/process.mjs';
-import { buildSoloHarnessCommand } from '../../../harness/solo-profiles.mjs';
-import { classifySoloFailure } from '../../../harness/solo-runtime.mjs';
+import { buildSoloHarnessCommand } from '../../../harness/solo/solo-profiles.mjs';
+import { classifySoloFailure } from '../../../harness/solo/solo-runtime.mjs';
 import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../interception/index.mjs';
 import { normalizeText } from './shared.mjs';
 import { buildIterationPrompt, parseHarnessJsonOutput } from './prompt.mjs';

@@ -5,11 +5,11 @@ import {
   buildDispatchPolicy,
   buildEffectiveDispatchPolicy,
   buildOrchestrationPlan,
-} from '../../../harness/orchestrator.mjs';
-import { persistDispatchEvidence } from '../../../harness/orchestrator-evidence.mjs';
-import { buildDispatchInsights } from '../../../harness/dispatch-insights.mjs';
-import { buildWorkItemTelemetry } from '../../../harness/work-item-telemetry.mjs';
-import { evaluateClarityGate, persistClarityGateDecision } from '../../../harness/clarity-gate.mjs';
+} from '../../../harness/orchestration/orchestrator.mjs';
+import { persistDispatchEvidence } from '../../../harness/orchestration/orchestrator-evidence.mjs';
+import { buildDispatchInsights } from '../../../harness/team/dispatch-insights.mjs';
+import { buildWorkItemTelemetry } from '../../../harness/orchestration/work-item-telemetry.mjs';
+import { evaluateClarityGate, persistClarityGateDecision } from '../../../harness/quality/clarity-gate.mjs';
 import { executeEntropyGc } from '../../govern/entropy-gc.mjs';
 import { applyReleaseGuardBlock } from './release-guard.mjs';
 import { normalizePositiveInteger, parseBooleanEnv } from './shared.mjs';

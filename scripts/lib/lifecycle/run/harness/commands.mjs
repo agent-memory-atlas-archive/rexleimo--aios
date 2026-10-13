@@ -7,10 +7,10 @@ import {
   readSoloRunSummary,
   requestSoloHarnessStop,
   writeSoloRunSummary,
-} from '../../../harness/solo-journal.mjs';
-import { finalizeSoloWorktree, prepareSoloWorktree } from '../../../harness/solo-worktree.mjs';
-import { checkSoloHarnessProfileReadiness } from '../../../harness/solo-profiles.mjs';
-import { buildLoopPacingConfig, runSoloHarnessLoop } from '../../../harness/solo-runtime.mjs';
+} from '../../../harness/solo/solo-journal.mjs';
+import { finalizeSoloWorktree, prepareSoloWorktree } from '../../../harness/solo/solo-worktree.mjs';
+import { checkSoloHarnessProfileReadiness } from '../../../harness/solo/solo-profiles.mjs';
+import { buildLoopPacingConfig, runSoloHarnessLoop } from '../../../harness/solo/solo-runtime.mjs';
 import { normalizeText } from './shared.mjs';
 import { ensureSoloHarnessSession } from './session.mjs';
 import { runHarnessDryRunChecks } from './dry-run.mjs';
@@ -19,7 +19,7 @@ import { buildProductionExecuteTurn } from './execute-turn.mjs';
 import { buildPiRpcExecuteTurn } from './execute-turn-pi-rpc.mjs';
 import { createLifecycleHooks } from './hooks.mjs';
 import { resolveResumeWorktree } from './worktree.mjs';
-import { writeHarnessDashboard } from '../../../harness/dashboard.mjs';
+import { writeHarnessDashboard } from '../../../harness/ops/dashboard.mjs';
 
 export async function runHarnessCommand(options = {}, {
   rootDir,

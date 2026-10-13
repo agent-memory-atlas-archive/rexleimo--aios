@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { renderCompatibilityExport } from './lib/agents/compat-export.mjs';
 import { loadCanonicalAgents } from './lib/agents/source-tree.mjs';
 import { writeFileAtomic } from './lib/fs/atomic-write.mjs';
-import { syncGeneratedAgents } from './lib/harness/orchestrator-agents.mjs';
+import { syncGeneratedAgents } from './lib/harness/team/orchestrator-agents.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const exportPath = path.join(rootDir, 'scripts', 'lib', 'specs', 'orchestrator-agents.json');

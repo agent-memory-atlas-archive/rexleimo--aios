@@ -1,4 +1,4 @@
-import { compactRlDecisionEvidence } from '../../harness/orchestrator-evidence.mjs';
+import { compactRlDecisionEvidence } from '../../harness/orchestration/orchestrator-evidence.mjs';
 import { validateOrchestratorEvidence, validateOrchestratorTask } from '../schema.mjs';
 import {
   computeHash,

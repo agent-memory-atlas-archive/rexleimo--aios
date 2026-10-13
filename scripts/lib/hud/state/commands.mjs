@@ -1,4 +1,4 @@
-import { getHarnessTarget } from '../../harness/targets.mjs';
+import { getHarnessTarget } from '../../harness/ops/targets.mjs';
 import {
   clipText,
   DISPATCH_HINDSIGHT_FIX_HINT_ACTIONS,

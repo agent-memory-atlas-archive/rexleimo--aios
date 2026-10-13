@@ -38,7 +38,7 @@ async function canonicalAgent(role) {
 }
 
 async function renderManagedAgent(agent, name = agent.name) {
-  const mod = await import('../../../lib/harness/orchestrator-agents.mjs');
+  const mod = await import('../../../lib/harness/team/orchestrator-agents.mjs');
   return mod.renderAgentMarkdown({
     ...agent,
     name,

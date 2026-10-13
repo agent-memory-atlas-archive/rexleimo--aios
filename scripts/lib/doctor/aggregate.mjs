@@ -8,7 +8,7 @@ import { doctorPiBridge } from '../components/pi/doctor.mjs';
 import { doctorZcodeAgents } from '../components/zcode/doctor.mjs';
 import { doctorContextDbShell } from '../components/shell.mjs';
 import { doctorContextDbSkills } from '../components/skills.mjs';
-import { getDisabledGateIds, isHarnessGateEnabled } from '../harness/profile.mjs';
+import { getDisabledGateIds, isHarnessGateEnabled } from '../harness/ops/profile.mjs';
 import { commandExists, captureCommand, runCommand } from '../platform/process.mjs';
 import { doctorRexHarness, isAiosRuntimeRoot } from '../rex-harness/runtime.mjs';
 import { inspectTokenDiscipline, printTokenDisciplineReport } from '../token-discipline/index.mjs';

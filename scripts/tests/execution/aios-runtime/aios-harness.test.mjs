@@ -10,8 +10,8 @@ import {
   getDisabledGateIds,
   isHarnessGateEnabled,
   normalizeHarnessProfile,
-} from '../../../lib/harness/profile.mjs';
-import { renderHandoffMarkdown, validateHandoffPayload } from '../../../lib/harness/handoff.mjs';
+} from '../../../lib/harness/ops/profile.mjs';
+import { renderHandoffMarkdown, validateHandoffPayload } from '../../../lib/harness/solo/handoff.mjs';
 import { planDoctor } from '../../../lib/lifecycle/govern/doctor.mjs';
 import { executeEntropyGc } from '../../../lib/lifecycle/govern/entropy-gc.mjs';
 import { planQualityGate, runQualityGate } from '../../../lib/lifecycle/govern/quality-gate.mjs';
@@ -661,7 +661,7 @@ test('renderHandoffMarkdown renders the shared schema', () => {
     taskTitle: 'Implement harness profiles',
     contextSummary: 'Profiles and quality gate landed; review integration risks.',
     findings: ['doctor now supports --profile'],
-    filesTouched: ['scripts/lib/harness/profile.mjs'],
+    filesTouched: ['scripts/lib/harness/ops/profile.mjs'],
     recommendations: ['run quality-gate pre-pr'],
   });
 

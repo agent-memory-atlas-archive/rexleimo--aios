@@ -1,7 +1,7 @@
 import {
   normalizeOrchestratorBlueprint,
   normalizeOrchestratorFormat,
-} from '../../../harness/orchestrator.mjs';
+} from '../../../harness/orchestration/orchestrator.mjs';
 import { normalizePositiveInteger } from './shared.mjs';
 import {
   normalizeOrchestrateDispatchMode,

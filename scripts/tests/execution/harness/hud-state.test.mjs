@@ -6,8 +6,8 @@ import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
 import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
-import { buildHindsightEval } from '../../../lib/harness/hindsight-eval.mjs';
-import { initSoloRunJournal, writeSoloControl } from '../../../lib/harness/solo-journal.mjs';
+import { buildHindsightEval } from '../../../lib/harness/quality/hindsight-eval.mjs';
+import { initSoloRunJournal, writeSoloControl } from '../../../lib/harness/solo/solo-journal.mjs';
 import { readHudDispatchSummary, readHudState, selectHudSessionId } from '../../../lib/hud/state.mjs';
 import { renderHud } from '../../../lib/hud/render.mjs';
 import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/hud/watch.mjs';

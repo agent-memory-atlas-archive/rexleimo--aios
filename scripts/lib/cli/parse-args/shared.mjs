@@ -34,7 +34,7 @@ import {
   normalizeTokenProfile,
   normalizeWrapMode,
 } from '../../lifecycle/govern/options.mjs';
-import { normalizeOrchestratorBlueprint, normalizeOrchestratorFormat } from '../../harness/orchestrator.mjs';
+import { normalizeOrchestratorBlueprint, normalizeOrchestratorFormat } from '../../harness/orchestration/orchestrator.mjs';
 import {
   ALL_CLIENTS,
   buildTeamProviderRuntimeClientMap,

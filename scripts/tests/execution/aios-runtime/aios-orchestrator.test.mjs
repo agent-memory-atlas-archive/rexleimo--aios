@@ -10,7 +10,7 @@ import {
   createLocalDispatchExecutorRegistry,
   resolveLocalDispatchExecutor,
   selectLocalDispatchExecutor,
-} from '../../../lib/harness/orchestrator-executors.mjs';
+} from '../../../lib/harness/orchestration/orchestrator-executors.mjs';
 import {
   buildExecutorCapabilityManifest,
   buildDecomposedWorkItems,
@@ -20,17 +20,17 @@ import {
   getOrchestratorBlueprint,
   mergeParallelHandoffs,
   renderOrchestrationReport,
-} from '../../../lib/harness/orchestrator.mjs';
-import { evaluateClarityGate } from '../../../lib/harness/clarity-gate.mjs';
-import { buildDispatchInsights } from '../../../lib/harness/dispatch-insights.mjs';
-import { persistDispatchEvidence } from '../../../lib/harness/orchestrator-evidence.mjs';
-import { buildWorkItemTelemetry } from '../../../lib/harness/work-item-telemetry.mjs';
-import { executeMergeGateJob } from '../../../lib/harness/subagent-runtime/merge-gate.mjs';
+} from '../../../lib/harness/orchestration/orchestrator.mjs';
+import { evaluateClarityGate } from '../../../lib/harness/quality/clarity-gate.mjs';
+import { buildDispatchInsights } from '../../../lib/harness/team/dispatch-insights.mjs';
+import { persistDispatchEvidence } from '../../../lib/harness/orchestration/orchestrator-evidence.mjs';
+import { buildWorkItemTelemetry } from '../../../lib/harness/orchestration/work-item-telemetry.mjs';
+import { executeMergeGateJob } from '../../../lib/harness/team/subagent-runtime/merge-gate.mjs';
 import { planOrchestrate, runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 
 async function importDispatchRuntimes() {
   try {
-    return await import('../../../lib/harness/orchestrator-runtimes.mjs');
+    return await import('../../../lib/harness/orchestration/orchestrator-runtimes.mjs');
   } catch {
     return null;
   }

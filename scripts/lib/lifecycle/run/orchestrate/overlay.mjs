@@ -1,4 +1,4 @@
-import { normalizeOrchestratorBlueprint } from '../../../harness/orchestrator.mjs';
+import { normalizeOrchestratorBlueprint } from '../../../harness/orchestration/orchestrator.mjs';
 
 // 纯函数：从 learn-eval recommendation id 中提取蓝图名，避免主流程重复解析 targetId 约定。
 export function extractBlueprintFromTargetId(targetId) {

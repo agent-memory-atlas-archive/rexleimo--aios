@@ -12,7 +12,7 @@ import {
   readSoloControl,
   readSoloRunStatus,
   requestSoloHarnessStop,
-} from '../../../lib/harness/solo-journal.mjs';
+} from '../../../lib/harness/solo/solo-journal.mjs';
 
 test('initSoloRunJournal writes objective summary and control artifacts', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-journal-'));

@@ -8,7 +8,7 @@ import {
   resolveSoloBackoffState,
   runSoloHarnessLoop,
   writeSoloIterationCheckpoint,
-} from '../../../../lib/harness/solo-runtime.mjs';
+} from '../../../../lib/harness/solo/solo-runtime.mjs';
 import { runContextDbCli } from '../../../../lib/contextdb-cli.mjs';
 import {
   getSoloHarnessPaths,
@@ -17,16 +17,16 @@ import {
   readSoloControl,
   readSoloRunStatus,
   requestSoloHarnessStop,
-} from '../../../../lib/harness/solo-journal.mjs';
+} from '../../../../lib/harness/solo/solo-journal.mjs';
 import { buildIterationPrompt, runHarnessCommand } from '../../../../lib/lifecycle/run/harness.mjs';
 import {
   buildClientStructuredOutputOptions,
   cleanupClientStructuredOutputTempDir,
   createClientStructuredOutputTempDir,
   shouldUseClientStructuredOutput,
-} from '../../../../lib/harness/subagent-clients/structured-output.mjs';
-import { buildOneShotInvocation } from '../../../../lib/harness/subagent-clients/one-shot.mjs';
-import { runOneShot } from '../../../../lib/harness/subagent-runtime/one-shot-runner.mjs';
+} from '../../../../lib/harness/team/subagent-clients/structured-output.mjs';
+import { buildOneShotInvocation } from '../../../../lib/harness/team/subagent-clients/one-shot.mjs';
+import { runOneShot } from '../../../../lib/harness/team/subagent-runtime/one-shot-runner.mjs';
 
 export async function pathExists(targetPath) {
   try {

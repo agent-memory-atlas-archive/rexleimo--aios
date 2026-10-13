@@ -1,4 +1,4 @@
-import { normalizeSoloIterationOutcome } from '../../../harness/solo-runtime.mjs';
+import { normalizeSoloIterationOutcome } from '../../../harness/solo/solo-runtime.mjs';
 import { normalizeText } from './shared.mjs';
 import { finalizeSession } from '../session-hooks/finalize.mjs';
 

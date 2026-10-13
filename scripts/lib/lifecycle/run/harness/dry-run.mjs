@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
-import { checkSoloHarnessProfileReadiness } from '../../../harness/solo-profiles.mjs';
+import { checkSoloHarnessProfileReadiness } from '../../../harness/solo/solo-profiles.mjs';
 import { resolveClientSkillRoots } from '../../../clients/registry.mjs';
 import { CLIENT_MCP_TARGETS } from '../../../clients/core/definitions.mjs';
 

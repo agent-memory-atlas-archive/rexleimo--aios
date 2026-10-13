@@ -1,8 +1,8 @@
 // scripts/lib/lifecycle/work/options.mjs — aios work 命令的纯函数选项契约
 // 中文注释：work 是 orchestrate 的语义化薄包装：默认 live 并发调度，dry-run 需显式；--serial 强制并发度 1。
 
-import { buildDispatchRuntimeEnv } from '../../../harness/orchestrator-runtimes/env.mjs';
-import { normalizeOrchestratorBlueprint, normalizeOrchestratorFormat } from '../../../harness/orchestrator.mjs';
+import { buildDispatchRuntimeEnv } from '../../../harness/orchestration/orchestrator-runtimes/env.mjs';
+import { normalizeOrchestratorBlueprint, normalizeOrchestratorFormat } from '../../../harness/orchestration/orchestrator.mjs';
 
 export const WORK_DEFAULT_CLIENT_ID = 'codex-cli';
 export const WORK_DEFAULT_CONCURRENCY = 3;

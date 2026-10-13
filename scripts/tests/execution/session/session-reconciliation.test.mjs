@@ -10,8 +10,8 @@ import {
   DEFAULT_STALE_AFTER_MS,
 } from '../../../lib/lifecycle/run/session-hooks/reconcile.mjs';
 import { readSessionCloseCandidate } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
-import { getSoloHarnessPaths } from '../../../lib/harness/solo-journal/paths.mjs';
-import { claimSessionOwner } from '../../../lib/harness/solo-journal/owner.mjs';
+import { getSoloHarnessPaths } from '../../../lib/harness/solo/solo-journal/paths.mjs';
+import { claimSessionOwner } from '../../../lib/harness/solo/solo-journal/owner.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {

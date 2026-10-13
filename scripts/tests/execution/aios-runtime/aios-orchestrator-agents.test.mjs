@@ -7,11 +7,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { buildLocalDispatchPlan, buildOrchestrationPlan } from '../../../lib/harness/orchestrator.mjs';
+import { buildLocalDispatchPlan, buildOrchestrationPlan } from '../../../lib/harness/orchestration/orchestrator.mjs';
 
 async function importAgentModule() {
   try {
-    return await import('../../../lib/harness/orchestrator-agents.mjs');
+    return await import('../../../lib/harness/team/orchestrator-agents.mjs');
   } catch {
     return null;
   }

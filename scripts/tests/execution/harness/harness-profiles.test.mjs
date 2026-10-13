@@ -7,7 +7,7 @@ import {
   checkSoloHarnessProfileReadiness,
   resolveSoloHarnessProfile,
   validateSoloHarnessExtraArgs,
-} from '../../../lib/harness/solo-profiles.mjs';
+} from '../../../lib/harness/solo/solo-profiles.mjs';
 
 test('resolveSoloHarnessProfile maps codex and opencode providers', () => {
   const codex = resolveSoloHarnessProfile({ provider: 'codex' });

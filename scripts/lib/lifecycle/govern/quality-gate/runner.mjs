@@ -1,8 +1,8 @@
 import path from 'node:path';
 
 import { evaluateArchitectureGovernance } from '../../../architecture/governance.mjs';
-import { getDisabledGateIds, isHarnessGateEnabled } from '../../../harness/profile.mjs';
-import { persistQualityGateEvidence } from '../../../harness/verification-evidence.mjs';
+import { getDisabledGateIds, isHarnessGateEnabled } from '../../../harness/ops/profile.mjs';
+import { persistQualityGateEvidence } from '../../../harness/quality/verification-evidence.mjs';
 import { runReleaseStatus } from '../../release/release-status.mjs';
 import {
   auditConsoleLogs,

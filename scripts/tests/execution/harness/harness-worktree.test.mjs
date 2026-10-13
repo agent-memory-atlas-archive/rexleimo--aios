@@ -9,7 +9,7 @@ import {
   detectSoloWorktreeChanges,
   finalizeSoloWorktree,
   prepareSoloWorktree,
-} from '../../../lib/harness/solo-worktree.mjs';
+} from '../../../lib/harness/solo/solo-worktree.mjs';
 
 async function makeGitRepo() {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-worktree-'));
