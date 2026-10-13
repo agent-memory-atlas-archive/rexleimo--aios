@@ -933,23 +933,23 @@ async function cl10() {
   return withWorkspace('context-lifecycle-cl10-', async () => {
     const contextTests = commandObservation(process.execPath, [
       '--test',
-      'scripts/tests/memo-temporal.test.mjs',
-      'scripts/tests/memo-scope.test.mjs',
-      'scripts/tests/memo-provenance.test.mjs',
-      'scripts/tests/memo-candidate-governance.test.mjs',
-      'scripts/tests/dream-governance.test.mjs',
-      'scripts/tests/context-lifecycle-s2.test.mjs',
-      'scripts/tests/contextdb-continuity.test.mjs',
-      'scripts/tests/contextdb-facade.test.mjs',
-      'scripts/tests/handoff.test.mjs',
-      'scripts/tests/canvas-context-scaling.test.mjs',
-      'scripts/tests/offload-tool-offload.test.mjs',
+      'scripts/tests/memory/memo-govern/memo-temporal.test.mjs',
+      'scripts/tests/memory/memo-store/memo-scope.test.mjs',
+      'scripts/tests/memory/memo-store/memo-provenance.test.mjs',
+      'scripts/tests/memory/memo-govern/memo-candidate-governance.test.mjs',
+      'scripts/tests/memory/dream/dream-governance.test.mjs',
+      'scripts/tests/foundation/context/context-lifecycle-s2.test.mjs',
+      'scripts/tests/memory/contextdb/contextdb-continuity.test.mjs',
+      'scripts/tests/memory/contextdb/contextdb-facade.test.mjs',
+      'scripts/tests/tooling/workspace/handoff.test.mjs',
+      'scripts/tests/tooling/offload/canvas-context-scaling.test.mjs',
+      'scripts/tests/tooling/offload/offload-tool-offload.test.mjs',
     ]);
     const planningTests = commandObservation(process.execPath, [
       '--test',
-      'scripts/tests/workflow-policy.test.mjs',
-      'scripts/tests/planning-contract.test.mjs',
-      'scripts/tests/preflight-contracts.test.mjs',
+      'scripts/tests/execution/workflow/workflow-policy.test.mjs',
+      'scripts/tests/execution/planning/planning-contract.test.mjs',
+      'scripts/tests/tooling/contracts/preflight-contracts.test.mjs',
     ]);
     const contextDbTests = commandObservation(process.execPath, [
       'scripts/with-project-node.mjs',

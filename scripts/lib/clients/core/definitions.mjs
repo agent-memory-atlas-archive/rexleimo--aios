@@ -152,7 +152,7 @@ export const CLIENT_DEFINITIONS = Object.freeze({
   // No sub-agents upstream: no `agents` capability until an extension verifies it.
   // team: the same spawn-based routing drives `pi -p` headlessly as any other
   // provider (verified live: worker dispatch + batch aggregation, see
-  // scripts/tests/team-pi-worker.test.mjs). Harness RPC (long-lived managed
+  // scripts/tests/execution/team/team-pi-worker.test.mjs). Harness RPC (long-lived managed
   // session) is supported via the pi-rpc transport.
   pi: Object.freeze({
     capabilities: Object.freeze(['skills', 'native', 'team', 'harness']),

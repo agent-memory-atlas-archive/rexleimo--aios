@@ -31,7 +31,7 @@ The following tests passed in the current worktree:
 
 ```text
 node --test rex-harness/tests/contract/client-install.test.mjs
-node --test scripts/tests/rex-release-gate.test.mjs
+node --test scripts/tests/execution/rex/runtime/rex-release-gate.test.mjs
 ```
 
 ## Release decision

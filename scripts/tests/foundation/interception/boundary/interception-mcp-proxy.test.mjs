@@ -1,0 +1,135 @@
+/* 中文注释：Interception 回归测试覆盖压缩、召回、指标和客户端配置，防止链路退化成 prompt-only。 */
+import assert from 'node:assert/strict';
+import { mkdtemp, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { createJsonRpcProxyHandler } from '../../../../lib/interception/mcp/json-rpc-proxy.mjs';
+import { readMetricsRecords } from '../../../../lib/interception/metrics/metrics-sink.mjs';
+import { readRawRef } from '../../../../lib/interception/refs/raw-ref-store.mjs';
+
+const SENTINEL = 'UNIQUE_MCP_RAW_PAYLOAD_SENTINEL';
+
+test('json-rpc proxy preserves multimodal tools/call content and stores AIOS metadata by ref', async () => {
+  const workspaceRoot = await mkdtemp(path.join(os.tmpdir(), 'aios-mcp-proxy-'));
+  const calls = [];
+  const content = [
+    { type: 'text', text: `HTML <main>${SENTINEL.repeat(20)}</main>` },
+    { type: 'image', data: 'c2NyZWVuc2hvdC1ieXRlcw==', mimeType: 'image/png' },
+    { type: 'audio', data: 'YXVkaW8tYnl0ZXM=', mimeType: 'audio/wav' },
+    { type: 'resource', resource: { uri: 'file:///page-state.bin', mimeType: 'application/octet-stream', blob: 'cmVzb3VyY2UtYnl0ZXM=' } },
+    { type: 'future-binary', payload: 'ZnV0dXJlLWJ5dGVz' },
+  ];
+  try {
+    const handler = createJsonRpcProxyHandler({
+      workspaceRoot,
+      sessionId: 'mcp-session',
+      host: 'generic-mcp',
+      now: () => new Date('2026-05-23T00:00:00.000Z'),
+      thresholds: { minRawBytes: 64 },
+      metrics: { enabled: true },
+      forward: async message => {
+        calls.push(message);
+        return {
+          jsonrpc: '2.0',
+          id: message.id,
+          result: {
+            content,
+          },
+        };
+      },
+    });
+
+    const response = await handler({
+      jsonrpc: '2.0',
+      id: 7,
+      method: 'tools/call',
+      params: { name: 'page.get_html', arguments: {} },
+    });
+
+    assert.equal(response.jsonrpc, '2.0');
+    assert.equal(response.id, 7);
+    assert.equal(calls.length, 1);
+    assert.deepEqual(response.result.content, content);
+    assert.equal(response.result._meta.aios.refs.length, 1);
+    assert.equal(JSON.stringify(response.result._meta.aios).includes(SENTINEL), false);
+    assert.equal(JSON.stringify(response.result._meta.aios).includes(content[1].data), false);
+    assert.equal(JSON.stringify(response.result._meta.aios).includes(content[2].data), false);
+    assert.equal(JSON.stringify(response.result._meta.aios).includes(content[3].resource.blob), false);
+    assert.equal(JSON.stringify(response.result._meta.aios).includes(content[4].payload), false);
+    assert.equal(response.result._meta.aios.type, 'aios.compact_packet');
+
+    const metrics = await readMetricsRecords({ workspaceRoot, sessionId: 'mcp-session' });
+    assert.equal(metrics.length, 1);
+    assert.equal(metrics[0].source, 'mcp');
+    assert.equal(metrics[0].ref_id, response.result._meta.aios.refs[0].ref_id);
+    assert.equal(metrics[0].saved_bytes, response.result._meta.aios.metrics.saved_bytes);
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test('json-rpc proxy keeps tools/list MCP shape, stores full catalog ref, and records metrics', async () => {
+  const workspaceRoot = await mkdtemp(path.join(os.tmpdir(), 'aios-mcp-proxy-'));
+  try {
+    const handler = createJsonRpcProxyHandler({
+      workspaceRoot,
+      sessionId: 'mcp-session',
+      host: 'generic-mcp',
+      now: () => new Date('2026-05-23T00:00:00.000Z'),
+      metrics: { enabled: true },
+      forward: async message => ({
+        jsonrpc: '2.0',
+        id: message.id,
+        result: {
+          tools: [
+            {
+              name: 'page.screenshot',
+              description: 'Take a screenshot and return a giant base64 blob.'.repeat(40),
+              inputSchema: { type: 'object', properties: { fullPage: { type: 'boolean' } } },
+            },
+          ],
+        },
+      }),
+    });
+
+    const response = await handler({ jsonrpc: '2.0', id: 3, method: 'tools/list' });
+    assert.equal(response.id, 3);
+    assert.equal(response.result.tools[0].name, 'page.screenshot');
+    assert.deepEqual(response.result.tools[0].inputSchema, { type: 'object', properties: { fullPage: { type: 'boolean' } } });
+    assert.equal(response.result._meta.aios.tools[0].name, 'page.screenshot');
+    assert.equal(response.result._meta.aios.refs.length, 1);
+    assert.equal(response.result._meta.aios.recall.length > 0, true);
+
+    const recalled = await readRawRef({
+      workspaceRoot,
+      sessionId: 'mcp-session',
+      refId: response.result._meta.aios.refs[0].ref_id,
+    });
+    assert.match(recalled.raw, /page\.screenshot/);
+    assert.match(recalled.raw, /giant base64 blob/);
+
+    const metrics = await readMetricsRecords({ workspaceRoot, sessionId: 'mcp-session' });
+    assert.equal(metrics.length, 1);
+    assert.equal(metrics[0].kind, 'mcp.tools_list');
+    assert.equal(metrics[0].ref_id, response.result._meta.aios.refs[0].ref_id);
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test('json-rpc proxy passes through non-MCP shaped tool results', async () => {
+  const handler = createJsonRpcProxyHandler({
+    workspaceRoot: process.cwd(),
+    sessionId: 'mcp-session',
+    forward: async message => ({
+      jsonrpc: '2.0',
+      id: message.id,
+      result: { arbitrary: true },
+    }),
+  });
+
+  const response = await handler({ jsonrpc: '2.0', id: 9, method: 'tools/call' });
+  assert.deepEqual(response.result, { arbitrary: true });
+});

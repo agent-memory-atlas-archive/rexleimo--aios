@@ -1,0 +1,479 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { planDoctor } from '../../../lib/lifecycle/doctor.mjs';
+import { planEntropyGc } from '../../../lib/lifecycle/entropy-gc.mjs';
+import { planReleaseStatus } from '../../../lib/lifecycle/release-status.mjs';
+import { planSetup, runSetup } from '../../../lib/lifecycle/setup.mjs';
+import { planUninstall } from '../../../lib/lifecycle/uninstall.mjs';
+import { planUpdate, runUpdate } from '../../../lib/lifecycle/update.mjs';
+
+test('planSetup defaults to Rex-only workflow components', () => {
+  const plan = planSetup();
+  assert.equal(plan.command, 'setup');
+  assert.deepEqual(plan.options.components, ['browser', 'shell', 'skills', 'native']);
+  assert.equal(plan.options.wrapMode, 'opt-in');
+  assert.equal(plan.options.client, 'all');
+  assert.match(plan.preview, /setup --components browser,shell,skills,native/);
+  assert.doesNotMatch(plan.preview, /superpowers/u);
+});
+
+test('planUninstall defaults to shell and skills only', () => {
+  const plan = planUninstall();
+  assert.equal(plan.command, 'uninstall');
+  assert.deepEqual(plan.options.components, ['shell', 'skills']);
+  assert.equal(plan.options.client, 'all');
+});
+
+test('planUpdate retains dry-run in its preview', () => {
+  const plan = planUpdate({ components: ['native'], dryRun: true });
+
+  assert.equal(plan.options.dryRun, true);
+  assert.match(plan.preview, /update --components native .*--dry-run/);
+});
+
+test('runUpdate dry-run returns its plan before component updates', async () => {
+  const calls = [];
+  const logs = [];
+  const result = await runUpdate({ components: ['native'], dryRun: true }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io: { log: (message) => logs.push(message) },
+    deps: {
+      updateNativeEnhancements: async () => { calls.push('native'); },
+    },
+  });
+
+  assert.deepEqual(calls, []);
+  assert.equal(result.options.dryRun, true);
+  assert.match(result.preview, /update --components native .*--dry-run/);
+  assert.match(logs.join('\n'), /^\[plan\] aios update/m);
+});
+
+test('planDoctor preserves strict and global security flags', () => {
+  const plan = planDoctor({
+    strict: true,
+    globalSecurity: true,
+    client: 'opencode',
+    nativeOnly: true,
+    verbose: true,
+    fix: true,
+    dryRun: true,
+  });
+  assert.equal(plan.command, 'doctor');
+  assert.equal(plan.options.strict, true);
+  assert.equal(plan.options.globalSecurity, true);
+  assert.equal(plan.options.client, 'opencode');
+  assert.equal(plan.options.nativeOnly, true);
+  assert.equal(plan.options.verbose, true);
+  assert.equal(plan.options.fix, true);
+  assert.equal(plan.options.dryRun, true);
+  assert.match(plan.preview, /doctor --strict --global-security --client opencode --native --verbose --fix --dry-run/);
+});
+
+test('planEntropyGc preserves explicit options', () => {
+  const plan = planEntropyGc({
+    sessionId: 'codex-cli-20260303T080437-065e16c0',
+    mode: 'dry-run',
+    retain: 9,
+    minAgeHours: 72,
+    format: 'json',
+  });
+  assert.equal(plan.command, 'entropy-gc');
+  assert.equal(plan.options.mode, 'dry-run');
+  assert.equal(plan.options.sessionId, 'codex-cli-20260303T080437-065e16c0');
+  assert.equal(plan.options.retain, 9);
+  assert.equal(plan.options.minAgeHours, 72);
+  assert.equal(plan.options.format, 'json');
+  assert.match(plan.preview, /entropy-gc dry-run/);
+  assert.match(plan.preview, /--retain 9/);
+});
+
+test('planReleaseStatus preserves strict health-gate options', () => {
+  const plan = planReleaseStatus({
+    statePath: 'experiments/rl-mixed-v1/release/custom.state.json',
+    recent: 12,
+    strict: true,
+    minSamples: 10,
+    maxFailureRate: 0.25,
+    maxFallbackRate: 0.15,
+    outputPath: 'tmp/release-status.json',
+    historyOutputPath: 'tmp/release-history.csv',
+    historyFormat: 'ndjson',
+    historyDays: 21,
+    format: 'json',
+  }, { rootDir: '/tmp/aios-test' });
+  assert.equal(plan.command, 'release-status');
+  assert.equal(plan.options.recent, 12);
+  assert.equal(plan.options.strict, true);
+  assert.equal(plan.options.minSamples, 10);
+  assert.equal(plan.options.maxFailureRate, 0.25);
+  assert.equal(plan.options.maxFallbackRate, 0.15);
+  assert.equal(plan.options.format, 'json');
+  assert.equal(plan.options.historyOutputPath.replace(/\\/g, '/').endsWith('/tmp/release-history.csv'), true);
+  assert.equal(plan.options.historyFormat, 'ndjson');
+  assert.equal(plan.options.historyDays, 21);
+  assert.match(plan.preview, /release-status/);
+  assert.match(plan.preview, /--strict/);
+  assert.match(plan.preview, /--min-samples 10/);
+  assert.match(plan.preview, /--max-failure-rate 0.25/);
+  assert.match(plan.preview, /--max-fallback-rate 0.15/);
+  assert.match(plan.preview, /--output tmp\/release-status.json/);
+  assert.match(plan.preview, /--history-output tmp\/release-history.csv/);
+  assert.match(plan.preview, /--history-format ndjson/);
+  assert.match(plan.preview, /--history-days 21/);
+});
+
+test('runSetup browser flow enables doctor auto-heal by default', async () => {
+  const calls = [];
+  const io = { log: () => {} };
+  await runSetup({
+    components: ['browser'],
+    skipPlaywrightInstall: true,
+    skipDoctor: false,
+    force: true,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io,
+    deps: {
+      installBrowserMcp: async (options) => { calls.push({ kind: 'install', options }); },
+      doctorBrowserMcp: async (options) => { calls.push({ kind: 'doctor', options }); },
+    },
+  });
+
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].kind, 'install');
+  assert.equal(calls[1].kind, 'doctor');
+  assert.equal(calls[1].options.fix, true);
+});
+
+test('runSetup browser flow does not block lifecycle when browser-use runtime is missing', async () => {
+  const calls = [];
+  const logs = [];
+  await runSetup({
+    components: ['browser'],
+    skipPlaywrightInstall: true,
+    skipDoctor: false,
+    force: true,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io: { log: (line) => logs.push(String(line)) },
+    deps: {
+      installBrowserMcp: async () => {
+        throw new Error('repository-local browser MCP is unavailable: scripts/run-local-browser-mcp.mjs');
+      },
+      doctorBrowserMcp: async (options) => { calls.push({ kind: 'doctor', options }); },
+    },
+  });
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].kind, 'doctor');
+  assert.equal(calls[0].options.fix, false);
+  assert.match(logs.join('\n'), /\[warn\] browser component skipped:/);
+  assert.match(logs.join('\n'), /aios internal browser doctor --fix/);
+});
+
+test('runUpdate browser flow enables doctor auto-heal by default', async () => {
+  const calls = [];
+  const io = { log: () => {} };
+  await runUpdate({
+    components: ['browser'],
+    withPlaywrightInstall: false,
+    skipDoctor: false,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io,
+    deps: {
+      installBrowserMcp: async (options) => { calls.push({ kind: 'install', options }); },
+      doctorBrowserMcp: async (options) => { calls.push({ kind: 'doctor', options }); },
+    },
+  });
+
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].kind, 'install');
+  assert.equal(calls[1].kind, 'doctor');
+  assert.equal(calls[1].options.fix, true);
+});
+
+test('runUpdate performs runtime self-update when requested', async () => {
+  const calls = [];
+  await runUpdate({
+    selfUpdate: true,
+    components: ['skills'],
+    skipDoctor: true,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io: { log: () => {} },
+    deps: {
+      // skipped/no-op replace keeps component work in-process
+      updateHarnessRuntime: async (options) => {
+        calls.push({ kind: 'runtime', options });
+        return { updated: false, skipped: true };
+      },
+      installContextDbSkills: async (options) => { calls.push({ kind: 'skills', options }); },
+      installRexClientProjections: async () => {},
+    },
+  });
+
+  assert.equal(calls[0].kind, 'runtime');
+  assert.equal(calls[0].options.rootDir, '/tmp/aios-test');
+  assert.equal(calls[1].kind, 'skills');
+});
+
+test('runUpdate re-execs component update after a successful runtime replace', async () => {
+  const calls = [];
+  const result = await runUpdate({
+    selfUpdate: true,
+    components: ['skills', 'native'],
+    skipDoctor: true,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-project',
+    io: { log: () => {} },
+    deps: {
+      updateHarnessRuntime: async (options) => {
+        calls.push({ kind: 'runtime', options });
+        return { updated: true, skipped: false, method: 'release-installer' };
+      },
+      reexecUpdateAfterRuntimeReplace: async (options) => {
+        calls.push({ kind: 'reexec', options });
+        return { reexec: true, exitCode: 0 };
+      },
+      installContextDbSkills: async () => {
+        calls.push({ kind: 'skills-should-not-run' });
+      },
+      updateNativeEnhancements: async () => {
+        calls.push({ kind: 'native-should-not-run' });
+      },
+    },
+  });
+
+  assert.deepEqual(calls.map((entry) => entry.kind), ['runtime', 'reexec']);
+  assert.equal(result.reexec, true);
+  assert.equal(calls[1].options.rootDir, '/tmp/aios-test');
+});
+
+test('runSetup projects Rex workflow skills for Grok after AIOS skills install', async () => {
+  const calls = [];
+  await runSetup({
+    components: ['skills'],
+    client: 'grok',
+    skipDoctor: true,
+    force: true,
+  }, {
+    rootDir: '/tmp/aios-install',
+    projectRoot: '/tmp/grok-project',
+    io: { log: () => {} },
+    deps: {
+      installContextDbSkills: async (options) => { calls.push({ kind: 'aios-skills', options }); },
+      installRexClientProjections: async (options) => { calls.push({ kind: 'rex-skills', options }); },
+    },
+  });
+
+  assert.deepEqual(calls.map((entry) => entry.kind), ['aios-skills', 'rex-skills']);
+  assert.equal(calls[1].options.rootDir, '/tmp/aios-install');
+  assert.equal(calls[1].options.projectRoot, '/tmp/grok-project');
+  assert.equal(calls[1].options.client, 'grok');
+  assert.equal(calls[1].options.scope, 'global');
+});
+
+test('runUpdate projects Rex workflow skills for all supported clients', async () => {
+  const calls = [];
+  await runUpdate({
+    components: ['skills'],
+    client: 'all',
+    skipDoctor: true,
+  }, {
+    rootDir: '/tmp/aios-install',
+    projectRoot: '/tmp/all-clients-project',
+    io: { log: () => {} },
+    deps: {
+      installContextDbSkills: async (options) => { calls.push({ kind: 'aios-skills', options }); },
+      installRexClientProjections: async (options) => { calls.push({ kind: 'rex-skills', options }); },
+    },
+  });
+
+  assert.deepEqual(calls.map((entry) => entry.kind), ['aios-skills', 'rex-skills']);
+  assert.equal(calls[1].options.client, 'all');
+  assert.equal(calls[1].options.projectRoot, '/tmp/all-clients-project');
+  assert.equal(calls[1].options.scope, 'global');
+});
+
+test('runSetup repairs the required rex-harness source submodule before component work', async () => {
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-setup-rex-'));
+  await mkdir(path.join(rootDir, 'scripts'), { recursive: true });
+  await writeFile(path.join(rootDir, 'scripts', 'aios.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  await writeFile(path.join(rootDir, '.gitmodules'), '[submodule "rex-harness"]\n', 'utf8');
+  const calls = [];
+
+  await runSetup({ components: ['skills'], skipDoctor: true }, {
+    rootDir,
+    projectRoot: rootDir,
+    io: { log: () => {} },
+    deps: {
+      ensureRexHarness: async (options) => {
+        calls.push({ kind: 'rex', options });
+        return { ready: true, version: '0.4.2', missing: [], fixHint: '' };
+      },
+      reconcileRexWorkflowSurface: async (options) => {
+        calls.push({ kind: 'reconcile', options });
+        return { status: 'already-converged', removed: [], conflicts: [] };
+      },
+      installContextDbSkills: async () => { calls.push({ kind: 'skills' }); },
+      installRexClientProjections: async () => {},
+    },
+  });
+
+  assert.equal(calls[0].kind, 'rex');
+  assert.equal(calls[0].options.fix, true);
+  assert.equal(calls[1].kind, 'reconcile');
+  assert.equal(calls[1].options.adoptLegacySuperpowers, false);
+  assert.equal(calls[2].kind, 'skills');
+});
+
+test('runUpdate automatically reconciles the Rex workflow surface after Rex is ready', async () => {
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-update-rex-'));
+  await mkdir(path.join(rootDir, 'scripts'), { recursive: true });
+  await writeFile(path.join(rootDir, 'scripts', 'aios.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  const calls = [];
+
+  await runUpdate({
+    components: ['skills'],
+    skipDoctor: true,
+    adoptLegacySuperpowers: true,
+  }, {
+    rootDir,
+    projectRoot: rootDir,
+    io: { log: () => {} },
+    deps: {
+      ensureRexHarness: async () => {
+        calls.push({ kind: 'rex' });
+        return { ready: true, version: '0.4.2', missing: [], fixHint: '' };
+      },
+      reconcileRexWorkflowSurface: async (options) => {
+        calls.push({ kind: 'reconcile', options });
+        return { status: 'already-converged', removed: [], conflicts: [] };
+      },
+      installContextDbSkills: async () => { calls.push({ kind: 'skills' }); },
+      installRexClientProjections: async () => {},
+    },
+  });
+
+  assert.deepEqual(calls.map((entry) => entry.kind), ['rex', 'reconcile', 'skills']);
+  assert.equal(calls[1].options.adoptLegacySuperpowers, true);
+});
+
+test('runUpdate blocks component work when the required rex-harness kernel cannot be repaired', async () => {
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-update-rex-'));
+  await mkdir(path.join(rootDir, 'scripts'), { recursive: true });
+  await writeFile(path.join(rootDir, 'scripts', 'aios.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  const calls = [];
+
+  await assert.rejects(
+    runUpdate({ components: ['skills'], skipDoctor: true }, {
+      rootDir,
+      projectRoot: rootDir,
+      io: { log: () => {} },
+      deps: {
+        ensureRexHarness: async (options) => {
+          calls.push({ kind: 'rex', options });
+          return { ready: false, fixHint: 'reinstall the AIOS release' };
+        },
+        installContextDbSkills: async () => { calls.push({ kind: 'skills' }); },
+      },
+    }),
+    /rex-harness is required for AIOS intelligent planning/u,
+  );
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].kind, 'rex');
+  assert.equal(calls[0].options.fix, true);
+});
+
+test('runSetup scopes native and agent project writes to projectRoot and client', async () => {
+  const calls = [];
+  await runSetup({
+    components: ['native', 'agents'],
+    client: 'opencode',
+    skipDoctor: true,
+    force: true,
+  }, {
+    rootDir: '/tmp/aios-install',
+    projectRoot: '/tmp/user-project',
+    io: { log: () => {} },
+    deps: {
+      installNativeEnhancements: async (options) => { calls.push({ kind: 'native', options }); },
+      installOrchestratorAgents: async (options) => { calls.push({ kind: 'agents', options }); },
+    },
+  });
+
+  assert.equal(calls[0].kind, 'native');
+  assert.equal(calls[0].options.rootDir, '/tmp/aios-install');
+  assert.equal(calls[0].options.projectRoot, '/tmp/user-project');
+  assert.equal(calls[0].options.client, 'opencode');
+  assert.equal(calls[1].kind, 'agents');
+  assert.equal(calls[1].options.rootDir, '/tmp/aios-install');
+  assert.equal(calls[1].options.projectRoot, '/tmp/user-project');
+  assert.equal(calls[1].options.client, 'opencode');
+  assert.equal(calls.length, 2);
+});
+
+test('runUpdate scopes native and agent project writes to projectRoot and client', async () => {
+  const calls = [];
+  await runUpdate({
+    components: ['native', 'agents'],
+    client: 'claude',
+    skipDoctor: true,
+  }, {
+    rootDir: '/tmp/aios-install',
+    projectRoot: '/tmp/user-project',
+    io: { log: () => {} },
+    deps: {
+      updateNativeEnhancements: async (options) => { calls.push({ kind: 'native', options }); },
+      installOrchestratorAgents: async (options) => { calls.push({ kind: 'agents', options }); },
+    },
+  });
+
+  assert.equal(calls[0].kind, 'native');
+  assert.equal(calls[0].options.rootDir, '/tmp/aios-install');
+  assert.equal(calls[0].options.projectRoot, '/tmp/user-project');
+  assert.equal(calls[0].options.client, 'claude');
+  assert.equal(calls[1].kind, 'agents');
+  assert.equal(calls[1].options.rootDir, '/tmp/aios-install');
+  assert.equal(calls[1].options.projectRoot, '/tmp/user-project');
+  assert.equal(calls[1].options.client, 'claude');
+  assert.equal(calls.length, 2);
+});
+
+test('runUpdate browser flow does not block lifecycle when browser-use runtime is missing', async () => {
+  const calls = [];
+  const logs = [];
+  await runUpdate({
+    components: ['browser'],
+    withPlaywrightInstall: false,
+    skipDoctor: false,
+  }, {
+    rootDir: '/tmp/aios-test',
+    projectRoot: '/tmp/aios-test',
+    io: { log: (line) => logs.push(String(line)) },
+    deps: {
+      installBrowserMcp: async () => {
+        throw new Error('repository-local browser MCP is unavailable: scripts/run-local-browser-mcp.mjs');
+      },
+      doctorBrowserMcp: async (options) => { calls.push({ kind: 'doctor', options }); },
+    },
+  });
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].kind, 'doctor');
+  assert.equal(calls[0].options.fix, false);
+  assert.match(logs.join('\n'), /\[warn\] browser component skipped:/);
+  assert.match(logs.join('\n'), /aios internal browser doctor --fix/);
+});

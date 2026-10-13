@@ -1,0 +1,381 @@
+import assert from 'node:assert/strict';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { realpathSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+
+import { runDream } from '../../../lib/lifecycle/dream/index.mjs';
+import {
+  appendMemoEvent,
+  setActiveMemoStorage,
+} from '../../../lib/memo/storage.mjs';
+import {
+  buildExecutionContextPacket,
+  evaluateExecutionContextPreflight,
+} from '../../../lib/contextdb/execution-context.mjs';
+import { evaluateContextReconciliation } from '../../../lib/lifecycle/context-reconciliation.mjs';
+import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
+import {
+  readCandidateGovernanceReceipts,
+} from '../../../lib/memo/storage/candidates.mjs';
+import {
+  gcDreamProposal,
+  readDreamGovernanceReceipts,
+} from '../../../lib/lifecycle/dream/governance.mjs';
+import { buildStructuredPlanState } from '../../../lib/planning/schema.mjs';
+
+const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
+
+async function withRoot(prefix, fn) {
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));
+  try {
+    return await fn(rootDir);
+  } finally {
+    await rm(rootDir, { recursive: true, force: true });
+  }
+}
+
+function spoofedHumanEnv() {
+  return {
+    ...process.env,
+    AIOS_RUNTIME_PRODUCER_TYPE: 'human',
+    AIOS_RUNTIME_PRINCIPAL_ID: 'attacker',
+    AIOS_RUNTIME_AGENT_ID: 'attacker',
+    AIOS_RUNTIME_ROLE: 'user',
+    AIOS_RUNTIME_SESSION_ID: 'attacker-session',
+    AIOS_RUNTIME_RUN_ID: 'attacker-run',
+    AIOS_RUNTIME_ACTIVATION_ID: 'attacker-activation',
+    AIOS_RUNTIME_POLICY_REVISION: 'attacker-controlled',
+    AIOS_RUNTIME_SOURCE_REF: 'attacker:env',
+    AIOS_RUNTIME_SOURCE_HASH: 'a'.repeat(64),
+    AIOS_RUNTIME_CAPABILITIES: 'memo:promote-shared,memo:approve-tombstone,memo:archive-shared,memo:restore-shared,memo:gc-shared',
+  };
+}
+
+function runCli(rootDir, args) {
+  return spawnSync(process.execPath, [cliPath, ...args], {
+    cwd: rootDir,
+    env: spoofedHumanEnv(),
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+}
+
+test('workspace-relative and equivalent absolute mutation refs have identical declaration semantics', async () => {
+  await withRoot('context-correction-path-', async (rootDir) => {
+    const plan = buildStructuredPlanState({
+      title: 'Path equivalence',
+      sessionId: 'path-equivalence',
+      tasks: [{
+        id: 'task-1',
+        title: 'Edit target',
+        targets: ['src/a.mjs'],
+        allowedWrites: ['src/**'],
+        contextRequirements: [],
+      }],
+    });
+    const { packet, receipt } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'task-1',
+      persist: false,
+    });
+    const relative = await evaluateExecutionContextPreflight({
+      rootDir,
+      packet,
+      receipt,
+      mutationRefs: ['src/a.mjs'],
+    });
+    const absolute = await evaluateExecutionContextPreflight({
+      rootDir,
+      packet,
+      receipt,
+      mutationRefs: [path.join(rootDir, 'src', 'a.mjs')],
+    });
+    assert.equal(relative.mutations[0].declared, true);
+    assert.equal(absolute.mutations[0].ref, 'src/a.mjs');
+    assert.equal(absolute.mutations[0].declared, true);
+    assert.deepEqual(absolute.wouldBlockReasons, relative.wouldBlockReasons);
+  });
+});
+
+test('absolute declared targets and patterns match relative mutations without false undeclared_target', async () => {
+  await withRoot('context-correction-absolute-declared-', async (rootDir) => {
+    const absoluteTarget = path.join(rootDir, 'src', 'a.mjs');
+    const absolutePattern = path.join(rootDir, 'src', '**');
+    const cjkRelative = 'docs/中文目录/说明.md';
+    const cjkAbsolute = path.join(rootDir, 'docs', '中文目录', '说明.md');
+    const plan = buildStructuredPlanState({
+      title: 'Absolute declared equivalence',
+      sessionId: 'absolute-declared',
+      tasks: [{
+        id: 'task-1',
+        title: 'Edit absolute-declared target',
+        targets: [absoluteTarget, cjkRelative],
+        allowedWrites: [absolutePattern],
+        contextRequirements: [],
+      }],
+    });
+    const { packet, receipt } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'task-1',
+      persist: false,
+    });
+    const verdict = await evaluateExecutionContextPreflight({
+      rootDir,
+      packet,
+      receipt,
+      mutationRefs: [
+        'src/a.mjs',
+        absoluteTarget,
+        path.join(rootDir, 'src', 'b.mjs'),
+        cjkAbsolute,
+        'src/./a.mjs',
+        'src//a.mjs',
+        'src/b/../a.mjs',
+      ],
+    });
+
+    assert.deepEqual(verdict.mutations.map((item) => item.ref), [
+      'src/a.mjs',
+      'src/a.mjs',
+      'src/b.mjs',
+      cjkRelative,
+      'src/a.mjs',
+      'src/a.mjs',
+      'src/a.mjs',
+    ]);
+    assert.deepEqual(verdict.mutations.map((item) => item.declared), [true, true, true, true, true, true, true]);
+    assert.deepEqual(verdict.wouldBlockReasons, []);
+
+    const outside = await evaluateExecutionContextPreflight({
+      rootDir,
+      packet,
+      receipt,
+      mutationRefs: [path.join(path.dirname(rootDir), 'outside.mjs')],
+    });
+    assert.equal(outside.mutations[0].declared, false);
+    assert.ok(outside.wouldBlockReasons.includes('undeclared_target'));
+  });
+});
+
+test('reconciliation treats absolute declared targets and absolute ledger paths as the same workspace ref', async () => {
+  await withRoot('context-correction-reconciliation-', async (rootDir) => {
+    const absoluteTarget = path.join(rootDir, 'src', 'a.mjs');
+    const plan = buildStructuredPlanState({
+      title: 'Reconciliation equivalence',
+      sessionId: 'recon-equivalence',
+      tasks: [{
+        id: 'task-1',
+        title: 'Edit target',
+        targets: [absoluteTarget],
+        allowedWrites: [],
+        contextRequirements: [],
+      }],
+    });
+    const { packet } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'task-1',
+      persist: false,
+    });
+    await recordSessionChangedFile({ rootDir, sessionId: 'recon-equivalence', filePath: 'src/a.mjs' });
+    const relativeLedger = await evaluateContextReconciliation({
+      rootDir,
+      sessionId: 'recon-equivalence',
+      packet,
+      persist: false,
+    });
+    assert.deepEqual(relativeLedger.undeclaredPaths, []);
+    assert.deepEqual(relativeLedger.missingDeclaredPaths, []);
+  });
+
+  await withRoot('context-correction-ledger-absolute-', async (rootDir) => {
+    const plan = buildStructuredPlanState({
+      title: 'Ledger absolute equivalence',
+      sessionId: 'ledger-absolute',
+      tasks: [{
+        id: 'task-1',
+        title: 'Edit target',
+        targets: ['src/a.mjs'],
+        allowedWrites: [],
+        contextRequirements: [],
+      }],
+    });
+    const { packet } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'task-1',
+      persist: false,
+    });
+    await recordSessionChangedFile({
+      rootDir,
+      sessionId: 'ledger-absolute',
+      filePath: path.join(rootDir, 'src', 'a.mjs'),
+    });
+    const absoluteLedger = await evaluateContextReconciliation({
+      rootDir,
+      sessionId: 'ledger-absolute',
+      packet,
+      persist: false,
+    });
+    assert.deepEqual(absoluteLedger.undeclaredPaths, []);
+    assert.deepEqual(absoluteLedger.missingDeclaredPaths, []);
+  });
+});
+
+test('Windows case variants preserve target and allowed-write declaration semantics', {
+  skip: process.platform !== 'win32',
+}, async () => {
+  await withRoot('context-correction-case-', async (rootDir) => {
+    const plan = buildStructuredPlanState({
+      title: 'Windows case equivalence',
+      tasks: [{
+        id: 'case-task',
+        title: 'Edit case-insensitive paths',
+        targets: ['src/target.mjs'],
+        allowedWrites: ['src/auth/**'],
+        contextRequirements: [],
+      }],
+    });
+    const { packet, receipt } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'case-task',
+      persist: false,
+    });
+    const verdict = await evaluateExecutionContextPreflight({
+      rootDir,
+      packet,
+      receipt,
+      mutationRefs: [
+        path.join(rootDir, 'SRC', 'TARGET.MJS'),
+        path.join(rootDir, 'SRC', 'AUTH', 'LOGIN.MJS'),
+      ],
+    });
+
+    assert.deepEqual(verdict.mutations.map((item) => item.declared), [true, true]);
+    assert.deepEqual(verdict.wouldBlockReasons, []);
+
+    await recordSessionChangedFile({
+      rootDir,
+      sessionId: 'case-session',
+      filePath: 'SRC/TARGET.MJS',
+    });
+    const reconciliation = await evaluateContextReconciliation({
+      rootDir,
+      sessionId: 'case-session',
+      packet,
+      persist: false,
+    });
+    assert.deepEqual(reconciliation.undeclaredPaths, []);
+    assert.deepEqual(reconciliation.missingDeclaredPaths, []);
+  });
+});
+
+test('spoofed AIOS_RUNTIME human identity cannot promote a candidate through the real CLI', async () => {
+  await withRoot('context-correction-candidate-', async (rootDir) => {
+    await setActiveMemoStorage(rootDir, 'file');
+    const candidate = await appendMemoEvent({
+      workspaceRoot: rootDir,
+      storage: 'file',
+      text: 'unapproved candidate',
+      runtimeIdentity: {
+        producerType: 'agent',
+        principalId: 'writer',
+        agentId: 'writer',
+        role: 'assistant',
+        policyRevision: 'writer-policy',
+        sourceRef: 'writer:test',
+        sourceHash: 'b'.repeat(64),
+        capabilities: [],
+      },
+    });
+    const result = runCli(rootDir, [
+      'memo', 'candidate', 'promote', candidate.eventId,
+      '--reason', 'attacker approval', '--json',
+    ]);
+    assert.notEqual(result.status, 0, result.stderr || result.stdout);
+    const receipts = await readCandidateGovernanceReceipts({ workspaceRoot: rootDir });
+    assert.equal(receipts.at(-1)?.decision, 'DENY');
+    assert.equal(receipts.at(-1)?.reasonCode, 'trusted_authority_unavailable');
+    assert.equal(receipts.at(-1)?.principal?.principalId, '');
+  });
+});
+
+test('spoofed env cannot approve Dream and physical GC is fail-closed', async () => {
+  await withRoot('context-correction-dream-', async (rootDir) => {
+    await setActiveMemoStorage(rootDir, 'file');
+    await appendMemoEvent({ workspaceRoot: rootDir, storage: 'file', text: 'duplicate source' });
+    await appendMemoEvent({ workspaceRoot: rootDir, storage: 'file', text: 'duplicate source' });
+    const applied = await runDream({ rootDir, mode: 'apply', spaces: ['default'] });
+    const approve = runCli(rootDir, [
+      'dream', '--workspace', rootDir,
+      '--governance', 'approve', '--proposal', applied.proposalId,
+      '--reason', 'attacker approval', '--json',
+    ]);
+    assert.notEqual(approve.status, 0, approve.stderr || approve.stdout);
+    const receipts = await readDreamGovernanceReceipts({ rootDir, proposalId: applied.proposalId });
+    assert.equal(receipts.at(-1)?.decision, 'DENY');
+    assert.equal(receipts.at(-1)?.reasonCode, 'trusted_authority_unavailable');
+    assert.equal(receipts.at(-1)?.principal?.principalId, '');
+
+    const gc = await gcDreamProposal({
+      rootDir,
+      proposalId: applied.proposalId,
+      reason: 'attacker GC',
+      runtimeIdentity: {
+        producerType: 'human',
+        principalId: 'attacker',
+        policyRevision: 'attacker-controlled',
+        capabilities: ['memo:gc-shared'],
+      },
+    });
+    assert.equal(gc.ok, false);
+    assert.equal(gc.receipt.reasonCode, 'trusted_authority_unavailable');
+  });
+});
+
+test('reconciliation treats symlinked workspace spellings (/var vs /private/var) as the same workspace', { skip: process.platform === 'win32' }, async () => {
+  await withRoot('context-correction-symlink-', async (rootDir) => {
+    const realRoot = realpathSync(rootDir);
+    await mkdir(path.join(rootDir, 'src'), { recursive: true });
+    await writeFile(path.join(rootDir, 'src', 'a.mjs'), 'symlink equivalence\n', 'utf8');
+    /* 中文注释：声明与 ledger 故意使用两种命名空间拼写；macOS 上 raw(/var/…) 与
+       real(/private/var/…) 不同（Linux 上相同，断言依然成立）。文件必须真实存在，
+       realpath 才能解析（不存在时回退到词法比较）。 */
+    const plan = buildStructuredPlanState({
+      title: 'Symlink equivalence',
+      sessionId: 'symlink-equivalence',
+      tasks: [{
+        id: 'task-1',
+        title: 'Edit target',
+        targets: [path.join(realRoot, 'src', 'a.mjs')],
+        allowedWrites: [],
+        contextRequirements: [],
+      }],
+    });
+    const { packet } = await buildExecutionContextPacket({
+      rootDir,
+      plan,
+      taskId: 'task-1',
+      persist: false,
+    });
+    await recordSessionChangedFile({
+      rootDir,
+      sessionId: 'symlink-equivalence',
+      filePath: path.join(realRoot, 'src', 'a.mjs'),
+    });
+    const result = await evaluateContextReconciliation({
+      rootDir,
+      sessionId: 'symlink-equivalence',
+      packet,
+      persist: false,
+    });
+    assert.deepEqual(result.undeclaredPaths, []);
+    assert.deepEqual(result.missingDeclaredPaths, []);
+  });
+});
