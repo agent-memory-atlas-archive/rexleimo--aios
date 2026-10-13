@@ -101,7 +101,7 @@ jobs:
       # The five test:rl-* experiment suites live outside the regression suite.
       # Nothing ran them in CI until 2026-09-21, so they were silently red (41 files,
       # including a real 'normalizeText is not defined' crash) — see
-      # docs/outstanding-work.md A7. They take ~25s.
+      # docs/reference/outstanding-work.md A7. They take ~25s.
       - name: Run RL experiment suites
         run: |
           set -o pipefail

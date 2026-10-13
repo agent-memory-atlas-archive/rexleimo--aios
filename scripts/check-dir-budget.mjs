@@ -36,14 +36,13 @@ export const EXEMPT_DIRS = Object.freeze({
   'mcp-server/test-results': 'generated bench output',
   'config': 'user-facing config surface (documented stable paths in messages/installers/docs; loaders join rootDir+config+name)',
   'client-sources/native-base': 'client registry surface (one dir per client, mirrors skill-sources precedent)',
+  'agent-sources/roles': 'agent registry surface (one file per role; flat readdir contract in agents/source-tree.mjs)',
 });
 
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
 // codemap/ 已拆完（16→7），故不在此列。
 export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib': 55,
-  'agent-sources/roles': 19,
-  'docs': 13,
   'skill-sources/rexai-image-generation/scripts': 9,
 });
 

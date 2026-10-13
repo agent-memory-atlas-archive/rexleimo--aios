@@ -68,7 +68,7 @@ jobs:
           npm run test:scripts
 
       # The test:rl-* experiment suites are outside the regression suite and were
-      # never run here until 2026-09-21 (docs/outstanding-work.md A7). ~25s.
+      # never run here until 2026-09-21 (docs/reference/outstanding-work.md A7). ~25s.
       - name: Run RL experiment suites
         run: |
           npm run test:rl

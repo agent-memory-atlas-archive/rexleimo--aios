@@ -30,7 +30,7 @@ Evaluate the AIOS workflow policy before creating a plan, selecting a skill, or 
 
 ## Prompt Authoring Norms（提示词撰写规范）
 
-Any prompt, skill, or script that guides the model follows three rules (full text: `docs/prompt-authoring-norms.md`):
+Any prompt, skill, or script that guides the model follows three rules (full text: `docs/reference/prompt-authoring-norms.md`):
 
 1. **Contract first**: declare input preconditions and a structured output contract; never branch on keywords/regex matched against user text — require an explicit `intent`/`task-type` field and let policy look it up.
 2. **Self-report, don't guess**: semantic judgments (done? stuck? read-only?) are fields the model reports in structured output (ReAct-style); code only counts/validates them.

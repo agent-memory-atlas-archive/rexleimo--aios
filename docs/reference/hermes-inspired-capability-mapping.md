@@ -24,7 +24,7 @@ This page tracks which Hermes-inspired capabilities are implemented in AIOS, wha
 - Pre-mutation snapshots are opt-in and currently scoped to editable phase owned paths in live subagent runtime.
 - Snapshot rollback is now available via `node scripts/aios.mjs snapshot-rollback --session <session_id>` (or `--manifest <path>`).
 - Live-runtime regression now includes explicit snapshot manifest shape assertions (schema/version/paths/target types/restore hint coherence).
-- Incident recovery workflow and command examples are documented in `docs/snapshot-incident-recovery.md`.
+- Incident recovery workflow and command examples are documented in `docs/reference/snapshot-incident-recovery.md`.
 
 ## Next Optional Improvements
 

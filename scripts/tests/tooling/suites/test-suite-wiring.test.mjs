@@ -30,7 +30,7 @@
  *   W5 Every test file is executed by a CI-reachable entry point, not merely reachable from
  *      some package.json script. Added 2026-09-21: the five `test:rl-*` suites (41 files)
  *      satisfied W2 through globs in scripts no workflow invoked, so nothing ran them in CI
- *      and they were silently red for weeks (see docs/outstanding-work.md A7). A file that
+ *      and they were silently red for weeks (see docs/reference/outstanding-work.md A7). A file that
  *      no CI job executes must be recorded in `knownNotInCi` with a reason.
  *
  * Explicitly considered and rejected (2026-09-21): a static "this test reads a gitignored
