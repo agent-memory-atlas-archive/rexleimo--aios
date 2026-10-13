@@ -1,4 +1,4 @@
-import { writeIndex } from '../context-registry.mjs';
+import { writeIndex } from '../registry/context-registry.mjs';
 
 export async function writeBridgeContextIndex({ workspace, agent, env }) {
   try {

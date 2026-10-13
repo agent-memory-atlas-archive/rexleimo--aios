@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../interception/index.mjs';
-import { loadFacade, generateFacadeFromSession } from '../../contextdb/facade.mjs';
-import { extractTouchedFilesFromText, writeContinuitySummary } from '../../contextdb/continuity.mjs';
+import { loadFacade, generateFacadeFromSession } from '../../contextdb/runtime/facade.mjs';
+import { extractTouchedFilesFromText, writeContinuitySummary } from '../../contextdb/registry/continuity.mjs';
 import { resolveTasksRoot, toWorkspaceRelative } from '../../aios/state-root.mjs';
 import { ensureBootstrapTask, isBootstrapEnabled } from '../../../ctx-bootstrap.mjs';
 import { assertWorkspaceExists } from '../context/common.mjs';
@@ -59,10 +59,10 @@ function resolveSession(opts) {
 
 async function ensureWorkspaceIndex(opts) {
   try {
-    const { initWorkspace } = await import('../../contextdb/workspace.mjs');
+    const { initWorkspace } = await import('../../contextdb/runtime/workspace.mjs');
     const wsResult = await initWorkspace(opts.workspaceRoot);
     if (wsResult.created) {
-      const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/skill-index.mjs');
+      const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/registry/skill-index.mjs');
       const index = await buildSkillIndex(opts.workspaceRoot);
       await writeSkillIndex(opts.workspaceRoot, index);
       console.error(`[aios] Workspace initialized with ${index.skills.length} skills indexed`);
@@ -110,7 +110,7 @@ async function writeContinuityAndHandoff(opts, routedPrompt, output, summary, ne
     }
   }
   try {
-    const { normalizeHandoffPacket, writeHandoffPacket } = await import('../../contextdb/handoff.mjs');
+    const { normalizeHandoffPacket, writeHandoffPacket } = await import('../../contextdb/runtime/handoff.mjs');
     const packet = normalizeHandoffPacket({ fromSessionId: opts.sessionId, agentType: opts.agent, role: 'implementer', intent: routedPrompt, progress: summary, nextActions: nextActions.split('|'), touchedFiles, confidence: exitCode === 0 ? 'high' : 'low' });
     await writeHandoffPacket(opts.workspaceRoot, opts.sessionId, packet);
   } catch (error) {

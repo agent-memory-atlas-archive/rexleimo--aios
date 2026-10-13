@@ -1,5 +1,5 @@
 import { appendSoloIteration, writeSoloRunSummary } from '../../solo-journal.mjs';
-import { writeContinuitySummary } from '../../../../contextdb/continuity.mjs';
+import { writeContinuitySummary } from '../../../../contextdb/registry/continuity.mjs';
 import { resolveSoloBackoffState } from '../loop/backoff.mjs';
 import {
   normalizeSoloIterationOutcome,

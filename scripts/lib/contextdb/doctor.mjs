@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { workspaceDir } from './workspace.mjs';
-import { buildSkillIndex } from './skill-index.mjs';
+import { workspaceDir } from './runtime/workspace.mjs';
+import { buildSkillIndex } from './registry/skill-index.mjs';
 
 export async function runDoctorChecks(workspaceRoot) {
   const root = path.resolve(workspaceRoot || process.cwd());

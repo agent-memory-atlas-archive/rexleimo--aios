@@ -5,13 +5,13 @@ import {
   buildDispatchPolicy,
   buildEffectiveDispatchPolicy,
   buildOrchestrationPlan,
-} from '../../../harness/orchestration/orchestrator.mjs';
-import { persistDispatchEvidence } from '../../../harness/orchestration/orchestrator-evidence.mjs';
-import { buildDispatchInsights } from '../../../harness/team/dispatch-insights.mjs';
-import { buildWorkItemTelemetry } from '../../../harness/orchestration/work-item-telemetry.mjs';
-import { evaluateClarityGate, persistClarityGateDecision } from '../../../harness/quality/clarity-gate.mjs';
-import { executeEntropyGc } from '../../govern/entropy-gc.mjs';
-import { applyReleaseGuardBlock } from './release-guard.mjs';
+} from '../../../../harness/orchestration/orchestrator.mjs';
+import { persistDispatchEvidence } from '../../../../harness/orchestration/orchestrator-evidence.mjs';
+import { buildDispatchInsights } from '../../../../harness/team/dispatch-insights.mjs';
+import { buildWorkItemTelemetry } from '../../../../harness/orchestration/work-item-telemetry.mjs';
+import { evaluateClarityGate, persistClarityGateDecision } from '../../../../harness/quality/clarity-gate.mjs';
+import { executeEntropyGc } from '../../../govern/entropy-gc.mjs';
+import { applyReleaseGuardBlock } from '../guards/release-guard.mjs';
 import { normalizePositiveInteger, parseBooleanEnv } from './shared.mjs';
 
 function buildClarityAdjustedPolicy(releaseGuardedFinalDispatchPolicy, resolvedClarityGate, sessionId) {
@@ -48,7 +48,7 @@ async function captureCodemapAnalysis(rootDir) {
   try {
     const codemapStatePath = path.join(rootDir, '.aios', 'codemap.json');
     if (existsSync(codemapStatePath)) {
-      const { captureCrgCommand } = await import('../../../components/codemap/codemap.mjs');
+      const { captureCrgCommand } = await import('../../../../components/codemap/codemap.mjs');
       const result = captureCrgCommand(['detect-changes', '--brief'], { cwd: rootDir });
       if (result && result.status === 0 && result.stdout) {
         return result.stdout.trim();

@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { readContinuitySummary } from '../../../../contextdb/continuity.mjs';
+import { readContinuitySummary } from '../../../../contextdb/registry/continuity.mjs';
 import { findCanvasMermaid, compactCanvas } from '../../../../offload/mermaid-canvas.mjs';
 import { capture, resolveStorage, resolveConfig } from '../../../../offload/tool-offload.mjs';
 import { readSoloControl, readSoloRunSummary, writeSoloRunSummary, appendSoloHookEvent, claimSessionOwner, installSessionSignalHandlers } from '../../solo-journal.mjs';

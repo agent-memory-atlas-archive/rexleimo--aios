@@ -57,7 +57,7 @@ test('env override can place project state outside the default .aios root', asyn
 
 test('ContextDB registry writes into .aios and advertises dotdir sources', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-registry-dotdir-'));
-  const { writeIndex, registryPath } = await import('../../../lib/contextdb/context-registry.mjs');
+  const { writeIndex, registryPath } = await import('../../../lib/contextdb/registry/context-registry.mjs');
 
   const result = await writeIndex({
     sessionId: 'session-1',

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveContextDbRoot, resolveTasksRoot, toWorkspaceRelative } from '../../aios/state-root.mjs';
-import { evaluateHandoffLineage, readHandoffPacket } from '../../contextdb/handoff.mjs';
+import { evaluateHandoffLineage, readHandoffPacket } from '../../contextdb/runtime/handoff.mjs';
 import { checkForUpdate, readCurrentVersion, readNoticeState } from '../../lifecycle/setup/update-notice.mjs';
 import { resolveNewestStableRelease } from '../../lifecycle/release/release-lookup.mjs';
 import { reconcileUnclosedSessions } from '../../lifecycle/run/session-hooks/reconcile.mjs';

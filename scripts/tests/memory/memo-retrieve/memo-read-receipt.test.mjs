@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { assembleExecutionContext } from '../../../lib/contextdb/execution-context.mjs';
+import { assembleExecutionContext } from '../../../lib/contextdb/runtime/execution-context.mjs';
 
 const BODY = 'CONTROLLED READ BODY FOR RECEIPT PROOF';
 

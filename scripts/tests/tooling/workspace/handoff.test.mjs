@@ -8,7 +8,7 @@ import {
   writeHandoffPacket,
   readHandoffPacket,
   renderHandoffInjection,
-} from '../../../lib/contextdb/handoff.mjs';
+} from '../../../lib/contextdb/runtime/handoff.mjs';
 
 test('normalizeHandoffPacket produces valid v2 packet from minimal input', async () => {
   const packet = normalizeHandoffPacket({

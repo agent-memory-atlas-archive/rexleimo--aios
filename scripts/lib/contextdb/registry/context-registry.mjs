@@ -1,7 +1,7 @@
 import { existsSync, promises as fs, statSync } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { contextDbRelativePath, resolveContextDbRoot } from '../aios/state-root.mjs';
+import { contextDbRelativePath, resolveContextDbRoot } from '../../aios/state-root.mjs';
 
 // --- Path helpers ---
 

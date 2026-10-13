@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { workspaceDir } from './workspace.mjs';
+import { workspaceDir } from '../runtime/workspace.mjs';
 
 const DISCOVERABLE_SKILL_ROOTS = [
   ['.codex', 'skills'],

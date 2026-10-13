@@ -8,7 +8,7 @@ import path from 'node:path';
 
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 import { runContextDbCli } from '../../../contextdb-cli.mjs';
-import { writeIndex } from '../../../contextdb/context-registry.mjs';
+import { writeIndex } from '../../../contextdb/registry/context-registry.mjs';
 
 export function buildSessionId({ agent = 'agent', now = new Date() } = {}) {
   const clientId = String(agent || 'agent').trim().toLowerCase().replace(/[^a-z0-9-]+/gu, '-') || 'agent';

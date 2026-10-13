@@ -3,7 +3,7 @@ export {
   extractTouchedFilesFromText,
   readContinuitySummary,
   writeContinuitySummary,
-} from './continuity.mjs';
+} from './registry/continuity.mjs';
 
 export {
   evaluateHandoffLineage,
@@ -11,12 +11,12 @@ export {
   readHandoffPacket,
   renderHandoffInjection,
   writeHandoffPacket,
-} from './handoff.mjs';
+} from './runtime/handoff.mjs';
 
 export {
   generateFacadeFromSession,
   loadFacade,
-} from './facade.mjs';
+} from './runtime/facade.mjs';
 
 export {
   buildExecutionContextPacket,
@@ -25,4 +25,4 @@ export {
   projectContextItems,
   resolveExecutionContextPaths,
   updateExecutionContextExpectedHash,
-} from './execution-context.mjs';
+} from './runtime/execution-context.mjs';

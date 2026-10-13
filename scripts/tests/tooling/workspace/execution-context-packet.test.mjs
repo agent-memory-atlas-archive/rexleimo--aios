@@ -11,7 +11,7 @@ import {
   projectContextItems,
   resolveExecutionContextPaths,
   updateExecutionContextExpectedHash,
-} from '../../../lib/contextdb/execution-context.mjs';
+} from '../../../lib/contextdb/runtime/execution-context.mjs';
 import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
 
 async function withTempRoot(prefix, fn) {

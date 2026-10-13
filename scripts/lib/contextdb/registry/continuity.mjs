@@ -1,12 +1,12 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveContextDbRoot } from '../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../aios/state-root.mjs';
 
 export const CONTINUITY_SUMMARY_FILENAME = 'continuity-summary.md';
 export const CONTINUITY_JSON_FILENAME = 'continuity.json';
 
-import { normalizeText } from '../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../src/shared/normalize.mjs';
 
 function normalizeStringArray(value) {
   const raw = Array.isArray(value)

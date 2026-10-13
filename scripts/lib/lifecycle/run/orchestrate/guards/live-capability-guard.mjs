@@ -1,4 +1,4 @@
-﻿import { parseBooleanEnv } from './shared.mjs';
+﻿import { parseBooleanEnv } from '../recovery/shared.mjs';
 
 const LIVE_CAPABILITY_GUARD_KEYS = ['network', 'browser', 'sideEffect'];
 

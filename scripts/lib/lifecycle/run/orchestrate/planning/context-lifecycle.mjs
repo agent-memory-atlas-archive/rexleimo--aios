@@ -1,9 +1,9 @@
 import {
   assembleExecutionContext,
   evaluateExecutionContextPreflight,
-} from '../../../contextdb/execution-context.mjs';
-import { readActivePlan } from '../../../planning/contract/contract.mjs';
-import { evaluateContextReconciliation } from '../../evolve/context-reconciliation.mjs';
+} from '../../../../contextdb/runtime/execution-context.mjs';
+import { readActivePlan } from '../../../../planning/contract/contract.mjs';
+import { evaluateContextReconciliation } from '../../../evolve/context-reconciliation.mjs';
 
 function allTasks(plan) {
   return Array.isArray(plan?.tasks) ? plan.tasks : [];

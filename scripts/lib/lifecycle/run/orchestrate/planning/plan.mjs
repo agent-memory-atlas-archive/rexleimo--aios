@@ -1,13 +1,13 @@
 import {
   normalizeOrchestratorBlueprint,
   normalizeOrchestratorFormat,
-} from '../../../harness/orchestration/orchestrator.mjs';
-import { normalizePositiveInteger } from './shared.mjs';
+} from '../../../../harness/orchestration/orchestrator.mjs';
+import { normalizePositiveInteger } from '../recovery/shared.mjs';
 import {
   normalizeOrchestrateDispatchMode,
   normalizeOrchestrateExecutionMode,
   normalizeOrchestratePreflightMode,
-} from '../../govern/options.mjs';
+} from '../../../govern/options.mjs';
 
 // 纯函数：统一解析 orchestrate 命令选项，避免 CLI 预览和实际执行各自维护默认值。
 export function normalizeOrchestrateOptions(rawOptions = {}) {

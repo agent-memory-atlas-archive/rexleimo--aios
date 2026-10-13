@@ -16,30 +16,30 @@ import {
   buildRetryBlockedRecoveryCommands,
   extractDispatchHindsightSummary,
   isRetryBlockedDispatchUnstable,
-} from './orchestrate/retry-blocked.mjs';
+} from './orchestrate/recovery/retry-blocked.mjs';
 import {
   buildLearnEvalOverlay,
   buildOverlayContext,
   extractBlueprintFromTargetId,
-} from './orchestrate/overlay.mjs';
+} from './orchestrate/planning/overlay.mjs';
 import {
   applyRetryBlockedDispatchPlan,
   loadLatestBlockedDispatchReplay,
-} from './orchestrate/retry-replay.mjs';
-import { planOrchestrate } from './orchestrate/plan.mjs';
-export { normalizeOrchestrateOptions, planOrchestrate } from './orchestrate/plan.mjs';
-import { executeDispatchPreflight } from './orchestrate/preflight.mjs';
-import { handleUnknownCapabilityGuard } from './orchestrate/runtime-capability-guard.mjs';
-import { buildPostDispatchReport } from './orchestrate/post-dispatch-report.mjs';
+} from './orchestrate/recovery/retry-replay.mjs';
+import { planOrchestrate } from './orchestrate/planning/plan.mjs';
+export { normalizeOrchestrateOptions, planOrchestrate } from './orchestrate/planning/plan.mjs';
+import { executeDispatchPreflight } from './orchestrate/planning/preflight.mjs';
+import { handleUnknownCapabilityGuard } from './orchestrate/guards/runtime-capability-guard.mjs';
+import { buildPostDispatchReport } from './orchestrate/recovery/post-dispatch-report.mjs';
 import {
   finalizeOrchestrateContextLifecycle,
   prepareOrchestrateContextLifecycle,
-} from './orchestrate/context-lifecycle.mjs';
+} from './orchestrate/planning/context-lifecycle.mjs';
 import {
   applyReleaseGuardBlock,
   buildReleaseGuardAction,
-} from './orchestrate/release-guard.mjs';
-import { writeWarning } from './orchestrate/shared.mjs';
+} from './orchestrate/guards/release-guard.mjs';
+import { writeWarning } from './orchestrate/recovery/shared.mjs';
 import { runDoctor } from '../govern/doctor.mjs';
 import { runQualityGate } from '../govern/quality-gate.mjs';
 import { runReleaseStatus } from '../release/release-status.mjs';

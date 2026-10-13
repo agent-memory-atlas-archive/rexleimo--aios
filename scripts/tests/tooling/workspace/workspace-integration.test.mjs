@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { initWorkspace, buildAgentView } from '../../../lib/contextdb/workspace.mjs';
-import { buildSkillIndex, writeSkillIndex } from '../../../lib/contextdb/skill-index.mjs';
-import { normalizeHandoffPacket, writeHandoffPacket } from '../../../lib/contextdb/handoff.mjs';
+import { initWorkspace, buildAgentView } from '../../../lib/contextdb/runtime/workspace.mjs';
+import { buildSkillIndex, writeSkillIndex } from '../../../lib/contextdb/registry/skill-index.mjs';
+import { normalizeHandoffPacket, writeHandoffPacket } from '../../../lib/contextdb/runtime/handoff.mjs';
 import { runDoctorChecks } from '../../../lib/contextdb/doctor.mjs';
 
 test('full lifecycle: two agents share workspace and handoff', async () => {

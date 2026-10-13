@@ -1,11 +1,11 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveContextDbRoot } from '../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../aios/state-root.mjs';
 import {
   resolveClientCommandNames,
   resolveClientRuntimeIds,
-} from '../clients/registry.mjs';
+} from '../../clients/registry.mjs';
 
 const VALID_AGENT_TYPES = [
   ...new Set([
@@ -17,7 +17,7 @@ const VALID_AGENT_TYPES = [
 const VALID_ROLES = ['planner', 'implementer', 'reviewer', 'orchestrator'];
 const VALID_CONFIDENCE = ['high', 'medium', 'low'];
 
-import { normalizeText } from '../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../src/shared/normalize.mjs';
 
 function normalizeStringArray(value) {
   const raw = Array.isArray(value)

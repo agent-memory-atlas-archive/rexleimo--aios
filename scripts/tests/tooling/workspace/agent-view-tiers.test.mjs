@@ -11,8 +11,8 @@ import {
   initWorkspace,
   workspaceDir,
   writeKnowledgeSnapshot,
-} from '../../../lib/contextdb/workspace.mjs';
-import { writeSkillIndex } from '../../../lib/contextdb/skill-index.mjs';
+} from '../../../lib/contextdb/runtime/workspace.mjs';
+import { writeSkillIndex } from '../../../lib/contextdb/registry/skill-index.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));

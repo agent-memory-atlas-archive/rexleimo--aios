@@ -9,12 +9,12 @@ import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
   updateExecutionContextExpectedHash,
-} from '../../../lib/contextdb/execution-context.mjs';
+} from '../../../lib/contextdb/runtime/execution-context.mjs';
 import {
   evaluateHandoffLineage,
   normalizeHandoffPacket,
   renderHandoffInjection,
-} from '../../../lib/contextdb/handoff.mjs';
+} from '../../../lib/contextdb/runtime/handoff.mjs';
 import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
 import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
 import { readSessionChangedFiles, recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';

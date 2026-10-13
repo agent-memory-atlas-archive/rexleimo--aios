@@ -12,7 +12,7 @@ import {
   writeIndex,
   computeSha256,
   classifyEventLevel,
-} from '../../../lib/contextdb/pack-manifest.mjs';
+} from '../../../lib/contextdb/registry/pack-manifest.mjs';
 
 // ─── Helper fixtures ────────────────────────────────────────────────────────
 

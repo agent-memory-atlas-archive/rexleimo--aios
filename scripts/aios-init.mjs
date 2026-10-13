@@ -4,8 +4,8 @@ import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { initWorkspace } from './lib/contextdb/workspace.mjs';
-import { buildSkillIndex, writeSkillIndex } from './lib/contextdb/skill-index.mjs';
+import { initWorkspace } from './lib/contextdb/runtime/workspace.mjs';
+import { buildSkillIndex, writeSkillIndex } from './lib/contextdb/registry/skill-index.mjs';
 import { ensurePersonaLayer } from './lib/memo/care/persona.mjs';
 import { ensureWorkspaceMemorySession } from './lib/memo/care/workspace-memory.mjs';
 import { AGENT_CONFIG, detectAgents, ensureMarker } from './lib/aios-init/agent-config.mjs';

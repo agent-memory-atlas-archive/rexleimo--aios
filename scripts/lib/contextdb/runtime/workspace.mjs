@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveContextDbRoot, resolveWorkspaceStateRoot } from '../aios/state-root.mjs';
+import { resolveContextDbRoot, resolveWorkspaceStateRoot } from '../../aios/state-root.mjs';
 import { evaluateHandoffLineage } from './handoff.mjs';
 
 export class OptimisticLockError extends Error {
@@ -230,7 +230,7 @@ export async function buildAgentView(workspaceRoot, sessionId, taskType = '', { 
   };
   if (normalizedTier === 'T0') return view;
 
-  const { readSkillIndex, findSkillsByTaskType } = await import('./skill-index.mjs');
+  const { readSkillIndex, findSkillsByTaskType } = await import('../registry/skill-index.mjs');
   const { readHandoffPacket, evaluateHandoffLineage } = await import('./handoff.mjs');
 
   const index = await readSkillIndex(workspaceRoot);

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { contextDbRelativePath, resolveContextDbRoot } from '../../../aios/state-root.mjs';
+import { contextDbRelativePath, resolveContextDbRoot } from '../../../../aios/state-root.mjs';
 
 // 纯函数：把 job 状态归一到 retry-replay 关心的阻断/未知语义。
 function normalizeJobRunStatus(rawValue = '') {

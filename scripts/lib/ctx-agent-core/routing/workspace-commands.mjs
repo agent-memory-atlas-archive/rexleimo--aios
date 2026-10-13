@@ -2,8 +2,8 @@ import { ctx, extractCreatedSessionId, extractLatestSessionId } from '../context
 
 export async function handleWorkspaceCommand(command, workspaceRoot) {
   if (command === 'workspace-init') {
-    const { initWorkspace } = await import('../../contextdb/workspace.mjs');
-    const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/skill-index.mjs');
+    const { initWorkspace } = await import('../../contextdb/runtime/workspace.mjs');
+    const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/registry/skill-index.mjs');
     const result = await initWorkspace(workspaceRoot);
     const index = await buildSkillIndex(workspaceRoot);
     await writeSkillIndex(workspaceRoot, index);
@@ -11,7 +11,7 @@ export async function handleWorkspaceCommand(command, workspaceRoot) {
     return;
   }
   if (command === 'workspace-sync') {
-    const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/skill-index.mjs');
+    const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/registry/skill-index.mjs');
     const index = await buildSkillIndex(workspaceRoot);
     await writeSkillIndex(workspaceRoot, index);
     console.log(JSON.stringify({ synced: index.skills.length }, null, 2));
@@ -88,7 +88,7 @@ export async function handleWorkspaceViewCommand(args = [], workspaceRoot) {
   }
   if (!sessionId) throw new Error(WORKSPACE_VIEW_USAGE);
 
-  const { buildAgentView } = await import('../../contextdb/workspace.mjs');
+  const { buildAgentView } = await import('../../contextdb/runtime/workspace.mjs');
   const view = await buildAgentView(workspaceRoot, sessionId, taskType, { tier });
   process.stdout.write(`${json ? `${JSON.stringify(view, null, 2)}\n` : `${renderAgentView(view)}\n`}`);
   return view;

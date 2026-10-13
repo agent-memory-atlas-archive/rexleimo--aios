@@ -411,7 +411,7 @@ async function cl05() {
     let repeat = null;
     let moduleError = '';
     try {
-      const { buildExecutionContextPacket } = await import('../lib/contextdb/execution-context.mjs');
+      const { buildExecutionContextPacket } = await import('../lib/contextdb/runtime/execution-context.mjs');
       observation = await buildExecutionContextPacket({
         rootDir: workspaceRoot,
         plan,
@@ -506,7 +506,7 @@ async function cl06() {
         buildExecutionContextPacket,
         evaluateExecutionContextPreflight,
         updateExecutionContextExpectedHash,
-      } = await import('../lib/contextdb/execution-context.mjs');
+      } = await import('../lib/contextdb/runtime/execution-context.mjs');
       if (typeof evaluateExecutionContextPreflight !== 'function'
           || typeof updateExecutionContextExpectedHash !== 'function') {
         throw new Error('S2 preflight API missing');
@@ -621,7 +621,7 @@ async function cl07() {
     let result = null;
     let moduleError = '';
     try {
-      const { buildExecutionContextPacket } = await import('../lib/contextdb/execution-context.mjs');
+      const { buildExecutionContextPacket } = await import('../lib/contextdb/runtime/execution-context.mjs');
       const { evaluateContextReconciliation } = await import('../lib/lifecycle/evolve/context-reconciliation.mjs');
       const observed = await buildExecutionContextPacket({
         rootDir: workspaceRoot,
@@ -707,7 +707,7 @@ async function cl08() {
     let repeat = null;
     let moduleError = '';
     try {
-      const { projectContextItems } = await import('../lib/contextdb/execution-context.mjs');
+      const { projectContextItems } = await import('../lib/contextdb/runtime/execution-context.mjs');
       projection = await projectContextItems({ rootDir: workspaceRoot, items, budgetUnits: 40 });
       repeat = await projectContextItems({ rootDir: workspaceRoot, items, budgetUnits: 40 });
     } catch (error) {
@@ -764,7 +764,7 @@ async function cl09() {
         evaluateHandoffLineage,
         normalizeHandoffPacket,
         renderHandoffInjection,
-      } = await import('../lib/contextdb/handoff.mjs');
+      } = await import('../lib/contextdb/runtime/handoff.mjs');
       if (typeof evaluateHandoffLineage !== 'function') throw new Error('handoff lineage API missing');
       v2 = normalizeHandoffPacket({
         fromSessionId: 'session-v2',
@@ -871,7 +871,7 @@ async function cl12() {
     let ledger = [];
     let moduleError = '';
     try {
-      const { assembleExecutionContext, evaluateExecutionContextPreflight } = await import('../lib/contextdb/execution-context.mjs');
+      const { assembleExecutionContext, evaluateExecutionContextPreflight } = await import('../lib/contextdb/runtime/execution-context.mjs');
       if (typeof evaluateExecutionContextPreflight !== 'function') throw new Error('S2 preflight API missing');
       observation = await assembleExecutionContext({
         rootDir: workspaceRoot,

@@ -1,6 +1,6 @@
-import { parseAiosCommandAction } from '../../../cli/fragment-parser.mjs';
-import { runReleaseStatus } from '../../release/release-status.mjs';
-import { isReleaseStateUnavailable } from './release-guard.mjs';
+import { parseAiosCommandAction } from '../../../../cli/fragment-parser.mjs';
+import { runReleaseStatus } from '../../../release/release-status.mjs';
+import { isReleaseStateUnavailable } from '../guards/release-guard.mjs';
 
 function createBufferedIo() {
   const lines = [];

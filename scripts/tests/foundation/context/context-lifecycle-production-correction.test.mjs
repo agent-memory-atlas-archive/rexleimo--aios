@@ -14,7 +14,7 @@ import {
 import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
-} from '../../../lib/contextdb/execution-context.mjs';
+} from '../../../lib/contextdb/runtime/execution-context.mjs';
 import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
 import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 import {

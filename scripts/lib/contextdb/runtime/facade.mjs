@@ -1,7 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { resolveContextDbRoot, toWorkspaceRelative } from '../aios/state-root.mjs';
-import { readContinuitySummary } from './continuity.mjs';
+import { resolveContextDbRoot, toWorkspaceRelative } from '../../aios/state-root.mjs';
+import { readContinuitySummary } from '../registry/continuity.mjs';
 
 export const FACADE_FILENAME = '.facade.json';
 export const DEFAULT_TTL_SECONDS = 3600;

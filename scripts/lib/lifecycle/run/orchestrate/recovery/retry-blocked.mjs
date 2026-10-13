@@ -1,5 +1,5 @@
 ﻿import { normalizeCounter, normalizePositiveInteger } from './shared.mjs';
-import { buildRuntimeClientProviderMap } from '../../../clients/registry.mjs';
+import { buildRuntimeClientProviderMap } from '../../../../clients/registry.mjs';
 
 function inferProviderFromClientId(clientId = '') {
   const normalized = String(clientId || '').trim().toLowerCase();
