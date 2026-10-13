@@ -1,8 +1,8 @@
 /* 中文注释：run-summary 读写只维护 solo harness 总状态，不处理 iteration/hook 文件。 */
 import { normalizeRunSummary, normalizeText } from './normalizers.mjs';
-import { getSoloHarnessPaths } from './paths.mjs';
-import { safeReadJson } from './io.mjs';
-import { writeFileAtomic } from '../../../fs/atomic-write.mjs';
+import { getSoloHarnessPaths } from '../plumbing/paths.mjs';
+import { safeReadJson } from '../plumbing/io.mjs';
+import { writeFileAtomic } from '../../../../fs/atomic-write.mjs';
 
 export async function writeSoloRunSummary(input = {}) {
   const summary = normalizeRunSummary(input);

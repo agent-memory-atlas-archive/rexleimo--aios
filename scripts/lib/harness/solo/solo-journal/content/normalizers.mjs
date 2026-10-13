@@ -1,11 +1,11 @@
 /* 中文注释：solo journal 归一化函数保持纯函数，避免读写逻辑和 schema 清洗混在一起。 */
 import path from 'node:path';
 
-import { SOLO_STAGES } from './constants.mjs';
+import { SOLO_STAGES } from '../plumbing/constants.mjs';
 
 // 纯函数：统一文本修剪，并支持 fallback。
 // 注意：`export ... from` 不会在当前作用域创建绑定，必须先 import 才能在本文件内调用。
-import { normalizeText } from '../../../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../../../src/shared/normalize.mjs';
 export { normalizeText };
 
 // 纯函数：数组字段去重、去空，保证写入 JSON 的结构稳定。

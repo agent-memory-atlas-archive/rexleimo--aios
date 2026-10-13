@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { readSoloRunStatus } from '../solo/solo-journal.mjs';
-import { getSoloHarnessPaths } from '../solo/solo-journal/paths.mjs';
+import { getSoloHarnessPaths } from '../solo/solo-journal/plumbing/paths.mjs';
 import { resolveContextDbRoot } from '../../aios/state-root.mjs';
 import { listProbedHosts, probeHost } from '../team/host-probes.mjs';
 import { listDreamProposals } from '../../lifecycle/evolve/dream/governance.mjs';

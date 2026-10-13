@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
-import { runContextDbCli } from '../../../contextdb-cli.mjs';
-import { normalizeStringArray, normalizeText } from './normalizers.mjs';
+import { resolveContextDbRoot } from '../../../../aios/state-root.mjs';
+import { runContextDbCli } from '../../../../contextdb-cli.mjs';
+import { normalizeStringArray, normalizeText } from '../support/normalizers.mjs';
 
 function sessionMetaPath(rootDir, sessionId) {
   return path.join(resolveContextDbRoot(rootDir, { preferLegacyExisting: true }), 'sessions', sessionId, 'meta.json');

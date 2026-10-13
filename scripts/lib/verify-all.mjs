@@ -1,6 +1,6 @@
-import { resolveSoloBackoffState, shouldAbortForConsecutiveFailures } from './harness/solo/solo-runtime/backoff.mjs';
+import { resolveSoloBackoffState, shouldAbortForConsecutiveFailures } from './harness/solo/solo-runtime/loop/backoff.mjs';
 import { computeCompactAction } from './offload/mermaid-canvas.mjs';
-import { evaluateDryRunReadiness, formatDryRunReadiness } from './harness/solo/solo-runtime/dry-run-readiness.mjs';
+import { evaluateDryRunReadiness, formatDryRunReadiness } from './harness/solo/solo-runtime/gate/dry-run-readiness.mjs';
 import { resolveRuntimeDirectiveInjections } from './lifecycle/run/harness/directive-inject.mjs';
 import { buildIterationPrompt } from './lifecycle/run/harness/prompt.mjs';
 import { runDream } from './lifecycle/evolve/dream/index.mjs';

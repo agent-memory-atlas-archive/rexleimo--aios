@@ -7,14 +7,14 @@ export {
   RUN_SUMMARY_FILENAME,
   SOLO_HARNESS_DIRNAME,
   SOLO_STAGES,
-} from './solo-journal/constants.mjs';
-export { clearSoloHarnessStop, readSoloControl, requestSoloHarnessStop, writeSoloControl } from './solo-journal/control.mjs';
-export { initSoloRunJournal } from './solo-journal/init.mjs';
-export { renderObjectiveMarkdown, safeReadJson } from './solo-journal/io.mjs';
-export { appendSoloIteration } from './solo-journal/iteration.mjs';
-export { appendSoloHookEvent } from './solo-journal/hooks.mjs';
-export { claimSessionOwner, isProcessAlive, readSessionOwner } from './solo-journal/owner.mjs';
-export { installSessionSignalHandlers } from './solo-journal/signals.mjs';
+} from './solo-journal/plumbing/constants.mjs';
+export { clearSoloHarnessStop, readSoloControl, requestSoloHarnessStop, writeSoloControl } from './solo-journal/lifecycle/control.mjs';
+export { initSoloRunJournal } from './solo-journal/lifecycle/init.mjs';
+export { renderObjectiveMarkdown, safeReadJson } from './solo-journal/plumbing/io.mjs';
+export { appendSoloIteration } from './solo-journal/lifecycle/iteration.mjs';
+export { appendSoloHookEvent } from './solo-journal/plumbing/hooks.mjs';
+export { claimSessionOwner, isProcessAlive, readSessionOwner } from './solo-journal/content/owner.mjs';
+export { installSessionSignalHandlers } from './solo-journal/lifecycle/signals.mjs';
 export {
   defaultBackoff,
   defaultControl,
@@ -28,7 +28,7 @@ export {
   normalizeStringArray,
   normalizeText,
   toPosixPath,
-} from './solo-journal/normalizers.mjs';
-export { getSoloHarnessPaths, iterationFileName, iterationLogFileName, sessionDir, soloHarnessDir } from './solo-journal/paths.mjs';
-export { readSoloRunStatus } from './solo-journal/status.mjs';
-export { readSoloRunSummary, writeSoloRunSummary } from './solo-journal/summary.mjs';
+} from './solo-journal/content/normalizers.mjs';
+export { getSoloHarnessPaths, iterationFileName, iterationLogFileName, sessionDir, soloHarnessDir } from './solo-journal/plumbing/paths.mjs';
+export { readSoloRunStatus } from './solo-journal/content/status.mjs';
+export { readSoloRunSummary, writeSoloRunSummary } from './solo-journal/content/summary.mjs';

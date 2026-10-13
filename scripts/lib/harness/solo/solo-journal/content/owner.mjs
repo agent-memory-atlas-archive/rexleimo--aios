@@ -8,8 +8,8 @@
 
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { atomicWriteText } from '../../../memo/storage/base/fs-io.mjs';
-import { getSoloHarnessPaths } from './paths.mjs';
+import { atomicWriteText } from '../../../../memo/storage/base/fs-io.mjs';
+import { getSoloHarnessPaths } from '../plumbing/paths.mjs';
 
 const OWNER_FILE = 'owner.json';
 const DEFAULT_HEARTBEAT_MS = 30_000;

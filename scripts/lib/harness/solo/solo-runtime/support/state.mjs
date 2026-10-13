@@ -1,13 +1,13 @@
-import { appendSoloIteration, writeSoloRunSummary } from '../solo-journal.mjs';
-import { writeContinuitySummary } from '../../../contextdb/continuity.mjs';
-import { resolveSoloBackoffState } from './backoff.mjs';
+import { appendSoloIteration, writeSoloRunSummary } from '../../solo-journal.mjs';
+import { writeContinuitySummary } from '../../../../contextdb/continuity.mjs';
+import { resolveSoloBackoffState } from '../loop/backoff.mjs';
 import {
   normalizeSoloIterationOutcome,
   normalizeStringArray,
   normalizeText,
   summarizeIterationForContinuity,
 } from './normalizers.mjs';
-import { buildCheckpointLogEntry, writeSoloIterationCheckpoint } from './checkpoint.mjs';
+import { buildCheckpointLogEntry, writeSoloIterationCheckpoint } from '../gate/checkpoint.mjs';
 
 function deriveRunStatus(outcome = {}) {
   const normalizedOutcome = normalizeText(outcome.outcome);

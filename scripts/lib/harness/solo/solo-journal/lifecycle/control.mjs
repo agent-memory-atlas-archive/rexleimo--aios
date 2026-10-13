@@ -1,8 +1,8 @@
 /* 中文注释：control 文件只表达暂停/停止请求，不和运行摘要混写。 */
-import { defaultControl, normalizeText } from './normalizers.mjs';
-import { getSoloHarnessPaths } from './paths.mjs';
-import { safeReadJson } from './io.mjs';
-import { writeFileAtomic } from '../../../fs/atomic-write.mjs';
+import { defaultControl, normalizeText } from '../content/normalizers.mjs';
+import { getSoloHarnessPaths } from '../plumbing/paths.mjs';
+import { safeReadJson } from '../plumbing/io.mjs';
+import { writeFileAtomic } from '../../../../fs/atomic-write.mjs';
 
 export async function writeSoloControl(input = {}) {
   const sessionId = normalizeText(input.sessionId);

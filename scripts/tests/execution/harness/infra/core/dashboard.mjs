@@ -10,7 +10,7 @@ import {
   writeHarnessDashboard,
 } from '../../../../../lib/harness/ops/dashboard.mjs';
 import { initSoloRunJournal } from '../../../../../lib/harness/solo/solo-journal.mjs';
-import { writeSoloRunSummary } from '../../../../../lib/harness/solo/solo-journal/summary.mjs';
+import { writeSoloRunSummary } from '../../../../../lib/harness/solo/solo-journal/content/summary.mjs';
 
 async function withRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

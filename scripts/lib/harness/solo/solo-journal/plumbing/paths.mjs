@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../../../aios/state-root.mjs';
 import {
   CONTROL_FILENAME,
   HOOK_EVENTS_FILENAME,
@@ -11,7 +11,7 @@ import {
   RUN_SUMMARY_FILENAME,
   SOLO_HARNESS_DIRNAME,
 } from './constants.mjs';
-import { normalizeText } from './normalizers.mjs';
+import { normalizeText } from '../content/normalizers.mjs';
 
 /* 中文注释：旧目录名 solo-harness → worker-journal 的一次性迁移。路径模块保持轻量：
    只在读取路径时做一次存在性检查，命中旧名且新名不存在时 rename，随后总是返回新路径。 */

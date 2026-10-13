@@ -18,7 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { probeHost } from '../../team/host-probes.mjs';
+import { probeHost } from '../../../team/host-probes.mjs';
 
 /**
  * 执行 dry-run readiness 预检

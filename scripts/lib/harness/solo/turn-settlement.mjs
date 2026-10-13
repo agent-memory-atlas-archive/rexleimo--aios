@@ -3,7 +3,7 @@
  * 映射只读 agent 显式声明的 outcome/failureClass/shouldStop 字段，不做任何文本猜测。 */
 import { deriveEffectRef, normalizeTurnResult } from '../../../../rex-harness/src/domain/turn-contract.mjs';
 import { captureCommand } from '../../platform/process.mjs';
-import { normalizeText } from './solo-runtime/normalizers.mjs';
+import { normalizeText } from './solo-runtime/support/normalizers.mjs';
 
 /** harness failureClass → turn contract failureKind 的声明映射表。 */
 const FAILURE_CLASS_TO_FAILURE_KIND = Object.freeze({

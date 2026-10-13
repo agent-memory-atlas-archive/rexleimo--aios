@@ -1,17 +1,17 @@
 import { Buffer } from 'node:buffer';
-import { readContinuitySummary } from '../../../contextdb/continuity.mjs';
-import { findCanvasMermaid, compactCanvas } from '../../../offload/mermaid-canvas.mjs';
-import { capture, resolveStorage, resolveConfig } from '../../../offload/tool-offload.mjs';
-import { readSoloControl, readSoloRunSummary, writeSoloRunSummary, appendSoloHookEvent, claimSessionOwner, installSessionSignalHandlers } from '../solo-journal.mjs';
+import { readContinuitySummary } from '../../../../contextdb/continuity.mjs';
+import { findCanvasMermaid, compactCanvas } from '../../../../offload/mermaid-canvas.mjs';
+import { capture, resolveStorage, resolveConfig } from '../../../../offload/tool-offload.mjs';
+import { readSoloControl, readSoloRunSummary, writeSoloRunSummary, appendSoloHookEvent, claimSessionOwner, installSessionSignalHandlers } from '../../solo-journal.mjs';
 import { sleep, resolveSoloBackoffState, shouldAbortForConsecutiveFailures, maxConsecutiveFailures } from './backoff.mjs';
 import { resolveCadenceState, resolveCadenceConfig } from './cadence.mjs';
-import { chargeQuotaSpend, computeQuotaState, resolveQuotaConfig } from './quota.mjs';
-import { resolveShouldRun } from './should-run.mjs';
-import { evaluateDryRunReadiness, formatDryRunReadiness } from './dry-run-readiness.mjs';
-import { writeSoloIterationCheckpoint } from './checkpoint.mjs';
-import { invokeLifecycleHook } from './hooks.mjs';
-import { normalizeSoloIterationOutcome } from './normalizers.mjs';
-import { buildStopOutcome, persistIterationState } from './state.mjs';
+import { chargeQuotaSpend, computeQuotaState, resolveQuotaConfig } from '../gate/quota.mjs';
+import { resolveShouldRun } from '../gate/should-run.mjs';
+import { evaluateDryRunReadiness, formatDryRunReadiness } from '../gate/dry-run-readiness.mjs';
+import { writeSoloIterationCheckpoint } from '../gate/checkpoint.mjs';
+import { invokeLifecycleHook } from '../support/hooks.mjs';
+import { normalizeSoloIterationOutcome } from '../support/normalizers.mjs';
+import { buildStopOutcome, persistIterationState } from '../support/state.mjs';
 
 export async function runSoloHarnessLoop({
   rootDir,
@@ -275,7 +275,7 @@ export async function runSoloHarnessLoop({
     // L3: ensure plan exists and mark next task in progress before the turn
     let currentPlanTaskId = null;
     try {
-      const { ensurePlanForRuntime, markPlanTaskInProgress } = await import('../../../planning/ops/plan-runtime.mjs');
+      const { ensurePlanForRuntime, markPlanTaskInProgress } = await import('../../../../planning/ops/plan-runtime.mjs');
       ensurePlanForRuntime({
         rootDir,
         objective: summary.objective,
@@ -420,7 +420,7 @@ export async function runSoloHarnessLoop({
 
     // L3: write iteration outcome back to structured plan (tasks + evidence)
     try {
-      const { syncPlanWithIterationOutcome } = await import('../../../planning/ops/plan-runtime.mjs');
+      const { syncPlanWithIterationOutcome } = await import('../../../../planning/ops/plan-runtime.mjs');
       const planSync = syncPlanWithIterationOutcome({
         rootDir,
         objective: summary.objective,

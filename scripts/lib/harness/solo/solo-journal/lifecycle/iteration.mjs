@@ -2,10 +2,10 @@
 import { appendFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { writeFileAtomic } from '../../../fs/atomic-write.mjs';
-import { normalizeIterationOutcome } from './normalizers.mjs';
-import { getSoloHarnessPaths, iterationFileName, iterationLogFileName } from './paths.mjs';
-import { readSoloRunSummary, writeSoloRunSummary } from './summary.mjs';
+import { writeFileAtomic } from '../../../../fs/atomic-write.mjs';
+import { normalizeIterationOutcome } from '../content/normalizers.mjs';
+import { getSoloHarnessPaths, iterationFileName, iterationLogFileName } from '../plumbing/paths.mjs';
+import { readSoloRunSummary, writeSoloRunSummary } from '../content/summary.mjs';
 
 export async function appendSoloIteration({ rootDir, sessionId, iteration, outcome, logEntries = [] } = {}) {
   const normalizedOutcome = normalizeIterationOutcome({ ...outcome, sessionId, iteration });

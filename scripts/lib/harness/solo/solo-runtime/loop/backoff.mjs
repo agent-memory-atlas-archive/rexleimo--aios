@@ -10,7 +10,7 @@
  *   gnhf orchestrator.ts:372 — 60_000 * Math.pow(2, n-1) 退避（无 cap，我们用 300s cap）
  */
 
-import { normalizeText } from './normalizers.mjs';
+import { normalizeText } from '../support/normalizers.mjs';
 
 const BACKOFF_BASE_MS = 30_000;
 const BACKOFF_CAP_MS = 300_000;

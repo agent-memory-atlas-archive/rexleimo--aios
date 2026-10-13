@@ -1,7 +1,7 @@
 /* 中文注释：status 读取只组合 summary/control/path，供 HUD 和 harness status 使用。 */
-import { readSoloControl } from './control.mjs';
+import { readSoloControl } from '../lifecycle/control.mjs';
 import { defaultWorktreeState, formatRelativePath, normalizeText } from './normalizers.mjs';
-import { getSoloHarnessPaths } from './paths.mjs';
+import { getSoloHarnessPaths } from '../plumbing/paths.mjs';
 import { readSoloRunSummary } from './summary.mjs';
 
 export async function readSoloRunStatus({ rootDir, sessionId } = {}) {

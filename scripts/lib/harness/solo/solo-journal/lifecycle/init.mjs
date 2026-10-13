@@ -2,12 +2,12 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { writeFileAtomic } from '../../../fs/atomic-write.mjs';
+import { writeFileAtomic } from '../../../../fs/atomic-write.mjs';
 import { readSoloControl, writeSoloControl } from './control.mjs';
-import { renderObjectiveMarkdown } from './io.mjs';
-import { defaultWorktreeState, formatRelativePath, normalizeText } from './normalizers.mjs';
-import { getSoloHarnessPaths, sessionDir } from './paths.mjs';
-import { readSoloRunSummary, writeSoloRunSummary } from './summary.mjs';
+import { renderObjectiveMarkdown } from '../plumbing/io.mjs';
+import { defaultWorktreeState, formatRelativePath, normalizeText } from '../content/normalizers.mjs';
+import { getSoloHarnessPaths, sessionDir } from '../plumbing/paths.mjs';
+import { readSoloRunSummary, writeSoloRunSummary } from '../content/summary.mjs';
 
 export async function initSoloRunJournal(input = {}) {
   const sessionId = normalizeText(input.sessionId);

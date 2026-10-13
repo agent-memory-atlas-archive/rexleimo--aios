@@ -6,7 +6,7 @@ import {
 
 // 纯函数：统一 solo harness 文本归一化，并保留兜底值。
 // 注意：`export ... from` 不创建本地绑定，必须先 import 才能在本文件内调用。
-import { normalizeText } from '../../../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../../../src/shared/normalize.mjs';
 export { normalizeText };
 
 // 纯函数：规整字符串数组，供 evidence/keyChanges 等字段复用。

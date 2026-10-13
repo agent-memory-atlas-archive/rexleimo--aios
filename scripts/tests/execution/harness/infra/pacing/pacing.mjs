@@ -3,17 +3,17 @@ import test from 'node:test';
 
 import {
   resolveShouldRun,
-} from '../../../../../lib/harness/solo/solo-runtime/should-run.mjs';
+} from '../../../../../lib/harness/solo/solo-runtime/gate/should-run.mjs';
 import {
   resolveCadenceConfig,
   resolveCadenceState,
   cadenceReady,
-} from '../../../../../lib/harness/solo/solo-runtime/cadence.mjs';
+} from '../../../../../lib/harness/solo/solo-runtime/loop/cadence.mjs';
 import {
   chargeQuotaSpend,
   computeQuotaState,
   resolveQuotaConfig,
-} from '../../../../../lib/harness/solo/solo-runtime/quota.mjs';
+} from '../../../../../lib/harness/solo/solo-runtime/gate/quota.mjs';
 
 const NOW = 1_800_000_000_000;
 

@@ -1,4 +1,4 @@
-import { appendSoloHookEvent } from '../solo-journal.mjs';
+import { appendSoloHookEvent } from '../../solo-journal.mjs';
 import { normalizeText } from './normalizers.mjs';
 
 function buildHookDetail(value = '') {

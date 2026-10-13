@@ -1,7 +1,7 @@
 /* 中文注释：hook event 追加独立处理生命周期钩子证据，不修改 run summary。 */
 import { appendFile, mkdir } from 'node:fs/promises';
 
-import { normalizeText } from './normalizers.mjs';
+import { normalizeText } from '../content/normalizers.mjs';
 import { getSoloHarnessPaths } from './paths.mjs';
 
 export async function appendSoloHookEvent({ rootDir, sessionId, event = {} } = {}) {
