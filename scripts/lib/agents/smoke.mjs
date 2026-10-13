@@ -3,7 +3,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 
 import { compressPostReceiveTurn, compressPreSendTurn, requireTurnCompression } from '../interception/index.mjs';
-import { DEFAULT_THRESHOLDS } from '../interception/core/types.mjs';
+import { DEFAULT_THRESHOLDS } from '../interception/runtime/core/types.mjs';
 import { loadCanonicalAgents } from './source-tree.mjs';
 import { runOneShot } from '../harness/team/subagent-runtime/one-shot-runner.mjs';
 import { MANAGED_RUNNER } from '../evidence/live-execution.mjs';

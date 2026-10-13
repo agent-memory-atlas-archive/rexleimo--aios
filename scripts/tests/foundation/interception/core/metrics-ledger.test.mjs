@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { LEDGER_LAYERS, aggregateLedgerByLayer, readLedgerRecords, writeLedgerRecord } from '../../../../lib/interception/metrics/ledger.mjs';
-import { buildTokensReport, renderTokensReport } from '../../../../lib/interception/metrics/report.mjs';
+import { LEDGER_LAYERS, aggregateLedgerByLayer, readLedgerRecords, writeLedgerRecord } from '../../../../lib/interception/observability/metrics/ledger.mjs';
+import { buildTokensReport, renderTokensReport } from '../../../../lib/interception/observability/metrics/report.mjs';
 
 async function makeWorkspace() {
   return mkdtemp(path.join(os.tmpdir(), 'aios-ledger-'));

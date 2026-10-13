@@ -20,11 +20,11 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
   Object.freeze({
     id: 'interception-capability-facade',
     label: 'Interception Capability Facade',
-    path: 'scripts/lib/interception/clients/capabilities.mjs',
+    path: 'scripts/lib/interception/transport/clients/capabilities.mjs',
     maxLines: 120,
     requiredModules: Object.freeze([
-      'scripts/lib/interception/mcp/proxy/proxy-config.mjs',
-      'scripts/lib/interception/mcp/proxy/proxy-inspector.mjs',
+      'scripts/lib/interception/transport/mcp/proxy/proxy-config.mjs',
+      'scripts/lib/interception/transport/mcp/proxy/proxy-inspector.mjs',
     ]),
   }),
   Object.freeze({

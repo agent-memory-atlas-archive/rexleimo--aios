@@ -15,8 +15,8 @@ import {
   requireTurnCompression,
   runTurnCompressionMatrixProof,
 } from '../../../../lib/interception/index.mjs';
-import { CLIENT_ORDER } from '../../../../lib/interception/clients/capabilities.mjs';
-import { readMetricsRecords } from '../../../../lib/interception/metrics/metrics-sink.mjs';
+import { CLIENT_ORDER } from '../../../../lib/interception/transport/clients/capabilities.mjs';
+import { readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
 import { ALL_CLIENTS } from '../../../../lib/clients/core/definitions.mjs';
 
 const PRE_SEND_SENTINEL = 'UNIQUE_PRE_SEND_AGENT_PROMPT_SENTINEL';
@@ -78,7 +78,7 @@ test('turn gateway compresses post-receive assistant output before it is accepte
   try {
     const rawOutput = [
       'Agent result: reviewed interception runtime.',
-      'ERROR actionable issue at scripts/lib/interception/core/engine.mjs:77',
+      'ERROR actionable issue at scripts/lib/interception/runtime/core/engine.mjs:77',
       POST_RECEIVE_SENTINEL.repeat(50),
       'Handoff: wire metrics event kinds next.',
     ].join('\n');

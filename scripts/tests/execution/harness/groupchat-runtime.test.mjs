@@ -17,7 +17,7 @@ import {
 } from '../../../lib/harness/team/groupchat-runtime.mjs';
 
 import { normalizeHandoffPayload } from '../../../lib/harness/solo/handoff.mjs';
-import { readMetricsRecords } from '../../../lib/interception/metrics/metrics-sink.mjs';
+import { readMetricsRecords } from '../../../lib/interception/observability/metrics/metrics-sink.mjs';
 
 // ---------------------------------------------------------------------------
 // Helpers

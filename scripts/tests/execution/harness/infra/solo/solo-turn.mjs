@@ -24,7 +24,7 @@ test('buildIterationPrompt injects offload canvas as compact resume context', ()
 
 test('buildProductionExecuteTurn compresses solo harness prompts before provider launch and compacts received output', async () => {
   const { buildProductionExecuteTurn } = await import('../../../../../lib/lifecycle/run/harness/execute-turn.mjs');
-  const { readMetricsRecords } = await import('../../../../../lib/interception/metrics/metrics-sink.mjs');
+  const { readMetricsRecords } = await import('../../../../../lib/interception/observability/metrics/metrics-sink.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-turn-'));
   const PRE_SENTINEL = 'SOLO_HARNESS_PRE_SEND_SENTINEL';
   const POST_SENTINEL = 'SOLO_HARNESS_POST_RECEIVE_SENTINEL';

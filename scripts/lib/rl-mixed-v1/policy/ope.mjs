@@ -1,6 +1,6 @@
 ﻿import { computeContextualBanditPolicyDistribution, evaluateContextualBanditOpe } from '../../rl-core/ope-eval.mjs';
 import { clamp } from '../shared.mjs';
-import { ORCHESTRATOR_OPE_DEFAULT } from '../reward-config.mjs';
+import { ORCHESTRATOR_OPE_DEFAULT } from '../rewards/reward-config.mjs';
 
 // 纯函数：规范化 OPE 日志行，丢弃缺少动作空间或选中动作的脏数据。
 export function normalizeOpeLogRow(raw) {

@@ -93,7 +93,7 @@ test('executePhaseJob waits for role-memory persistence before returning', async
 
 test('executePhaseJob compresses subagent prompts before client launch and compacts accepted output', async () => {
   const { executePhaseJob } = await import('../../../../../lib/harness/team/subagent-runtime/phase-job.mjs');
-  const { readMetricsRecords } = await import('../../../../../lib/interception/metrics/metrics-sink.mjs');
+  const { readMetricsRecords } = await import('../../../../../lib/interception/observability/metrics/metrics-sink.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-subagent-turn-'));
   const PRE_SENTINEL = 'SUBAGENT_PRE_SEND_SENTINEL';
   const POST_SENTINEL = 'SUBAGENT_POST_RECEIVE_SENTINEL';

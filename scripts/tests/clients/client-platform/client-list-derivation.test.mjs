@@ -15,7 +15,7 @@ import {
   getClientInstructionFileName,
   orderByPriority,
 } from '../../../lib/clients/registry.mjs';
-import { CLIENT_ORDER } from '../../../lib/interception/clients/capabilities.mjs';
+import { CLIENT_ORDER } from '../../../lib/interception/transport/clients/capabilities.mjs';
 import { CLIENT_INSTRUCTION_FILES } from '../../../lib/components/codemap/constants.mjs';
 import { AGENTS_MD_COWRITERS } from '../../../lib/native/emitters/shared.mjs';
 import { EMITTERS } from '../../../lib/native/sync/constants.mjs';

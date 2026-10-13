@@ -418,7 +418,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       if (sub !== 'report') {
         throw new Error('Usage: aios tokens report [--session <id>] [--json]');
       }
-      const { buildTokensReport, renderTokensReport } = await import('../interception/metrics/report.mjs');
+      const { buildTokensReport, renderTokensReport } = await import('../interception/observability/metrics/report.mjs');
       const json = flags.includes('--json');
       const sessionFlag = flags.indexOf('--session');
       const sessionId = sessionFlag >= 0 ? String(flags[sessionFlag + 1] || 'default') : 'default';

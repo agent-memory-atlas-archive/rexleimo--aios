@@ -1,8 +1,8 @@
 /* 中文注释：interception 分发独立成命令处理器，避免顶层 dispatch 继续承载业务细节。 */
-import { runInterceptionDoctor } from '../../interception/doctor.mjs';
-import { runInterceptionProof } from '../../interception/proof.mjs';
-import { runInterceptionRewrite } from '../../interception/rewrite.mjs';
-import { runInterceptionTail } from '../../interception/tail.mjs';
+import { runInterceptionDoctor } from '../../interception/pipeline/doctor.mjs';
+import { runInterceptionProof } from '../../interception/pipeline/proof.mjs';
+import { runInterceptionRewrite } from '../../interception/pipeline/rewrite.mjs';
+import { runInterceptionTail } from '../../interception/pipeline/tail.mjs';
 
 /* 中文注释：proof 只验证链路；doctor/mcp-migrate 复用同一修复实现，防止修复逻辑分叉。 */
 export async function runInterceptionCommand(parsed, { rootDir, workspaceRoot }) {
@@ -16,8 +16,8 @@ export async function runInterceptionCommand(parsed, { rootDir, workspaceRoot })
     return runInterceptionRewrite({ ...parsed.options, rootDir });
   }
   if (parsed.options.subcommand === 'audit') {
-    const { runAuditAggregation } = await import('../../interception/audit/aggregate.mjs');
-    const { runAuditQuery } = await import('../../interception/audit/query.mjs');
+    const { runAuditAggregation } = await import('../../interception/observability/audit/aggregate.mjs');
+    const { runAuditQuery } = await import('../../interception/observability/audit/query.mjs');
 
     /* 中文注释：audit 子命令先聚合再查询；聚合是从原始 metrics JSONL 生成 hourly.jsonl。 */
     const aggResult = await runAuditAggregation({ workspaceRoot });

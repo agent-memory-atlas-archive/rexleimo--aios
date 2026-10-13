@@ -70,7 +70,7 @@ import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 
 import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { inspectMcpProxyTarget } from '../../../lib/interception/mcp/proxy/proxy-inspector.mjs';
+import { inspectMcpProxyTarget } from '../../../lib/interception/transport/mcp/proxy/proxy-inspector.mjs';
 
 function proxiedEntry(rootDir, alias = PRIMARY_BROWSER_ALIAS) {
   return {

@@ -5,7 +5,7 @@
 // The tap is a pure consumer of rpc-client's existing onEvent transparency
 // channel (rpc-client itself stays untouched); telemetry failures are
 // fire-and-forget and must never break the transport.
-import { writeLedgerRecord } from '../interception/metrics/ledger.mjs';
+import { writeLedgerRecord } from '../interception/observability/metrics/ledger.mjs';
 
 export function extractUsageFromRecord(record) {
   if (!record || typeof record !== 'object') return null;

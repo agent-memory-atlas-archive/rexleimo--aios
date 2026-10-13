@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import path from 'node:path';
 
-import { writeMixedSummary } from './lib/rl-mixed-v1/contextdb-summary.mjs';
-import { runMixedCampaign, runMixedEvaluation } from './lib/rl-mixed-v1/run-orchestrator.mjs';
+import { writeMixedSummary } from './lib/rl-mixed-v1/evidence/contextdb-summary.mjs';
+import { runMixedCampaign, runMixedEvaluation } from './lib/rl-mixed-v1/run/run-orchestrator.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

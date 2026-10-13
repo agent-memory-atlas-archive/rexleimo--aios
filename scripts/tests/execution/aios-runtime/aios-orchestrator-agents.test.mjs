@@ -158,8 +158,8 @@ test('canonical agents support ECC-style native pack metadata and token/smoke ro
 
 test('turn compression metrics preserve agent_id for catalogue promotion evidence', async () => {
   const rootDir = await makeRootDir();
-  const { compressPreSendTurn, compressPostReceiveTurn } = await import('../../../lib/interception/turn/turn-gateway.mjs');
-  const { readMetricsRecords } = await import('../../../lib/interception/metrics/metrics-sink.mjs');
+  const { compressPreSendTurn, compressPostReceiveTurn } = await import('../../../lib/interception/runtime/turn/turn-gateway.mjs');
+  const { readMetricsRecords } = await import('../../../lib/interception/observability/metrics/metrics-sink.mjs');
   const common = {
     workspaceRoot: rootDir,
     cwd: rootDir,
@@ -242,7 +242,7 @@ test('agents smoke emits schema-v2 evidence only from a managed live invocation'
   const rootDir = await makeRootDir();
   await copyCanonicalSource(rootDir);
   const { runAgentsSmoke } = await import('../../../lib/agents/smoke.mjs');
-  const { readMetricsRecords } = await import('../../../lib/interception/metrics/metrics-sink.mjs');
+  const { readMetricsRecords } = await import('../../../lib/interception/observability/metrics/metrics-sink.mjs');
   const { buildAgentCatalogue } = await import('../../../lib/agents/catalogue.mjs');
   const stdout = `AIOS_AGENT_SMOKE_OK ${'planner-audit-payload '.repeat(96)}`;
   const result = await runAgentsSmoke({

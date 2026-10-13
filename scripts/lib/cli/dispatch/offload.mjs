@@ -9,7 +9,7 @@ function writeLine(stream, text) {
 export async function runRefsCommand(parsed, { stdout = process.stdout, stderr = process.stderr, ...context } = {}) {
   const { resolveStorage } = await import('../../offload/tool-offload.mjs');
   const { readRef, grepRefs, listRefs, pruneRefs } = await import('../../offload/refs-store.mjs');
-  const { readInterceptionRef, grepInterceptionRefs, listInterceptionRefs, pruneInterceptionRefs } = await import('../../interception/refs/index.mjs');
+  const { readInterceptionRef, grepInterceptionRefs, listInterceptionRefs, pruneInterceptionRefs } = await import('../../interception/observability/refs/index.mjs');
   const ws = resolveRuntimeWorkspace(parsed.command, parsed.options, context);
   const config = await loadWorkspaceConfig(ws);
   const storage = resolveStorage(parsed.options, process.env, config);
