@@ -8,7 +8,7 @@ import {
   evaluateOwnershipEvidence,
   evaluatePlanEvidence,
   mergeReadinessVerdicts,
-} from '../../../lib/lifecycle/preflight-contracts.mjs';
+} from '../../../lib/lifecycle/govern/preflight-contracts.mjs';
 import { buildPlanMarkdown } from '../../../lib/planning/contract.mjs';
 
 const COMPLETE_PLAN = `# Example Plan

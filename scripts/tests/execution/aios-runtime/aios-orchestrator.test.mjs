@@ -26,7 +26,7 @@ import { buildDispatchInsights } from '../../../lib/harness/dispatch-insights.mj
 import { persistDispatchEvidence } from '../../../lib/harness/orchestrator-evidence.mjs';
 import { buildWorkItemTelemetry } from '../../../lib/harness/work-item-telemetry.mjs';
 import { executeMergeGateJob } from '../../../lib/harness/subagent-runtime/merge-gate.mjs';
-import { planOrchestrate, runOrchestrate } from '../../../lib/lifecycle/orchestrate.mjs';
+import { planOrchestrate, runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 
 async function importDispatchRuntimes() {
   try {

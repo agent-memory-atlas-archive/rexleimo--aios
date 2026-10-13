@@ -6,8 +6,8 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { normalizeWorkOptions, buildWorkRuntimeEnv } from '../../../lib/lifecycle/work/options.mjs';
-import { runWorkCommand } from '../../../lib/lifecycle/work.mjs';
+import { normalizeWorkOptions, buildWorkRuntimeEnv } from '../../../lib/lifecycle/run/work/options.mjs';
+import { runWorkCommand } from '../../../lib/lifecycle/run/work.mjs';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 
 const TEST_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

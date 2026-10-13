@@ -13,7 +13,7 @@ import { readSoloRunStatus } from './solo-journal.mjs';
 import { getSoloHarnessPaths } from './solo-journal/paths.mjs';
 import { resolveContextDbRoot } from '../aios/state-root.mjs';
 import { listProbedHosts, probeHost } from './host-probes.mjs';
-import { listDreamProposals } from '../lifecycle/dream/governance.mjs';
+import { listDreamProposals } from '../lifecycle/evolve/dream/governance.mjs';
 
 const SETTLEMENT_TAIL_ROWS = 20;
 

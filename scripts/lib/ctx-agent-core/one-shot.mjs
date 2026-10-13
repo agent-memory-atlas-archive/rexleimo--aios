@@ -175,7 +175,7 @@ export async function runRoutedOneShotTask(options = {}) {
   const io = createBufferedIo(outputChunks);
 
   if (spec.routeMode === 'harness') {
-    const { runHarnessCommand } = await import('../lifecycle/harness.mjs');
+    const { runHarnessCommand } = await import('../lifecycle/run/harness.mjs');
     const result = await runHarnessCommand({
       subcommand: 'run', objective: String(options.taskPrompt || '').trim(), sessionId: String(options.sessionId || '').trim(),
       provider: spec.provider, profile: 'standard', worktree: true, baseRef: 'HEAD', maxIterations: spec.harnessMaxIterations,
@@ -184,7 +184,7 @@ export async function runRoutedOneShotTask(options = {}) {
     return { output: formatRoutedOutput(spec, outputChunks.join('\n').trim()), exitCode: result.exitCode ?? 1, preview: spec.preview, routeMode: spec.routeMode, executionMode: spec.executionMode };
   }
 
-  const { runOrchestrate } = await import('../lifecycle/orchestrate.mjs');
+  const { runOrchestrate } = await import('../lifecycle/run/orchestrate.mjs');
   const useGroupChat = spec.routeMode === 'team' && spec.executionMode === 'live';
   const rootDir = options.workspaceRoot || process.cwd();
   const taskTitle = String(options.taskPrompt || '').trim();

@@ -12,9 +12,9 @@ import {
   normalizeHarnessProfile,
 } from '../../../lib/harness/profile.mjs';
 import { renderHandoffMarkdown, validateHandoffPayload } from '../../../lib/harness/handoff.mjs';
-import { planDoctor } from '../../../lib/lifecycle/doctor.mjs';
-import { executeEntropyGc } from '../../../lib/lifecycle/entropy-gc.mjs';
-import { planQualityGate, runQualityGate } from '../../../lib/lifecycle/quality-gate.mjs';
+import { planDoctor } from '../../../lib/lifecycle/govern/doctor.mjs';
+import { executeEntropyGc } from '../../../lib/lifecycle/govern/entropy-gc.mjs';
+import { planQualityGate, runQualityGate } from '../../../lib/lifecycle/govern/quality-gate.mjs';
 import { DEFAULT_ARCHITECTURE_RULES, evaluateArchitectureGovernance } from '../../../lib/architecture/governance.mjs';
 import { commandExists } from '../../../lib/platform/process.mjs';
 

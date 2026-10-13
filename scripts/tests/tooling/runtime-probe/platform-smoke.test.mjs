@@ -133,12 +133,12 @@ describe('REQUIRED: py/py3 — Cross-Platform Safety', () => {
   });
 
   it('self-update.mjs uses USERPROFILE fallback', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'self-update.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
     assert.ok(content.includes('USERPROFILE'), 'should reference USERPROFILE');
   });
 
   it('self-update.mjs enables TLS 1.2 before Windows release installer request', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'self-update.mjs'), 'utf8');
+    const content = fs.readFileSync(path.join(rootDir, 'scripts', 'lib', 'lifecycle', 'setup', 'self-update.mjs'), 'utf8');
     // The installer command (preferred local path, remote `irm` fetch as
     // fallback) is composed into one PowerShell script. The security contract
     // is that the TLS assignment is the FIRST statement of that script, so it

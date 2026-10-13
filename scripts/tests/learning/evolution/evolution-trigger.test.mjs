@@ -11,9 +11,9 @@ import {
   readTriggerState,
   updatePendingCount,
   EVOLUTION_TRIGGER_DEFAULTS,
-} from '../../../lib/lifecycle/evolution/trigger.mjs';
-import { getEvolutionStatus } from '../../../lib/lifecycle/evolution/status.mjs';
-import { autoMemoSessionClose } from '../../../lib/lifecycle/session-hooks/close.mjs';
+} from '../../../lib/lifecycle/evolve/evolution/trigger.mjs';
+import { getEvolutionStatus } from '../../../lib/lifecycle/evolve/evolution/status.mjs';
+import { autoMemoSessionClose } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {

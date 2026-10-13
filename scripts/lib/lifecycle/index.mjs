@@ -1,10 +1,10 @@
 /* 中文注释：Lifecycle barrel，仅导出被外部域（rl-orchestrator-v1、cli、hud）消费的能力。 */
-export { runOrchestrate } from './orchestrate.mjs';
-export { buildTeamWatchdogState } from './watchdog.mjs';
+export { runOrchestrate } from './run/orchestrate.mjs';
+export { buildTeamWatchdogState } from './fleet/watchdog.mjs';
 export {
   collectGitChangedFiles,
   evaluateContextReconciliation,
-} from './context-reconciliation.mjs';
+} from './evolve/context-reconciliation.mjs';
 export {
   createDefaultDoctorOptions,
   createDefaultEntropyGcOptions,
@@ -39,4 +39,4 @@ export {
   normalizeSoloHarnessProvider,
   normalizeTokenProfile,
   normalizeWrapMode,
-} from './options.mjs';
+} from './govern/options.mjs';

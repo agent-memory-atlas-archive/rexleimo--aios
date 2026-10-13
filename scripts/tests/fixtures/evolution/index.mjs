@@ -183,6 +183,6 @@ export function trustedCoreFixture(baseline = baselineFixture()) {
     ...goodCandidateFixture(baseline),
     candidateId: 'cand-trusted-core-001',
     version: 'candidate-trusted',
-    touchedFiles: ['scripts/lib/lifecycle/evolution/verdict.mjs'],
+    touchedFiles: ['scripts/lib/lifecycle/evolve/evolution/verdict.mjs'],
   };
 }

@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { resolveMemoRoot } from '../../../lib/aios/state-root.mjs';
-import { runDream, readDreamArchivedEventIds } from '../../../lib/lifecycle/dream/index.mjs';
+import { runDream, readDreamArchivedEventIds } from '../../../lib/lifecycle/evolve/dream/index.mjs';
 import { appendMemoEvent, listMemoEvents, searchMemoEvents, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
 
 const ARCHIVED_TEXT = 'archive index secret memo text';

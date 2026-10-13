@@ -15,7 +15,7 @@ import {
   normalizeHandoffPacket,
   renderHandoffInjection,
 } from '../../../lib/contextdb/handoff.mjs';
-import { evaluateContextReconciliation } from '../../../lib/lifecycle/context-reconciliation.mjs';
+import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
 import { buildStructuredPlanState } from '../../../lib/planning/schema.mjs';
 import { readSessionChangedFiles, recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runUpdate } from '../../../../lib/lifecycle/update.mjs';
+import { runUpdate } from '../../../../lib/lifecycle/setup/update.mjs';
 
 function fingerprintProjection(entry) {
   return createHash('sha256').update(JSON.stringify({
@@ -959,7 +959,7 @@ test('reconciliation resolves fallback homes without reading developer environme
 });
 
 test('workflow preflight uses the same Rex workflow-surface reconciliation seam', async () => {
-  const { runWorkflowCommand } = await import('../../../../lib/lifecycle/workflow.mjs');
+  const { runWorkflowCommand } = await import('../../../../lib/lifecycle/run/workflow.mjs');
   const calls = [];
   let output = '';
 

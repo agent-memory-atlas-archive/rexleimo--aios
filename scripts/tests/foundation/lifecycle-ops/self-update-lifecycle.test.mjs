@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { ensureWorkingDirectoryOutsideInstallTree, updateHarnessRuntime } from '../../../lib/lifecycle/self-update.mjs';
+import { ensureWorkingDirectoryOutsideInstallTree, updateHarnessRuntime } from '../../../lib/lifecycle/setup/self-update.mjs';
 
 // 中文注释：macOS 的 TMPDIR（/var/...）是符号链接，chdir 后 process.cwd() 返回
 // 解析路径（/private/var/...）；temp 根必须先 realpath，否则与库内 path.resolve 比较不一致。

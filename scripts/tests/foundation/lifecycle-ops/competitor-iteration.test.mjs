@@ -13,13 +13,13 @@ import {
   collectDurableMemoLines,
   writeAgentsDreamBlock,
   AGENTS_DREAM_BEGIN,
-} from '../../../lib/lifecycle/dream/export-to.mjs';
+} from '../../../lib/lifecycle/evolve/dream/export-to.mjs';
 import {
   buildDeathNotice,
   writeDeathNotice,
   readDeathNotices,
   hasDuplicateNotice,
-} from '../../../lib/lifecycle/death-notice.mjs';
+} from '../../../lib/lifecycle/evolve/death-notice.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

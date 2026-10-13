@@ -1,4 +1,4 @@
-import { textSimilarity } from '../../lifecycle/dream/dedup.mjs';
+import { textSimilarity } from '../../lifecycle/evolve/dream/dedup.mjs';
 import { normalizeClaimStatus } from './provenance.mjs';
 
 // Bi-temporal fact lifecycle for memo events.

@@ -8,8 +8,8 @@ import { existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { buildSessionId, ensureContextDbSession, sessionMetaPath } from '../../../lib/lifecycle/session-hooks/start-session.mjs';
-import { runSessionStartTimeline } from '../../../lib/lifecycle/session-hooks/start-timeline.mjs';
+import { buildSessionId, ensureContextDbSession, sessionMetaPath } from '../../../lib/lifecycle/run/session-hooks/start-session.mjs';
+import { runSessionStartTimeline } from '../../../lib/lifecycle/run/session-hooks/start-timeline.mjs';
 import { parseSessionArgs } from '../../../lib/cli/parse-args/session.mjs';
 
 function recordingCliImpl() {

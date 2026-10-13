@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { autoMemoSessionClose, sessionCloseCandidatePath } from '../../../lib/lifecycle/session-hooks/close.mjs';
+import { autoMemoSessionClose, sessionCloseCandidatePath } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
 import {
   appendMemoEvent,
   listMemoEvents,

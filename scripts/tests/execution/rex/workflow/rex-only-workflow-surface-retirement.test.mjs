@@ -9,7 +9,7 @@ import { parseArgs } from '../../../../lib/cli/parse-args.mjs';
 import { getCommandHelpText } from '../../../../lib/cli/help.mjs';
 import { CLIENT_CAPABILITIES, CLIENT_DEFINITIONS } from '../../../../lib/clients/core/definitions.mjs';
 import { runDoctorSuite } from '../../../../lib/doctor/aggregate.mjs';
-import { normalizeComponents } from '../../../../lib/lifecycle/options.mjs';
+import { normalizeComponents } from '../../../../lib/lifecycle/govern/options.mjs';
 import { listWorkflowRecipes } from '../../../../lib/workflows/recipes.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', '..');

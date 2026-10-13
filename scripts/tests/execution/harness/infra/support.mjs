@@ -18,7 +18,7 @@ import {
   readSoloRunStatus,
   requestSoloHarnessStop,
 } from '../../../../lib/harness/solo-journal.mjs';
-import { buildIterationPrompt, runHarnessCommand } from '../../../../lib/lifecycle/harness.mjs';
+import { buildIterationPrompt, runHarnessCommand } from '../../../../lib/lifecycle/run/harness.mjs';
 import {
   buildClientStructuredOutputOptions,
   cleanupClientStructuredOutputTempDir,

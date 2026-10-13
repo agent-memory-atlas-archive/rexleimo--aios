@@ -38,8 +38,9 @@ export const EXEMPT_DIRS = Object.freeze({
 // codemap/ 已拆完（16→7），故不在此列。
 export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib': 55,
-  'scripts/lib/lifecycle': 43,
   'scripts/lib/harness': 37,
+  'scripts/lib/lifecycle/run/harness': 11,
+  'scripts/lib/lifecycle/run/orchestrate': 11,
   'scripts/lib/cli/parse-args': 25,
   'scripts/lib/harness/subagent-runtime': 24,
   'scripts/lib/rl-shell-v1': 22,

@@ -33,7 +33,7 @@ import {
   normalizeSkillScope,
   normalizeTokenProfile,
   normalizeWrapMode,
-} from '../../lifecycle/options.mjs';
+} from '../../lifecycle/govern/options.mjs';
 import { normalizeOrchestratorBlueprint, normalizeOrchestratorFormat } from '../../harness/orchestrator.mjs';
 import {
   ALL_CLIENTS,

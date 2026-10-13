@@ -6,13 +6,13 @@ import test from 'node:test';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { readHudState } from '../../../lib/hud/state.mjs';
-import { runTeamStatus } from '../../../lib/lifecycle/team-ops.mjs';
+import { runTeamStatus } from '../../../lib/lifecycle/fleet/team-ops.mjs';
 import {
   collectWatchdogSignals,
   buildWatchdogReadiness,
   decideWatchdogRecovery,
   runTeamWatchdog,
-} from '../../../lib/lifecycle/watchdog.mjs';
+} from '../../../lib/lifecycle/fleet/watchdog.mjs';
 
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });

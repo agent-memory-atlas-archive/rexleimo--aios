@@ -606,7 +606,7 @@ if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}` || proc
 async function handleOrchestrate(params = {}) {
   const workspace = params.workspace || process.cwd();
   try {
-    const { runOrchestrate } = await import('./lib/lifecycle/orchestrate.mjs');
+    const { runOrchestrate } = await import('./lib/lifecycle/run/orchestrate.mjs');
     const contextTaskId = String(params.context_task || params.contextTaskId || '').trim();
     const contextBudgetUnits = Number(params.context_budget || params.contextBudget || 12_000);
     const runResult = await runOrchestrate({

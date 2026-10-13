@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { buildHindsightEval } from '../../harness/hindsight-eval.mjs';
 import { readSoloControl, readSoloRunSummary } from '../../harness/solo-journal.mjs';
-import { buildTeamWatchdogState } from '../../lifecycle/watchdog.mjs';
+import { buildTeamWatchdogState } from '../../lifecycle/fleet/watchdog.mjs';
 import {
   collectRecentDispatchEvidence,
   collectRecentSkillCandidates,

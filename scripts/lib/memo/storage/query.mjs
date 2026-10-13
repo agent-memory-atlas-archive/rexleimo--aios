@@ -9,7 +9,7 @@ import {
   sortEventsDescending,
 } from './normalizers.mjs';
 import { filterTemporal, normalizeIsoTimestamp } from './temporal.mjs';
-import { readDreamArchivedEventIds } from '../../lifecycle/dream/governance.mjs';
+import { readDreamArchivedEventIds } from '../../lifecycle/evolve/dream/governance.mjs';
 import { applyMemoFeedbackBoost, readMemoFeedbackScores } from './feedback.mjs';
 
 /* CJK and other unspaced scripts have no word boundaries; Intl.Segmenter (the

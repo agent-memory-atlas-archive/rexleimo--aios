@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runDream } from '../../../lib/lifecycle/dream/index.mjs';
+import { runDream } from '../../../lib/lifecycle/evolve/dream/index.mjs';
 import {
   appendMemoEvent,
   setActiveMemoStorage,
@@ -15,7 +15,7 @@ import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
 } from '../../../lib/contextdb/execution-context.mjs';
-import { evaluateContextReconciliation } from '../../../lib/lifecycle/context-reconciliation.mjs';
+import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/context-reconciliation.mjs';
 import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 import {
   readCandidateGovernanceReceipts,
@@ -23,7 +23,7 @@ import {
 import {
   gcDreamProposal,
   readDreamGovernanceReceipts,
-} from '../../../lib/lifecycle/dream/governance.mjs';
+} from '../../../lib/lifecycle/evolve/dream/governance.mjs';
 import { buildStructuredPlanState } from '../../../lib/planning/schema.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');

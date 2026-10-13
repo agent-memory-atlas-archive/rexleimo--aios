@@ -175,16 +175,16 @@ async function main() {
 
     // Import lifecycle modules
     if (action === 'setup') {
-      const { runSetup } = await import('../lifecycle/setup.mjs');
+      const { runSetup } = await import('../lifecycle/setup/setup.mjs');
       await runSetup(options, { rootDir, projectRoot, io });
     } else if (action === 'update') {
-      const { runUpdate } = await import('../lifecycle/update.mjs');
+      const { runUpdate } = await import('../lifecycle/setup/update.mjs');
       await runUpdate(options, { rootDir, projectRoot, io });
     } else if (action === 'uninstall') {
-      const { runUninstall } = await import('../lifecycle/uninstall.mjs');
+      const { runUninstall } = await import('../lifecycle/setup/uninstall.mjs');
       await runUninstall(options, { rootDir, projectRoot, io });
     } else if (action === 'doctor') {
-      const { runDoctor } = await import('../lifecycle/doctor.mjs');
+      const { runDoctor } = await import('../lifecycle/govern/doctor.mjs');
       await runDoctor(options, { rootDir, io });
     } else {
       io.error(`Unknown action: ${action}`);

@@ -7,7 +7,7 @@ import test from 'node:test';
 import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
 import { collectEvents } from '../../../lib/memo/storage/events-read.mjs';
 import { withMemoStorageLock } from '../../../lib/memo/storage/lock.mjs';
-import { createGcSnapshot } from '../../../lib/lifecycle/dream/governance.mjs';
+import { createGcSnapshot } from '../../../lib/lifecycle/evolve/dream/governance.mjs';
 
 async function withRoot(fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'memo-gc-lock-'));

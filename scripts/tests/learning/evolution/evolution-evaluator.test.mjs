@@ -13,8 +13,8 @@ import {
   checkMemoryConflict,
   checkReplay,
   checkHoldout,
-} from '../../../lib/lifecycle/evolution/evaluator.mjs';
-import { readVerdict } from '../../../lib/lifecycle/evolution/verdict.mjs';
+} from '../../../lib/lifecycle/evolve/evolution/evaluator.mjs';
+import { readVerdict } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
 import {
   baselineFixture,
   goodCandidateFixture,

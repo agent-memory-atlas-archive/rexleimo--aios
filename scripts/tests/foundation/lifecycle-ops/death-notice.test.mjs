@@ -11,7 +11,7 @@ import {
   readDeathNotices,
   hasDuplicateNotice,
   VALID_DEATH_REASONS,
-} from '../../../lib/lifecycle/death-notice.mjs';
+} from '../../../lib/lifecycle/evolve/death-notice.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 
 /* ================================================================

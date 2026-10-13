@@ -222,8 +222,8 @@ import {
   autoMemoSessionClose,
   readSessionCloseCandidate,
   sessionCloseCandidatePath,
-} from '../../../lib/lifecycle/session-hooks/close.mjs';
-import { renderActivityTimeline } from '../../../lib/lifecycle/session-hooks/start-timeline.mjs';
+} from '../../../lib/lifecycle/run/session-hooks/close.mjs';
+import { renderActivityTimeline } from '../../../lib/lifecycle/run/session-hooks/start-timeline.mjs';
 import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 

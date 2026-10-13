@@ -6,7 +6,7 @@ import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 
 import { resolveContextDbRoot } from './lib/aios/state-root.mjs';
-import { runTeamStatus } from './lib/lifecycle/team-ops.mjs';
+import { runTeamStatus } from './lib/lifecycle/fleet/team-ops.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

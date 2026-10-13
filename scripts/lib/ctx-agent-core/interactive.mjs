@@ -7,7 +7,7 @@ import { getClientCommandName, resolveClientFromRuntimeId } from '../clients/reg
 import { ROOT_DIR, runCommand } from './common.mjs';
 import { buildCodexMcpDisableArgs } from './routes.mjs';
 import { buildOpenCodeStrictAgentArgs } from '../opencode/strict-primary-agent.mjs';
-import { finalizeSession } from '../lifecycle/session-hooks/finalize.mjs';
+import { finalizeSession } from '../lifecycle/run/session-hooks/finalize.mjs';
 
 function commandForRuntime(agent) {
   const client = resolveClientFromRuntimeId(agent);

@@ -9,7 +9,7 @@ import { startPlan, readActivePlan } from '../../../lib/planning/contract.mjs';
 import { showActivePlan, formatPlanShowText } from '../../../lib/planning/show.mjs';
 import { evaluateSkillComplianceLive } from '../../../lib/skills/compliance-live.mjs';
 import { runSkillComply } from '../../../lib/skills/compliance.mjs';
-import { syncDreamLinesToActivePlan } from '../../../lib/lifecycle/dream/export-to.mjs';
+import { syncDreamLinesToActivePlan } from '../../../lib/lifecycle/evolve/dream/export-to.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

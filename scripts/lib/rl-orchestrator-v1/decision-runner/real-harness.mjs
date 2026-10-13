@@ -1,4 +1,4 @@
-import { runOrchestrate } from '../../lifecycle/orchestrate.mjs';
+import { runOrchestrate } from '../../lifecycle/run/orchestrate.mjs';
 import { compactRlDecisionEvidence } from '../../harness/orchestrator-evidence.mjs';
 import {
   decidePolicyReleaseRoute,

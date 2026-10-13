@@ -126,7 +126,7 @@ describe('automatic memory loop end-to-end', () => {
       writeFileSync(path.join(sessionDir, 'continuity.json'), JSON.stringify({ summary: 'Explored retry behavior under load; awaiting verification.' }));
       // finalizeSession must still produce the governed session-close candidate
       // (review/promotion required) WITHOUT a parallel agent-private auto memo.
-      const { finalizeSession } = await import('../../../lib/lifecycle/session-hooks/finalize.mjs');
+      const { finalizeSession } = await import('../../../lib/lifecycle/run/session-hooks/finalize.mjs');
       const candidate = await finalizeSession({
         rootDir: tmp,
         sessionId: 'e2e-automem-interactive',

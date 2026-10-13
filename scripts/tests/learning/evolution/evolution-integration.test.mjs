@@ -10,10 +10,10 @@ import {
   promoteSessionCandidate,
   syncPromotionGovernance,
   getUnifiedCandidateView,
-} from '../../../lib/lifecycle/evolution/integration.mjs';
-import { readPromotion, listPromotions } from '../../../lib/lifecycle/evolution/promotion.mjs';
-import { readVerdict, listVerdicts } from '../../../lib/lifecycle/evolution/verdict.mjs';
-import { autoMemoSessionClose } from '../../../lib/lifecycle/session-hooks/close.mjs';
+} from '../../../lib/lifecycle/evolve/evolution/integration.mjs';
+import { readPromotion, listPromotions } from '../../../lib/lifecycle/evolve/evolution/promotion.mjs';
+import { readVerdict, listVerdicts } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
+import { autoMemoSessionClose } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 
 async function withWorkspace(prefix, fn) {

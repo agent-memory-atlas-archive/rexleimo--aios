@@ -8,8 +8,8 @@ import test from 'node:test';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { getCodemapHelpText, getCommandHelpText } from '../../../lib/cli/help.mjs';
-import { runReleaseStatus } from '../../../lib/lifecycle/release-status.mjs';
-import { runSnapshotRollback } from '../../../lib/lifecycle/snapshot-rollback.mjs';
+import { runReleaseStatus } from '../../../lib/lifecycle/release/release-status.mjs';
+import { runSnapshotRollback } from '../../../lib/lifecycle/setup/snapshot-rollback.mjs';
 
 test('parseArgs returns interactive mode when no args are provided', () => {
   const result = parseArgs([]);

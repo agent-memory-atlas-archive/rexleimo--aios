@@ -20,7 +20,7 @@ export async function maybeRecordWorkerDeathNotice({
       writeDeathNotice,
       readDeathNotices,
       hasDuplicateNotice,
-    } = await import('../../lifecycle/death-notice.mjs');
+    } = await import('../../lifecycle/evolve/death-notice.mjs');
 
     const reasonText = String(failureReason || '');
     const reason = /timed out/i.test(reasonText)

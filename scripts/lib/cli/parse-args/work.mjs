@@ -2,7 +2,7 @@
 // 中文注释：work 无子命令，只有选项 + 位置任务标题；解析后直接归一化，让 CLI 与运行入口共享同一契约。
 
 import { Command } from 'commander';
-import { normalizeWorkOptions } from '../../lifecycle/work/options.mjs';
+import { normalizeWorkOptions } from '../../lifecycle/run/work/options.mjs';
 import { parsePositiveInteger } from './shared.mjs';
 
 const WORK_CLI = new Command()

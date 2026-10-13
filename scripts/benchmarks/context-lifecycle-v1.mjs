@@ -7,9 +7,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { resolveContextDbRoot } from '../lib/aios/state-root.mjs';
-import { autoMemoSessionClose } from '../lib/lifecycle/session-hooks/close.mjs';
-import { runDream } from '../lib/lifecycle/dream/index.mjs';
-import { runReadinessCheck } from '../lib/lifecycle/preflight-contracts.mjs';
+import { autoMemoSessionClose } from '../lib/lifecycle/run/session-hooks/close.mjs';
+import { runDream } from '../lib/lifecycle/evolve/dream/index.mjs';
+import { runReadinessCheck } from '../lib/lifecycle/govern/preflight-contracts.mjs';
 import { appendMemoEvent } from '../lib/memo/storage/events-write.mjs';
 import { listMemoEvents } from '../lib/memo/storage/query.mjs';
 import { buildStructuredPlanState } from '../lib/planning/schema.mjs';
@@ -622,7 +622,7 @@ async function cl07() {
     let moduleError = '';
     try {
       const { buildExecutionContextPacket } = await import('../lib/contextdb/execution-context.mjs');
-      const { evaluateContextReconciliation } = await import('../lib/lifecycle/context-reconciliation.mjs');
+      const { evaluateContextReconciliation } = await import('../lib/lifecycle/evolve/context-reconciliation.mjs');
       const observed = await buildExecutionContextPacket({
         rootDir: workspaceRoot,
         plan,

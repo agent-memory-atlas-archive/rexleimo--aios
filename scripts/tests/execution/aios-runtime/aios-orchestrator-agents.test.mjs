@@ -184,7 +184,7 @@ test('agents smoke --dry-run covers every canonical role without writing evidenc
   await copyCanonicalSource(rootDir);
 
   const { parseArgs } = await import('../../../lib/cli/parse-args.mjs');
-  const { runAgentsCommand } = await import('../../../lib/lifecycle/agents.mjs');
+  const { runAgentsCommand } = await import('../../../lib/lifecycle/fleet/agents.mjs');
   const parsed = parseArgs(['agents', 'smoke', '--dry-run', '--json']);
   assert.equal(parsed.options.subcommand, 'smoke');
   assert.equal(parsed.options.dryRun, true);
@@ -211,7 +211,7 @@ test('agents smoke requires explicit live execution before it can record promoti
   await copyCanonicalSource(rootDir);
 
   const { parseArgs } = await import('../../../lib/cli/parse-args.mjs');
-  const { runAgentsCommand } = await import('../../../lib/lifecycle/agents.mjs');
+  const { runAgentsCommand } = await import('../../../lib/lifecycle/fleet/agents.mjs');
   const parsed = parseArgs(['agents', 'smoke', '--json']);
   assert.equal(parsed.options.subcommand, 'smoke');
   assert.equal(parsed.options.dryRun, false);

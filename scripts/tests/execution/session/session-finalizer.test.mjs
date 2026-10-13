@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { finalizeSession, resetFinalizeRegistry } from '../../../lib/lifecycle/session-hooks/finalize.mjs';
-import { readSessionCloseCandidate } from '../../../lib/lifecycle/session-hooks/close.mjs';
+import { finalizeSession, resetFinalizeRegistry } from '../../../lib/lifecycle/run/session-hooks/finalize.mjs';
+import { readSessionCloseCandidate } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';
 import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 

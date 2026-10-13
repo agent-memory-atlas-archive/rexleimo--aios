@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runDream } from '../../../lib/lifecycle/dream/index.mjs';
+import { runDream } from '../../../lib/lifecycle/evolve/dream/index.mjs';
 import {
   approveDreamProposal,
   archiveDreamProposal,
@@ -16,7 +16,7 @@ import {
   readDreamGovernanceReceipts,
   rejectDreamProposal,
   restoreDreamProposal,
-} from '../../../lib/lifecycle/dream/governance.mjs';
+} from '../../../lib/lifecycle/evolve/dream/governance.mjs';
 import { appendMemoEvent, listMemoEvents, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');

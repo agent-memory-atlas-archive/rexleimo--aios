@@ -25,13 +25,13 @@ import test from 'node:test';
 
 import { atomicTempPath, writeFileAtomic } from '../../../lib/fs/atomic-write.mjs';
 import { sanitizeFileSegment } from '../../../lib/fs/file-segment.mjs';
-import { createVerdict, readVerdict, writeVerdict } from '../../../lib/lifecycle/evolution/verdict.mjs';
+import { createVerdict, readVerdict, writeVerdict } from '../../../lib/lifecycle/evolve/evolution/verdict.mjs';
 import {
   createPromotion,
   listPromotions,
   readPromotion,
   writePromotion,
-} from '../../../lib/lifecycle/evolution/promotion.mjs';
+} from '../../../lib/lifecycle/evolve/evolution/promotion.mjs';
 
 const ILLEGAL = /[<>:"/\\|?*\u0000-\u001f]/;
 

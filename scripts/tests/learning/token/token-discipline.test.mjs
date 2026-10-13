@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { runDoctorSuite } from '../../../lib/doctor/aggregate.mjs';
-import { planSetup } from '../../../lib/lifecycle/setup.mjs';
-import { planUpdate } from '../../../lib/lifecycle/update.mjs';
+import { planSetup } from '../../../lib/lifecycle/setup/setup.mjs';
+import { planUpdate } from '../../../lib/lifecycle/setup/update.mjs';
 import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
 import {
   inspectTokenDiscipline,

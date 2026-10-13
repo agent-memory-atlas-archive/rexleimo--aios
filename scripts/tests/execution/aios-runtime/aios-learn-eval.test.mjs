@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { buildLearnEvalReport, renderLearnEvalReport } from '../../../lib/harness/learn-eval.mjs';
-import { planLearnEval, runLearnEval } from '../../../lib/lifecycle/learn-eval.mjs';
+import { planLearnEval, runLearnEval } from '../../../lib/lifecycle/evolve/learn-eval.mjs';
 
 async function makeRootDir() {
   return await fs.mkdtemp(path.join(os.tmpdir(), 'aios-learn-eval-'));

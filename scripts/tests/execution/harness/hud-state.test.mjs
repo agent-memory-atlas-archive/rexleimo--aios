@@ -11,8 +11,8 @@ import { initSoloRunJournal, writeSoloControl } from '../../../lib/harness/solo-
 import { readHudDispatchSummary, readHudState, selectHudSessionId } from '../../../lib/hud/state.mjs';
 import { renderHud } from '../../../lib/hud/render.mjs';
 import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/hud/watch.mjs';
-import { runHud } from '../../../lib/lifecycle/hud.mjs';
-import { runOrchestrate } from '../../../lib/lifecycle/orchestrate.mjs';
+import { runHud } from '../../../lib/lifecycle/fleet/hud.mjs';
+import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 import {
   createStatusWatchStallTracker,
   resolveStatusSkillCandidateOptions,
@@ -20,7 +20,7 @@ import {
   runTeamSkillCandidatesList,
   runTeamSkillCandidatesExport,
   runTeamStatus,
-} from '../../../lib/lifecycle/team-ops.mjs';
+} from '../../../lib/lifecycle/fleet/team-ops.mjs';
 
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });

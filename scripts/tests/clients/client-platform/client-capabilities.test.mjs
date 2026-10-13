@@ -8,7 +8,7 @@ import test from 'node:test';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { ALL_CLIENTS, CLIENT_DEFINITIONS } from '../../../lib/clients/core/definitions.mjs';
 import { buildClientCapabilityReport } from '../../../lib/clients/capability-report.mjs';
-import { runClientsCommand } from '../../../lib/lifecycle/clients.mjs';
+import { runClientsCommand } from '../../../lib/lifecycle/fleet/clients.mjs';
 
 const CLI = 'scripts/aios.mjs';
 

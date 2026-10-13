@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { buildOpenCodeConfig, resolveOpenCodeMaxSteps } from '../../../lib/opencode/config.mjs';
 import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
-import { runClientsCommand } from '../../../lib/lifecycle/clients.mjs';
+import { runClientsCommand } from '../../../lib/lifecycle/fleet/clients.mjs';
 import { evaluateSkillComplianceDryRun } from '../../../lib/skills/compliance.mjs';
 import { buildSkillHealthReport, recordSkillObservation } from '../../../lib/skills/health.mjs';
 import { recordSessionChangedFile, readSessionChangedFiles } from '../../../lib/session/changed-files.mjs';

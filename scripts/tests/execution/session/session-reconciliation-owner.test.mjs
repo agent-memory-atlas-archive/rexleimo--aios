@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { reconcileUnclosedSessions } from '../../../lib/lifecycle/session-hooks/reconcile.mjs';
+import { reconcileUnclosedSessions } from '../../../lib/lifecycle/run/session-hooks/reconcile.mjs';
 import { claimSessionOwner } from '../../../lib/harness/solo-journal/owner.mjs';
 import { getSoloHarnessPaths } from '../../../lib/harness/solo-journal/paths.mjs';
 import { resolveContextDbRoot } from '../../../lib/aios/state-root.mjs';

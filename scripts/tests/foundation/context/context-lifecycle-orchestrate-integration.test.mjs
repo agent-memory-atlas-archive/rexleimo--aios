@@ -7,7 +7,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { createDispatchRuntimeRegistry } from '../../../lib/harness/orchestrator-runtimes.mjs';
-import { runOrchestrate } from '../../../lib/lifecycle/orchestrate.mjs';
+import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 import { startPlan } from '../../../lib/planning/contract.mjs';
 import {
   captureSessionWorkspaceSnapshot,
