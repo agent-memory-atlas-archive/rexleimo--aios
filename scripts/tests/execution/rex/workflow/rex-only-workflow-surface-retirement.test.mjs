@@ -45,7 +45,7 @@ test('AIOS exposes only the Rex workflow surface', async () => {
   }
 
   const uiFiles = [
-    'scripts/lib/tui-ink/types.ts',
+    'scripts/lib/tui-ink/views/types.ts',
     'scripts/lib/tui-ink/hooks/useSetupOptions.ts',
     'scripts/lib/tui-ink/screens/SetupScreen.tsx',
     'scripts/lib/tui-ink/screens/UpdateScreen.tsx',

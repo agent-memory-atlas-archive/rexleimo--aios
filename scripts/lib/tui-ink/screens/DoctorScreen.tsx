@@ -7,7 +7,7 @@ import { Box, Text, useInput } from 'ink';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Checkbox } from '../components/Checkbox';
-import type { DoctorOptions } from '../types';
+import type { DoctorOptions } from '../views/types';
 
 interface DoctorScreenProps {
   rootDir: string;

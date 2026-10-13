@@ -7,8 +7,8 @@ import { Box, Text, useInput } from 'ink';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Checkbox } from '../components/Checkbox';
-import { getNativePreview } from '../native-preview';
-import type { UninstallOptions, ComponentsConfig } from '../types';
+import { getNativePreview } from '../views/native-preview';
+import type { UninstallOptions, ComponentsConfig } from '../views/types';
 
 interface UninstallScreenProps {
   rootDir: string;

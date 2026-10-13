@@ -36,7 +36,7 @@ export function applyResultExitCode(result) {
 
 /** TUI 是交互入口；非 TTY 下直接降级为 help，避免自动化环境挂起 */
 function runInteractiveTui({ rootDir, projectRoot, stderr = process.stderr }) {
-  const cliPath = path.join(rootDir, 'scripts/lib/tui-ink/cli.tsx');
+  const cliPath = path.join(rootDir, 'scripts/lib/tui-ink/app/cli.tsx');
   const tsxCliPath = path.join(rootDir, 'node_modules', 'tsx', 'dist', 'cli.mjs');
 
   if (!existsSync(tsxCliPath)) {

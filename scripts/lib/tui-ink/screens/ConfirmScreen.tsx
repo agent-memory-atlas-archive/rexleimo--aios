@@ -6,8 +6,8 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Box, Text, useInput } from 'ink';
 import { ConfirmInput } from '@inkjs/ui';
 import { Header } from '../components/Header';
-import { getNativePreview } from '../native-preview';
-import type { Action, AllOptions, Client } from '../types';
+import { getNativePreview } from '../views/native-preview';
+import type { Action, AllOptions, Client } from '../views/types';
 
 interface ConfirmScreenProps {
   rootDir: string;

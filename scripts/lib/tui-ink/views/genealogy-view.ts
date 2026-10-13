@@ -2,7 +2,7 @@ import type {
   MemoryGenealogyGraph,
   MemoryGenealogyNode,
   MemoryGenealogyRisk,
-} from '../../../mcp-server/src/contextdb/genealogy.ts';
+} from '../../../../mcp-server/src/contextdb/genealogy.ts';
 
 export interface GenealogyRow {
   id: string;

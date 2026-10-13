@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Box, Text } from 'ink';
 import { Header } from '../components/Header';
 import { ScrollableSelect } from '../components/ScrollableSelect';
-import type { CatalogSkill, Client, Scope, InstalledSkills, Action } from '../types';
+import type { CatalogSkill, Client, Scope, InstalledSkills, Action } from '../views/types';
 
 interface SkillPickerScreenProps {
   rootDir: string;

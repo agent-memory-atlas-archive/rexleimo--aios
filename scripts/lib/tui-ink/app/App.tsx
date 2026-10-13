@@ -3,17 +3,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { MemoryRouter, Routes, Route, useNavigate } from 'react-router';
 import { Box, Text, useApp, useInput } from 'ink';
-import { MainScreen } from './screens/MainScreen';
-import { SetupScreen } from './screens/SetupScreen';
-import { UpdateScreen } from './screens/UpdateScreen';
-import { UninstallScreen } from './screens/UninstallScreen';
-import { DoctorScreen } from './screens/DoctorScreen';
-import { HudScreen } from './screens/HudScreen';
-import { MemoryGenealogyScreen } from './screens/MemoryGenealogyScreen';
-import { SkillPickerScreen } from './screens/SkillPickerScreen';
-import { ConfirmScreen } from './screens/ConfirmScreen';
-import { useSetupOptions } from './hooks/useSetupOptions';
-import type { TuiSessionProps, Action, Client, Scope, ComponentsConfig } from './types';
+import { MainScreen } from '../screens/MainScreen';
+import { SetupScreen } from '../screens/SetupScreen';
+import { UpdateScreen } from '../screens/UpdateScreen';
+import { UninstallScreen } from '../screens/UninstallScreen';
+import { DoctorScreen } from '../screens/DoctorScreen';
+import { HudScreen } from '../screens/HudScreen';
+import { MemoryGenealogyScreen } from '../screens/MemoryGenealogyScreen';
+import { SkillPickerScreen } from '../screens/SkillPickerScreen';
+import { ConfirmScreen } from '../screens/ConfirmScreen';
+import { useSetupOptions } from '../hooks/useSetupOptions';
+import type { TuiSessionProps, Action, Client, Scope, ComponentsConfig } from '../views/types';
 
 function AppContent({
   rootDir,

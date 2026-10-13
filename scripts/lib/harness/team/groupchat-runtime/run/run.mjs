@@ -1,17 +1,17 @@
-import { normalizeOrchestratorAgentSpec } from '../orchestrator-agents.mjs';
-import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../interception/index.mjs';
-import { resolveModelRoutingForRole } from '../../../model-router.mjs';
-import agentSpec from '../../../specs/orchestrator-agents.json' with { type: 'json' };
+import { normalizeOrchestratorAgentSpec } from '../../orchestrator-agents.mjs';
+import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../../interception/index.mjs';
+import { resolveModelRoutingForRole } from '../../../../model-router.mjs';
+import agentSpec from '../../../../specs/orchestrator-agents.json' with { type: 'json' };
 
-import { redactExecutionContextText } from '../../ops/runtime-context-redaction.mjs';
+import { redactExecutionContextText } from '../../../ops/runtime-context-redaction.mjs';
 import { resolveBlueprintRounds } from './blueprint-rounds.mjs';
-import { normalizeGroupChatConfig } from './config.mjs';
+import { normalizeGroupChatConfig } from '../support/config.mjs';
 import { executeRound } from './execution.mjs';
-import { ConversationHistory } from './history.mjs';
-import { buildConversationPrompt, buildRolePrompt, buildSystemPromptForSpeaker } from './prompts.mjs';
-import { selectNextRoundSpeakers } from './speakers.mjs';
-import { checkTermination } from './termination.mjs';
-import { normalizeText } from './shared.mjs';
+import { ConversationHistory } from '../dialogue/history.mjs';
+import { buildConversationPrompt, buildRolePrompt, buildSystemPromptForSpeaker } from '../dialogue/prompts.mjs';
+import { selectNextRoundSpeakers } from '../dialogue/speakers.mjs';
+import { checkTermination } from '../dialogue/termination.mjs';
+import { normalizeText } from '../support/shared.mjs';
 
 function resolveAgentId(role) {
   const normalized = normalizeText(role).toLowerCase();

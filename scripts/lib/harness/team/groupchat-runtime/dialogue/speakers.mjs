@@ -1,5 +1,5 @@
-import { BLOCKED_STATUSES, RE_PLAN_ROLES } from './constants.mjs';
-import { normalizeText } from './shared.mjs';
+import { BLOCKED_STATUSES, RE_PLAN_ROLES } from '../support/constants.mjs';
+import { normalizeText } from '../support/shared.mjs';
 
 function shouldReplan(history, blueprintRounds) {
   if (history.length === 0) return false;

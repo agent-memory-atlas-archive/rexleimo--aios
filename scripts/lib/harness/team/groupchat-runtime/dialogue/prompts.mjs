@@ -1,6 +1,6 @@
-import { buildPersonaOverlay } from '../../../memo/care/persona.mjs';
-import { buildModelRouterPromptSection } from '../../../model-router.mjs';
-import { normalizeText } from './shared.mjs';
+import { buildPersonaOverlay } from '../../../../memo/care/persona.mjs';
+import { buildModelRouterPromptSection } from '../../../../model-router.mjs';
+import { normalizeText } from '../support/shared.mjs';
 
 function deliveredExecutionContext(executionContext) {
   return String(executionContext?.text || '').trim();

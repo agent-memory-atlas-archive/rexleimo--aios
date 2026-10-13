@@ -54,21 +54,21 @@ test('screens can be imported', async () => {
 });
 
 test('native preview helper can be imported', async () => {
-  const preview = await import('../native-preview.ts');
+  const preview = await import('../views/native-preview.ts');
   assert.ok(preview.getNativePreview, 'getNativePreview should be exported');
   assert.equal(typeof preview.getNativePreview, 'function', 'getNativePreview should be a function');
 });
 
 test('genealogy view formatter can be imported', async () => {
-  const view = await import('../genealogy-view.ts');
+  const view = await import('../views/genealogy-view.ts');
   assert.ok(view.formatGenealogyRows, 'formatGenealogyRows should be exported');
   assert.ok(view.formatNodeDetails, 'formatNodeDetails should be exported');
   assert.ok(view.formatRiskSummary, 'formatRiskSummary should be exported');
 });
 
 test('App and runInteractiveSession can be imported', async () => {
-  const app = await import('../App.tsx');
-  const index = await import('../index.tsx');
+  const app = await import('../app/App.tsx');
+  const index = await import('../app/index.tsx');
 
   assert.ok(app.App, 'App component should be exported');
   assert.ok(index.runInteractiveSession, 'runInteractiveSession should be exported');
@@ -80,7 +80,7 @@ test('genealogy view formatter creates readable hierarchy rows and details', asy
     formatGenealogyRows,
     formatNodeDetails,
     formatRiskSummary,
-  } = await import('../genealogy-view.ts');
+  } = await import('../views/genealogy-view.ts');
 
   const graph: MemoryGenealogyGraph = {
     schemaVersion: 1,
@@ -187,7 +187,7 @@ test('genealogy view formatter handles malformed partial graph inputs', async ()
     formatGenealogyRows,
     formatNodeDetails,
     formatRiskSummary,
-  } = await import('../genealogy-view.ts');
+  } = await import('../views/genealogy-view.ts');
 
   const graph = {
     schemaVersion: 1,

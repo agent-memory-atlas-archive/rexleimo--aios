@@ -1,4 +1,4 @@
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
 
 function createFailureHandoff({ role, speaker, message }) {
   return normalizeHandoffPayload({

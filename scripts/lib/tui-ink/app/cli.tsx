@@ -1,11 +1,12 @@
-// scripts/lib/tui-ink/index.tsx
-
-import { render } from 'ink';
-import fs from 'node:fs';
+#!/usr/bin/env npx tsx
+// This file is the entry point for the TUI, run via tsx for TypeScript support
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import React from 'react';
-import { App } from './App';
-import type { CatalogSkill, InstalledSkills, Client } from './types';
+import { render } from 'ink';
+import { App } from '../App';
+import type { CatalogSkill, InstalledSkills, Client } from '../views/types';
 
 // ASCII art banner
 const REX_CLI_BANNER = `
@@ -27,12 +28,21 @@ function printBanner(): void {
   console.log('\x1b[36m' + REX_CLI_BANNER + '\x1b[0m'); // cyan color
 }
 
-// Import from existing modules
-// Note: These paths work because tui-ink is under scripts/lib/
-// and platform/paths.mjs is at scripts/lib/platform/paths.mjs
+function canUseInteractiveTui(): boolean {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY && typeof process.stdin.setRawMode === 'function');
+}
+
+function printNonInteractiveTuiHelp(): void {
+  console.error('[err] AIOS TUI requires an interactive terminal with raw keyboard input.');
+  console.error('[hint] Open Windows Terminal or PowerShell directly, then run: aios');
+  console.error('[hint] Non-interactive alternatives: aios doctor, aios setup, aios update');
+}
+
+const rootDir = process.env.AIOS_ROOT_DIR || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const projectRoot = process.env.AIOS_PROJECT_ROOT || process.cwd();
 
 async function loadSkillsCatalog(rootDir: string): Promise<CatalogSkill[]> {
-  const { scanSkillsSources } = await import('../skills/source-tree.mjs');
+  const { scanSkillsSources } = await import('../../skills/source-tree.mjs');
   const skills = scanSkillsSources(rootDir);
   return skills
     .filter((entry) => entry.installCatalogName !== null)
@@ -62,7 +72,7 @@ function getClientHomes(): Record<Client, string> {
     claude: path.join(home, '.claude'),
     gemini: path.join(home, '.gemini'),
     opencode: path.join(home, '.opencode'),
-    all: home, // Not used for 'all'
+    all: home,
   };
 }
 
@@ -71,7 +81,7 @@ function getClientProjectSkillDir(projectRoot: string, client: Client): string {
   return path.join(projectRoot, `.${client}/skills`);
 }
 
-function collectInstalledSkills(
+export function collectInstalledSkills(
   rootDir: string,
   projectRoot: string,
   catalogSkills: CatalogSkill[]
@@ -101,17 +111,13 @@ function collectInstalledSkills(
   return installedSkills;
 }
 
-export interface RunInteractiveSessionOptions {
-  rootDir: string;
-  onRun: (action: string, options: unknown) => Promise<void>;
-}
-
 export async function runInteractiveSession({
   rootDir,
   onRun,
-}: RunInteractiveSessionOptions): Promise<void> {
-  printBanner();
-
+}: {
+  rootDir: string;
+  onRun: (action: string, options: unknown, hooks?: { onLog?: (line: string) => void }) => Promise<void>;
+}): Promise<void> {
   const catalogSkills = await loadSkillsCatalog(rootDir);
   const cwd = process.cwd();
 
@@ -124,7 +130,7 @@ export async function runInteractiveSession({
     options: unknown,
     hooks?: { onLog?: (line: string) => void }
   ) => {
-    await onRun(action, options);
+    await onRun(action, options, hooks);
   };
 
   const { waitUntilExit } = render(
@@ -139,3 +145,56 @@ export async function runInteractiveSession({
 
   await waitUntilExit();
 }
+
+// Main entry point when run directly
+async function main() {
+  if (!canUseInteractiveTui()) {
+    printNonInteractiveTuiHelp();
+    process.exitCode = 1;
+    return;
+  }
+
+  // Print welcome banner first
+  printBanner();
+
+  const onRun = async (
+    action: string,
+    options: unknown,
+    hooks?: { onLog?: (line: string) => void }
+  ) => {
+    const emit = (prefix: string, args: unknown[]) => {
+      const text = args.map((item) => String(item ?? '')).join(' ').trim();
+      if (!text) return;
+      hooks?.onLog?.(prefix ? `${prefix}${text}` : text);
+    };
+    const io = {
+      log: (...args: unknown[]) => emit('', args),
+      warn: (...args: unknown[]) => emit('[warn] ', args),
+      error: (...args: unknown[]) => emit('[err] ', args),
+    };
+
+    // Import lifecycle modules
+    if (action === 'setup') {
+      const { runSetup } = await import('../../lifecycle/setup/setup.mjs');
+      await runSetup(options, { rootDir, projectRoot, io });
+    } else if (action === 'update') {
+      const { runUpdate } = await import('../../lifecycle/setup/update.mjs');
+      await runUpdate(options, { rootDir, projectRoot, io });
+    } else if (action === 'uninstall') {
+      const { runUninstall } = await import('../../lifecycle/setup/uninstall.mjs');
+      await runUninstall(options, { rootDir, projectRoot, io });
+    } else if (action === 'doctor') {
+      const { runDoctor } = await import('../../lifecycle/govern/doctor.mjs');
+      await runDoctor(options, { rootDir, io });
+    } else {
+      io.error(`Unknown action: ${action}`);
+    }
+  };
+
+  await runInteractiveSession({ rootDir, onRun });
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

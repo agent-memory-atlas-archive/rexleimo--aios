@@ -1,4 +1,4 @@
-import { getOrchestratorBlueprint, ORCHESTRATOR_BLUEPRINT_NAMES } from '../../orchestration/orchestrator.mjs';
+import { getOrchestratorBlueprint, ORCHESTRATOR_BLUEPRINT_NAMES } from '../../../orchestration/orchestrator.mjs';
 
 export function resolveBlueprintRounds(blueprintName = 'feature') {
   const name = ORCHESTRATOR_BLUEPRINT_NAMES.includes(blueprintName) ? blueprintName : 'feature';

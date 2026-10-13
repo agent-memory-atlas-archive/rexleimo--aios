@@ -1,6 +1,6 @@
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
-import { normalizeModelRouting } from '../../../model-router.mjs';
-import { normalizeText } from './shared.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
+import { normalizeModelRouting } from '../../../../model-router.mjs';
+import { normalizeText } from '../support/shared.mjs';
 
 export class ConversationHistory {
   constructor() {

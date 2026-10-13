@@ -9,7 +9,7 @@ import type {
   Scope,
   WrapMode,
   ComponentsConfig,
-} from '../types';
+} from '../views/types';
 
 const MODE_OPTIONS: WrapMode[] = ['all', 'repo-only', 'opt-in', 'off'];
 const CLIENT_OPTIONS: Client[] = ['all', 'codex', 'claude', 'gemini', 'opencode'];

@@ -7,8 +7,8 @@ import { Box, Text, useInput } from 'ink';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Checkbox } from '../components/Checkbox';
-import { getNativePreview } from '../native-preview';
-import type { UpdateOptions, ComponentsConfig } from '../types';
+import { getNativePreview } from '../views/native-preview';
+import type { UpdateOptions, ComponentsConfig } from '../views/types';
 
 interface UpdateScreenProps {
   rootDir: string;

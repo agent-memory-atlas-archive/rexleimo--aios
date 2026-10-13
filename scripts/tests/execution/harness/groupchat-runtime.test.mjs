@@ -766,14 +766,14 @@ test('runGroupChat compresses large pre-send prompts and post-receive raw output
       return {
         exitCode: 0,
         handoff: makeHandoff({ fromRole: args.role, toRole: 'done', findings: ['done'] }),
-        rawOutput: `${POST_SENTINEL.repeat(120)}\nERROR issue at scripts/lib/harness/team/groupchat-runtime/run.mjs:25`,
+        rawOutput: `${POST_SENTINEL.repeat(120)}\nERROR issue at scripts/lib/harness/team/groupchat-runtime/run/run.mjs:25`,
         elapsedMs: 1,
       };
     };
 
     const result = await runGroupChat({
       taskTitle: 'Compress groupchat turn',
-      contextSummary: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/harness/team/groupchat-runtime/run.mjs:25`,
+      contextSummary: `${PRE_SENTINEL.repeat(120)}\nscripts/lib/harness/team/groupchat-runtime/run/run.mjs:25`,
       blueprint: 'bugfix',
       spawnFn,
       rootDir,

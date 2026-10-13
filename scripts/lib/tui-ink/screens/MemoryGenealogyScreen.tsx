@@ -12,7 +12,7 @@ import {
   formatNodeDetails,
   formatRiskSummary,
   type GenealogyRow,
-} from '../genealogy-view';
+} from '../views/genealogy-view';
 import { buildMemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/genealogy.ts';
 import type { MemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/genealogy.ts';
 

@@ -18,8 +18,8 @@ export const LOG_AUDIT_EXCLUDE_GLOBS = [
   '!scripts/materialize-release-local-outputs.mjs',
   '!scripts/perf-orchestrate-learn-eval-smoke.mjs',
   '!scripts/perf-team-status-watch-smoke.mjs',
-  '!scripts/lib/tui-ink/cli.tsx',
-  '!scripts/lib/tui-ink/index.tsx',
+  '!scripts/lib/tui-ink/app/cli.tsx',
+  '!scripts/lib/tui-ink/app/index.tsx',
 ];
 
 export const QUALITY_FAILURE_CATEGORY_BY_LABEL = {

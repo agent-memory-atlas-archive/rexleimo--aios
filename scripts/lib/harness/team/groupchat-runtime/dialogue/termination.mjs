@@ -1,4 +1,4 @@
-import { BLOCKED_STATUSES } from './constants.mjs';
+import { BLOCKED_STATUSES } from '../support/constants.mjs';
 
 export function checkTermination({ history, currentRound, maxRounds, blueprintRounds }) {
   if (currentRound > maxRounds) {

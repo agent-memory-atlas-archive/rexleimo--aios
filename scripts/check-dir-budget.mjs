@@ -39,7 +39,6 @@ export const EXEMPT_DIRS = Object.freeze({
 export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib': 55,
   'scripts/lib/harness/team/subagent-runtime': 24,
-  'scripts/lib/harness/team/groupchat-runtime': 10,
   'scripts/lib/harness/subagent-runtime': 24,
   'agent-sources/roles': 19,
   'scripts/tests/harness-runtime': 17,
@@ -51,7 +50,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'mcp-server': 11,
   'scripts/lib/lifecycle/harness': 11,
   'scripts/lib/lifecycle/orchestrate': 11,
-  'scripts/lib/tui-ink': 11,
   'client-sources/native-base/shared/partials': 10,
   'config': 10,
   'mcp-server/src/browser': 10,

@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const tsxCliPath = path.join(rootDir, 'node_modules', 'tsx', 'dist', 'cli.mjs');
 const tuiPath = path.join(rootDir, 'scripts/lib/tui-ink/cli.tsx');
 
