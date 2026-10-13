@@ -1,10 +1,10 @@
 import path from 'node:path';
 
-import { contextDbRelativePath } from '../../../aios/state-root.mjs';
-import { buildDispatchProgress } from '../dispatch-progress.mjs';
-import { normalizeDispatchInsightsArtifact } from '../dispatch-insights.mjs';
-import { safeReadJson } from '../io.mjs';
-import { clipText, normalizeText, toPosixPath } from '../shared.mjs';
+import { contextDbRelativePath } from '../../../../aios/state-root.mjs';
+import { buildDispatchProgress } from '../../dispatch/dispatch-progress.mjs';
+import { normalizeDispatchInsightsArtifact } from '../../dispatch/dispatch-insights.mjs';
+import { safeReadJson } from '../../sessions/io.mjs';
+import { clipText, normalizeText, toPosixPath } from '../../sessions/shared.mjs';
 import { loadDispatchIndex } from './cache.mjs';
 
 function buildInvalidDispatchArtifact(rootDir, absPath) {

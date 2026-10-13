@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { getCommandSpawnSpec } from '../../platform/process.mjs';
+import { getCommandSpawnSpec } from '../../../platform/process.mjs';
 
 export function spawnInherited(command, args, cwd, env) {
   const spec = getCommandSpawnSpec(command, args, { env });

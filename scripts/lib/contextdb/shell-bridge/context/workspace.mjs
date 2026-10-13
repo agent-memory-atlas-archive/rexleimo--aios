@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { AIOS_MARKERS, BLOCKED_SUBCOMMANDS } from './constants.mjs';
-import { normalizeForCompare, parseBoolEnv } from './shared.mjs';
+import { AIOS_MARKERS, BLOCKED_SUBCOMMANDS } from '../runtime/constants.mjs';
+import { normalizeForCompare, parseBoolEnv } from '../entry/shared.mjs';
 
 export function runGit(cwd, args) {
   return spawnSync('git', ['-C', cwd, ...args], {

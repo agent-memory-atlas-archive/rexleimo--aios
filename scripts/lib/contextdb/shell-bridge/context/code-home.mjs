@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { expandHome } from './shared.mjs';
+import { expandHome } from '../entry/shared.mjs';
 
 const CLIENT_HOME_ENV_VARS = Object.freeze([
   Object.freeze({ env: 'CODEX_HOME', label: 'codex' }),

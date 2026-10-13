@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { resolveContextDbRoot } from '../../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 import { readDirMtimeMs, safeReadJsonCached } from './io.mjs';
 import {
   bumpLruCache,

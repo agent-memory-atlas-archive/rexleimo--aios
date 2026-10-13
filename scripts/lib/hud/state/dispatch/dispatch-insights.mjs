@@ -1,4 +1,4 @@
-import { normalizeText } from './shared.mjs';
+import { normalizeText } from '../sessions/shared.mjs';
 
 function normalizeDispatchInsightStatus(value = '') {
   const status = normalizeText(value).toLowerCase();

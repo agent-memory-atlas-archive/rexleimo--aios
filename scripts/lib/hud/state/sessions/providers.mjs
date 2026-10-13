@@ -2,7 +2,7 @@ import {
   ALL_CLIENTS,
   getClientRuntimeId,
   resolveClientTeamProviders,
-} from '../../clients/registry.mjs';
+} from '../../../clients/registry.mjs';
 import { normalizeText } from './shared.mjs';
 
 export const HUD_PROVIDER_AGENT_MAP = Object.freeze(Object.fromEntries(

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { main } from './lib/contextdb/shell-bridge/main.mjs';
+import { main } from './lib/contextdb/shell-bridge/entry/main.mjs';
 
 main().catch((err) => {
   console.error(`[contextdb-shell-bridge] fatal: ${err.message}`);

@@ -1,13 +1,13 @@
 import path from 'node:path';
 
-import { safeReadJsonCached } from '../io.mjs';
+import { safeReadJsonCached } from '../../sessions/io.mjs';
 import {
   clipText,
   mapWithConcurrency,
   normalizeText,
   SKILL_CANDIDATE_ARTIFACT_KIND,
   toPosixPath,
-} from '../shared.mjs';
+} from '../../sessions/shared.mjs';
 import { loadDispatchIndex } from './cache.mjs';
 
 // 纯函数：把候选技能产物规整成 HUD 使用的扁平结构。

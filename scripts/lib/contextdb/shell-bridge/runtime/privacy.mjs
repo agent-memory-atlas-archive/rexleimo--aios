@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { expandHome, parseBoolEnv } from './shared.mjs';
+import { expandHome, parseBoolEnv } from '../entry/shared.mjs';
 
 const KNOWN_ENDPOINT_ENV_NAMES = new Set([
   'OPENAI_BASE_URL',

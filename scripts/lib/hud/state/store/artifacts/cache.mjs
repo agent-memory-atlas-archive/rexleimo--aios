@@ -2,15 +2,15 @@ import { promises as fs } from 'node:fs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { readDirMtimeMs } from '../io.mjs';
-import { getSessionsRoot } from '../sessions.mjs';
+import { readDirMtimeMs } from '../../sessions/io.mjs';
+import { getSessionsRoot } from '../../sessions/sessions.mjs';
 import {
   bumpLruCache,
   getCacheKeyPart,
   normalizeText,
   setLruCache,
   SKILL_CANDIDATE_ARTIFACT_FILE_PATTERN,
-} from '../shared.mjs';
+} from '../../sessions/shared.mjs';
 
 const DISPATCH_INDEX_CACHE_TTL_MS = 2000;
 const DISPATCH_INDEX_CACHE_MAX_ENTRIES = 32;

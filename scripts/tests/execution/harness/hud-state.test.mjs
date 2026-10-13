@@ -54,12 +54,12 @@ test('hud state entrypoint delegates state, artifact, and command responsibiliti
   assert.equal(entryLines <= 260, true, `hud/state.mjs is ${entryLines} lines; keep session, artifact, IO, and command logic split under hud/state/*`);
 
   const modules = [
-    { file: 'state/providers.mjs', exports: ['HUD_PROVIDER_AGENT_MAP', 'normalizeProvider', 'inferProviderFromAgent'] },
-    { file: 'state/io.mjs', exports: ['safeReadJsonCached', 'readLastJsonLine', 'readLatestQualityGateEvent'] },
-    { file: 'state/sessions.mjs', exports: ['listContextDbSessions', 'selectHudSessionId'] },
-    { file: 'state/artifacts.mjs', exports: ['findLatestDispatchArtifact', 'findLatestSkillCandidateArtifact', 'collectRecentDispatchEvidence'] },
-    { file: 'state/commands.mjs', exports: ['buildSuggestedCommands', 'buildHarnessSuggestedCommands', 'buildDispatchFixHint'] },
-    { file: 'state/compose.mjs', exports: ['readHudState', 'readHudDispatchSummary'] },
+    { file: 'state/sessions/providers.mjs', exports: ['HUD_PROVIDER_AGENT_MAP', 'normalizeProvider', 'inferProviderFromAgent'] },
+    { file: 'state/sessions/io.mjs', exports: ['safeReadJsonCached', 'readLastJsonLine', 'readLatestQualityGateEvent'] },
+    { file: 'state/sessions/sessions.mjs', exports: ['listContextDbSessions', 'selectHudSessionId'] },
+    { file: 'state/store/artifacts.mjs', exports: ['findLatestDispatchArtifact', 'findLatestSkillCandidateArtifact', 'collectRecentDispatchEvidence'] },
+    { file: 'state/dispatch/commands.mjs', exports: ['buildSuggestedCommands', 'buildHarnessSuggestedCommands', 'buildDispatchFixHint'] },
+    { file: 'state/dispatch/compose.mjs', exports: ['readHudState', 'readHudDispatchSummary'] },
   ];
 
   for (const moduleDef of modules) {

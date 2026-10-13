@@ -1,4 +1,4 @@
-import { shouldAutoCreateMarker } from './workspace.mjs';
+import { shouldAutoCreateMarker } from '../context/workspace.mjs';
 
 export function shouldDebug(env) {
   const value = (env.CTXDB_DEBUG || '').trim().toLowerCase();

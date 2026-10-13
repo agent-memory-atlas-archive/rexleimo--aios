@@ -1,15 +1,15 @@
-import { getHarnessTarget } from '../../harness/ops/targets.mjs';
+import { getHarnessTarget } from '../../../harness/ops/targets.mjs';
 import {
   clipText,
   DISPATCH_HINDSIGHT_FIX_HINT_ACTIONS,
   normalizeStringArray,
   normalizeText,
   nowIso,
-} from './shared.mjs';
+} from '../sessions/shared.mjs';
 import {
   inferProviderFromAgent,
   TEAM_PROVIDER_NAMES,
-} from './providers.mjs';
+} from '../sessions/providers.mjs';
 
 export function formatErrorMessage(error) {
   if (!error) return '';

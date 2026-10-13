@@ -1,13 +1,13 @@
 import path from 'node:path';
-import { buildHindsightEval } from '../../harness/quality/hindsight-eval.mjs';
-import { readSoloControl, readSoloRunSummary } from '../../harness/solo/solo-journal.mjs';
-import { buildTeamWatchdogState } from '../../lifecycle/fleet/watchdog.mjs';
+import { buildHindsightEval } from '../../../harness/quality/hindsight-eval.mjs';
+import { readSoloControl, readSoloRunSummary } from '../../../harness/solo/solo-journal.mjs';
+import { buildTeamWatchdogState } from '../../../lifecycle/fleet/watchdog.mjs';
 import {
   collectRecentDispatchEvidence,
   collectRecentSkillCandidates,
   findLatestDispatchArtifact,
   findLatestSkillCandidateArtifact,
-} from './artifacts.mjs';
+} from '../store/artifacts.mjs';
 import {
   buildDispatchFixHint,
   buildHarnessSuggestedCommands,
@@ -17,17 +17,17 @@ import {
 import {
   inferProviderFromAgent,
   normalizeProvider,
-} from './providers.mjs';
-import { getSessionsRoot, selectHudSessionId } from './sessions.mjs';
+} from '../sessions/providers.mjs';
+import { getSessionsRoot, selectHudSessionId } from '../sessions/sessions.mjs';
 import {
   normalizeText,
   nowIso,
-} from './shared.mjs';
+} from '../sessions/shared.mjs';
 import {
   readLastJsonLine,
   readLatestQualityGateEvent,
   safeReadJsonCached,
-} from './io.mjs';
+} from '../sessions/io.mjs';
 
 export async function readHudState({
   rootDir,

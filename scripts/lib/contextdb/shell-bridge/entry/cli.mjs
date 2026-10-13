@@ -4,7 +4,7 @@ import {
   getClientCommandName,
   resolveClientCommandNames,
   resolveClientRuntimeIds,
-} from '../../clients/registry.mjs';
+} from '../../../clients/registry.mjs';
 
 // 中文注释：Commander 声明式解析，替代手写 for+switch 循环。
 const SHELL_BRIDGE_CLI = new Command()

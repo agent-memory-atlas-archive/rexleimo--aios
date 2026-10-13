@@ -1,13 +1,13 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { normalizeCodeHome } from './code-home.mjs';
+import { normalizeCodeHome } from '../context/code-home.mjs';
 import { parseArgs, usage, validateOptions } from './cli.mjs';
-import { writeBridgeContextIndex } from './context-index.mjs';
+import { writeBridgeContextIndex } from '../context/context-index.mjs';
 import { logBridgeDecision } from './debug.mjs';
-import { buildPrivacyBanner, shouldPrintPrivacyBanner } from './privacy.mjs';
-import { extractOneShotPrompt, isInteractivePassthrough } from './prompts.mjs';
-import { spawnInherited } from './process-runner.mjs';
-import { applyOpenCodeRuntimeDefaults } from '../../opencode/runtime-env.mjs';
+import { buildPrivacyBanner, shouldPrintPrivacyBanner } from '../runtime/privacy.mjs';
+import { extractOneShotPrompt, isInteractivePassthrough } from '../context/prompts.mjs';
+import { spawnInherited } from '../runtime/process-runner.mjs';
+import { applyOpenCodeRuntimeDefaults } from '../../../opencode/runtime-env.mjs';
 import {
   detectAiosMarker,
   detectRunner,
@@ -15,7 +15,7 @@ import {
   isBlockedSubcommand,
   shouldWrapWorkspace,
   tryEnsureOptInMarker,
-} from './workspace.mjs';
+} from '../context/workspace.mjs';
 
 function validateOrExit(opts) {
   try {
