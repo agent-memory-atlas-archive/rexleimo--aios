@@ -7,7 +7,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { getCodemapHelpText, getCommandHelpText } from '../../../lib/cli/help.mjs';
+import { getCodemapHelpText, getCommandHelpText } from '../../../lib/cli/help/help.mjs';
 import { runReleaseStatus } from '../../../lib/lifecycle/release/release-status.mjs';
 import { runSnapshotRollback } from '../../../lib/lifecycle/setup/snapshot-rollback.mjs';
 
@@ -96,7 +96,7 @@ test('aios declares CLI engineering dependencies directly', async () => {
 });
 
 test('interactive command picker returns a parsed command choice', async () => {
-  const { chooseInteractiveCommand } = await import('../../../lib/cli/interactive.mjs');
+  const { chooseInteractiveCommand } = await import('../../../lib/cli/commander/interactive.mjs');
   let promptConfig;
   const parsed = await chooseInteractiveCommand({
     selectFn: async (config) => {
@@ -126,7 +126,7 @@ test('embedded AIOS command fragments parse through the shared fragment helper',
 });
 
 test('the CLI dispatcher factory can be imported independently of the launcher', async () => {
-  const { createAiosDispatch } = await import('../../../lib/cli/dispatch.mjs');
+  const { createAiosDispatch } = await import('../../../lib/cli/dispatch/dispatch.mjs');
 
   let output = '';
   const dispatch = createAiosDispatch({
@@ -140,7 +140,7 @@ test('the CLI dispatcher factory can be imported independently of the launcher',
 });
 
 test('the CLI dispatcher forwards the explicit legacy Superpowers adoption option to init', async () => {
-  const { createAiosDispatch } = await import('../../../lib/cli/dispatch.mjs');
+  const { createAiosDispatch } = await import('../../../lib/cli/dispatch/dispatch.mjs');
   const initCalls = [];
   const dispatch = createAiosDispatch({
     rootDir: process.cwd(),
@@ -166,7 +166,7 @@ test('the CLI dispatcher forwards the explicit legacy Superpowers adoption optio
 });
 
 test('applyResultExitCode clears stale failures when a command succeeds', async () => {
-  const { applyResultExitCode } = await import('../../../lib/cli/dispatch.mjs');
+  const { applyResultExitCode } = await import('../../../lib/cli/dispatch/dispatch.mjs');
   const previousExitCode = process.exitCode;
 
   try {
@@ -183,7 +183,7 @@ test('applyResultExitCode clears stale failures when a command succeeds', async 
 });
 
 test('createAiosDispatch routes refs output through injected streams and respects the limit', async () => {
-  const { createAiosDispatch } = await import('../../../lib/cli/dispatch.mjs');
+  const { createAiosDispatch } = await import('../../../lib/cli/dispatch/dispatch.mjs');
   const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'aios-cli-refs-'));
   const previousExitCode = process.exitCode;
   const originalConsoleLog = console.log;
@@ -243,7 +243,7 @@ test('createAiosDispatch routes refs output through injected streams and respect
 });
 
 test('createAiosDispatch clears stale exit codes between invocations', async () => {
-  const { createAiosDispatch } = await import('../../../lib/cli/dispatch.mjs');
+  const { createAiosDispatch } = await import('../../../lib/cli/dispatch/dispatch.mjs');
   const previousExitCode = process.exitCode;
   let stdout = '';
   let stderr = '';
@@ -281,7 +281,7 @@ test('createAiosDispatch clears stale exit codes between invocations', async () 
 });
 
 test('Commander app declares commands with readable options', async () => {
-  const { createAiosProgram } = await import('../../../lib/cli/commander-app.mjs');
+  const { createAiosProgram } = await import('../../../lib/cli/commander/commander-app.mjs');
   const program = createAiosProgram({ version: 'test-version', dispatch: async () => {} });
   assert.equal(program.name(), 'aios');
   assert.match(program.description(), /AIOS/i);
@@ -300,7 +300,7 @@ test('Commander app declares commands with readable options', async () => {
 });
 
 test('Commander app routes actions through parsed command dispatch', async () => {
-  const { createAiosProgram } = await import('../../../lib/cli/commander-app.mjs');
+  const { createAiosProgram } = await import('../../../lib/cli/commander/commander-app.mjs');
   let dispatched;
   const program = createAiosProgram({
     version: 'test-version',

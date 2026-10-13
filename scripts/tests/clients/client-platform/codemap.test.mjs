@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { pathToFileURL } from 'node:url';
 
-import { doctorCodemap, installCodemap } from '../../../lib/components/codemap.mjs';
+import { doctorCodemap, installCodemap } from '../../../lib/components/codemap/codemap.mjs';
 import {
   collectCodemapMcpTargets,
   inspectCodemapMcpTarget,
@@ -23,7 +23,7 @@ import { ensureOpencodePlugin } from '../../../lib/components/codemap/targets/op
 import { getCodemapHelpText } from '../../../lib/cli/help/codemap.mjs';
 import { buildCrgEntryForTarget } from '../../../lib/components/codemap/targets/mcp-targets/entries.mjs';
 import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../../../lib/clients/integration/mcp/zcode-schema.mjs';
-import { buildAiosPiMcpServers } from '../../../lib/components/pi/mcp-adapter.mjs';
+import { buildAiosPiMcpServers } from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
 import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../../../lib/clients/registry.mjs';
 
 async function makeTemp(prefix) {
@@ -326,7 +326,7 @@ test('codemap doctor reports missing per-client MCP config and --fix heals it', 
 });
 
 test('codemap component keeps client config responsibilities in focused modules', async () => {
-  const entry = await readFile(path.resolve('scripts/lib/components/codemap.mjs'), 'utf8');
+  const entry = await readFile(path.resolve('scripts/lib/components/codemap/codemap.mjs'), 'utf8');
   const entryLines = entry.trim().split(/\r?\n/u).length;
   assert.equal(entryLines <= 360, true, `codemap.mjs is ${entryLines} lines; keep config/state/docs/plugins split under components/codemap/*`);
 

@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 
-import { parseArgs } from './parse-args.mjs';
+import { parseArgs } from '../parse-args.mjs';
 
 const INTERACTIVE_COMMANDS = [
   {

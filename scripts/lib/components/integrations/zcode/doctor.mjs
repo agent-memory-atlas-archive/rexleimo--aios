@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { getClientHomes } from '../../platform/paths.mjs';
+import { getClientHomes } from '../../../platform/paths.mjs';
 import {
   ZCODE_AGENTS_PLUGIN_NAME,
   buildAiosAgentsPluginContents,

@@ -3,7 +3,7 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
   Object.freeze({
     id: 'codemap-component-facade',
     label: 'Codemap Component Facade',
-    path: 'scripts/lib/components/codemap.mjs',
+    path: 'scripts/lib/components/codemap/codemap.mjs',
     maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/components/codemap/constants.mjs',
@@ -39,7 +39,7 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
   Object.freeze({
     id: 'browser-component-facade',
     label: 'Browser Component Facade',
-    path: 'scripts/lib/components/browser.mjs',
+    path: 'scripts/lib/components/browser/browser.mjs',
     maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/components/browser/constants.mjs',
@@ -66,7 +66,7 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
   Object.freeze({
     id: 'skills-component-facade',
     label: 'Skills Component Facade',
-    path: 'scripts/lib/components/skills.mjs',
+    path: 'scripts/lib/components/skills/skills.mjs',
     maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/components/skills/constants.mjs',

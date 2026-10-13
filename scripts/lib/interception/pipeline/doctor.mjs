@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { getClientHomes } from '../../platform/paths.mjs';
 import { PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from '../../components/browser/constants.mjs';
-import { migrateBrowserMcpConfig } from '../../components/browser.mjs';
+import { migrateBrowserMcpConfig } from '../../components/browser/browser.mjs';
 import { buildCapabilityMatrix, inspectMcpProxyTargets } from '../transport/clients/capabilities.mjs';
 import { runInterceptionProof } from './proof.mjs';
 import { resolveMetricsFile } from './tail.mjs';

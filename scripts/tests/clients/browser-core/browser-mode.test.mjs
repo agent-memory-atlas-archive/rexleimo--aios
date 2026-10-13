@@ -179,7 +179,7 @@ test('migrate 默认 none：client .mcp.json 有 auth/shell、无 browser（默�
 
   await makeMigrateRoot(rootDir, { withRuntime: false });
   const logs = [];
-  const result = await import('../../../lib/components/browser.mjs').then((m) => m.migrateBrowserMcpConfig({
+  const result = await import('../../../lib/components/browser/browser.mjs').then((m) => m.migrateBrowserMcpConfig({
     rootDir,
     io: { log: (line) => logs.push(String(line)) },
     clientHomes: { codex: codexHome },
@@ -202,7 +202,7 @@ test('migrate 默认 none：client .mcp.json 有 auth/shell、无 browser（默�
   const codexHome2 = await makeTemp('aios-browser-migrate-codex2-');
   await mkdir(codexHome2, { recursive: true });
   await writeFile(path.join(codexHome2, 'config.toml'), 'model = "gpt"\n', 'utf8');
-  await import('../../../lib/components/browser.mjs').then((m) => m.migrateBrowserMcpConfig({
+  await import('../../../lib/components/browser/browser.mjs').then((m) => m.migrateBrowserMcpConfig({
     rootDir: p2, io: { log: () => {} }, clientHomes: { codex: codexHome2 },
   }));
   const codexToml2 = await readFile(path.join(codexHome2, 'config.toml'), 'utf8');

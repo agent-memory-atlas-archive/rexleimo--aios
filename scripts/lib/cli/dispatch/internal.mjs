@@ -14,7 +14,7 @@ export async function runInternal(options, { rootDir, projectRoot } = {}) {
   }
 
   if (target === 'skills') {
-    const module = await import('../../components/skills.mjs');
+    const module = await import('../../components/skills/skills.mjs');
     if (action === 'install') {
       return module.installContextDbSkills({
         rootDir,
@@ -74,7 +74,7 @@ export async function runInternal(options, { rootDir, projectRoot } = {}) {
   }
 
   if (target === 'browser') {
-    const module = await import('../../components/browser.mjs');
+    const module = await import('../../components/browser/browser.mjs');
     if (action === 'install') return module.installBrowserMcp({ rootDir, dryRun: Boolean(options.dryRun), skipPlaywrightInstall: Boolean(options.skipPlaywrightInstall) });
     if (action === 'doctor') return module.doctorBrowserMcp({ rootDir, fix: Boolean(options.fix), dryRun: Boolean(options.dryRun) });
     if (action === 'mcp-migrate') return module.migrateBrowserMcpConfig({ rootDir, dryRun: Boolean(options.dryRun) });
@@ -92,7 +92,7 @@ export async function runInternal(options, { rootDir, projectRoot } = {}) {
   }
 
   if (target === 'codemap') {
-    const module = await import('../../components/codemap.mjs');
+    const module = await import('../../components/codemap/codemap.mjs');
     if (action === 'install') return module.installCodemap({ rootDir, projectRoot, dryRun: Boolean(options.dryRun), client: options.client ?? 'all', io: console });
     if (action === 'uninstall') return module.uninstallCodemap({ rootDir, projectRoot, dryRun: Boolean(options.dryRun), client: options.client ?? 'all', io: console });
     if (action === 'doctor') return module.doctorCodemap({ rootDir, projectRoot, fix: Boolean(options.fix), dryRun: Boolean(options.dryRun), client: options.client ?? 'all', io: console });

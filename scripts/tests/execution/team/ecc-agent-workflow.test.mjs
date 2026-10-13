@@ -10,7 +10,7 @@ import { buildClientCapabilityReport } from '../../../lib/clients/reporting/capa
 import { buildAiosStatus } from '../../../lib/lifecycle/fleet/status.mjs';
 import { buildWorkflowDryRun, listWorkflowRecipes } from '../../../lib/workflows/recipes.mjs';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
-import { getCommandHelpText } from '../../../lib/cli/help.mjs';
+import { getCommandHelpText } from '../../../lib/cli/help/help.mjs';
 
 async function writeAgentEvidence(rootDir, agentId, {
   smokeStatus = 'pass',

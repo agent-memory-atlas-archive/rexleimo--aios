@@ -170,7 +170,7 @@ export async function runHarnessCommand(options = {}, {
       const codemapStatePath = path.join(rootDir, '.aios', 'codemap.json');
       if (existsSync(codemapStatePath)) {
         try {
-          const { buildCodemap } = await import('../../../components/codemap.mjs');
+          const { buildCodemap } = await import('../../../components/codemap/codemap.mjs');
           await buildCodemap({ projectRoot: preservedWorktree.workspacePath || preservedWorktree.path, io: { log: (msg) => {} } });
         } catch (buildErr) {
           io.log(`[warn] codemap build in worktree failed: ${buildErr instanceof Error ? buildErr.message : String(buildErr)}`);

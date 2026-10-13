@@ -8,9 +8,9 @@ export {
   doctorBrowserMcp,
   installBrowserMcp,
   migrateBrowserMcpConfig,
-} from './browser.mjs';
+} from './browser/browser.mjs';
 
-export { doctorCodemap } from './codemap.mjs';
+export { doctorCodemap } from './codemap/codemap.mjs';
 
 export {
   doctorNativeEnhancements,
@@ -30,6 +30,6 @@ export {
   doctorContextDbSkills,
   installContextDbSkills,
   uninstallContextDbSkills,
-} from './skills.mjs';
+} from './skills/skills.mjs';
 
 export { PRIMARY_BROWSER_ALIAS, SHELL_ALIAS } from './browser/constants.mjs';

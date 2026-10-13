@@ -20,7 +20,7 @@ import {
   piMcpAdapterSpec,
   resolvePiMcpJsonPath,
   resolvePiMcpMode,
-} from '../../../lib/components/pi/mcp-adapter.mjs';
+} from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

@@ -1,13 +1,13 @@
 import path from 'node:path';
 
 import { inspectBootstrapTask } from '../../doctor-bootstrap-task.mjs';
-import { doctorBrowserMcp } from '../components/browser.mjs';
-import { doctorCodemap } from '../components/codemap.mjs';
+import { doctorBrowserMcp } from '../components/browser/browser.mjs';
+import { doctorCodemap } from '../components/codemap/codemap.mjs';
 import { doctorNativeEnhancements } from '../components/native.mjs';
-import { doctorPiBridge } from '../components/pi/doctor.mjs';
-import { doctorZcodeAgents } from '../components/zcode/doctor.mjs';
+import { doctorPiBridge } from '../components/integrations/pi/doctor.mjs';
+import { doctorZcodeAgents } from '../components/integrations/zcode/doctor.mjs';
 import { doctorContextDbShell } from '../components/shell.mjs';
-import { doctorContextDbSkills } from '../components/skills.mjs';
+import { doctorContextDbSkills } from '../components/skills/skills.mjs';
 import { getDisabledGateIds, isHarnessGateEnabled } from '../harness/ops/profile.mjs';
 import { commandExists, captureCommand, runCommand } from '../platform/process.mjs';
 import { doctorRexHarness, isAiosRuntimeRoot } from '../rex-harness/runtime.mjs';

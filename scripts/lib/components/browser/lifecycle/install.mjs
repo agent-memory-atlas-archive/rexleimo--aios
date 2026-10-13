@@ -95,7 +95,7 @@ export async function ensurePiBrowserMcpServer({
 } = {}) {
   try {
     const { getClientHomes } = await import('../../../platform/paths.mjs');
-    const { buildAiosPiBrowserServer, ensurePiMcpServers, resolvePiMcpJsonPath } = await import('../../pi/mcp-adapter.mjs');
+    const { buildAiosPiBrowserServer, ensurePiMcpServers, resolvePiMcpJsonPath } = await import('../../integrations/pi/mcp-adapter.mjs');
     // Home resolution mirrors migrateBrowserMcpConfig: an injected clientHomes
     // map wins, so isolated callers (tests, dry runs) never reach the real
     // ~/.pi/agent/mcp.json. piHome === '' explicitly means "no Pi home".

@@ -257,7 +257,7 @@ export async function main(argv = process.argv.slice(2)) {
         ensurePiExtensionRegistered,
         resolveBundledPiExtensionPath,
         resolvePiSettingsPath,
-      } = await import('./lib/components/pi/extension-settings.mjs');
+      } = await import('./lib/components/integrations/pi/extension-settings.mjs');
       const result = ensurePiExtensionRegistered({
         settingsPath: resolvePiSettingsPath(getClientHomes(process.env).pi),
         extensionPath: resolveBundledPiExtensionPath(AIOS_ROOT),
@@ -280,7 +280,7 @@ export async function main(argv = process.argv.slice(2)) {
         buildAiosPiMcpServers,
         ensurePiMcpAdapter,
         resolvePiMcpJsonPath,
-      } = await import('./lib/components/pi/mcp-adapter.mjs');
+      } = await import('./lib/components/integrations/pi/mcp-adapter.mjs');
       const { isBrowserMcpRuntimeInstalled } = await import('./lib/components/browser/runtime/runtime-readiness.mjs');
       const { execFile } = await import('node:child_process');
       const run = (cmd, args) => new Promise((resolveRun, rejectRun) => {
@@ -345,7 +345,7 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('== ZCode Agents Plugin ==');
     try {
       const { getClientHomes } = await import('./lib/platform/paths.mjs');
-      const { installAiosZcodeAgentsPlugin } = await import('./lib/components/zcode/agents-plugin.mjs');
+      const { installAiosZcodeAgentsPlugin } = await import('./lib/components/integrations/zcode/agents-plugin.mjs');
       const result = installAiosZcodeAgentsPlugin({
         aiosRoot: AIOS_ROOT,
         zcodeHome: getClientHomes(process.env).zcode,

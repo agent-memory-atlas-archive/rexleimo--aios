@@ -10,11 +10,11 @@ import {
   normalizeWrapMode,
 } from '../govern/options.mjs';
 import { installOrchestratorAgents } from '../../components/agents.mjs';
-import { installBrowserMcp } from '../../components/browser.mjs';
-import { doctorBrowserMcp } from '../../components/browser.mjs';
+import { installBrowserMcp } from '../../components/browser/browser.mjs';
+import { doctorBrowserMcp } from '../../components/browser/browser.mjs';
 import { installNativeEnhancements } from '../../components/native.mjs';
 import { doctorContextDbShell, installContextDbShell, installPrivacyGuard } from '../../components/shell.mjs';
-import { doctorContextDbSkills, installContextDbSkills } from '../../components/skills.mjs';
+import { doctorContextDbSkills, installContextDbSkills } from '../../components/skills/skills.mjs';
 import { installRexClientProjections } from '../../rex-harness/client-projection.mjs';
 import { prepareRexWorkflowSurface } from '../../workflows/surface/rex-workflow-surface-lifecycle.mjs';
 

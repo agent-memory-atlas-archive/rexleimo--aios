@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { getCommandHelpText, getRootHelpText } from '../../../lib/cli/help.mjs';
+import { getCommandHelpText, getRootHelpText } from '../../../lib/cli/help/help.mjs';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 
 const CLI_PATH = path.join(process.cwd(), 'scripts', 'aios.mjs');

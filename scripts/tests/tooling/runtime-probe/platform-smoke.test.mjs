@@ -15,7 +15,7 @@ function countSourceLines(source) {
 }
 
 describe('MCP Server Config - Local Runtime (static analysis)', () => {
-  const browserFacadeSrc = readRepoSource('scripts', 'lib', 'components', 'browser.mjs');
+  const browserFacadeSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'browser.mjs');
   const browserRuntimePathsSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'runtime-paths.mjs');
   const browserMcpBuilderSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'mcp', 'mcp-server-builders.mjs');
   const browserCdpServiceSrc = readRepoSource('scripts', 'lib', 'components', 'browser', 'runtime', 'cdp-service.mjs');
@@ -24,10 +24,10 @@ describe('MCP Server Config - Local Runtime (static analysis)', () => {
   it('browser component entrypoint stays a thin facade over focused modules', () => {
     assert.equal(countSourceLines(browserFacadeSrc) <= 40, true,
       'browser.mjs should stay a facade and keep browser responsibilities under components/browser/*');
-    assert.ok(browserFacadeSrc.includes("from './browser/mcp/mcp-config.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/lifecycle/install.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/runtime/cdp-service.mjs'"));
-    assert.ok(browserFacadeSrc.includes("from './browser/lifecycle/doctor.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './mcp/mcp-config.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './lifecycle/install.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './runtime/cdp-service.mjs'"));
+    assert.ok(browserFacadeSrc.includes("from './lifecycle/doctor.mjs'"));
   });
 
   it('preferred browser MCP always uses the repository-local Node launcher', () => {

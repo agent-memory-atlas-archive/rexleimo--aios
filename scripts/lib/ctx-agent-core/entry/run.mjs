@@ -506,7 +506,7 @@ export async function runCtxAgent(argv = process.argv.slice(2)) {
   // 失败只告警不阻塞；AIOS_CODEMAP_AUTO_INSTALL=0 可关）。放在 saveGuard
   // 分流之后，使交互与单发两种模式共用同一入口。
   try {
-    const { ensureCodemapInstalled } = await import('../../components/codemap.mjs');
+    const { ensureCodemapInstalled } = await import('../../components/codemap/codemap.mjs');
     const { ROOT_DIR } = await import('../context/common.mjs');
     await ensureCodemapInstalled({
       projectRoot: opts.workspaceRoot,

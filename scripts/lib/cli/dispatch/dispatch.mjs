@@ -1,15 +1,15 @@
 // scripts/lib/cli/dispatch.mjs — barrel index + 剩余的 createAiosDispatch 路由逻辑
 // 原文件 425 行拆分为 helpers.mjs（printHelp/applyResultExitCode/runInteractiveTui）+ 本文件（路由表）
 
-import { chooseInteractiveCommand } from './interactive.mjs';
-import { runInternal } from './dispatch/internal.mjs';
-import { runInterceptionCommand } from './dispatch/interception.mjs';
-import { runCanvasCommand, runRefsCommand } from './dispatch/offload.mjs';
-import { buildTeamRuntimeEnv, getRuntimeVersion, resolveRuntimeWorkspace } from './dispatch/runtime.mjs';
-import { printHelp, applyResultExitCode, runInteractiveTui } from './dispatch/helpers.mjs';
-import { applyProjectRootFlag } from './project-root.mjs';
+import { chooseInteractiveCommand } from '../commander/interactive.mjs';
+import { runInternal } from './internal.mjs';
+import { runInterceptionCommand } from './interception.mjs';
+import { runCanvasCommand, runRefsCommand } from './offload.mjs';
+import { buildTeamRuntimeEnv, getRuntimeVersion, resolveRuntimeWorkspace } from './runtime.mjs';
+import { printHelp, applyResultExitCode, runInteractiveTui } from './helpers.mjs';
+import { applyProjectRootFlag } from '../project-root.mjs';
 
-export { applyResultExitCode } from './dispatch/helpers.mjs';
+export { applyResultExitCode } from './helpers.mjs';
 
 /** 所有 CLI 命令的路由表；新增能力必须在这里接入才能被真实调用 */
 export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdout, stderr = process.stderr, runAiosInit = null } = {}) {
@@ -48,7 +48,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'rex') {
-      const { createRexCommandRunner } = await import('../rex-harness/command.mjs');
+      const { createRexCommandRunner } = await import('../../rex-harness/command.mjs');
       const runRex = createRexCommandRunner({ rootDir: process.env.AIOS_REX_ROOT || rootDir });
       const result = await runRex(parsed.options.args, { write: (value) => stdout.write(value) });
       process.exitCode = result.exitCode;
@@ -66,7 +66,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'init') {
-      const runInit = runAiosInit || (await import('../../aios-init.mjs')).main;
+      const runInit = runAiosInit || (await import('../../../aios-init.mjs')).main;
       const args = [];
       if (parsed.options.agent) args.push('--agent', parsed.options.agent);
       if (parsed.options.all) args.push('--all');
@@ -75,7 +75,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       if (parsed.options.yesCompressionTools) args.push('--yes-compression-tools');
       if (parsed.options.yesHeadroomMcp) args.push('--yes-headroom-mcp');
       if (parsed.options.defaultMode) {
-        const { writeAiosConfig } = await import('../lifecycle/govern/options/default-mode.mjs');
+        const { writeAiosConfig } = await import('../../lifecycle/govern/options/default-mode.mjs');
         await writeAiosConfig(rootDir, { defaultMode: parsed.options.defaultMode });
         args.push('--default-mode', parsed.options.defaultMode);
       }
@@ -84,91 +84,91 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'setup') {
-      const { runSetup } = await import('../lifecycle/setup/setup.mjs');
+      const { runSetup } = await import('../../lifecycle/setup/setup.mjs');
       await runSetup(parsed.options, context);
       return;
     }
 
     if (parsed.command === 'update') {
-      const { runUpdate } = await import('../lifecycle/setup/update.mjs');
+      const { runUpdate } = await import('../../lifecycle/setup/update.mjs');
       await runUpdate(parsed.options, context);
       return;
     }
 
     if (parsed.command === 'uninstall') {
-      const { runUninstall } = await import('../lifecycle/setup/uninstall.mjs');
+      const { runUninstall } = await import('../../lifecycle/setup/uninstall.mjs');
       await runUninstall(parsed.options, context);
       return;
     }
 
     if (parsed.command === 'doctor') {
-      const { runDoctor } = await import('../lifecycle/govern/doctor.mjs');
+      const { runDoctor } = await import('../../lifecycle/govern/doctor.mjs');
       await runDoctor(parsed.options, context);
       return;
     }
 
     if (parsed.command === 'clients') {
-      const { runClientsCommand } = await import('../lifecycle/fleet/clients.mjs');
+      const { runClientsCommand } = await import('../../lifecycle/fleet/clients.mjs');
       applyResultExitCode(await runClientsCommand(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
       return;
     }
 
     if (parsed.command === 'status') {
-      const { runStatusCommand } = await import('../lifecycle/fleet/status.mjs');
+      const { runStatusCommand } = await import('../../lifecycle/fleet/status.mjs');
       applyResultExitCode(await runStatusCommand(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
       return;
     }
 
     if (parsed.command === 'agents') {
-      const { runAgentsCommand } = await import('../lifecycle/fleet/agents.mjs');
+      const { runAgentsCommand } = await import('../../lifecycle/fleet/agents.mjs');
       applyResultExitCode(await runAgentsCommand(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
       return;
     }
 
     if (parsed.command === 'skill') {
       if (parsed.options.subcommand === 'comply') {
-        const { runSkillComply } = await import('../skills/compliance/compliance.mjs');
+        const { runSkillComply } = await import('../../skills/compliance/compliance.mjs');
         applyResultExitCode(await runSkillComply(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'health') {
-        const { runSkillHealth } = await import('../skills/compliance/health.mjs');
+        const { runSkillHealth } = await import('../../skills/compliance/health.mjs');
         applyResultExitCode(await runSkillHealth(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'certify') {
-        const { runSkillTrainingCertification } = await import('../skills/training/training-gate.mjs');
+        const { runSkillTrainingCertification } = await import('../../skills/training/training-gate.mjs');
         applyResultExitCode(await runSkillTrainingCertification(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'verify-training') {
-        const { runSkillTrainingGate } = await import('../skills/training/training-gate.mjs');
+        const { runSkillTrainingGate } = await import('../../skills/training/training-gate.mjs');
         applyResultExitCode(await runSkillTrainingGate(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       /* Skill Workshop — 受控技能自生成闭环 */
       if (parsed.options.subcommand === 'propose') {
-        const { propose } = await import('../skills/skill-workshop.mjs');
+        const { propose } = await import('../../skills/skill-workshop.mjs');
         applyResultExitCode(await propose({ rootDir: workspaceFor(parsed), description: parsed.options.description, stdout }));
         return;
       }
       if (parsed.options.subcommand === 'review') {
-        const { review } = await import('../skills/skill-workshop.mjs');
+        const { review } = await import('../../skills/skill-workshop.mjs');
         applyResultExitCode(await review({ rootDir: workspaceFor(parsed), id: parsed.options.id, action: parsed.options.action, stdout, stderr }));
         return;
       }
       if (parsed.options.subcommand === 'apply') {
-        const { apply: workshopApply } = await import('../skills/skill-workshop.mjs');
+        const { apply: workshopApply } = await import('../../skills/skill-workshop.mjs');
         applyResultExitCode(await workshopApply({ rootDir: workspaceFor(parsed), id: parsed.options.id, policyCheck: Boolean(parsed.options.policy), stdout, stderr }));
         return;
       }
       if (parsed.options.subcommand === 'rollback') {
-        const { rollback } = await import('../skills/skill-workshop.mjs');
+        const { rollback } = await import('../../skills/skill-workshop.mjs');
         applyResultExitCode(await rollback({ rootDir: workspaceFor(parsed), name: parsed.options.name, stdout, stderr }));
         return;
       }
       if (parsed.options.subcommand === 'index') {
-        const { skillIndexScan } = await import('../skills/skill-workshop.mjs');
+        const { skillIndexScan } = await import('../../skills/skill-workshop.mjs');
         applyResultExitCode(await skillIndexScan({ rootDir: workspaceFor(parsed), stdout }));
         return;
       }
@@ -177,47 +177,47 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     if (parsed.command === 'session') {
       const sub = parsed.options.subcommand;
       if (sub === 'close') {
-        const { runSessionClose } = await import('../lifecycle/run/session-hooks/close.mjs');
+        const { runSessionClose } = await import('../../lifecycle/run/session-hooks/close.mjs');
         applyResultExitCode(await runSessionClose(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (sub === 'start') {
-        const { runSessionStartTimeline } = await import('../lifecycle/run/session-hooks/start-timeline.mjs');
+        const { runSessionStartTimeline } = await import('../../lifecycle/run/session-hooks/start-timeline.mjs');
         applyResultExitCode(await runSessionStartTimeline(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
-      const { runSessionChangedFiles } = await import('../session/changed-files.mjs');
+      const { runSessionChangedFiles } = await import('../../session/changed-files.mjs');
       applyResultExitCode(await runSessionChangedFiles(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
       return;
     }
 
     if (parsed.command === 'quality-gate') {
-      const { runQualityGate } = await import('../lifecycle/govern/quality-gate.mjs');
+      const { runQualityGate } = await import('../../lifecycle/govern/quality-gate.mjs');
       applyResultExitCode(await runQualityGate(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'orchestrate') {
-      const { runOrchestrate } = await import('../lifecycle/run/orchestrate.mjs');
+      const { runOrchestrate } = await import('../../lifecycle/run/orchestrate.mjs');
       applyResultExitCode(await runOrchestrate(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'workflow') {
-      const { runWorkflowCommand } = await import('../lifecycle/run/workflow.mjs');
+      const { runWorkflowCommand } = await import('../../lifecycle/run/workflow.mjs');
       applyResultExitCode(await runWorkflowCommand(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
       return;
     }
 
     if (parsed.command === 'work') {
       /* work 是统一并发调度入口：默认 live（AIOS_EXECUTE_LIVE=1），语义翻译在 lifecycle/run/work.mjs */
-      const { runWorkCommand } = await import('../lifecycle/run/work.mjs');
+      const { runWorkCommand } = await import('../../lifecycle/run/work.mjs');
       applyResultExitCode(await runWorkCommand(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'snapshot-rollback') {
-      const { runSnapshotRollback } = await import('../lifecycle/setup/snapshot-rollback.mjs');
+      const { runSnapshotRollback } = await import('../../lifecycle/setup/snapshot-rollback.mjs');
       applyResultExitCode(await runSnapshotRollback(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
@@ -225,41 +225,41 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     if (parsed.command === 'team') {
       /* team dry-run 没有任务标题时只做 preflight，防止误启动多 agent 执行 */
       if (parsed.options.executionMode === 'dry-run' && !parsed.options.taskTitle) {
-        const { runReadinessCheck } = await import('../lifecycle/govern/preflight-contracts.mjs');
+        const { runReadinessCheck } = await import('../../lifecycle/govern/preflight-contracts.mjs');
         const result = await runReadinessCheck({ rootDir: workspaceFor(parsed), mode: 'team' });
         console.log(JSON.stringify(result, null, 2));
         if (result.verdict === 'blocked') process.exitCode = 1;
         return;
       }
       if (parsed.options.subcommand === 'status') {
-        const { runTeamStatus } = await import('../lifecycle/fleet/team-ops.mjs');
+        const { runTeamStatus } = await import('../../lifecycle/fleet/team-ops.mjs');
         applyResultExitCode(await runTeamStatus(parsed.options, { rootDir: workspaceFor(parsed) }));
         return;
       }
       if (parsed.options.subcommand === 'history') {
-        const { runTeamHistory } = await import('../lifecycle/fleet/team-ops.mjs');
+        const { runTeamHistory } = await import('../../lifecycle/fleet/team-ops.mjs');
         applyResultExitCode(await runTeamHistory(parsed.options, { rootDir: workspaceFor(parsed) }));
         return;
       }
       if (parsed.options.subcommand === 'watchdog') {
-        const { runTeamWatchdog } = await import('../lifecycle/fleet/watchdog.mjs');
+        const { runTeamWatchdog } = await import('../../lifecycle/fleet/watchdog.mjs');
         applyResultExitCode(await runTeamWatchdog(parsed.options, { rootDir: workspaceFor(parsed) }));
         return;
       }
       if (parsed.options.subcommand === 'skill-candidates') {
         if (parsed.options.action === 'list') {
-          const { runTeamSkillCandidatesList } = await import('../lifecycle/fleet/team-ops.mjs');
+          const { runTeamSkillCandidatesList } = await import('../../lifecycle/fleet/team-ops.mjs');
           applyResultExitCode(await runTeamSkillCandidatesList(parsed.options, { rootDir: workspaceFor(parsed) }));
           return;
         }
         if (parsed.options.action === 'export') {
-          const { runTeamSkillCandidatesExport } = await import('../lifecycle/fleet/team-ops.mjs');
+          const { runTeamSkillCandidatesExport } = await import('../../lifecycle/fleet/team-ops.mjs');
           applyResultExitCode(await runTeamSkillCandidatesExport(parsed.options, { rootDir: workspaceFor(parsed) }));
           return;
         }
       }
 
-      const { runOrchestrate } = await import('../lifecycle/run/orchestrate.mjs');
+      const { runOrchestrate } = await import('../../lifecycle/run/orchestrate.mjs');
       const runtimeEnv = buildTeamRuntimeEnv(parsed.options, process.env);
       /* team 命令最终复用 orchestrate，本层只负责把团队语义翻译成 local dispatch 参数 */
       applyResultExitCode(await runOrchestrate({
@@ -287,13 +287,13 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     if (parsed.command === 'harness') {
       /* 非 run 的 dry-run harness 先做 readiness，避免 resume/status 误触发真实执行 */
       if (parsed.options.executionMode === 'dry-run' && parsed.options.action !== 'run') {
-        const { runReadinessCheck } = await import('../lifecycle/govern/preflight-contracts.mjs');
+        const { runReadinessCheck } = await import('../../lifecycle/govern/preflight-contracts.mjs');
         const result = await runReadinessCheck({ rootDir: workspaceFor(parsed), mode: 'harness' });
         console.log(JSON.stringify(result, null, 2));
         if (result.verdict === 'blocked') process.exitCode = 1;
         return;
       }
-      const { runHarnessCommand } = await import('../lifecycle/run/harness.mjs');
+      const { runHarnessCommand } = await import('../../lifecycle/run/harness.mjs');
       applyResultExitCode(await runHarnessCommand(parsed.options, {
         rootDir: workspaceFor(parsed),
         aiosRootDir: rootDir,
@@ -302,31 +302,31 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'hud') {
-      const { runHud } = await import('../lifecycle/fleet/hud.mjs');
+      const { runHud } = await import('../../lifecycle/fleet/hud.mjs');
       applyResultExitCode(await runHud(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'learn-eval') {
-      const { runLearnEval } = await import('../lifecycle/evolve/learn-eval.mjs');
+      const { runLearnEval } = await import('../../lifecycle/evolve/learn-eval.mjs');
       applyResultExitCode(await runLearnEval(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'entropy-gc') {
-      const { runEntropyGc } = await import('../lifecycle/govern/entropy-gc.mjs');
+      const { runEntropyGc } = await import('../../lifecycle/govern/entropy-gc.mjs');
       applyResultExitCode(await runEntropyGc(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'release-status') {
-      const { runReleaseStatus } = await import('../lifecycle/release/release-status.mjs');
+      const { runReleaseStatus } = await import('../../lifecycle/release/release-status.mjs');
       applyResultExitCode(await runReleaseStatus(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
 
     if (parsed.command === 'evolution') {
-      const { runEvolutionCommand } = await import('../lifecycle/evolve/evolution-cli.mjs');
+      const { runEvolutionCommand } = await import('../../lifecycle/evolve/evolution-cli.mjs');
       applyResultExitCode(await runEvolutionCommand(parsed.options, {
         rootDir: workspaceFor(parsed) || rootDir,
         stdout,
@@ -336,7 +336,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'plan') {
-      const { runPlanCommand } = await import('../planning/ops/cli.mjs');
+      const { runPlanCommand } = await import('../../planning/ops/cli.mjs');
       const result = await runPlanCommand(parsed.options, {
         rootDir: workspaceFor(parsed) || rootDir,
         stdout,
@@ -350,13 +350,13 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       const workspace = workspaceFor(parsed);
       let result;
       if (parsed.options.governanceAction) {
-        const { runDreamGovernanceCommand } = await import('../lifecycle/evolve/dream/governance.mjs');
+        const { runDreamGovernanceCommand } = await import('../../lifecycle/evolve/dream/governance.mjs');
         result = await runDreamGovernanceCommand(parsed.options, {
           rootDir: workspace,
           env: process.env,
         });
       } else if (parsed.options.to) {
-        const { runDreamExport } = await import('../lifecycle/evolve/dream/export-to.mjs');
+        const { runDreamExport } = await import('../../lifecycle/evolve/dream/export-to.mjs');
         result = await runDreamExport({
           rootDir: workspace,
           mode: parsed.options.mode,
@@ -364,7 +364,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
           to: parsed.options.to,
         });
       } else {
-        const { runDream } = await import('../lifecycle/evolve/dream/index.mjs');
+        const { runDream } = await import('../../lifecycle/evolve/dream/index.mjs');
         result = await runDream({
           rootDir: workspace,
           mode: parsed.options.mode,
@@ -377,7 +377,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'integration') {
-      const { runIntegrationCommand } = await import('../integrations/cli.mjs');
+      const { runIntegrationCommand } = await import('../../integrations/cli.mjs');
       applyResultExitCode(await runIntegrationCommand(parsed.options, {
         rootDir: workspaceFor(parsed),
         projectRoot: context.projectRoot,
@@ -387,7 +387,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'judgment') {
-      const { runJudgmentCommand } = await import('../judgment/cli.mjs');
+      const { runJudgmentCommand } = await import('../../judgment/cli.mjs');
       applyResultExitCode(await runJudgmentCommand(parsed.options, {
         rootDir: workspaceFor(parsed),
         stdout,
@@ -396,7 +396,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'memo') {
-      const { runMemo } = await import('../memo/memo.mjs');
+      const { runMemo } = await import('../../memo/memo.mjs');
       await runMemo(parsed.options, { rootDir: workspaceFor(parsed) });
       return;
     }
@@ -406,7 +406,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       if (sub !== 'report') {
         throw new Error('Usage: aios memory report [--json]');
       }
-      const { buildMemoryReport, renderMemoryReport } = await import('../memo/care/report.mjs');
+      const { buildMemoryReport, renderMemoryReport } = await import('../../memo/care/report.mjs');
       const report = await buildMemoryReport(workspaceFor(parsed), { env: process.env });
       const json = flags.includes('--json');
       stdout.write(json ? `${JSON.stringify(report, null, 2)}\n` : `${renderMemoryReport(report)}\n`);
@@ -418,7 +418,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       if (sub !== 'report') {
         throw new Error('Usage: aios tokens report [--session <id>] [--json]');
       }
-      const { buildTokensReport, renderTokensReport } = await import('../interception/observability/metrics/report.mjs');
+      const { buildTokensReport, renderTokensReport } = await import('../../interception/observability/metrics/report.mjs');
       const json = flags.includes('--json');
       const sessionFlag = flags.indexOf('--session');
       const sessionId = sessionFlag >= 0 ? String(flags[sessionFlag + 1] || 'default') : 'default';
@@ -428,13 +428,13 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'import') {
-      const { runImportCommand } = await import('../memo/flow/import-cli.mjs');
+      const { runImportCommand } = await import('../../memo/flow/import-cli.mjs');
       await runImportCommand({ args: parsed.options.args || [], rootDir: workspaceFor(parsed), stdout });
       return;
     }
 
     if (parsed.command === 'model-router') {
-      const { runModelRouterCommand } = await import('../model-router.mjs');
+      const { runModelRouterCommand } = await import('../../model-router.mjs');
       applyResultExitCode(await runModelRouterCommand(parsed.options, { rootDir: workspaceFor(parsed) }));
       return;
     }
@@ -443,13 +443,13 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
       const sub = parsed.options.subcommand || 'summary';
       const runtimeRoot = workspaceFor(parsed);
       if (sub === 'record') {
-        const { recordOutcomeSnapshot } = await import('../perception/outcome-recorder.mjs');
+        const { recordOutcomeSnapshot } = await import('../../perception/outcome-recorder.mjs');
         await recordOutcomeSnapshot(parsed.options, { rootDir: runtimeRoot });
       } else if (sub === 'insights') {
-        const { generateInsights } = await import('../perception/insight-generator.mjs');
+        const { generateInsights } = await import('../../perception/insight-generator.mjs');
         await generateInsights(parsed.options, { rootDir: runtimeRoot });
       } else if (sub === 'summary') {
-        const { runPerceptionSummary } = await import('../perception/perception-summary.mjs');
+        const { runPerceptionSummary } = await import('../../perception/perception-summary.mjs');
         await runPerceptionSummary(parsed.options, { rootDir: runtimeRoot });
       } else {
         throw new Error(`Unknown perception subcommand: ${sub}. Use: record, insights, summary`);
@@ -463,7 +463,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'search') {
-      const { runSearchCommand } = await import('../search/cli.mjs');
+      const { runSearchCommand } = await import('../../search/cli.mjs');
       applyResultExitCode(await runSearchCommand(parsed.options, {
         rootDir: workspaceFor(parsed),
         stdout,

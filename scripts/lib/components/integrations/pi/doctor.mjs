@@ -7,8 +7,8 @@
 // root, never a repo-relative literal.
 import fs from 'node:fs';
 
-import { captureCommand, commandExists } from '../../platform/process.mjs';
-import { getClientHomes } from '../../platform/paths.mjs';
+import { captureCommand, commandExists } from '../../../platform/process.mjs';
+import { getClientHomes } from '../../../platform/paths.mjs';
 import { buildAiosPiMcpServers, isAdapterInstalled, parsePiVersion, piMcpAdapterSpec, resolvePiMcpJsonPath, resolvePiMcpMode } from './mcp-adapter.mjs';
 
 const MANAGED_SERVER_NAMES = ['code-review-graph', 'aios-memory', 'aios-bridge'];

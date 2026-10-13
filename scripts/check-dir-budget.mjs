@@ -48,8 +48,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'docs': 13,
   'scripts/lib/harness/orchestrator': 13,
   'mcp-server/tests': 12,
-  'scripts/lib/cli': 12,
-  'scripts/lib/components': 12,
   'scripts/lib/harness/solo-journal': 12,
   'scripts/lib/harness/solo-runtime': 12,
   'scripts/lib/native': 12,

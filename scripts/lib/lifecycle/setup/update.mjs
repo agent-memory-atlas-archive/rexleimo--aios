@@ -14,11 +14,11 @@ import {
   normalizeWrapMode,
 } from '../govern/options.mjs';
 import { installOrchestratorAgents } from '../../components/agents.mjs';
-import { installBrowserMcp } from '../../components/browser.mjs';
-import { doctorBrowserMcp } from '../../components/browser.mjs';
+import { installBrowserMcp } from '../../components/browser/browser.mjs';
+import { doctorBrowserMcp } from '../../components/browser/browser.mjs';
 import { updateNativeEnhancements } from '../../components/native.mjs';
 import { doctorContextDbShell, installContextDbShell, installPrivacyGuard } from '../../components/shell.mjs';
-import { doctorContextDbSkills, installContextDbSkills } from '../../components/skills.mjs';
+import { doctorContextDbSkills, installContextDbSkills } from '../../components/skills/skills.mjs';
 import { installRexClientProjections } from '../../rex-harness/client-projection.mjs';
 import { updateHarnessRuntime } from './self-update.mjs';
 import { resolveNewestStableRelease } from '../release/release-lookup.mjs';

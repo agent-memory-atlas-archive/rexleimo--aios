@@ -5,7 +5,7 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { getCommandHelpText, getInternalHelpText, getMemoHelpText, getRootHelpText } from '../help.mjs';
+import { getCommandHelpText, getInternalHelpText, getMemoHelpText, getRootHelpText } from '../help/help.mjs';
 
 /** 帮助输出也走统一分发器，保证新增 interception 子命令后 CLI 和文档入口一致 */
 function printHelp(parsed, { stdout = process.stdout } = {}) {

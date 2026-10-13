@@ -11,8 +11,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildAiosPiMcpServers, resolvePiMcpJsonPath } from '../../../lib/components/pi/mcp-adapter.mjs';
-import { doctorPiBridge } from '../../../lib/components/pi/doctor.mjs';
+import { buildAiosPiMcpServers, resolvePiMcpJsonPath } from '../../../lib/components/integrations/pi/mcp-adapter.mjs';
+import { doctorPiBridge } from '../../../lib/components/integrations/pi/doctor.mjs';
 import { AIOS_SYSTEM_PROMPT_ADDITION, buildBeforeAgentStartMessage } from '../../../../packages/aios-pi/lib/gates.mjs';
 import { buildToolDefs } from '../../../../packages/aios-pi/lib/tools.mjs';
 import { memoCheckpointArgs, memoRecallArgs, memoWriteArgs, resolveAiosRoot } from '../../../../packages/aios-pi/lib/aios-cli.mjs';

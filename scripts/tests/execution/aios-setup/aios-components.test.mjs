@@ -16,12 +16,12 @@ import {
   doctorContextDbSkills,
   installContextDbSkills,
   uninstallContextDbSkills,
-} from '../../../lib/components/skills.mjs';
+} from '../../../lib/components/skills/skills.mjs';
 import {
   installOrchestratorAgents,
   uninstallOrchestratorAgents,
 } from '../../../lib/components/agents.mjs';
-import { installBrowserMcp, migrateBrowserMcpConfig } from '../../../lib/components/browser.mjs';
+import { installBrowserMcp, migrateBrowserMcpConfig } from '../../../lib/components/browser/browser.mjs';
 import {
   renderCdpLaunchAgentPlist,
   resolveCdpServiceLayout,

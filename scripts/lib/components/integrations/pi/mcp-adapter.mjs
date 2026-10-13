@@ -23,8 +23,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { PRIMARY_BROWSER_ALIAS } from '../browser/constants.mjs';
-import { resolveLocalBrowserMcpScript } from '../browser/runtime/runtime-paths.mjs';
+import { PRIMARY_BROWSER_ALIAS } from '../../browser/constants.mjs';
+import { resolveLocalBrowserMcpScript } from '../../browser/runtime/runtime-paths.mjs';
 
 export const PI_MCP_ADAPTER_PACKAGE = 'pi-mcp-adapter';
 export const PI_MCP_ADAPTER_VERSION = '2.33.0';

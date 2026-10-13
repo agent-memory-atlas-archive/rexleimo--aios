@@ -13,8 +13,8 @@ import {
   resolveZcodeAgentsPluginDir,
   resolveZcodeUserConfigPath,
   ZCODE_AGENTS_PLUGIN_NAME,
-} from '../../../lib/components/zcode/agents-plugin.mjs';
-import { doctorZcodeAgents } from '../../../lib/components/zcode/doctor.mjs';
+} from '../../../lib/components/integrations/zcode/agents-plugin.mjs';
+import { doctorZcodeAgents } from '../../../lib/components/integrations/zcode/doctor.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 

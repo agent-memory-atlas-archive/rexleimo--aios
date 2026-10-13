@@ -89,7 +89,7 @@ test('the project root channel is declared in the parser, specs, and help text',
   ]) {
     assert.match(read(relativePath), /--project-root <path>/u, `${relativePath} must document the flag`);
   }
-  assert.match(read('lib/cli/dispatch.mjs'), /applyProjectRootFlag\(context, parsed\.options\)/u);
+  assert.match(read('lib/cli/dispatch/dispatch.mjs'), /applyProjectRootFlag\(context, parsed\.options\)/u);
   assert.match(read('aios.mjs'), /resolveProjectRoot\(\{ env: process\.env \}\)/u);
 });
 

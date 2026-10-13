@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { getMemoHelpText } from '../../../cli/help.mjs';
+import { getMemoHelpText } from '../../../cli/help/help.mjs';
 import {
   DEFAULT_AIOS_ROOT_DIR,
   DEFAULT_WORKSPACE_MEMO_ENTRY_MAX_CHARS,

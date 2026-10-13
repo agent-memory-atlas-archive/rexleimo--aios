@@ -2,10 +2,10 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createAiosProgram } from './lib/cli/commander-app.mjs';
-import { createAiosDispatch } from './lib/cli/dispatch.mjs';
+import { createAiosProgram } from './lib/cli/commander/commander-app.mjs';
+import { createAiosDispatch } from './lib/cli/dispatch/dispatch.mjs';
 import { getRuntimeVersion } from './lib/cli/dispatch/runtime.mjs';
-import { getRootHelpText } from './lib/cli/help.mjs';
+import { getRootHelpText } from './lib/cli/help/help.mjs';
 import { resolveProjectRoot } from './lib/cli/project-root.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

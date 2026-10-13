@@ -47,7 +47,7 @@ export const CLI_COMPONENT_RULES = Object.freeze([
   Object.freeze({
     id: 'cli-help-facade',
     label: 'CLI Help Facade',
-    path: 'scripts/lib/cli/help.mjs',
+    path: 'scripts/lib/cli/help/help.mjs',
     maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/cli/help/root.mjs',

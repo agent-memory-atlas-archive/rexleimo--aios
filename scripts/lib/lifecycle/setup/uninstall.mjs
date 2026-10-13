@@ -9,7 +9,7 @@ import {
 import { uninstallOrchestratorAgents } from '../../components/agents.mjs';
 import { uninstallNativeEnhancements } from '../../components/native.mjs';
 import { uninstallContextDbShell } from '../../components/shell.mjs';
-import { uninstallContextDbSkills } from '../../components/skills.mjs';
+import { uninstallContextDbSkills } from '../../components/skills/skills.mjs';
 
 export function normalizeUninstallOptions(rawOptions = {}) {
   const defaults = createDefaultUninstallOptions();
