@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { buildOpenCodeConfig, resolveOpenCodeMaxSteps } from '../../../lib/opencode/config.mjs';
-import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
+import { syncNativeEnhancements } from '../../../lib/native/synchronize/sync.mjs';
 import { runClientsCommand } from '../../../lib/lifecycle/fleet/clients.mjs';
 import { evaluateSkillComplianceDryRun } from '../../../lib/skills/compliance/compliance.mjs';
 import { buildSkillHealthReport, recordSkillObservation } from '../../../lib/skills/compliance/health.mjs';

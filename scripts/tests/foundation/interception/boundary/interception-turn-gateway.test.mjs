@@ -29,7 +29,7 @@ test('turn gateway compresses pre-send prompts before they enter the target clie
   try {
     const rawPrompt = [
       'You are an AIOS worker. Follow the objective and include exact paths.',
-      'Relevant file: scripts/lib/lifecycle/run/harness/execute-turn.mjs:42',
+      'Relevant file: scripts/lib/lifecycle/run/harness/execution/execute-turn.mjs:42',
       PRE_SEND_SENTINEL.repeat(50),
       'Next action: implement the missing turn gateway.',
     ].join('\n');

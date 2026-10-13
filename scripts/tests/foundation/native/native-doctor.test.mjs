@@ -6,9 +6,9 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { runDoctorSuite } from '../../../lib/doctor/aggregate.mjs';
-import { rollbackNativeRepair } from '../../../lib/native/repairs.mjs';
-import { syncRouteTriggerCommands } from '../../../lib/native/route-commands.mjs';
-import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
+import { rollbackNativeRepair } from '../../../lib/native/repair/repairs.mjs';
+import { syncRouteTriggerCommands } from '../../../lib/native/routing/route-commands.mjs';
+import { syncNativeEnhancements } from '../../../lib/native/synchronize/sync.mjs';
 
 function resolveRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

@@ -6,7 +6,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { readNativeSyncMetadata } from '../../../lib/native/install-metadata.mjs';
-import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
+import { syncNativeEnhancements } from '../../../lib/native/synchronize/sync.mjs';
 
 function resolveRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');

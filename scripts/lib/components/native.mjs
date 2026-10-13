@@ -1,7 +1,7 @@
-import { syncNativeEnhancements } from '../native/sync.mjs';
-import { doctorNativeEnhancements as runNativeDoctor } from '../native/doctor.mjs';
-import { getNativeRepair, listNativeRepairs, rollbackNativeRepair } from '../native/repairs.mjs';
-import { checkRouteTriggerCommandsSync, syncRouteTriggerCommands } from '../native/route-commands.mjs';
+import { syncNativeEnhancements } from '../native/synchronize/sync.mjs';
+import { doctorNativeEnhancements as runNativeDoctor } from '../native/health/doctor.mjs';
+import { getNativeRepair, listNativeRepairs, rollbackNativeRepair } from '../native/repair/repairs.mjs';
+import { checkRouteTriggerCommandsSync, syncRouteTriggerCommands } from '../native/routing/route-commands.mjs';
 
 export async function installNativeEnhancements({
   rootDir,

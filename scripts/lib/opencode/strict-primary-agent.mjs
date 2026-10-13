@@ -1,7 +1,7 @@
 import {
   AIOS_NATIVE_BEGIN_MARK,
   AIOS_NATIVE_END_MARK,
-} from '../native/emitters/shared.mjs';
+} from '../native/distribution/emitters/shared.mjs';
 
 export const OPENCODE_STRICT_PRIMARY_AGENT_NAME = 'aios-build';
 export const OPENCODE_STRICT_PRIMARY_AGENT_PATH = `.opencode/agent/${OPENCODE_STRICT_PRIMARY_AGENT_NAME}.md`;

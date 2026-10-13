@@ -9,7 +9,7 @@ import {
   buildRouteTriggerCommandTargets,
   checkRouteTriggerCommandsSync,
   syncRouteTriggerCommands,
-} from '../../../lib/native/route-commands.mjs';
+} from '../../../lib/native/routing/route-commands.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

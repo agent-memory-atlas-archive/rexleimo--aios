@@ -1,2 +1,2 @@
-export { buildIterationPrompt } from './harness/prompt.mjs';
-export { runHarnessCommand } from './harness/commands.mjs';
+export { buildIterationPrompt } from './harness/session/prompt.mjs';
+export { runHarnessCommand } from './harness/execution/commands.mjs';
