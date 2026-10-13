@@ -9,26 +9,26 @@ import {
   SUBAGENT_TIMEOUT_MS_ENV,
   SUPPORTED_CLIENT_IDS,
   SUPPORTED_CLIENTS,
-} from './subagent-runtime/constants.mjs';
+} from './subagent-runtime/state/constants.mjs';
 import {
   cleanupClientStructuredOutputTempDir,
   createClientStructuredOutputTempDir,
 } from './subagent-clients/structured-output.mjs';
 import {
   detectSessionIdFromPlan,
-} from './subagent-runtime/context-packet.mjs';
-import { runDispatchJobs } from './subagent-runtime/dispatch-executor.mjs';
-import { resolveRepoRoot } from './subagent-runtime/paths.mjs';
+} from './subagent-runtime/context/context-packet.mjs';
+import { runDispatchJobs } from './subagent-runtime/run/dispatch-executor.mjs';
+import { resolveRepoRoot } from './subagent-runtime/context/paths.mjs';
 import {
   hasCostTelemetry,
   mergeCostTelemetry,
   normalizeCostTelemetry,
-} from './subagent-runtime/telemetry.mjs';
+} from './subagent-runtime/state/telemetry.mjs';
 import {
   normalizeText,
   parseBooleanEnv,
   parsePositiveInt,
-} from './subagent-runtime/text.mjs';
+} from './subagent-runtime/context/text.mjs';
 
 export {
   SUBAGENT_CLAUDE_UNATTENDED_ENV,
@@ -41,9 +41,9 @@ export {
   SUBAGENT_TIMEOUT_MS_ENV,
   SUBAGENT_UPSTREAM_BACKOFF_MS_ENV,
   SUBAGENT_UPSTREAM_MAX_ATTEMPTS_ENV,
-} from './subagent-runtime/constants.mjs';
+} from './subagent-runtime/state/constants.mjs';
 
-export { runOneShot } from './subagent-runtime/one-shot-runner.mjs';
+export { runOneShot } from './subagent-runtime/run/one-shot-runner.mjs';
 
 function buildUnsupportedClientResult({ clientId, dispatchPlan }) {
   const supportedHint = `Set ${SUBAGENT_CLIENT_ENV} to one of: ${SUPPORTED_CLIENT_IDS.join(', ')}.`;

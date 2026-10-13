@@ -18,7 +18,7 @@ import {
   modelProtocolSet,
   resolveModelForTask,
 } from '../../../lib/model-router.mjs';
-import { resolveExecutionClientId } from '../../../lib/harness/team/subagent-runtime/client-args.mjs';
+import { resolveExecutionClientId } from '../../../lib/harness/team/subagent-runtime/context/client-args.mjs';
 
 // 中文注释：这份用例锁住 provider 与 protocol 的分工。历史上 provider 既当“上游厂商”
 // 又当“可启动客户端”，于是 `aios team --provider pi` 会把 provider=claude 的模型

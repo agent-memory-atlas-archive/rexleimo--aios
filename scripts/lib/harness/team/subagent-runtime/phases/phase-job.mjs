@@ -1,7 +1,7 @@
-import { normalizeModelRouting } from '../../../model-router.mjs';
-import { shouldUseClientStructuredOutput } from '../subagent-clients/structured-output.mjs';
-import { resolveExecutionClientId } from './client-args.mjs';
-import { runOneShot } from './one-shot-runner.mjs';
+import { normalizeModelRouting } from '../../../../model-router.mjs';
+import { shouldUseClientStructuredOutput } from '../../subagent-clients/structured-output.mjs';
+import { resolveExecutionClientId } from '../context/client-args.mjs';
+import { runOneShot } from '../run/one-shot-runner.mjs';
 import {
   buildStructuredOutput,
   injectAgentIdEnv,
@@ -10,13 +10,13 @@ import {
 import { buildBlockedPhaseJobRun } from './phase-blocks.mjs';
 import { readSubagentOutputText } from './phase-output.mjs';
 import { finalizePhaseJobRun } from './phase-job-finalize.mjs';
-import { buildSystemPrompt, buildUserPrompt } from './prompts.mjs';
-import { appendJobFindingsToRoleMemory } from './role-memory.mjs';
-import { collectCostTelemetry } from './telemetry.mjs';
-import { normalizeText } from './text.mjs';
-import { compactSubagentTurnOutput, prepareSubagentTurnPrompts } from './turn-compression.mjs';
-import { extractJsonCandidate } from './handoff-output.mjs';
-import { redactExecutionContextText, redactExecutionContextValue } from '../../ops/runtime-context-redaction.mjs';
+import { buildSystemPrompt, buildUserPrompt } from '../context/prompts.mjs';
+import { appendJobFindingsToRoleMemory } from '../context/role-memory.mjs';
+import { collectCostTelemetry } from '../state/telemetry.mjs';
+import { normalizeText } from '../context/text.mjs';
+import { compactSubagentTurnOutput, prepareSubagentTurnPrompts } from '../state/turn-compression.mjs';
+import { extractJsonCandidate } from '../run/handoff-output.mjs';
+import { redactExecutionContextText, redactExecutionContextValue } from '../../../ops/runtime-context-redaction.mjs';
 import { bindPhaseJobRexActivation, evaluatePhaseJobRexLaunchGate } from './phase-rex.mjs';
 
 export { bindPhaseJobRexActivation };

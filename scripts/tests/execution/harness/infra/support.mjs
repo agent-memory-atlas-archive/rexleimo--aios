@@ -26,7 +26,7 @@ import {
   shouldUseClientStructuredOutput,
 } from '../../../../lib/harness/team/subagent-clients/structured-output.mjs';
 import { buildOneShotInvocation } from '../../../../lib/harness/team/subagent-clients/one-shot.mjs';
-import { runOneShot } from '../../../../lib/harness/team/subagent-runtime/one-shot-runner.mjs';
+import { runOneShot } from '../../../../lib/harness/team/subagent-runtime/run/one-shot-runner.mjs';
 
 export async function pathExists(targetPath) {
   try {

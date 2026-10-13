@@ -4,7 +4,7 @@ import {
   buildRuntimeClientProviderMap,
   getClientCommandName,
   resolveClientRuntimeIds,
-} from '../../../clients/registry.mjs';
+} from '../../../../clients/registry.mjs';
 
 export const SUBAGENT_CLIENT_ENV = 'AIOS_SUBAGENT_CLIENT';
 export const SUBAGENT_CONCURRENCY_ENV = 'AIOS_SUBAGENT_CONCURRENCY';

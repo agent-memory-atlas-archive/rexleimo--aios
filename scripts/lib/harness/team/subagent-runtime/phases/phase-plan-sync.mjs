@@ -10,7 +10,7 @@ export async function maybeSyncPlanOnPhaseSuccess({
   io = null,
 } = {}) {
   try {
-    const { syncPlanWithIterationOutcome } = await import('../../../planning/ops/plan-runtime.mjs');
+    const { syncPlanWithIterationOutcome } = await import('../../../../planning/ops/plan-runtime.mjs');
     return syncPlanWithIterationOutcome({
       rootDir,
       objective: plan?.taskTitle || plan?.objective || job?.jobId,

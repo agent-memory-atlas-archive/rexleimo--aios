@@ -6,13 +6,13 @@ import {
   loadModelAvailability,
   normalizeModelRouting,
   recordModelDispatch,
-} from '../../../model-router.mjs';
+} from '../../../../model-router.mjs';
 
 import {
   clientSupportsModelProtocol,
   getClientModelRouting,
-} from '../../../clients/registry.mjs';
-import { classifyChannelEvidence, recordModelAvailability } from '../../../model-router/routing/availability.mjs';
+} from '../../../../clients/registry.mjs';
+import { classifyChannelEvidence, recordModelAvailability } from '../../../../model-router/routing/availability.mjs';
 
 import {
   SUBAGENT_CLAUDE_UNATTENDED_ENV,
@@ -20,7 +20,7 @@ import {
   SUBAGENT_CODEX_UNATTENDED_ENV,
   SUBAGENT_GEMINI_UNATTENDED_ENV,
   SUBAGENT_GROK_UNATTENDED_ENV,
-} from './constants.mjs';
+} from '../state/constants.mjs';
 import { normalizeText, parseBooleanEnv } from './text.mjs';
 
 export function buildCodexConfigArgs(env = process.env) {

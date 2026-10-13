@@ -2,8 +2,8 @@ import { spawnCommandWithInput } from '../../../platform/process.mjs';
 import {
   SUBAGENT_UPSTREAM_BACKOFF_MS_ENV,
   SUBAGENT_UPSTREAM_MAX_ATTEMPTS_ENV,
-} from '../subagent-runtime/constants.mjs';
-import { parsePositiveInt } from '../subagent-runtime/text.mjs';
+} from '../subagent-runtime/state/constants.mjs';
+import { parsePositiveInt } from '../subagent-runtime/context/text.mjs';
 import { attachExecutedArgs, normalizeSpawnResult } from './spawn-result.mjs';
 
 function isUnsupportedCodexFlagError(text, flags = []) {

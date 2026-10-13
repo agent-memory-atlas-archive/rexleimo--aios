@@ -13,7 +13,7 @@ import {
 } from '../support.mjs';
 
 test('executePhaseJob waits for role-memory persistence before returning', async () => {
-  const { executePhaseJob } = await import('../../../../../lib/harness/team/subagent-runtime/phase-job.mjs');
+  const { executePhaseJob } = await import('../../../../../lib/harness/team/subagent-runtime/phases/phase-job.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-subagent-role-memory-'));
   const gate = Promise.withResolvers();
   let appendStarted = false;
@@ -92,7 +92,7 @@ test('executePhaseJob waits for role-memory persistence before returning', async
 });
 
 test('executePhaseJob compresses subagent prompts before client launch and compacts accepted output', async () => {
-  const { executePhaseJob } = await import('../../../../../lib/harness/team/subagent-runtime/phase-job.mjs');
+  const { executePhaseJob } = await import('../../../../../lib/harness/team/subagent-runtime/phases/phase-job.mjs');
   const { readMetricsRecords } = await import('../../../../../lib/interception/observability/metrics/metrics-sink.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-subagent-turn-'));
   const PRE_SENTINEL = 'SUBAGENT_PRE_SEND_SENTINEL';
@@ -103,7 +103,7 @@ test('executePhaseJob compresses subagent prompts before client launch and compa
     const requiredInstruction = 'REQUIRED_ORIGINAL_TASK_INSTRUCTION_SURVIVES_PRE_SEND';
     const plan = {
       taskTitle: 'Subagent turn compression',
-      contextSummary: `${PRE_SENTINEL.repeat(120)}\n${requiredInstruction}\nscripts/lib/harness/team/subagent-runtime/phase-job.mjs:42`,
+      contextSummary: `${PRE_SENTINEL.repeat(120)}\n${requiredInstruction}\nscripts/lib/harness/team/subagent-runtime/phases/phase-job.mjs:42`,
       phases: [],
       workItems: [],
     };
@@ -140,7 +140,7 @@ test('executePhaseJob compresses subagent prompts before client launch and compa
             fromRole: 'implementer',
             toRole: 'reviewer',
             taskTitle: 'Subagent turn compression',
-            contextSummary: `${POST_SENTINEL.repeat(120)}\nscripts/lib/harness/team/subagent-runtime/phase-output.mjs:7`,
+            contextSummary: `${POST_SENTINEL.repeat(120)}\nscripts/lib/harness/team/subagent-runtime/phases/phase-output.mjs:7`,
             findings: ['compressed'],
             filesTouched: [],
             openQuestions: [],

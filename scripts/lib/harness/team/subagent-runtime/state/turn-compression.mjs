@@ -1,7 +1,7 @@
 /* 中文注释：Subagent turn 压缩集中在这里，避免 phase-job 同时承担 prompt/result 网关细节。 */
-import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../interception/index.mjs';
-import { normalizeText } from './text.mjs';
-import { redactExecutionContextText } from '../../ops/runtime-context-redaction.mjs';
+import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../../interception/index.mjs';
+import { normalizeText } from '../context/text.mjs';
+import { redactExecutionContextText } from '../../../ops/runtime-context-redaction.mjs';
 
 export async function prepareSubagentTurnPrompts({
   rootDir,

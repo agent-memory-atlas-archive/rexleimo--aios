@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { buildClientStructuredOutputOptions } from '../subagent-clients/structured-output.mjs';
-import { CODEX_OUTPUT_SCHEMA_REL, AGENT_ID_ENV } from './constants.mjs';
-import { resolveRepoRoot } from './paths.mjs';
-import { normalizeText, safeFileSlug } from './text.mjs';
+import { buildClientStructuredOutputOptions } from '../../subagent-clients/structured-output.mjs';
+import { CODEX_OUTPUT_SCHEMA_REL, AGENT_ID_ENV } from '../state/constants.mjs';
+import { resolveRepoRoot } from '../context/paths.mjs';
+import { normalizeText, safeFileSlug } from '../context/text.mjs';
 
 export function resolveAgentForJob(job, spec) {
   const agentId = normalizeText(job?.launchSpec?.agentRefId);

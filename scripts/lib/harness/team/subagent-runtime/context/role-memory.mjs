@@ -1,13 +1,13 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { runContextDbCli } from '../../../contextdb-cli.mjs';
+import { runContextDbCli } from '../../../../contextdb-cli.mjs';
 import {
   workspaceMemorySessionId,
   workspaceMemorySessionDir,
   workspaceMemoryMetaPath,
   workspaceMemoryPinnedPath,
-} from '../../../memo/care/workspace-memory.mjs';
+} from '../../../../memo/care/workspace-memory.mjs';
 import { normalizeText } from './text.mjs';
 
 function normalizeRoleMemoryKey(role) {

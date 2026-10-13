@@ -1,7 +1,7 @@
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
-import { mergeParallelHandoffs } from '../../orchestration/orchestrator.mjs';
-import { buildBlockedJobRun } from './job-runs.mjs';
-import { normalizeText } from './text.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
+import { mergeParallelHandoffs } from '../../../orchestration/orchestrator.mjs';
+import { buildBlockedJobRun } from '../run/job-runs.mjs';
+import { normalizeText } from '../context/text.mjs';
 
 function summarizeBlockedDependencies(dependencyRuns = []) {
   return dependencyRuns

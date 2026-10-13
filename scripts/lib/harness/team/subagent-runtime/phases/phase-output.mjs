@@ -1,8 +1,8 @@
 import { promises as fs } from 'node:fs';
 
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
-import { hasCostTelemetry } from './telemetry.mjs';
-import { normalizeText } from './text.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
+import { hasCostTelemetry } from '../state/telemetry.mjs';
+import { normalizeText } from '../context/text.mjs';
 
 export async function readSubagentOutputText({ structuredOutput = null, rawCommandOutput = '' } = {}) {
   let outputText = rawCommandOutput;

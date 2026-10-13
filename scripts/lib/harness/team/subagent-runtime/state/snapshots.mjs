@@ -1,13 +1,13 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { resolveOwnedPathPrefixes } from './file-policy.mjs';
+import { resolveOwnedPathPrefixes } from '../context/file-policy.mjs';
 import {
   normalizeText,
   normalizeWorkspaceRelativePath,
   safeFileSlug,
   toPosixPath,
-} from './text.mjs';
+} from '../context/text.mjs';
 
 export function formatSnapshotTimestamp(ts = new Date()) {
   return ts.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');

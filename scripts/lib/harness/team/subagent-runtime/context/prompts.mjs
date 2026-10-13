@@ -1,5 +1,5 @@
-import { buildModelRouterPromptSection } from '../../../model-router.mjs';
-import { HANDOFF_SCHEMA_DISPLAY_PATH } from './constants.mjs';
+import { buildModelRouterPromptSection } from '../../../../model-router.mjs';
+import { HANDOFF_SCHEMA_DISPLAY_PATH } from '../state/constants.mjs';
 import { resolveOwnedPathPrefixes } from './file-policy.mjs';
 import { normalizeText } from './text.mjs';
 

@@ -1,8 +1,8 @@
-import { commandExists } from '../../../platform/process.mjs';
-import { buildOneShotInvocation } from '../subagent-clients/one-shot.mjs';
-import { runClientInvocation } from '../subagent-clients/invocation-runner.mjs';
+import { commandExists } from '../../../../platform/process.mjs';
+import { buildOneShotInvocation } from '../../subagent-clients/one-shot.mjs';
+import { runClientInvocation } from '../../subagent-clients/invocation-runner.mjs';
 
-import { CLIENT_COMMAND } from './constants.mjs';
+import { CLIENT_COMMAND } from '../state/constants.mjs';
 import {
   buildClaudeUnattendedArgs,
   buildCodexConfigArgs,
@@ -10,8 +10,8 @@ import {
   buildGeminiUnattendedArgs,
   buildGrokUnattendedArgs,
   buildRoutedExtraArgs,
-} from './client-args.mjs';
-import { normalizeText } from './text.mjs';
+} from '../context/client-args.mjs';
+import { normalizeText } from '../context/text.mjs';
 
 const PENDING_SMOKE_SUBAGENT_CLIENTS = new Set([]);
 

@@ -4,10 +4,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { bindPhaseJobRexActivation, executePhaseJob } from '../../../../lib/harness/team/subagent-runtime/phase-job.mjs';
-import { evaluatePhaseFilePolicy } from '../../../../lib/harness/team/subagent-runtime/file-policy.mjs';
+import { bindPhaseJobRexActivation, executePhaseJob } from '../../../../lib/harness/team/subagent-runtime/phases/phase-job.mjs';
+import { evaluatePhaseFilePolicy } from '../../../../lib/harness/team/subagent-runtime/context/file-policy.mjs';
 import { findStandaloneWorkflow } from '../../../../../rex-harness/src/index.mjs';
-import { buildSystemPrompt } from '../../../../lib/harness/team/subagent-runtime/prompts.mjs';
+import { buildSystemPrompt } from '../../../../lib/harness/team/subagent-runtime/context/prompts.mjs';
 
 function job(itemId, prefixes) {
   return {

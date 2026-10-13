@@ -1,6 +1,6 @@
-import { recordPhaseModelDispatch } from './client-args.mjs';
-import { buildBlockedJobRun } from './job-runs.mjs';
-import { clipText, normalizeText } from './text.mjs';
+import { recordPhaseModelDispatch } from '../context/client-args.mjs';
+import { buildBlockedJobRun } from '../run/job-runs.mjs';
+import { clipText, normalizeText } from '../context/text.mjs';
 
 // 纯函数：把不同执行器返回的 attempts 统一为非负整数。
 function normalizeAttemptCount(raw, fallback = 0) {

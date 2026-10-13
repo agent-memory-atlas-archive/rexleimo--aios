@@ -25,7 +25,7 @@ import { evaluateClarityGate } from '../../../lib/harness/quality/clarity-gate.m
 import { buildDispatchInsights } from '../../../lib/harness/team/dispatch-insights.mjs';
 import { persistDispatchEvidence } from '../../../lib/harness/orchestration/orchestrator-evidence.mjs';
 import { buildWorkItemTelemetry } from '../../../lib/harness/orchestration/work-item-telemetry.mjs';
-import { executeMergeGateJob } from '../../../lib/harness/team/subagent-runtime/merge-gate.mjs';
+import { executeMergeGateJob } from '../../../lib/harness/team/subagent-runtime/state/merge-gate.mjs';
 import { planOrchestrate, runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 
 async function importDispatchRuntimes() {

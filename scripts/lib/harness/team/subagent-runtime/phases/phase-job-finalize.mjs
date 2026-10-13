@@ -1,13 +1,13 @@
-import { validateHandoffPayload } from '../../solo/handoff.mjs';
-import { recordPhaseModelDispatch } from './client-args.mjs';
-import { evaluatePhaseFilePolicy, summarizeFilePolicyViolation } from './file-policy.mjs';
-import { buildFailureReason } from './job-runs.mjs';
+import { validateHandoffPayload } from '../../../solo/handoff.mjs';
+import { recordPhaseModelDispatch } from '../context/client-args.mjs';
+import { evaluatePhaseFilePolicy, summarizeFilePolicyViolation } from '../context/file-policy.mjs';
+import { buildFailureReason } from '../run/job-runs.mjs';
 import { maybeRecordWorkerDeathNotice } from './phase-death-notice.mjs';
 import { normalizeResultAttempts } from './phase-job-helpers.mjs';
 import { buildBlockedPhaseJobRun } from './phase-blocks.mjs';
 import { buildCompletedPhaseJobRun, normalizePhaseHandoffPayload, resolvePhaseJobStatus } from './phase-output.mjs';
 import { maybeSyncPlanOnPhaseSuccess } from './phase-plan-sync.mjs';
-import { hasCostTelemetry } from './telemetry.mjs';
+import { hasCostTelemetry } from '../state/telemetry.mjs';
 
 export async function finalizePhaseJobRun({
   plan,

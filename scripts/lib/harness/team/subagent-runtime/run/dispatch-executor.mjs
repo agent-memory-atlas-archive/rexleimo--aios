@@ -1,16 +1,16 @@
 import {
   createPreMutationSnapshot,
   withPreMutationSnapshot,
-} from './snapshots.mjs';
+} from '../state/snapshots.mjs';
 import {
   buildAutoCompletedReadOnlyReviewRun,
   buildBlockedJobRun,
   normalizeSeededJobRun,
   shouldAutoCompleteReadOnlyReviewPhase,
 } from './job-runs.mjs';
-import { executeMergeGateJob } from './merge-gate.mjs';
-import { executePhaseJob } from './phase-job.mjs';
-import { normalizeText } from './text.mjs';
+import { executeMergeGateJob } from '../state/merge-gate.mjs';
+import { executePhaseJob } from '../phases/phase-job.mjs';
+import { normalizeText } from '../context/text.mjs';
 
 function collectSeedJobRuns(dispatchPlan) {
   return Array.isArray(dispatchPlan?.seedJobRuns)

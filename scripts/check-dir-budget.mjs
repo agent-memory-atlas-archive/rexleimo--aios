@@ -42,7 +42,6 @@ export const EXEMPT_DIRS = Object.freeze({
 // codemap/ 已拆完（16→7），故不在此列。
 export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib': 55,
-  'scripts/lib/harness/team/subagent-runtime': 24,
   'agent-sources/roles': 19,
   'docs': 13,
   'skill-sources/rexai-image-generation/scripts': 9,

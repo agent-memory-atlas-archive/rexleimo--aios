@@ -1,7 +1,7 @@
-import { normalizeModelRouting } from '../../../model-router.mjs';
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
-import { clipText, normalizeText } from './text.mjs';
-import { hasCostTelemetry, normalizeCostTelemetry } from './telemetry.mjs';
+import { normalizeModelRouting } from '../../../../model-router.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
+import { clipText, normalizeText } from '../context/text.mjs';
+import { hasCostTelemetry, normalizeCostTelemetry } from '../state/telemetry.mjs';
 
 export function buildBlockedJobRun(plan, job, dependencyRuns, {
   executorLabel,

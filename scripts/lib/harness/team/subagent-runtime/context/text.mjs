@@ -1,4 +1,4 @@
-import { normalizeText } from '../../../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../../../src/shared/normalize.mjs';
 export { normalizeText };
 
 export function clipText(value, maxLen = 8000) {
