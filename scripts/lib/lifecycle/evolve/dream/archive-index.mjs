@@ -7,8 +7,8 @@ import {
   collectRecursiveFiles,
   hashParts,
   readTextIfExists,
-} from '../../../memo/storage/fs-io.mjs';
-import { withMemoRootLock } from '../../../memo/storage/lock.mjs';
+} from '../../../memo/storage/base/fs-io.mjs';
+import { withMemoRootLock } from '../../../memo/storage/base/lock.mjs';
 
 const ARCHIVE_INDEX_SCHEMA_VERSION = 1;
 const ARCHIVE_INDEX_KIND = 'memo.dream-archive-index';

@@ -5,8 +5,8 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { appendMemoEvent, setActiveMemoStorage } from '../../../lib/memo/storage.mjs';
-import { collectEvents } from '../../../lib/memo/storage/events-read.mjs';
-import { withMemoStorageLock } from '../../../lib/memo/storage/lock.mjs';
+import { collectEvents } from '../../../lib/memo/storage/events/events-read.mjs';
+import { withMemoStorageLock } from '../../../lib/memo/storage/base/lock.mjs';
 import { createGcSnapshot } from '../../../lib/lifecycle/evolve/dream/governance.mjs';
 
 async function withRoot(fn) {

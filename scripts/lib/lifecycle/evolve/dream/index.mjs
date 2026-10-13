@@ -9,10 +9,10 @@ import path from 'node:path';
 import { classifyEvent, isExpired, TAXONOMY_CLASSES } from './taxonomy.mjs';
 import { dedupDecisions } from './dedup.mjs';
 import { resolveMemoRoot } from '../../../aios/state-root.mjs';
-import { collectEvents } from '../../../memo/storage/events-read.mjs';
-import { getActiveMemoStorage } from '../../../memo/storage/config.mjs';
-import { atomicWriteText, sha256Hex } from '../../../memo/storage/fs-io.mjs';
-import { readPinnedMemo } from '../../../memo/storage/pinned.mjs';
+import { collectEvents } from '../../../memo/storage/events/events-read.mjs';
+import { getActiveMemoStorage } from '../../../memo/storage/base/config.mjs';
+import { atomicWriteText, sha256Hex } from '../../../memo/storage/base/fs-io.mjs';
+import { readPinnedMemo } from '../../../memo/storage/govern/pinned.mjs';
 
 
 /**

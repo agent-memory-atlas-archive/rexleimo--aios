@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "kind": "aios.skill-training-certification.v2",
+  "skillId": "promo-video-pipeline",
+  "sourcePath": "skill-sources/promo-video-pipeline/SKILL.md",
+  "base": "HEAD",
+  "status": "accepted",
+  "nonRegression": true,
+  "acceptedSkillHash": "24778fc085768deca19a22cff27d22c6f02d3be0caa5580a1c105d4688ffa52b",
+  "baseline": {
+    "kind": "no-skill-control",
+    "contentSha256": "0fd95f98fbd96cabd51a28e383fdf69733517d67fb95d1e5365ad50fa1f0ac01"
+  },
+  "candidate": {
+    "contentSha256": "24778fc085768deca19a22cff27d22c6f02d3be0caa5580a1c105d4688ffa52b"
+  },
+  "metrics": {
+    "baseline": {
+      "taskCount": 3,
+      "trainTaskCount": 2,
+      "validationTaskCount": 1,
+      "trainHard": 1,
+      "validationHard": 0,
+      "overallHard": 0.6666666666666666
+    },
+    "candidate": {
+      "taskCount": 3,
+      "trainTaskCount": 2,
+      "validationTaskCount": 1,
+      "trainHard": 1,
+      "validationHard": 1,
+      "overallHard": 1
+    }
+  },
+  "artifacts": {
+    "tasks": "tasks.json",
+    "baselineSkill": "baseline-skill.md",
+    "baselineRaw": "baseline.raw.json",
+    "baselineScored": "baseline.scored.json",
+    "candidateRaw": "candidate.raw.json",
+    "candidateScored": "candidate.scored.json"
+  },
+  "generatedAt": "2026-10-13T05:17:30.719Z"
+}

@@ -18,7 +18,7 @@
  * before any check can promote.
  */
 
-import { sha256Hex } from '../../../memo/storage/fs-io.mjs';
+import { sha256Hex } from '../../../memo/storage/base/fs-io.mjs';
 import { createVerdict, evaluateVerdict, writeVerdict } from './verdict.mjs';
 
 const VALID_SCOPES = new Set(['session', 'project', 'global']);
@@ -40,7 +40,7 @@ const TRUSTED_CORE_PATTERNS = Object.freeze([
   'evolution/trigger.mjs',
   'evolution/promotion.mjs',
   'evolution/evaluator.mjs',
-  'memo/storage/candidates.mjs',
+  'memo/storage/govern/candidates.mjs',
 ]);
 
 /**

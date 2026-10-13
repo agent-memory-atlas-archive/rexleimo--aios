@@ -6,6 +6,19 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- feat(video): new standalone Remotion sub-app at `video/` producing the 60s / 1920x1080 / 30fps AIOS
+  promo film — 8 scenes drawn entirely with React + SVG (no external assets, offline-reproducible),
+  one timeline source (`video/src/timeline.json`) shared by `timeline.ts` and the render script, and
+  `video/scripts/render.mjs` printing visible render progress in three channels (TTY bar, non-TTY
+  percentage lines every 2.5% for agent capture, throttled `out/render-progress.json`). Every on-screen
+  claim carries a `file:line` citation listed in `video/README.md`; render artifacts stay gitignored.
+- feat(skills): `promo-video-pipeline` dispatches the storyboard as independent per-scene work items
+  (main thread freezes `src/components/**`, `theme.ts`, `PromoVideo.tsx` and `timeline.json`; each
+  subagent owns exactly one `src/scenes/<id>.tsx`), keeps the `aios work --dry-run` preview separate
+  from live approval, and gates completion on real render evidence (mp4 exists, progress json
+  `phase=done`, `renderedFrames == totalFrames`, typecheck and test exit 0). Certified with
+  `nonRegression: true` at `docs/evidence/skill-training/promo-video-pipeline-certification-*/state.json`.
+
 ## [6.3.0] - 2026-10-01
 
 - feat(pi): the Pi MCP bridge now picks its carrier from the installed pi version instead of always

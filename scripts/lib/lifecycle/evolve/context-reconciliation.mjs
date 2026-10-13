@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { resolveAiosStateRoot, resolveContextDbRoot } from '../../aios/state-root.mjs';
 import { isExecutionContextMutationDeclared } from '../../contextdb/execution-context.mjs';
-import { atomicWriteText, sha256Hex } from '../../memo/storage/fs-io.mjs';
+import { atomicWriteText, sha256Hex } from '../../memo/storage/base/fs-io.mjs';
 import { normalizeSessionId, readSessionChangedFiles } from '../../session/changed-files.mjs';
 
 function normalizePath(value) {

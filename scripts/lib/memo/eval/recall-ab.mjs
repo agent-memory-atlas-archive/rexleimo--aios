@@ -12,10 +12,10 @@
 // The gap between the last two is the honest cost of relying on automatic
 // detection instead of asking the writer to declare what a fact replaces.
 
-import { appendMemoEvent, writeExistingEvents } from '../storage/events-write.mjs';
-import { createHashLexicalEmbedder } from '../storage/embedding.mjs';
-import { searchMemoEvents } from '../storage/query.mjs';
-import { proposeSupersedes, DEFAULT_SUPERSEDE_THRESHOLD } from '../storage/temporal.mjs';
+import { appendMemoEvent, writeExistingEvents } from '../storage/events/events-write.mjs';
+import { createHashLexicalEmbedder } from '../storage/mind/embedding.mjs';
+import { searchMemoEvents } from '../storage/views/query.mjs';
+import { proposeSupersedes, DEFAULT_SUPERSEDE_THRESHOLD } from '../storage/govern/temporal.mjs';
 
 const BASE_TS = Date.parse('2026-01-01T00:00:00.000Z');
 const TS_STEP_MS = 60 * 60 * 1000;

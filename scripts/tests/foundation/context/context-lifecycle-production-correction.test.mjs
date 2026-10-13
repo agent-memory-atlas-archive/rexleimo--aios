@@ -19,7 +19,7 @@ import { evaluateContextReconciliation } from '../../../lib/lifecycle/evolve/con
 import { recordSessionChangedFile } from '../../../lib/session/changed-files.mjs';
 import {
   readCandidateGovernanceReceipts,
-} from '../../../lib/memo/storage/candidates.mjs';
+} from '../../../lib/memo/storage/govern/candidates.mjs';
 import {
   gcDreamProposal,
   readDreamGovernanceReceipts,

@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
-import { getActiveMemoStorage } from './storage/config.mjs';
-import { collectEvents } from './storage/events-read.mjs';
+import { getActiveMemoStorage } from './storage/base/config.mjs';
+import { collectEvents } from './storage/events/events-read.mjs';
 
 /* F3 migration importers: bring external assistant-memory files into the
  * governed memo queue as candidates. Nothing is promoted here — imported

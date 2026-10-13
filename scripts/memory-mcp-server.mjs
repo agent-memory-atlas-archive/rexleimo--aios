@@ -89,12 +89,12 @@ async function handleMemoryRecall(args = {}) {
 }
 
 async function getActiveStorage(root) {
-  const { getActiveMemoStorage } = await import('./lib/memo/storage/config.mjs');
+  const { getActiveMemoStorage } = await import('./lib/memo/storage/base/config.mjs');
   return await getActiveMemoStorage(root);
 }
 
 async function handleMemoryWrite(args = {}) {
-  const { appendMemoEvent } = await import('./lib/memo/storage/events-write.mjs');
+  const { appendMemoEvent } = await import('./lib/memo/storage/events/events-write.mjs');
   const text = String(args.text || '').trim();
   if (!text) throw new Error('text is required');
   const root = resolveWorkspaceRoot();
@@ -116,7 +116,7 @@ async function handleMemoryWrite(args = {}) {
 }
 
 async function handleMemoryCheckpoint(args = {}) {
-  const { appendPinnedMemo } = await import('./lib/memo/storage/pinned.mjs');
+  const { appendPinnedMemo } = await import('./lib/memo/storage/govern/pinned.mjs');
   const text = String(args.text || '').trim();
   if (!text) throw new Error('text is required');
   const root = resolveWorkspaceRoot();

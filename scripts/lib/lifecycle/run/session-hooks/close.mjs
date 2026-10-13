@@ -1,8 +1,8 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
-import { readJsonlEvents } from '../../../memo/storage/events-read.mjs';
-import { atomicWriteText } from '../../../memo/storage/fs-io.mjs';
+import { readJsonlEvents } from '../../../memo/storage/events/events-read.mjs';
+import { atomicWriteText } from '../../../memo/storage/base/fs-io.mjs';
 import { normalizeSessionId, readSessionChangedFiles } from '../../../session/changed-files.mjs';
 
 const SUMMARY_MAX_CHARS = 200;

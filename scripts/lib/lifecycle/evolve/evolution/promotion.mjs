@@ -27,7 +27,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveMemoRoot } from '../../../aios/state-root.mjs';
 import { sanitizeFileSegment } from '../../../fs/file-segment.mjs';
-import { atomicWriteText, sha256Hex } from '../../../memo/storage/fs-io.mjs';
+import { atomicWriteText, sha256Hex } from '../../../memo/storage/base/fs-io.mjs';
 import { readVerdict } from './verdict.mjs';
 
 const PROMOTIONS_DIR = 'promotions';

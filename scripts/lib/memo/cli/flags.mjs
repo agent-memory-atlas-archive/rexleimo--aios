@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { normalizeIsoTimestamp, toSupersedes } from '../storage/temporal.mjs';
+import { normalizeIsoTimestamp, toSupersedes } from '../storage/govern/temporal.mjs';
 import {
   DEFAULT_LIST_LIMIT,
   DEFAULT_RECALL_HIGHLIGHT_LIMIT,

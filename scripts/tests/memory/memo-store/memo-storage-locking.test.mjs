@@ -12,7 +12,7 @@ import {
   recoverStaleMemoRootLock,
   resolveMemoStorageLockPath,
   withMemoStorageLock,
-} from '../../../lib/memo/storage/lock.mjs';
+} from '../../../lib/memo/storage/base/lock.mjs';
 
 const workerPath = path.resolve(process.cwd(), 'scripts', 'tests', 'fixtures', 'memo-storage-append-worker.mjs');
 

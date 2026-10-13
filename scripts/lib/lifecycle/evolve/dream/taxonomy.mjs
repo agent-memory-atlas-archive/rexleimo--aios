@@ -3,7 +3,7 @@
  * Pure deterministic rules, no LLM calls.
  */
 
-import { normalizeMemoScope } from '../../../memo/storage/normalizers.mjs';
+import { normalizeMemoScope } from '../../../memo/storage/base/normalizers.mjs';
 
 export const TAXONOMY_CLASSES = {
   STABLE_PREFERENCE: 'STABLE_PREFERENCE',

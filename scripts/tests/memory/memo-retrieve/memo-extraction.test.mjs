@@ -14,7 +14,7 @@ import {
   normalizeExtractionEntities,
   normalizeExtractionEvidenceRef,
   normalizeExtractionFact,
-} from '../../../lib/memo/storage/extraction.mjs';
+} from '../../../lib/memo/storage/mind/extraction.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

@@ -23,7 +23,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveMemoRoot } from '../../aios/state-root.mjs';
-import { atomicWriteText } from '../../memo/storage/fs-io.mjs';
+import { atomicWriteText } from '../../memo/storage/base/fs-io.mjs';
 
 const NOTICE_STATE_FILE = 'update-notice.json';
 const CHANNELS = new Set(['stable', 'beta', 'dev']);

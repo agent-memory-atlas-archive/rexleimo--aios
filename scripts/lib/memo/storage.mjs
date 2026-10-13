@@ -1,25 +1,25 @@
 export {
   DEFAULT_MEMO_STORAGE,
   SUPPORTED_MEMO_STORAGES,
-} from './storage/constants.mjs';
+} from './storage/base/constants.mjs';
 export {
   getActiveMemoStorage,
   setActiveMemoStorage,
-} from './storage/config.mjs';
+} from './storage/base/config.mjs';
 export {
   appendMemoEvent,
-} from './storage/events-write.mjs';
+} from './storage/events/events-write.mjs';
 export {
   normalizeMemoStorageName,
-} from './storage/normalizers.mjs';
+} from './storage/base/normalizers.mjs';
 export {
   listMemoEvents,
   searchMemoEvents,
-} from './storage/query.mjs';
+} from './storage/views/query.mjs';
 export {
   buildMemoAuthority,
   normalizeRuntimeIdentity,
-} from './storage/provenance.mjs';
+} from './storage/govern/provenance.mjs';
 export {
   expireMemoryCandidate,
   inspectMemoryCandidate,
@@ -27,21 +27,21 @@ export {
   promoteMemoryCandidate,
   readCandidateGovernanceReceipts,
   rejectMemoryCandidate,
-} from './storage/candidates.mjs';
+} from './storage/govern/candidates.mjs';
 export {
   appendPinnedMemo,
   readPinnedMemo,
   writePinnedMemo,
-} from './storage/pinned.mjs';
+} from './storage/govern/pinned.mjs';
 export {
   rebuildMemoStorage,
-} from './storage/derived.mjs';
+} from './storage/views/derived.mjs';
 export {
   switchMemoStorage,
-} from './storage/migration.mjs';
+} from './storage/mind/migration.mjs';
 export {
   getMemoStorageStatus,
-} from './storage/status.mjs';
+} from './storage/views/status.mjs';
 export {
   runMemoStorageDoctor,
-} from './storage/doctor.mjs';
+} from './storage/mind/doctor.mjs';

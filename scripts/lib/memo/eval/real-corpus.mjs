@@ -1,5 +1,5 @@
-import { collectEvents } from '../storage/events-read.mjs';
-import { searchMemoEvents, tokenizeForMatch } from '../storage/query.mjs';
+import { collectEvents } from '../storage/events/events-read.mjs';
+import { searchMemoEvents, tokenizeForMatch } from '../storage/views/query.mjs';
 
 /* G1 real-corpus eval: the AB harness measures synthetic chains; this harness
  * measures the live project corpus instead, so retrieval changes are judged

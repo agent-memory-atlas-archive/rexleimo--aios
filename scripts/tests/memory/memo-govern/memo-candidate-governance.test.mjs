@@ -19,7 +19,7 @@ import {
   promoteMemoryCandidate,
   readCandidateGovernanceReceipts,
   rejectMemoryCandidate,
-} from '../../../lib/memo/storage/candidates.mjs';
+} from '../../../lib/memo/storage/govern/candidates.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

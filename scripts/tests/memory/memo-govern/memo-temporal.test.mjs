@@ -18,7 +18,7 @@ import {
   partitionSupersedes,
   proposeSupersedes,
   toSupersedes,
-} from '../../../lib/memo/storage/temporal.mjs';
+} from '../../../lib/memo/storage/govern/temporal.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const cliPath = path.resolve(here, '..', '..', '..', 'aios.mjs');

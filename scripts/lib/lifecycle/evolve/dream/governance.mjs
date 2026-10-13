@@ -3,11 +3,11 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { resolveMemoRoot } from '../../../aios/state-root.mjs';
-import { collectEvents } from '../../../memo/storage/events-read.mjs';
-import { appendText, atomicWriteText, collectRecursiveFiles, readTextIfExists, sha256Hex } from '../../../memo/storage/fs-io.mjs';
-import { fileEventsPath, splitEventsRoot } from '../../../memo/storage/paths.mjs';
-import { normalizeRuntimeIdentity } from '../../../memo/storage/provenance.mjs';
-import { withMemoStorageLock } from '../../../memo/storage/lock.mjs';
+import { collectEvents } from '../../../memo/storage/events/events-read.mjs';
+import { appendText, atomicWriteText, collectRecursiveFiles, readTextIfExists, sha256Hex } from '../../../memo/storage/base/fs-io.mjs';
+import { fileEventsPath, splitEventsRoot } from '../../../memo/storage/base/paths.mjs';
+import { normalizeRuntimeIdentity } from '../../../memo/storage/govern/provenance.mjs';
+import { withMemoStorageLock } from '../../../memo/storage/base/lock.mjs';
 import { readOrRebuildDreamArchiveIndex } from './archive-index.mjs';
 
 const ACTIONS = new Set(['approve', 'reject', 'archive', 'restore', 'gc']);

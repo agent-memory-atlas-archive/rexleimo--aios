@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   PINNED_DEFAULT_MAX_CHARS,
   renderPinnedBlock,
-} from '../../../lib/memo/storage/pinned.mjs';
+} from '../../../lib/memo/storage/govern/pinned.mjs';
 
 test('render numbers lines and reports margin metadata', () => {
   const rendered = renderPinnedBlock('first\nsecond\nthird');

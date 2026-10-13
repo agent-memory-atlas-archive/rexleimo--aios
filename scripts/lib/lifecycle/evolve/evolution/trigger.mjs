@@ -12,8 +12,8 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { resolveMemoRoot } from '../../../aios/state-root.mjs';
-import { atomicWriteText } from '../../../memo/storage/fs-io.mjs';
-import { listMemoryCandidates } from '../../../memo/storage/candidates.mjs';
+import { atomicWriteText } from '../../../memo/storage/base/fs-io.mjs';
+import { listMemoryCandidates } from '../../../memo/storage/govern/candidates.mjs';
 
 const TRIGGER_STATE_FILE = 'trigger-state.json';
 const DEFAULT_CONFIG = Object.freeze({

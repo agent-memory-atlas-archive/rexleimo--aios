@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { appendMemoEvent } from '../../../lib/memo/storage/events-write.mjs';
-import { collectEvents } from '../../../lib/memo/storage/events-read.mjs';
+import { appendMemoEvent } from '../../../lib/memo/storage/events/events-write.mjs';
+import { collectEvents } from '../../../lib/memo/storage/events/events-read.mjs';
 import {
   ENTITY_DIRECT_BOOST,
   ENTITY_SPREAD_ATTENUATION,
@@ -14,7 +14,7 @@ import {
   normalizeEntity,
   scoreEventsWithEntity,
   searchMemoEvents,
-} from '../../../lib/memo/storage/query.mjs';
+} from '../../../lib/memo/storage/views/query.mjs';
 import { buildCorpusEvents, runArm } from '../../../lib/memo/eval/recall-ab.mjs';
 
 async function withTempRoot(fn) {

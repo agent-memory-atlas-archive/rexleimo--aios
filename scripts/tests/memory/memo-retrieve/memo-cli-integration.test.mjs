@@ -216,8 +216,8 @@ test('aios memo recall emits readable digest from active storage records', async
 
 /* ── Session close auto-memo & start timeline tests ── */
 
-import { appendMemoEvent } from '../../../lib/memo/storage/events-write.mjs';
-import { listMemoEvents } from '../../../lib/memo/storage/query.mjs';
+import { appendMemoEvent } from '../../../lib/memo/storage/events/events-write.mjs';
+import { listMemoEvents } from '../../../lib/memo/storage/views/query.mjs';
 import {
   autoMemoSessionClose,
   readSessionCloseCandidate,

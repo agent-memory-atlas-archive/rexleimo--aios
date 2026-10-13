@@ -13,17 +13,17 @@ import {
   resolveActiveSpace,
   writeActiveSpaceToState,
 } from './workspace-state.mjs';
-import { handleMemoAddCommand, handleMemoListCommand, handleMemoRecallCommand, handleMemoSearchCommand } from './commands/events.mjs';
-import { handleMemoHygieneCommand } from './commands/hygiene.mjs';
-import { handleMemoPinCommand } from './commands/pin.mjs';
-import { handleMemoCheckpointCommand } from './commands/checkpoint.mjs';
-import { handleMemoReportCommand } from './commands/report.mjs';
-import { handleMemoUsefulCommand } from './commands/useful.mjs';
-import { handleMemoSpaceCommand } from './commands/space.mjs';
-import { handleMemoStorageCommand } from './commands/storage.mjs';
-import { handleMemoSupersedeCommand } from './commands/supersede.mjs';
-import { handleMemoCandidateCommand } from './commands/candidates.mjs';
-import { handlePersonaCommand } from './commands/persona.mjs';
+import { handleMemoAddCommand, handleMemoListCommand, handleMemoRecallCommand, handleMemoSearchCommand } from './commands/ops/events.mjs';
+import { handleMemoHygieneCommand } from './commands/review/hygiene.mjs';
+import { handleMemoPinCommand } from './commands/curate/pin.mjs';
+import { handleMemoCheckpointCommand } from './commands/ops/checkpoint.mjs';
+import { handleMemoReportCommand } from './commands/review/report.mjs';
+import { handleMemoUsefulCommand } from './commands/curate/useful.mjs';
+import { handleMemoSpaceCommand } from './commands/ops/space.mjs';
+import { handleMemoStorageCommand } from './commands/review/storage.mjs';
+import { handleMemoSupersedeCommand } from './commands/curate/supersede.mjs';
+import { handleMemoCandidateCommand } from './commands/curate/candidates.mjs';
+import { handlePersonaCommand } from './commands/review/persona.mjs';
 
 function resolveWorkspaceMemoLimits(env = process.env) {
   return {

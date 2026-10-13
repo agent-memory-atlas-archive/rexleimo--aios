@@ -29,7 +29,7 @@ import { createVerdict, writeVerdict, readVerdict } from './verdict.mjs';
 import {
   listMemoryCandidates,
   readCandidateGovernanceReceipts,
-} from '../../../memo/storage/candidates.mjs';
+} from '../../../memo/storage/govern/candidates.mjs';
 import { listDreamProposals } from '../dream/governance.mjs';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 

@@ -11,9 +11,9 @@ import {
   memoEventsCacheStats,
   readJsonlEvents,
   readSplitEvents,
-} from '../../../lib/memo/storage/events-read.mjs';
-import { fileEventsPath } from '../../../lib/memo/storage/paths.mjs';
-import { searchMemoEvents } from '../../../lib/memo/storage/query.mjs';
+} from '../../../lib/memo/storage/events/events-read.mjs';
+import { fileEventsPath } from '../../../lib/memo/storage/base/paths.mjs';
+import { searchMemoEvents } from '../../../lib/memo/storage/views/query.mjs';
 
 async function withTempRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

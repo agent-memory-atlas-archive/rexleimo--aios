@@ -6,12 +6,12 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { appendPinnedMemo } from '../../../memo/storage/pinned.mjs';
-import { getActiveMemoStorage } from '../../../memo/storage/config.mjs';
+import { appendPinnedMemo } from '../../../memo/storage/govern/pinned.mjs';
+import { getActiveMemoStorage } from '../../../memo/storage/base/config.mjs';
 import { runDream } from './index.mjs';
 import { TAXONOMY_CLASSES } from './taxonomy.mjs';
-import { collectEvents } from '../../../memo/storage/events-read.mjs';
-import { segmentWords } from '../../../memo/storage/query.mjs';
+import { collectEvents } from '../../../memo/storage/events/events-read.mjs';
+import { segmentWords } from '../../../memo/storage/views/query.mjs';
 
 const AGENTS_DREAM_BEGIN = '<!-- AIOS DREAM BEGIN -->';
 const AGENTS_DREAM_END = '<!-- AIOS DREAM END -->';

@@ -13,11 +13,11 @@ export {
 
 export {
   appendMemoEvent,
-} from './storage/events-write.mjs';
-export { readJsonlEvents, collectEvents } from './storage/events-read.mjs';
-export { listMemoEvents, searchMemoEvents } from './storage/query.mjs';
-export { getActiveMemoStorage } from './storage/config.mjs';
-export { normalizeMemoStorageName, normalizeMemoScope } from './storage/normalizers.mjs';
-export { atomicWriteText } from './storage/fs-io.mjs';
-export { fileEventsPath } from './storage/paths.mjs';
-export { readPinnedMemo } from './storage/pinned.mjs';
+} from './storage/events/events-write.mjs';
+export { readJsonlEvents, collectEvents } from './storage/events/events-read.mjs';
+export { listMemoEvents, searchMemoEvents } from './storage/views/query.mjs';
+export { getActiveMemoStorage } from './storage/base/config.mjs';
+export { normalizeMemoStorageName, normalizeMemoScope } from './storage/base/normalizers.mjs';
+export { atomicWriteText } from './storage/base/fs-io.mjs';
+export { fileEventsPath } from './storage/base/paths.mjs';
+export { readPinnedMemo } from './storage/govern/pinned.mjs';

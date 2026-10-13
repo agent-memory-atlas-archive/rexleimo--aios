@@ -9,7 +9,7 @@ import {
   buildRealCorpusQueries,
   measureRealCorpus,
 } from '../../../lib/memo/eval/real-corpus.mjs';
-import { normalizeEventRows } from '../../../lib/memo/storage/normalizers.mjs';
+import { normalizeEventRows } from '../../../lib/memo/storage/base/normalizers.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..', '..');

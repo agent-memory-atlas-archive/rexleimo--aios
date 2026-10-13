@@ -12,7 +12,7 @@ import {
   splitMarkdownFacts,
 } from '../../../lib/memo/import-external.mjs';
 import { importExternalMemories } from '../../../lib/memo/import-external.mjs';
-import { collectEvents } from '../../../lib/memo/storage/events-read.mjs';
+import { collectEvents } from '../../../lib/memo/storage/events/events-read.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CLI_PATH = path.resolve(HERE, '..', '..', '..', 'aios.mjs');

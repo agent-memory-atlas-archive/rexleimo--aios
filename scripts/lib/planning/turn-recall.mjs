@@ -10,8 +10,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { searchAiosProject } from '../search/unified-search.mjs';
-import { segmentWords, tokenizeForMatch } from '../memo/storage/query.mjs';
-import { recordMemoRecallFeedback } from '../memo/storage/feedback.mjs';
+import { segmentWords, tokenizeForMatch } from '../memo/storage/views/query.mjs';
+import { recordMemoRecallFeedback } from '../memo/storage/mind/feedback.mjs';
 import { parseMemoryDeclaration } from '../memo/declaration.mjs';
 
 const MAX_HITS = 6;

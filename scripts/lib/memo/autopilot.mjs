@@ -5,9 +5,9 @@ import path from 'node:path';
 import { resolveContextDbRoot } from '../aios/state-root.mjs';
 import { assertWorkspaceMemoryContentSafe } from './safety.mjs';
 import { appendMemoEvent, getActiveMemoStorage, listMemoEvents } from './storage.mjs';
-import { collectEvents } from './storage/events-read.mjs';
-import { recordMemoRecallFeedback } from './storage/feedback.mjs';
-import { appendText, sha256Hex } from './storage/fs-io.mjs';
+import { collectEvents } from './storage/events/events-read.mjs';
+import { recordMemoRecallFeedback } from './storage/mind/feedback.mjs';
+import { appendText, sha256Hex } from './storage/base/fs-io.mjs';
 import { stripMemoryDeclaration } from './declaration.mjs';
 
 export const AUTO_MEMORY_POLICY_REVISION = 'auto-memory-v1';

@@ -20,7 +20,7 @@
  * - trustedCoreFixture()      candidate touching trusted-core files
  */
 
-import { sha256Hex } from '../../../lib/memo/storage/fs-io.mjs';
+import { sha256Hex } from '../../../lib/memo/storage/base/fs-io.mjs';
 
 const BASELINE_CONTENT = 'Always run the test suite before claiming a task is complete.';
 

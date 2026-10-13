@@ -9,8 +9,8 @@ import {
   cosineSimilarity,
   createHashLexicalEmbedder,
   resolveEmbedderFromEnv,
-} from '../../../lib/memo/storage/embedding.mjs';
-import { searchMemoEvents } from '../../../lib/memo/storage/query.mjs';
+} from '../../../lib/memo/storage/mind/embedding.mjs';
+import { searchMemoEvents } from '../../../lib/memo/storage/views/query.mjs';
 
 function row(eventId, ts, text, extra = {}) {
   return {

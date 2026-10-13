@@ -1,4 +1,4 @@
-import { listMemoEvents } from '../../../memo/storage/query.mjs';
+import { listMemoEvents } from '../../../memo/storage/views/query.mjs';
 
 const KIND_ICONS = {
   memo: '📝',
