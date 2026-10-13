@@ -17,7 +17,7 @@ import {
   evaluateAiosSoftwareRequest,
   startAiosCapabilityActivation,
   startAiosSoftwareWorkflow,
-} from '../../../../lib/workflows/rex-harness-adapter.mjs';
+} from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
 
 const ADAPTER_PARITY_SCENARIO = Object.freeze({

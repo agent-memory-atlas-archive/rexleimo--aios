@@ -1,5 +1,5 @@
 import { reconcileRexWorkflowSurface } from './rex-workflow-surface-reconciliation.mjs';
-import { ensureRexHarness, isAiosRuntimeRoot } from '../rex-harness/runtime.mjs';
+import { ensureRexHarness, isAiosRuntimeRoot } from '../../rex-harness/runtime.mjs';
 
 /**
  * Lifecycle callers share this adapter so a preserved user-owned projection is

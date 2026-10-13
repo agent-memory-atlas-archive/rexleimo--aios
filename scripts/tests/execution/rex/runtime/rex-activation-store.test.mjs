@@ -20,7 +20,7 @@ import {
   continueStoredAiosSoftwareWorkflow,
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/rex-activation-store.mjs';
+} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
 
 const SCENARIO_GREEN_MARKER = '.rex-scenario-green';
 const SCENARIO_ARGS = Object.freeze([

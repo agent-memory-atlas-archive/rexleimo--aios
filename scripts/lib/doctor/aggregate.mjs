@@ -12,7 +12,7 @@ import { getDisabledGateIds, isHarnessGateEnabled } from '../harness/profile.mjs
 import { commandExists, captureCommand, runCommand } from '../platform/process.mjs';
 import { doctorRexHarness, isAiosRuntimeRoot } from '../rex-harness/runtime.mjs';
 import { inspectTokenDiscipline, printTokenDisciplineReport } from '../token-discipline/index.mjs';
-import { reconcileLegacyWorkflowSurface } from '../workflows/rex-workflow-surface-lifecycle.mjs';
+import { reconcileLegacyWorkflowSurface } from '../workflows/surface/rex-workflow-surface-lifecycle.mjs';
 import { runNativeOnlyDoctor } from './aggregate/native-only.mjs';
 import { addDoctorCheck, countEffectiveWarnLines, logSkippedGate, printCaptured, printDoctorCheckSummary } from './aggregate/reporting.mjs';
 

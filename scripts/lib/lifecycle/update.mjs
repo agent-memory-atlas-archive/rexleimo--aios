@@ -22,7 +22,7 @@ import { doctorContextDbSkills, installContextDbSkills } from '../components/ski
 import { installRexClientProjections } from '../rex-harness/client-projection.mjs';
 import { updateHarnessRuntime } from './self-update.mjs';
 import { resolveNewestStableRelease } from './release-lookup.mjs';
-import { prepareRexWorkflowSurface } from '../workflows/rex-workflow-surface-lifecycle.mjs';
+import { prepareRexWorkflowSurface } from '../workflows/surface/rex-workflow-surface-lifecycle.mjs';
 import { checkForUpdate, renderUpdateNotice } from './update-notice.mjs';
 
 async function fetchLatestAiosRelease() {

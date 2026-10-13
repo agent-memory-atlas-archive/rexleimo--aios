@@ -227,7 +227,7 @@ async function executePrompt(opts) {
     routeMode: routeDecision.routeMode,
   });
   if (workflow?.capabilityCommand?.provider?.kind === 'agent') {
-    const { prepareAiosAgentProviderExecution } = await import('../workflows/rex-agent-provider.mjs');
+    const { prepareAiosAgentProviderExecution } = await import('../workflows/adapters/rex-agent-provider.mjs');
     const prepared = await prepareAiosAgentProviderExecution({
       command: workflow.capabilityCommand,
       evidenceRoot: opts.workspaceRoot,
@@ -319,7 +319,7 @@ async function ingestRexProviderEvidence(opts, workflow, output, exitCode) {
   }
 
   try {
-    const { ingestCapabilityProviderOutput } = await import('../workflows/rex-capability-runtime.mjs');
+    const { ingestCapabilityProviderOutput } = await import('../workflows/adapters/rex-capability-runtime.mjs');
 
     // host 侧判定闸门（opt-in）。默认关闭时 evaluateStageAdvanceGate 立即返回 advance，
     // 既不解析信封也不出网，rex 行为与引入闸门前一致。它只能收窄：advance | hold。

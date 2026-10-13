@@ -1,5 +1,5 @@
 import { buildWorkflowDryRun, listWorkflowRecipes } from '../workflows/recipes.mjs';
-import { prepareRexWorkflowSurface } from '../workflows/rex-workflow-surface-lifecycle.mjs';
+import { prepareRexWorkflowSurface } from '../workflows/surface/rex-workflow-surface-lifecycle.mjs';
 
 function renderRecipeText(report) {
   const lines = [`AIOS workflow recipes (${report.policy})`];

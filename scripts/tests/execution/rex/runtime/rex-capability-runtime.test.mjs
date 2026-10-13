@@ -12,12 +12,12 @@ import {
   parseAgentProviderHandoff,
   parseCapabilityEvidenceEnvelope,
   recordAiosCapabilityEvidence,
-} from '../../../../lib/workflows/rex-capability-runtime.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/rex-harness-adapter.mjs';
+} from '../../../../lib/workflows/adapters/rex-capability-runtime.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
 import {
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/rex-activation-store.mjs';
+} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
 

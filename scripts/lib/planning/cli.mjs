@@ -19,7 +19,7 @@ import {
   confirmTaskContextCandidates,
   proposeTaskContextCandidates,
 } from './context-candidates.mjs';
-import { recordAiosCapabilityEvidence } from '../workflows/rex-capability-runtime.mjs';
+import { recordAiosCapabilityEvidence } from '../workflows/adapters/rex-capability-runtime.mjs';
 
 function isContainedPath(rootPath, candidatePath) {
   const relative = path.relative(rootPath, candidatePath);

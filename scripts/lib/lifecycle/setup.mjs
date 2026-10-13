@@ -16,7 +16,7 @@ import { installNativeEnhancements } from '../components/native.mjs';
 import { doctorContextDbShell, installContextDbShell, installPrivacyGuard } from '../components/shell.mjs';
 import { doctorContextDbSkills, installContextDbSkills } from '../components/skills.mjs';
 import { installRexClientProjections } from '../rex-harness/client-projection.mjs';
-import { prepareRexWorkflowSurface } from '../workflows/rex-workflow-surface-lifecycle.mjs';
+import { prepareRexWorkflowSurface } from '../workflows/surface/rex-workflow-surface-lifecycle.mjs';
 
 function isMissingBrowserMcpRuntimeError(error) {
   const message = error instanceof Error ? error.message : String(error || '');

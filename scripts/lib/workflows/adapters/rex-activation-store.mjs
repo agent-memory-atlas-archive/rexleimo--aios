@@ -9,7 +9,7 @@ import {
   persistStandaloneWorkflow,
   resolveStandaloneExecutionReceipt,
   validateCommandEvidence,
-} from '../../../rex-harness/src/index.mjs';
+} from '../../../../rex-harness/src/index.mjs';
 
 import {
   advanceAiosSoftwareWorkflow,

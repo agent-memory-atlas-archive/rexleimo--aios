@@ -10,7 +10,7 @@ import { MANAGED_RUNNER } from '../../../../lib/evidence/live-execution.mjs';
 import {
   prepareAiosAgentProviderExecution,
   resolveAiosAgentProvider,
-} from '../../../../lib/workflows/rex-agent-provider.mjs';
+} from '../../../../lib/workflows/adapters/rex-agent-provider.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../..');
 

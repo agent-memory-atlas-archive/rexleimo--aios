@@ -3,8 +3,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { writeFileAtomic } from '../fs/atomic-write.mjs';
-import { getAgentsHome, getClientHomes } from '../platform/paths.mjs';
+import { writeFileAtomic } from '../../fs/atomic-write.mjs';
+import { getAgentsHome, getClientHomes } from '../../platform/paths.mjs';
 
 const LEDGER_SCHEMA_VERSION = 1;
 const OWNERSHIP_MARKER = 'aios';

@@ -102,7 +102,7 @@ export async function evaluateStageAdvanceGate({
   let parsedEnvelope = envelope;
   if (!parsedEnvelope) {
     try {
-      const { parseCapabilityEvidenceEnvelope } = await import('../workflows/rex-capability-runtime.mjs');
+      const { parseCapabilityEvidenceEnvelope } = await import('../workflows/adapters/rex-capability-runtime.mjs');
       parsedEnvelope = parseCapabilityEvidenceEnvelope(output, {
         activationId: command?.activationId,
         capabilityId: command?.capabilityId,

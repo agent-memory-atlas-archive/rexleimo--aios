@@ -1,7 +1,7 @@
 // scripts/lib/workflows/recipes/definitions.mjs — 工作流配方定义
 // 从 recipes.mjs 拆分：QUALITY_GATE_EVIDENCE 常量 + RECIPES 数据 + 辅助函数
 
-import { buildRexWorkflowDefinitions } from '../rex-harness-adapter.mjs';
+import { buildRexWorkflowDefinitions } from '../adapters/rex-harness-adapter.mjs';
 
 /** 质量门常规定义 */
 export const QUALITY_GATE_EVIDENCE = Object.freeze({

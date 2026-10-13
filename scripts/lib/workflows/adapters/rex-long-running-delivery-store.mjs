@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { advanceLongRunningDelivery } from '../../../rex-harness/src/index.mjs';
+import { advanceLongRunningDelivery } from '../../../../rex-harness/src/index.mjs';
 
 const DELIVERY_DIR = path.join('.aios', 'workflow-activations', 'long-running-deliveries');
 const RECORD_KIND = 'aios.rex-long-running-delivery.v1';

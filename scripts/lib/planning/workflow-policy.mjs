@@ -6,7 +6,7 @@
 import {
   describeAiosCapability,
   evaluateAiosSoftwareRequest,
-} from '../workflows/rex-harness-adapter.mjs';
+} from '../workflows/adapters/rex-harness-adapter.mjs';
 import { RESUME_PREFIX } from './resume-phrases.mjs';
 
 export const WORKFLOW_POLICY_MODES = Object.freeze(['adaptive', 'strict']);

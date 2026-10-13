@@ -10,11 +10,11 @@ import {
   resolveStandaloneExecutionReceipt,
   expectedScenarioCommandForWorkflow,
   validateCommandEvidence,
-} from '../../../rex-harness/src/index.mjs';
+} from '../../../../rex-harness/src/index.mjs';
 import {
   addPlanEvidence,
   readActivePlan,
-} from '../planning/contract.mjs';
+} from '../../planning/contract.mjs';
 import {
   advanceStoredAiosCapabilityActivation,
   readStoredAiosCapabilityActivation,

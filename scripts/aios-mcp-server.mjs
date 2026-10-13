@@ -758,7 +758,7 @@ export function resolvePlanningArtifactParam(params = {}) {
 async function handleCapabilityEvidence(params) {
   const workspace = params.workspace || process.cwd();
   try {
-    const { recordAiosCapabilityEvidence } = await import('./lib/workflows/rex-capability-runtime.mjs');
+    const { recordAiosCapabilityEvidence } = await import('./lib/workflows/adapters/rex-capability-runtime.mjs');
     const result = recordAiosCapabilityEvidence({
       rootDir: workspace,
       activationId: params.activationId || params.activation_id,

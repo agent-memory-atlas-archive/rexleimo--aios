@@ -16,11 +16,11 @@ import { parsePlanArgs } from '../../../lib/cli/parse-args/plan.mjs';
 import { runPlanCommand } from '../../../lib/planning/cli.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../lib/workflows/rex-harness-adapter.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../lib/workflows/adapters/rex-harness-adapter.mjs';
 import {
   advanceStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../lib/workflows/rex-activation-store.mjs';
+} from '../../../lib/workflows/adapters/rex-activation-store.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

@@ -83,7 +83,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/rl-shell-v1/temp-runner': 9,
   'scripts/lib/specs': 9,
   'scripts/lib/tui-ink/screens': 9,
-  'scripts/lib/workflows': 9,
   'skill-sources/rexai-image-generation/scripts': 9,
 });
 

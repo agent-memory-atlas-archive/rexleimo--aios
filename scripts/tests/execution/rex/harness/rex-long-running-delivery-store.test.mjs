@@ -14,7 +14,7 @@ import {
   persistAiosLongRunningDelivery,
   readAiosLongRunningDelivery,
   runAiosLongRunningDeliveryIteration,
-} from '../../../../lib/workflows/rex-long-running-delivery-store.mjs';
+} from '../../../../lib/workflows/adapters/rex-long-running-delivery-store.mjs';
 
 function scenarioCommand(rootDir, args) {
   return {

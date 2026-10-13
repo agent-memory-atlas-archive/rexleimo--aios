@@ -12,7 +12,7 @@ import { AGENT_CONFIG, detectAgents, ensureMarker } from './lib/aios-init/agent-
 import { ensureHook } from './lib/aios-init/hooks.mjs';
 import { ensureCompressionTools } from './lib/aios-init/compression-tools.mjs';
 import { ensureRexHarness } from './lib/rex-harness/runtime.mjs';
-import { reconcileLegacyWorkflowSurface } from './lib/workflows/rex-workflow-surface-lifecycle.mjs';
+import { reconcileLegacyWorkflowSurface } from './lib/workflows/surface/rex-workflow-surface-lifecycle.mjs';
 
 const AIOS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 

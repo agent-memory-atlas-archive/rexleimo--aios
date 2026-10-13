@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildAgentCatalogue } from '../agents/catalogue.mjs';
-import { loadCanonicalAgents } from '../agents/source-tree.mjs';
+import { buildAgentCatalogue } from '../../agents/catalogue.mjs';
+import { loadCanonicalAgents } from '../../agents/source-tree.mjs';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_AIOS_ROOT = path.resolve(MODULE_DIR, '../../..');
+const DEFAULT_AIOS_ROOT = path.resolve(MODULE_DIR, '../../../..');
 const RISK_SELECTED_PROVIDER_IDS = new Set(['rex-specialist-review', 'ecc-specialist']);
 
 // 顺序同时表达多风险命中时的确定性优先级：安全问题优先于框架和语言审查。

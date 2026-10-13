@@ -12,7 +12,7 @@ import {
   rexNativeProviderBindings,
   startActivation,
   startSoftwareWorkflow,
-} from '../../../rex-harness/src/index.mjs';
+} from '../../../../rex-harness/src/index.mjs';
 import { resolveAiosAgentProvider } from './rex-agent-provider.mjs';
 
 export function createAiosRexProviderBindings() {

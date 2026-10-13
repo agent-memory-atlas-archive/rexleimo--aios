@@ -16,7 +16,7 @@ import {
 import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
 import { readRawRef } from '../../../lib/interception/refs/raw-ref-store.mjs';
 import { runAutoGate } from '../../../lib/planning/auto-gate.mjs';
-import { advanceStoredAiosCapabilityActivation } from '../../../lib/workflows/rex-activation-store.mjs';
+import { advanceStoredAiosCapabilityActivation } from '../../../lib/workflows/adapters/rex-activation-store.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 
 const CTX_AGENT_CLI = path.resolve('scripts', 'ctx-agent.mjs');
@@ -819,7 +819,7 @@ test('ctx-agent one-shot executes a promoted rex Agent Provider and adapts its J
     assert.equal(command.provider.kind, 'agent');
     assert.equal(command.provider.id, agentId);
 
-    const { prepareAiosAgentProviderExecution } = await import('../../../lib/workflows/rex-agent-provider.mjs');
+    const { prepareAiosAgentProviderExecution } = await import('../../../lib/workflows/adapters/rex-agent-provider.mjs');
     const prepared = await prepareAiosAgentProviderExecution({
       command,
       evidenceRoot: workspaceRoot,
@@ -831,7 +831,7 @@ test('ctx-agent one-shot executes a promoted rex Agent Provider and adapts its J
     assert.match(prepared.prompt, /rex-security-reviewer/u);
     assert.doesNotMatch(prepared.prompt, /AIOS_REX_EVIDENCE=/u);
 
-    const { ingestCapabilityProviderOutput } = await import('../../../lib/workflows/rex-capability-runtime.mjs');
+    const { ingestCapabilityProviderOutput } = await import('../../../lib/workflows/adapters/rex-capability-runtime.mjs');
     const handoff = {
       schemaVersion: 1,
       agentId: 'rex-security-reviewer',

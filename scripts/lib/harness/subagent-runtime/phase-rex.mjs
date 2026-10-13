@@ -1,6 +1,6 @@
 import { resolveOwnedPathPrefixes } from './file-policy.mjs';
-import { evaluateAiosSoftwareRequest } from '../../workflows/rex-harness-adapter.mjs';
-import { startStoredAiosCapabilityActivation } from '../../workflows/rex-activation-store.mjs';
+import { evaluateAiosSoftwareRequest } from '../../workflows/adapters/rex-harness-adapter.mjs';
+import { startStoredAiosCapabilityActivation } from '../../workflows/adapters/rex-activation-store.mjs';
 
 export function resolvePhaseJobWorkItemKey(job) {
   const workItemRef = Array.isArray(job?.launchSpec?.workItemRefs)

@@ -6,11 +6,11 @@ import test from 'node:test';
 
 import { parsePlanArgs } from '../../../../lib/cli/parse-args/plan.mjs';
 import { runPlanCommand } from '../../../../lib/planning/cli.mjs';
-import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/rex-harness-adapter.mjs';
+import { evaluateAiosSoftwareRequest } from '../../../../lib/workflows/adapters/rex-harness-adapter.mjs';
 import {
   readStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../../../../lib/workflows/rex-activation-store.mjs';
+} from '../../../../lib/workflows/adapters/rex-activation-store.mjs';
 
 const WAYFINDER_ARTIFACT = Object.freeze({
   schemaVersion: 1,
