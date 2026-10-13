@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildAxSnapshotFromCdpNodes } from '../src/browser/actions/snapshot.js';
+import { buildAxSnapshotFromCdpNodes } from '../../src/browser/actions/snapshot.js';
 
 test('buildAxSnapshotFromCdpNodes disambiguates duplicate role selectors with nth', () => {
   const snapshot = buildAxSnapshotFromCdpNodes(

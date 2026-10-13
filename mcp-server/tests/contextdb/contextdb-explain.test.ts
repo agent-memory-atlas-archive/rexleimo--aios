@@ -11,7 +11,7 @@ import {
   searchEvents,
   searchMemory,
   writeCheckpoint,
-} from '../src/contextdb/core.js';
+} from '../../src/contextdb/core.js';
 
 async function makeWorkspace(): Promise<string> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-explain-'));

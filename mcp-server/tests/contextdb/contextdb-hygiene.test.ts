@@ -9,12 +9,12 @@ import {
   appendEvent,
   createSession,
   writeCheckpoint,
-} from '../src/contextdb/core.js';
+} from '../../src/contextdb/core.js';
 import {
   compactContextDb,
   hygieneStatus,
   pruneNoise,
-} from '../src/contextdb/hygiene.js';
+} from '../../src/contextdb/hygiene.js';
 
 async function makeWorkspace(): Promise<string> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-hygiene-'));

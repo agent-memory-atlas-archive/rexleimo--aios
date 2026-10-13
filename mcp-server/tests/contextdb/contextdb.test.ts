@@ -18,9 +18,9 @@ import {
   searchMemory,
   searchEvents,
   writeCheckpoint,
-} from '../src/contextdb/core.js';
-import { buildMemoryGenealogyGraph } from '../src/contextdb/genealogy.js';
-import { closeSqliteSidecar, timelineCheckpointRows } from '../src/contextdb/sqlite.js';
+} from '../../src/contextdb/core.js';
+import { buildMemoryGenealogyGraph } from '../../src/contextdb/genealogy.js';
+import { closeSqliteSidecar, timelineCheckpointRows } from '../../src/contextdb/sqlite.js';
 
 async function makeWorkspace(): Promise<string> {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), 'ctxdb-'));

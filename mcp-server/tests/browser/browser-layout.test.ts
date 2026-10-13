@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildHybridLayoutModel } from '../src/browser/actions/snapshot.js';
+import { buildHybridLayoutModel } from '../../src/browser/actions/snapshot.js';
 
 test('buildHybridLayoutModel returns compact layout regions for editor-like pages', () => {
   const result = buildHybridLayoutModel({

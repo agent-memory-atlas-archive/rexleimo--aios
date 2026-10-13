@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { tools } from '../src/browser/index.js';
+import { tools } from '../../src/browser/index.js';
 import {
   BrowserLauncher,
   isUserDataDirLockedError,
   resolveLaunchHeadless,
   resolveRequireCdp,
-} from '../src/browser/launcher.js';
+} from '../../src/browser/launcher.js';
 
 test('resolveLaunchHeadless defaults to visible browser', () => {
   const result = resolveLaunchHeadless({}, { name: 'default' }, undefined);

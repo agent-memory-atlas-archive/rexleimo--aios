@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { tools } from '../src/browser/index.js';
-import { buildBrowserHealth } from '../src/browser/health.js';
-import type { ProfileState } from '../src/browser/types.js';
+import { tools } from '../../src/browser/index.js';
+import { buildBrowserHealth } from '../../src/browser/health.js';
+import type { ProfileState } from '../../src/browser/types.js';
 
 test('browser_health is exposed without requiring a browser launch', () => {
   const healthTool = tools.find((tool) => tool.name === 'browser_health');

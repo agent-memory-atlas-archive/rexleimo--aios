@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { tools } from '../src/browser/index.js';
-import { browserLauncher } from '../src/browser/launcher.js';
-import { setInputFiles } from '../src/browser/actions/set-input-files.js';
+import { tools } from '../../src/browser/index.js';
+import { browserLauncher } from '../../src/browser/launcher.js';
+import { setInputFiles } from '../../src/browser/actions/set-input-files.js';
 
 test('browser_set_input_files schema exposes selector and files array', () => {
   const uploadTool = tools.find((tool) => tool.name === 'browser_set_input_files');
