@@ -5,10 +5,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { startPlan, readActivePlan } from '../../../lib/planning/contract.mjs';
-import { showActivePlan, formatPlanShowText } from '../../../lib/planning/show.mjs';
-import { evaluateSkillComplianceLive } from '../../../lib/skills/compliance-live.mjs';
-import { runSkillComply } from '../../../lib/skills/compliance.mjs';
+import { startPlan, readActivePlan } from '../../../lib/planning/contract/contract.mjs';
+import { showActivePlan, formatPlanShowText } from '../../../lib/planning/ops/show.mjs';
+import { evaluateSkillComplianceLive } from '../../../lib/skills/compliance/compliance-live.mjs';
+import { runSkillComply } from '../../../lib/skills/compliance/compliance.mjs';
 import { syncDreamLinesToActivePlan } from '../../../lib/lifecycle/evolve/dream/export-to.mjs';
 
 async function makeTemp(prefix) {

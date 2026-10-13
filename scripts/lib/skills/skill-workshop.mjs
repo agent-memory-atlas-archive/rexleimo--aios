@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { assertWorkspaceMemoryContentSafe } from '../memo/care/safety.mjs';
 import { scanSkillsSources } from './source-tree.mjs';
-import { readInstallPolicy, checkPolicy, policyDenialError } from './install-policy.mjs';
+import { readInstallPolicy, checkPolicy, policyDenialError } from './install/install-policy.mjs';
 
 // ---------------------------------------------------------------------------
 // Paths

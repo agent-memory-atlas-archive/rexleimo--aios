@@ -8,7 +8,7 @@ import {
   buildExecutionContextPacket,
   evaluateExecutionContextPreflight,
 } from '../lib/contextdb/execution-context.mjs';
-import { buildStructuredPlanState } from '../lib/planning/schema.mjs';
+import { buildStructuredPlanState } from '../lib/planning/contract/schema.mjs';
 
 const TASK_COUNT = 20;
 const CASES_PER_TASK = 10;

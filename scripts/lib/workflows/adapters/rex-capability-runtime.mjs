@@ -14,7 +14,7 @@ import {
 import {
   addPlanEvidence,
   readActivePlan,
-} from '../../planning/contract.mjs';
+} from '../../planning/contract/contract.mjs';
 import {
   advanceStoredAiosCapabilityActivation,
   readStoredAiosCapabilityActivation,

@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { supportsClientCapability } from '../../clients/registry.mjs';
-import { checkGeneratedSkillsSync } from '../../skills/sync.mjs';
+import { checkGeneratedSkillsSync } from '../../skills/install/sync.mjs';
 import { EMITTERS } from '../sync/constants.mjs';
 import { AIOS_NATIVE_JSON_KEY, hasManagedMarkdownBlock, parseJsonObject } from '../emitters/shared.mjs';
 import { readNativeSyncMetadata } from '../install-metadata.mjs';

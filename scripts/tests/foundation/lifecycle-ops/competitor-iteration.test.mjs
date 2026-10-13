@@ -8,7 +8,7 @@ import {
   applyMcpToolDescriptionMode,
   compactToolDescription,
   resolveMcpDescMode,
-} from '../../../lib/planning/mcp-compact.mjs';
+} from '../../../lib/planning/ops/mcp-compact.mjs';
 import {
   collectDurableMemoLines,
   writeAgentsDreamBlock,

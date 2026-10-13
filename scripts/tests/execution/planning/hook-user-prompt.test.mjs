@@ -6,9 +6,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { detectHookClient } from '../../../lib/planning/user-prompt-submit.mjs';
+import { detectHookClient } from '../../../lib/planning/flow/user-prompt-submit.mjs';
 
-const HOOK = path.resolve('scripts/lib/planning/hook-user-prompt.mjs');
+const HOOK = path.resolve('scripts/lib/planning/flow/hook-user-prompt.mjs');
 const AIOS = path.resolve('scripts/aios.mjs');
 
 function runHook(payload, extraEnv = {}) {

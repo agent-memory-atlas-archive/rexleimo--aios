@@ -539,7 +539,7 @@ async function handleMessage(message) {
 
   if (message.method === 'tools/list') {
     // A4: AIOS_MCP_TOOL_DESC=compact|minimal shrinks tool descriptions for lean context
-    const { applyMcpToolDescriptionMode } = await import('./lib/planning/mcp-compact.mjs');
+    const { applyMcpToolDescriptionMode } = await import('./lib/planning/ops/mcp-compact.mjs');
     const { withJudgmentTool } = await import('./lib/judgment/mcp-tool.mjs');
     // 判定闸门默认关闭：关闭时 aios_judge 不出现在工具表里，而不是"注册了再报拒绝"。
     const listed = withJudgmentTool(TOOLS);
@@ -637,7 +637,7 @@ async function handlePlanStart(params) {
     return { content: [{ type: 'text', text: 'aios_plan_start requires title (or objective)' }] };
   }
   try {
-    const { startPlan } = await import('./lib/planning/contract.mjs');
+    const { startPlan } = await import('./lib/planning/contract/contract.mjs');
     const state = startPlan({
       rootDir: workspace,
       title,
@@ -663,7 +663,7 @@ async function handlePlanTask(params = {}) {
     const {
       proposeTaskContextCandidates,
       readTaskContextCandidate,
-    } = await import('./lib/planning/context-candidates.mjs');
+    } = await import('./lib/planning/ops/context-candidates.mjs');
     if (action === 'status') {
       const proposal = await readTaskContextCandidate(workspace, taskId);
       return { content: [{ type: 'text', text: JSON.stringify({ proposal }, null, 2) }] };
@@ -699,7 +699,7 @@ async function handlePlanTask(params = {}) {
 async function handlePlanStatus(params) {
   const workspace = params.workspace || process.cwd();
   try {
-    const { readActivePlan, formatActivePlanInjection } = await import('./lib/planning/contract.mjs');
+    const { readActivePlan, formatActivePlanInjection } = await import('./lib/planning/contract/contract.mjs');
     const state = readActivePlan(workspace);
     const injection = formatActivePlanInjection(workspace);
     return {
@@ -719,7 +719,7 @@ async function handlePlanGate(params) {
     return { content: [{ type: 'text', text: 'aios_plan_gate requires status' }] };
   }
   try {
-    const { setPlanStatus } = await import('./lib/planning/contract.mjs');
+    const { setPlanStatus } = await import('./lib/planning/contract/contract.mjs');
     const state = setPlanStatus(workspace, params.status, { note: params.note || '' });
     return { content: [{ type: 'text', text: JSON.stringify(state, null, 2) }] };
   } catch (err) {
@@ -731,7 +731,7 @@ async function handlePlanAutoGate(params) {
   const workspace = params.workspace || process.cwd();
   const message = params.message || params.prompt || params.objective || '';
   try {
-    const { runAutoGate } = await import('./lib/planning/auto-gate.mjs');
+    const { runAutoGate } = await import('./lib/planning/flow/auto-gate.mjs');
     const result = runAutoGate({
       rootDir: workspace,
       message,

@@ -10,9 +10,9 @@ import {
   addPlanEvidence,
   readActivePlan,
   updatePlanTask,
-} from './contract.mjs';
-import { summarizePlanProgress } from './schema.mjs';
-import { isTerminalPlan } from './workflow-policy.mjs';
+} from '../contract/contract.mjs';
+import { summarizePlanProgress } from '../contract/schema.mjs';
+import { isTerminalPlan } from '../contract/workflow-policy.mjs';
 
 function normalizeText(value = '') {
   return String(value || '').trim();

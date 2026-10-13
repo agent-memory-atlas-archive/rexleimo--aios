@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { validateTrainingEvidence } from '../../../../lib/skills/training-evidence-validator.mjs';
+import { validateTrainingEvidence } from '../../../../lib/skills/training/training-evidence-validator.mjs';
 
 const tasks = [
   { id: 'train-1', split: 'train', assertions: ['states scope', 'lists evidence'] },

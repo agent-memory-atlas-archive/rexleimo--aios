@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { evaluateDoneGate, readActivePlan, summarizePlanProgress } from './contract.mjs';
+import { evaluateDoneGate, readActivePlan, summarizePlanProgress } from '../contract/contract.mjs';
 
 function statusIcon(status) {
   switch (status) {

@@ -4,7 +4,7 @@ import { readFile, realpath } from 'node:fs/promises';
 
 import { resolveContextDbRoot } from '../aios/state-root.mjs';
 import { atomicWriteText, sha256Hex } from '../memo/storage/base/fs-io.mjs';
-import { normalizeTask } from '../planning/schema.mjs';
+import { normalizeTask } from '../planning/contract/schema.mjs';
 
 export const EXECUTION_CONTEXT_SCHEMA_VERSION = 1;
 export const EXECUTION_CONTEXT_MODES = Object.freeze(['off', 'observe']);

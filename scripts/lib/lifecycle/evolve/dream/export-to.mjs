@@ -172,7 +172,7 @@ export async function syncDreamLinesToActivePlan(rootDir, durableLines = [], { m
     readActivePlan,
     addPlanEvidence,
     replacePlanTasks,
-  } = await import('../../../planning/contract.mjs');
+  } = await import('../../../planning/contract/contract.mjs');
 
   let plan = readActivePlan(rootDir);
   if (!plan || plan.status === 'done') {

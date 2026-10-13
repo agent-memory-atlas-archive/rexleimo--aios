@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { GENERATED_SKILL_META_FILE } from '../install-metadata.mjs';
-import { isManagedTomlCommand } from '../emitters/toml-command.mjs';
+import { isManagedTomlCommand } from '../../emitters/toml-command.mjs';
 
 /** 递归扫描目录，收集所有包含 generated skill metadata 的子目录 */
 export function collectManagedGeneratedTargets(rootDir) {

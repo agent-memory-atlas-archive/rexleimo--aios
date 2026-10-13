@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { syncCanonicalAgents } from '../../agents/sync.mjs';
 import { withRepoLock } from '../../fs/repo-lock.mjs';
-import { syncGeneratedSkills } from '../../skills/sync.mjs';
+import { syncGeneratedSkills } from '../../skills/install/sync.mjs';
 import { supportsClientCapability } from '../../clients/registry.mjs';
 import { buildNativeOutputPlan, loadNativeSyncManifest, resolveNativeClients } from '../source-tree.mjs';
 

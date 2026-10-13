@@ -12,7 +12,7 @@ import {
   resolveExecutionContextPaths,
   updateExecutionContextExpectedHash,
 } from '../../../lib/contextdb/execution-context.mjs';
-import { buildStructuredPlanState } from '../../../lib/planning/schema.mjs';
+import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
 
 async function withTempRoot(prefix, fn) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), prefix));

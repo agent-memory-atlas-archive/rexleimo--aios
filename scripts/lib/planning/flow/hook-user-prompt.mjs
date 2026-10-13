@@ -18,7 +18,7 @@ async function main() {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const defaultRoot = process.env.CLAUDE_PROJECT_DIR
     || process.env.AIOS_ROOT
-    || path.resolve(here, '../../..');
+    || path.resolve(here, '../../../..');
 
   let cwd = defaultRoot;
   let payload = {};

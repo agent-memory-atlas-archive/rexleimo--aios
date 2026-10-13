@@ -5,7 +5,7 @@ import {
   evaluateWorkflowPolicy,
   isSameSessionPlan,
   isTerminalPlan,
-} from '../../../lib/planning/workflow-policy.mjs';
+} from '../../../lib/planning/contract/workflow-policy.mjs';
 
 function activePlan(overrides = {}) {
   return {

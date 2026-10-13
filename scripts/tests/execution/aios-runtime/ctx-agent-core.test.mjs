@@ -15,7 +15,7 @@ import {
 } from '../../../ctx-agent-core.mjs';
 import { runContextDbCli } from '../../../lib/contextdb-cli.mjs';
 import { readRawRef } from '../../../lib/interception/refs/raw-ref-store.mjs';
-import { runAutoGate } from '../../../lib/planning/auto-gate.mjs';
+import { runAutoGate } from '../../../lib/planning/flow/auto-gate.mjs';
 import { advanceStoredAiosCapabilityActivation } from '../../../lib/workflows/adapters/rex-activation-store.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 

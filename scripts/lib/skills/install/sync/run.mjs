@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { getClientSkillFormat } from '../../clients/registry.mjs';
+import { getClientSkillFormat } from '../../../clients/registry.mjs';
 import {
   buildGeneratedSkillMetadata,
   GENERATED_SKILL_META_FILE,
@@ -20,14 +20,14 @@ import {
   materializeSkillTree,
   resolveGeneratedTargetPath,
   resolveGeneratedTargetRelativePath,
-} from '../source-tree.mjs';
+} from '../../source-tree.mjs';
 import { snapshotDirectory, snapshotsEqual } from '../directory-snapshot.mjs';
 import {
   convertSkillToTomlCommand,
   isManagedTomlCommand,
   writeTomlCommandTarget,
-} from '../emitters/toml-command.mjs';
-import { withRepoLock } from '../../fs/repo-lock.mjs';
+} from '../../emitters/toml-command.mjs';
+import { withRepoLock } from '../../../fs/repo-lock.mjs';
 
 import {
   collectManagedGeneratedTargets,

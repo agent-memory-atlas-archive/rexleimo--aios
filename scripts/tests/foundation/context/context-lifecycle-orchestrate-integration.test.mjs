@@ -8,7 +8,7 @@ import test from 'node:test';
 
 import { createDispatchRuntimeRegistry } from '../../../lib/harness/orchestration/orchestrator-runtimes.mjs';
 import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
-import { startPlan } from '../../../lib/planning/contract.mjs';
+import { startPlan } from '../../../lib/planning/contract/contract.mjs';
 import {
   captureSessionWorkspaceSnapshot,
   recordSessionWorkspaceChanges,

@@ -3,8 +3,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
-import { readActivePlan, updatePlanTask } from './contract.mjs';
-import { normalizeContextRequirement, normalizeTask } from './schema.mjs';
+import { readActivePlan, updatePlanTask } from '../contract/contract.mjs';
+import { normalizeContextRequirement, normalizeTask } from '../contract/schema.mjs';
 
 const CANDIDATE_SCHEMA_VERSION = 1;
 const CANDIDATE_KIND = 'aios.planning.context-candidate';

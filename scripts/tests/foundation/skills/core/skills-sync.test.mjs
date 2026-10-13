@@ -5,8 +5,8 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { collectUnexpectedSkillRootFindings } from '../../../../lib/platform/fs.mjs';
-import { readGeneratedSkillMetadata } from '../../../../lib/skills/install-metadata.mjs';
-import { checkGeneratedSkillsSync, syncGeneratedSkills } from '../../../../lib/skills/sync.mjs';
+import { readGeneratedSkillMetadata } from '../../../../lib/skills/install/install-metadata.mjs';
+import { checkGeneratedSkillsSync, syncGeneratedSkills } from '../../../../lib/skills/install/sync.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

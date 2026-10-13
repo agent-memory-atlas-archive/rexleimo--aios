@@ -128,7 +128,7 @@ async function executePrompt(opts) {
     : null;
   let workflow = null;
   try {
-    const { runAutoGate } = await import('../planning/auto-gate.mjs');
+    const { runAutoGate } = await import('../planning/flow/auto-gate.mjs');
     workflow = runAutoGate({
       rootDir: opts.workspaceRoot,
       message: opts.prompt,
@@ -153,7 +153,7 @@ async function executePrompt(opts) {
     recall: { status: 'skipped', reason: 'workflow-unavailable', hits: 0 },
   };
   try {
-    const { collectTurnRecallResult } = await import('../planning/turn-recall.mjs');
+    const { collectTurnRecallResult } = await import('../planning/flow/turn-recall.mjs');
     const recallResult = await collectTurnRecallResult({
       rootDir: opts.workspaceRoot,
       message: opts.prompt,
@@ -453,7 +453,7 @@ async function runPromptFlow(opts) {
   // which recalled memos it actually used; those get marked useful. Best-effort
   // — must never fail the turn.
   try {
-    const { inferUsefulRecallEventIds } = await import('../planning/turn-recall.mjs');
+    const { inferUsefulRecallEventIds } = await import('../planning/flow/turn-recall.mjs');
     const { markMemoUseful } = await import('../memo/flow/autopilot.mjs');
     const usefulIds = effectiveExitCode === 0
       ? inferUsefulRecallEventIds({

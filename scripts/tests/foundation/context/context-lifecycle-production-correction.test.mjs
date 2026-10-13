@@ -24,7 +24,7 @@ import {
   gcDreamProposal,
   readDreamGovernanceReceipts,
 } from '../../../lib/lifecycle/evolve/dream/governance.mjs';
-import { buildStructuredPlanState } from '../../../lib/planning/schema.mjs';
+import { buildStructuredPlanState } from '../../../lib/planning/contract/schema.mjs';
 
 const cliPath = path.resolve(process.cwd(), 'scripts', 'aios.mjs');
 

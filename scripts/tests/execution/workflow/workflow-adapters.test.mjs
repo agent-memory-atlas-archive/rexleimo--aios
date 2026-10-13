@@ -13,7 +13,7 @@ import {
   resolvePlanningArtifactParam,
 } from '../../../aios-mcp-server.mjs';
 import { parsePlanArgs } from '../../../lib/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../lib/planning/cli.mjs';
+import { runPlanCommand } from '../../../lib/planning/ops/cli.mjs';
 import { captureStandaloneExecutionReceipt } from '../../../../rex-harness/src/index.mjs';
 import { REQUIREMENTS_DECISION_FIXTURE } from '../../../../rex-harness/tests/fixtures/requirements-decision.mjs';
 import { evaluateAiosSoftwareRequest } from '../../../lib/workflows/adapters/rex-harness-adapter.mjs';

@@ -11,8 +11,8 @@ import { parseArgs } from '../../../lib/cli/parse-args.mjs';
 import { buildOpenCodeConfig, resolveOpenCodeMaxSteps } from '../../../lib/opencode/config.mjs';
 import { syncNativeEnhancements } from '../../../lib/native/sync.mjs';
 import { runClientsCommand } from '../../../lib/lifecycle/fleet/clients.mjs';
-import { evaluateSkillComplianceDryRun } from '../../../lib/skills/compliance.mjs';
-import { buildSkillHealthReport, recordSkillObservation } from '../../../lib/skills/health.mjs';
+import { evaluateSkillComplianceDryRun } from '../../../lib/skills/compliance/compliance.mjs';
+import { buildSkillHealthReport, recordSkillObservation } from '../../../lib/skills/compliance/health.mjs';
 import { recordSessionChangedFile, readSessionChangedFiles } from '../../../lib/session/changed-files.mjs';
 
 function resolveRepoRoot() {
@@ -261,7 +261,7 @@ test('skill training gate rejects legacy state without auditable V2 artifacts', 
   await mkdir(path.join(rootDir, 'skill-sources', 'search-first'), { recursive: true });
   await writeFile(path.join(rootDir, 'skill-sources', 'search-first', 'SKILL.md'), skillContents, 'utf8');
 
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const blocked = await verifySkillTrainingGate({
     rootDir,
     changedFiles: ['skill-sources/search-first/SKILL.md'],
@@ -311,7 +311,7 @@ test('skill training gate rejects legacy namespaced state by state skillId', asy
     acceptedSkillHash: 'a'.repeat(64),
   });
 
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const report = await verifySkillTrainingGate({
     rootDir,
     changedFiles: ['skill-sources/.system/skill-creator/SKILL.md'],
@@ -334,8 +334,8 @@ test('skill training gate discovers changed rex-harness Skill sources', async ()
   execFileSync('git', ['add', '.'], { cwd: rootDir });
   execFileSync('git', ['commit', '-m', 'test fixture'], { cwd: rootDir, stdio: 'ignore' });
   await writeFile(skillFile, `${await readFile(skillFile, 'utf8')}\nUpdated.\n`, 'utf8');
-  const { certifySkillTraining } = await import('../../../lib/skills/training-certification.mjs');
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { certifySkillTraining } = await import('../../../lib/skills/training/training-certification.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const certification = await certifySkillTraining({
     rootDir,
     changedFiles: ['rex-harness/skill-sources/rex-workflow/SKILL.md'],
@@ -373,8 +373,8 @@ test('skill training gate discovers changed Rex Skills in a nested Git worktree'
 
   const changedContents = `${initialContents}\nChanged in the nested worktree.\n`;
   await writeFile(skillFile, changedContents, 'utf8');
-  const { certifySkillTraining } = await import('../../../lib/skills/training-certification.mjs');
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { certifySkillTraining } = await import('../../../lib/skills/training/training-certification.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const certification = await certifySkillTraining({
     rootDir,
     changedFiles: ['rex-harness/skill-sources/rex-workflow/SKILL.md'],
@@ -403,7 +403,7 @@ test('skill training gate discovers untracked rex-harness Skill sources', async 
   const skillFile = path.join(rootDir, 'rex-harness', 'skill-sources', 'rex-workflow', 'SKILL.md');
   await mkdir(path.dirname(skillFile), { recursive: true });
   await writeFile(skillFile, '---\nname: rex-workflow\ndescription: Use when testing rex.\n---\n# Rex\n', 'utf8');
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const report = await verifySkillTrainingGate({ rootDir, base: 'HEAD' });
 
   assert.deepEqual(report.changedFiles, [
@@ -427,7 +427,7 @@ test('skill training gate rejects accepted evidence after Skill content changes'
   });
   await writeFile(skillFile, `${trainedContents}\nUntrained behavior change.\n`, 'utf8');
 
-  const { verifySkillTrainingGate } = await import('../../../lib/skills/training-gate.mjs');
+  const { verifySkillTrainingGate } = await import('../../../lib/skills/training/training-gate.mjs');
   const report = await verifySkillTrainingGate({
     rootDir,
     changedFiles: ['skill-sources/search-first/SKILL.md'],

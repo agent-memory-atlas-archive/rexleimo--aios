@@ -9,17 +9,17 @@ import {
   startPlan,
   summarizePlanProgress,
   updatePlanTask,
-} from './contract.mjs';
+} from '../contract/contract.mjs';
 import {
   buildAlwaysOnPlanningDirective,
   runAutoGate,
-} from './auto-gate.mjs';
-import { runUserPromptSubmitHook } from './user-prompt-submit.mjs';
+} from '../flow/auto-gate.mjs';
+import { runUserPromptSubmitHook } from '../flow/user-prompt-submit.mjs';
 import {
   confirmTaskContextCandidates,
   proposeTaskContextCandidates,
 } from './context-candidates.mjs';
-import { recordAiosCapabilityEvidence } from '../workflows/adapters/rex-capability-runtime.mjs';
+import { recordAiosCapabilityEvidence } from '../../workflows/adapters/rex-capability-runtime.mjs';
 
 function isContainedPath(rootPath, candidatePath) {
   const relative = path.relative(rootPath, candidatePath);

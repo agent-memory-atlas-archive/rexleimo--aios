@@ -156,7 +156,7 @@ test('editable phase job does not launch when rex bind fails', async () => {
 
 test('file policy rejects touches outside the work item prefix', () => {
   const phase = { canEditFiles: true, ownedPathPrefixes: ['scripts/'] };
-  const inside = evaluatePhaseFilePolicy({ filesTouched: ['scripts/lib/planning/auto-gate.mjs'] }, phase);
+  const inside = evaluatePhaseFilePolicy({ filesTouched: ['scripts/lib/planning/flow/auto-gate.mjs'] }, phase);
   const outside = evaluatePhaseFilePolicy({ filesTouched: ['mcp-server/src/index.ts'] }, phase);
   assert.equal(inside.ok, true);
   assert.equal(outside.ok, false);

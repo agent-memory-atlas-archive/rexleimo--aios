@@ -2,7 +2,7 @@ import {
   assembleExecutionContext,
   evaluateExecutionContextPreflight,
 } from '../../../contextdb/execution-context.mjs';
-import { readActivePlan } from '../../../planning/contract.mjs';
+import { readActivePlan } from '../../../planning/contract/contract.mjs';
 import { evaluateContextReconciliation } from '../../evolve/context-reconciliation.mjs';
 
 function allTasks(plan) {

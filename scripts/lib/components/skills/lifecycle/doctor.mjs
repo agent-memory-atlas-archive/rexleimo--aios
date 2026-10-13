@@ -6,7 +6,7 @@ import { getAgentsHome } from '../../../platform/paths.mjs';
 import { resolveClientSelection } from '../../../clients/registry.mjs';
 
 import { analyzeCatalogEntries, loadSkillsCatalog, resolveTargetRoot, tryLoadSkillsSyncManifest } from '../catalog.mjs';
-import { GENERATED_SKILL_META_FILE } from '../../../skills/install-metadata.mjs';
+import { GENERATED_SKILL_META_FILE } from '../../../skills/install/install-metadata.mjs';
 import {
   INSTALLED_SKILL_META_FILE,
   isLegacyManagedLinkInstall,

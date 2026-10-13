@@ -8,7 +8,7 @@ import test from 'node:test';
 import { promisify } from 'node:util';
 
 import { handleMessage } from '../../../aios-mcp-server.mjs';
-import { readActivePlan, startPlan } from '../../../lib/planning/contract.mjs';
+import { readActivePlan, startPlan } from '../../../lib/planning/contract/contract.mjs';
 
 const execFileAsync = promisify(execFile);
 const cliPath = path.resolve('scripts/aios.mjs');

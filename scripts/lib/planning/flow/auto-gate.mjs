@@ -11,15 +11,15 @@ import {
   readActivePlan,
   startPlan,
   summarizePlanProgress,
-} from './contract.mjs';
+} from '../contract/contract.mjs';
 import {
   evaluateWorkflowPolicy,
   normalizeWorkflowPolicyMode,
-} from './workflow-policy.mjs';
+} from '../contract/workflow-policy.mjs';
 import {
   findStoredAiosCapabilityActivation,
   startStoredAiosCapabilityActivation,
-} from '../workflows/adapters/rex-activation-store.mjs';
+} from '../../workflows/adapters/rex-activation-store.mjs';
 
 export const ALWAYS_ON_PLANNING_POLICY = Object.freeze({
   schemaVersion: 2,

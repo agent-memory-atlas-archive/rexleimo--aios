@@ -127,22 +127,22 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
 
     if (parsed.command === 'skill') {
       if (parsed.options.subcommand === 'comply') {
-        const { runSkillComply } = await import('../skills/compliance.mjs');
+        const { runSkillComply } = await import('../skills/compliance/compliance.mjs');
         applyResultExitCode(await runSkillComply(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'health') {
-        const { runSkillHealth } = await import('../skills/health.mjs');
+        const { runSkillHealth } = await import('../skills/compliance/health.mjs');
         applyResultExitCode(await runSkillHealth(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'certify') {
-        const { runSkillTrainingCertification } = await import('../skills/training-gate.mjs');
+        const { runSkillTrainingCertification } = await import('../skills/training/training-gate.mjs');
         applyResultExitCode(await runSkillTrainingCertification(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
       if (parsed.options.subcommand === 'verify-training') {
-        const { runSkillTrainingGate } = await import('../skills/training-gate.mjs');
+        const { runSkillTrainingGate } = await import('../skills/training/training-gate.mjs');
         applyResultExitCode(await runSkillTrainingGate(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
@@ -336,7 +336,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.command === 'plan') {
-      const { runPlanCommand } = await import('../planning/cli.mjs');
+      const { runPlanCommand } = await import('../planning/ops/cli.mjs');
       const result = await runPlanCommand(parsed.options, {
         rootDir: workspaceFor(parsed) || rootDir,
         stdout,

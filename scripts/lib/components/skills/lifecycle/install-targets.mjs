@@ -14,12 +14,12 @@ import {
   INSTALLED_SKILL_META_FILE,
   isManagedInstalledSkill,
   writeInstalledSkillMetadata,
-} from '../../../skills/install-metadata.mjs';
+} from '../../../skills/install/install-metadata.mjs';
 import {
   hashFileBuffer,
   snapshotDirectory,
   snapshotsEqual,
-} from '../../../skills/directory-snapshot.mjs';
+} from '../../../skills/install/directory-snapshot.mjs';
 import { materializeSkillTree } from '../../../skills/source-tree.mjs';
 
 import { arePathsEqual } from '../path-utils.mjs';

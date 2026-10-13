@@ -275,7 +275,7 @@ export async function runSoloHarnessLoop({
     // L3: ensure plan exists and mark next task in progress before the turn
     let currentPlanTaskId = null;
     try {
-      const { ensurePlanForRuntime, markPlanTaskInProgress } = await import('../../../planning/plan-runtime.mjs');
+      const { ensurePlanForRuntime, markPlanTaskInProgress } = await import('../../../planning/ops/plan-runtime.mjs');
       ensurePlanForRuntime({
         rootDir,
         objective: summary.objective,
@@ -420,7 +420,7 @@ export async function runSoloHarnessLoop({
 
     // L3: write iteration outcome back to structured plan (tasks + evidence)
     try {
-      const { syncPlanWithIterationOutcome } = await import('../../../planning/plan-runtime.mjs');
+      const { syncPlanWithIterationOutcome } = await import('../../../planning/ops/plan-runtime.mjs');
       const planSync = syncPlanWithIterationOutcome({
         rootDir,
         objective: summary.objective,

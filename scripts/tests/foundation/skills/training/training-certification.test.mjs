@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { certifySkillTraining, validateCertifiedTrainingEvidence } from '../../../../lib/skills/training-certification.mjs';
-import { runSkillTrainingCertification, runSkillTrainingGate, verifySkillTrainingGate } from '../../../../lib/skills/training-gate.mjs';
+import { certifySkillTraining, validateCertifiedTrainingEvidence } from '../../../../lib/skills/training/training-certification.mjs';
+import { runSkillTrainingCertification, runSkillTrainingGate, verifySkillTrainingGate } from '../../../../lib/skills/training/training-gate.mjs';
 
 async function createGitSkillFixture() {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-training-certification-'));

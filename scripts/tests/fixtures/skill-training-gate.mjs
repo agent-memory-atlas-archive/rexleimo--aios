@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { certifySkillTraining } from '../../lib/skills/training-certification.mjs';
+import { certifySkillTraining } from '../../lib/skills/training/training-certification.mjs';
 
 /**
  * Test-only Git fixture that produces the same auditable V2 artifacts used by

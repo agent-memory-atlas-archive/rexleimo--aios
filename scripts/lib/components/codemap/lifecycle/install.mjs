@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { commandExists } from '../../../platform/process.mjs';
-import { syncGeneratedSkills } from '../../../skills/sync.mjs';
+import { syncGeneratedSkills } from '../../../skills/install/sync.mjs';
 
 import { CRG_DATA_DIR, CRG_MCP_ALIAS } from '../constants.mjs';
 import { captureCrgCommand, runCrgCommand } from '../graph/crg.mjs';

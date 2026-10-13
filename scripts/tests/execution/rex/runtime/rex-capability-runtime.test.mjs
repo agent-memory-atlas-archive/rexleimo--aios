@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runAutoGate } from '../../../../lib/planning/auto-gate.mjs';
+import { runAutoGate } from '../../../../lib/planning/flow/auto-gate.mjs';
 import {
   ingestCapabilityProviderOutput,
   ingestCapabilityEvidenceOutput,

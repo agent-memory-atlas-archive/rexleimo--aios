@@ -12,8 +12,8 @@ import { runDream } from '../lib/lifecycle/evolve/dream/index.mjs';
 import { runReadinessCheck } from '../lib/lifecycle/govern/preflight-contracts.mjs';
 import { appendMemoEvent } from '../lib/memo/storage/events/events-write.mjs';
 import { listMemoEvents } from '../lib/memo/storage/views/query.mjs';
-import { buildStructuredPlanState } from '../lib/planning/schema.mjs';
-import { evaluateWorkflowPolicy } from '../lib/planning/workflow-policy.mjs';
+import { buildStructuredPlanState } from '../lib/planning/contract/schema.mjs';
+import { evaluateWorkflowPolicy } from '../lib/planning/contract/workflow-policy.mjs';
 import { readSessionChangedFiles, recordSessionChangedFile } from '../lib/session/changed-files.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');

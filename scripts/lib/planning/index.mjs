@@ -12,7 +12,7 @@ export {
   evaluateDoneGate,
   summarizePlanProgress,
   formatActivePlanInjection,
-} from './contract.mjs';
+} from './contract/contract.mjs';
 
 export {
   PLAN_SCHEMA_VERSION,
@@ -20,7 +20,7 @@ export {
   seedTasksFromObjective,
   buildStructuredPlanState,
   skillsForRoute,
-} from './schema.mjs';
+} from './contract/schema.mjs';
 
 export {
   WORKFLOW_POLICY_MODES,
@@ -36,7 +36,7 @@ export {
   hasNewActionableObjective,
   isReadOnlyMessage,
   evaluateWorkflowPolicy,
-} from './workflow-policy.mjs';
+} from './contract/workflow-policy.mjs';
 
 export {
   ALWAYS_ON_PLANNING_POLICY,
@@ -46,24 +46,24 @@ export {
   buildAlwaysOnPlanningDirective,
   runClaudeUserPromptSubmitHook,
   runAutoGate,
-} from './auto-gate.mjs';
+} from './flow/auto-gate.mjs';
 
 export {
   resolveMcpDescMode,
   compactToolDescription,
   applyMcpToolDescriptionMode,
-} from './mcp-compact.mjs';
+} from './ops/mcp-compact.mjs';
 
 export {
   ensurePlanForRuntime,
   markPlanTaskInProgress,
   syncPlanWithIterationOutcome,
   attachPlanVerificationEvidence,
-} from './plan-runtime.mjs';
+} from './ops/plan-runtime.mjs';
 
 export {
   formatPlanShowText,
   formatPlanShowHtml,
   showActivePlan,
   writePlanShowHtml,
-} from './show.mjs';
+} from './ops/show.mjs';

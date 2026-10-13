@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { evaluateSkillComplianceLive } from './compliance-live.mjs';
+import { evaluateSkillComplianceLive } from '../compliance/compliance-live.mjs';
 import { validateTrainingEvidence } from './training-evidence-validator.mjs';
 
 const ARTIFACT_NAMES = Object.freeze({

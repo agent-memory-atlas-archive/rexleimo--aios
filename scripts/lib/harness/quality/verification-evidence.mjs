@@ -115,7 +115,7 @@ export async function persistQualityGateEvidence({ rootDir, sessionId, report, e
 
   // L3: attach verification artifact to active intelligent plan (if any)
   try {
-    const { attachPlanVerificationEvidence } = await import('../../planning/plan-runtime.mjs');
+    const { attachPlanVerificationEvidence } = await import('../../planning/ops/plan-runtime.mjs');
     attachPlanVerificationEvidence({
       rootDir,
       artifactPath,

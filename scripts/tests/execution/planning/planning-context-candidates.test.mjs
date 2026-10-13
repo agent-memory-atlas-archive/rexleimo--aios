@@ -9,13 +9,13 @@ import {
   readActivePlan,
   startPlan,
   updatePlanTask,
-} from '../../../lib/planning/contract.mjs';
+} from '../../../lib/planning/contract/contract.mjs';
 import {
   confirmTaskContextCandidates,
   proposeTaskContextCandidates,
   readTaskContextCandidate,
   resolveTaskContextCandidatePath,
-} from '../../../lib/planning/context-candidates.mjs';
+} from '../../../lib/planning/ops/context-candidates.mjs';
 
 async function withRoot(name, work) {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), name));
