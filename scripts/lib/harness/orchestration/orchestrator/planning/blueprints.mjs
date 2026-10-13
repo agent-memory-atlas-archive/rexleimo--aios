@@ -1,4 +1,4 @@
-import blueprintSpec from '../../../../specs/orchestrator-blueprints.json' with { type: 'json' };
+import blueprintSpec from '../../../../specs/orchestrator/orchestrator-blueprints.json' with { type: 'json' };
 import { hasWildcardOwnedPrefix, normalizeOwnedPathPrefixes, normalizeText } from '../shared.mjs';
 
 export const ORCHESTRATOR_ROLE_IDS = ['planner', 'implementer', 'reviewer', 'security-reviewer'];

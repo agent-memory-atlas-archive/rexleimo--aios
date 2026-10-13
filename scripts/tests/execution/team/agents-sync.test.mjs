@@ -50,8 +50,8 @@ async function seedManagedTargets(rootDir, { extraManagedFile = null } = {}) {
   await copyCanonicalSource(rootDir);
   await writeText(
     rootDir,
-    'scripts/lib/specs/orchestrator-agents.json',
-    await readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs', 'orchestrator-agents.json'), 'utf8')
+    'scripts/lib/specs/orchestrator/orchestrator-agents.json',
+    await readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs/orchestrator', 'orchestrator-agents.json'), 'utf8')
   );
 
   for (const agent of Object.values(source.agentsById)) {
@@ -159,7 +159,7 @@ test('syncCanonicalAgents rolls back replacements when final export write fails'
   const mod = await import('../../../lib/agents/sync.mjs');
   const beforeClaude = await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8');
   const beforeCodex = await readFile(path.join(rootDir, '.codex/agents/rex-planner.toml'), 'utf8');
-  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator-agents.json'), 'utf8');
+  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   await assert.rejects(
     () => mod.syncCanonicalAgents({
@@ -176,7 +176,7 @@ test('syncCanonicalAgents rolls back replacements when final export write fails'
 
   assert.equal(await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8'), beforeClaude);
   assert.equal(await readFile(path.join(rootDir, '.codex/agents/rex-planner.toml'), 'utf8'), beforeCodex);
-  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator-agents.json'), 'utf8'), beforeExport);
+  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
 });
 
 test('syncCanonicalAgents rolls back when stale managed backup move fails', async () => {
@@ -215,7 +215,7 @@ test('syncCanonicalAgents rolls back when target replacement fails during commit
 
   const mod = await import('../../../lib/agents/sync.mjs');
   const beforePlanner = await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8');
-  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator-agents.json'), 'utf8');
+  const beforeExport = await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   await assert.rejects(
     () => mod.syncCanonicalAgents({
@@ -231,7 +231,7 @@ test('syncCanonicalAgents rolls back when target replacement fails during commit
   );
 
   assert.equal(await readFile(path.join(rootDir, '.claude/agents/rex-planner.md'), 'utf8'), beforePlanner);
-  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator-agents.json'), 'utf8'), beforeExport);
+  assert.equal(await readFile(path.join(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8'), beforeExport);
 });
 
 test('syncCanonicalAgents detects collisions before any file is written', async () => {

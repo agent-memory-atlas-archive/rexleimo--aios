@@ -155,7 +155,7 @@ process.stdout.write('{"status":"verified"}\\n');
   await writeFixtureFile(rootDir, 'scripts/lib/agents/emitters/grok.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'agents', 'emitters', 'grok.mjs'), 'utf8'));
   await writeFixtureFile(rootDir, 'scripts/lib/harness/team/orchestrator-agents.mjs', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'harness', 'team', 'orchestrator-agents.mjs'), 'utf8'));
   await cp(path.join(workspaceRoot, 'scripts', 'lib', 'clients'), path.join(rootDir, 'scripts', 'lib', 'clients'), { recursive: true });
-  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator-agents.json', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'specs', 'orchestrator-agents.json'), 'utf8'));
+  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json', await readFile(path.join(workspaceRoot, 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json'), 'utf8'));
 
   // scripts/lib/agents/emitters/* 和 scripts/lib/ctx-agent-core/entry/args.mjs 依赖 src/shared/ 下的公共工具。
   await cp(path.join(workspaceRoot, 'src', 'shared'), path.join(rootDir, 'src', 'shared'), { recursive: true });
@@ -204,7 +204,7 @@ test('package-release emits stable assets including the rex-harness planning ker
     'aios.tar.gz should not include legacy JSON role cards'
   );
   await assertFileExists(
-    path.join(extractDir, 'aios', 'scripts', 'lib', 'specs', 'orchestrator-agents.json'),
+    path.join(extractDir, 'aios', 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json'),
     'aios.tar.gz did not include bundled runtime specs'
   );
   await assertFileExists(
@@ -687,7 +687,7 @@ test('release-preflight fails when generated orchestrator agent export drifts', 
     checkSkillsSyncScript: "console.log('[ok] skills sync clean');\nprocess.exit(0);\n",
     checkNativeSyncScript: "console.log('[ok] native sync clean');\nprocess.exit(0);\n",
   });
-  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator-agents.json', '{"schemaVersion":1,"roleMap":{},"agents":{}}\n');
+  await writeFixtureFile(rootDir, 'scripts/lib/specs/orchestrator/orchestrator-agents.json', '{"schemaVersion":1,"roleMap":{},"agents":{}}\n');
 
   const result = process.platform === 'win32'
     ? runPowerShell('scripts/release-preflight.ps1', ['-Tag', 'v1.2.3'], { cwd: rootDir })

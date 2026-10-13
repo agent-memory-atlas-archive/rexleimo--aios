@@ -3,15 +3,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { MemoryRouter, Routes, Route, useNavigate } from 'react-router';
 import { Box, Text, useApp, useInput } from 'ink';
-import { MainScreen } from '../screens/MainScreen';
-import { SetupScreen } from '../screens/SetupScreen';
-import { UpdateScreen } from '../screens/UpdateScreen';
-import { UninstallScreen } from '../screens/UninstallScreen';
-import { DoctorScreen } from '../screens/DoctorScreen';
-import { HudScreen } from '../screens/HudScreen';
-import { MemoryGenealogyScreen } from '../screens/MemoryGenealogyScreen';
-import { SkillPickerScreen } from '../screens/SkillPickerScreen';
-import { ConfirmScreen } from '../screens/ConfirmScreen';
+import { MainScreen } from '../screens/ops/MainScreen';
+import { SetupScreen } from '../screens/setup/SetupScreen';
+import { UpdateScreen } from '../screens/setup/UpdateScreen';
+import { UninstallScreen } from '../screens/setup/UninstallScreen';
+import { DoctorScreen } from '../screens/ops/DoctorScreen';
+import { HudScreen } from '../screens/ops/HudScreen';
+import { MemoryGenealogyScreen } from '../screens/ops/MemoryGenealogyScreen';
+import { SkillPickerScreen } from '../screens/setup/SkillPickerScreen';
+import { ConfirmScreen } from '../screens/setup/ConfirmScreen';
 import { useSetupOptions } from '../hooks/useSetupOptions';
 import type { TuiSessionProps, Action, Client, Scope, ComponentsConfig } from '../views/types';
 

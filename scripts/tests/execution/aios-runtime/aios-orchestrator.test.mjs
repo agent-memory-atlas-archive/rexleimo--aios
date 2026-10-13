@@ -38,7 +38,7 @@ async function importDispatchRuntimes() {
 
 async function importDispatchRuntimeSpec() {
   try {
-    return await import('../../../lib/specs/orchestrator-runtimes.json', { with: { type: 'json' } });
+    return await import('../../../lib/specs/orchestrator/orchestrator-runtimes.json', { with: { type: 'json' } });
   } catch {
     return null;
   }
@@ -46,7 +46,7 @@ async function importDispatchRuntimeSpec() {
 
 async function importWorkItemTelemetrySpec() {
   try {
-    return await import('../../../lib/specs/orchestrator-work-item-telemetry.schema.json', { with: { type: 'json' } });
+    return await import('../../../lib/specs/orchestrator/orchestrator-work-item-telemetry.schema.json', { with: { type: 'json' } });
   } catch {
     return null;
   }

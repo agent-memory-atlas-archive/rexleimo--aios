@@ -1,13 +1,13 @@
-// scripts/lib/tui-ink/screens/ConfirmScreen.tsx
+// scripts/lib/tui-ink/screens/setup/ConfirmScreen.tsx
 import React from 'react';
 
 import { useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Box, Text, useInput } from 'ink';
 import { ConfirmInput } from '@inkjs/ui';
-import { Header } from '../components/Header';
-import { getNativePreview } from '../views/native-preview';
-import type { Action, AllOptions, Client } from '../views/types';
+import { Header } from '../../components/Header';
+import { getNativePreview } from '../../views/native-preview';
+import type { Action, AllOptions, Client } from '../../views/types';
 
 interface ConfirmScreenProps {
   rootDir: string;
@@ -157,7 +157,7 @@ export function ConfirmScreen({ rootDir, options, onRun }: ConfirmScreenProps) {
     };
 
     try {
-      const nativeModule = await import('../../components/native.mjs');
+      const nativeModule = await import('../../../components/native.mjs');
       await nativeModule.rollbackNativeEnhancements({
         rootDir,
         repairId: rollbackTargetId,

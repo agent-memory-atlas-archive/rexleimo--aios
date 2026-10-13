@@ -1,14 +1,14 @@
-// scripts/lib/tui-ink/screens/UpdateScreen.tsx
+// scripts/lib/tui-ink/screens/setup/UpdateScreen.tsx
 import React from 'react';
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { Checkbox } from '../components/Checkbox';
-import { getNativePreview } from '../views/native-preview';
-import type { UpdateOptions, ComponentsConfig } from '../views/types';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { Checkbox } from '../../components/Checkbox';
+import { getNativePreview } from '../../views/native-preview';
+import type { UpdateOptions, ComponentsConfig } from '../../views/types';
 
 interface UpdateScreenProps {
   rootDir: string;

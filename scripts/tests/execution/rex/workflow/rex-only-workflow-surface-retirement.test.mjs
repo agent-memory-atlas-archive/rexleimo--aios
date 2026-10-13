@@ -47,10 +47,10 @@ test('AIOS exposes only the Rex workflow surface', async () => {
   const uiFiles = [
     'scripts/lib/tui-ink/views/types.ts',
     'scripts/lib/tui-ink/hooks/useSetupOptions.ts',
-    'scripts/lib/tui-ink/screens/SetupScreen.tsx',
-    'scripts/lib/tui-ink/screens/UpdateScreen.tsx',
-    'scripts/lib/tui-ink/screens/UninstallScreen.tsx',
-    'scripts/lib/tui-ink/screens/DoctorScreen.tsx',
+    'scripts/lib/tui-ink/screens/setup/SetupScreen.tsx',
+    'scripts/lib/tui-ink/screens/setup/UpdateScreen.tsx',
+    'scripts/lib/tui-ink/screens/setup/UninstallScreen.tsx',
+    'scripts/lib/tui-ink/screens/ops/DoctorScreen.tsx',
   ];
   for (const relativePath of uiFiles) {
     const source = await readFile(path.join(rootDir, relativePath), 'utf8');

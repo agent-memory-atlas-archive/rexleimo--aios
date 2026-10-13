@@ -30,5 +30,5 @@ export const CLIENT_COMMAND = Object.freeze(Object.fromEntries(
   ])
 ));
 
-export const CODEX_OUTPUT_SCHEMA_REL = path.join('scripts', 'lib', 'specs', 'agent-handoff.schema.json');
-export const HANDOFF_SCHEMA_DISPLAY_PATH = 'scripts/lib/specs/agent-handoff.schema.json';
+export const CODEX_OUTPUT_SCHEMA_REL = path.join('scripts', 'lib', 'specs', 'registry', 'agent-handoff.schema.json');
+export const HANDOFF_SCHEMA_DISPLAY_PATH = 'scripts/lib/specs/registry/agent-handoff.schema.json';

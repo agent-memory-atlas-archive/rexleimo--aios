@@ -129,7 +129,7 @@ export function buildSystemPromptForSpeaker({ agent, rootDir, env, rolePinnedMem
 
   lines.push('');
   lines.push('Output Contract');
-  lines.push('Output a single JSON object (no surrounding text) that conforms to `scripts/lib/specs/agent-handoff.schema.json`.');
+  lines.push('Output a single JSON object (no surrounding text) that conforms to `scripts/lib/specs/registry/agent-handoff.schema.json`.');
   lines.push('');
   lines.push('Required fields: schemaVersion, status, fromRole, toRole, taskTitle, contextSummary, findings, filesTouched, openQuestions, recommendations.');
   lines.push('Set schemaVersion=1. Always include array fields (empty arrays are OK).');

@@ -40,7 +40,7 @@ function buildManagedBody(rawAgent = {}) {
     prompt,
     '',
     'Output Contract',
-    'Output a single JSON object (no surrounding text) that conforms to `scripts/lib/specs/agent-handoff.schema.json`.',
+    'Output a single JSON object (no surrounding text) that conforms to `scripts/lib/specs/registry/agent-handoff.schema.json`.',
     '',
     'Required fields:',
     '- schemaVersion',

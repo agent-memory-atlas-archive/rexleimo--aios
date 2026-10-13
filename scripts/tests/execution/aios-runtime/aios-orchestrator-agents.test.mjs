@@ -116,7 +116,7 @@ test('generateCompatibilityExport stays in sync with canonical markdown sources'
   const path = await import('node:path');
 
   const rendered = compat.renderCompatibilityExport(source);
-  const actual = await fs.readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs/orchestrator-agents.json'), 'utf8');
+  const actual = await fs.readFile(path.join(resolveRepoRoot(), 'scripts/lib/specs/orchestrator/orchestrator-agents.json'), 'utf8');
 
   // Line endings are enforced by git config (.gitattributes text eol=lf on
   // canonical sources and generated specs); the guard compares bytes exactly.

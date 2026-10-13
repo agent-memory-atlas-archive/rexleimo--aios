@@ -13,6 +13,6 @@ export {
   formatSkillCandidatePatchTemplateDocument,
 } from './skill-candidates.mjs';
 
-export { buildWatchMeta } from './watch-meta.mjs';
-export { resolveWatchCadence } from './watch-cadence.mjs';
-export { createThrottledWatchRender, watchRenderLoop } from './watch.mjs';
+export { buildWatchMeta } from './watch/watch-meta.mjs';
+export { resolveWatchCadence } from './watch/watch-cadence.mjs';
+export { createThrottledWatchRender, watchRenderLoop } from './watch/watch.mjs';

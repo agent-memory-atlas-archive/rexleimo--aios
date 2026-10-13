@@ -1,5 +1,5 @@
 /* 中文注释：runtime catalog 只负责读取 manifest 和选择 runtime，不执行任何任务。 */
-import runtimeSpec from '../../../specs/orchestrator-runtimes.json' with { type: 'json' };
+import runtimeSpec from '../../../specs/orchestrator/orchestrator-runtimes.json' with { type: 'json' };
 import { LOCAL_DRY_RUN_RUNTIME, SUBAGENT_RUNTIME } from './constants.mjs';
 
 export const DISPATCH_RUNTIME_CATALOG = Object.freeze(

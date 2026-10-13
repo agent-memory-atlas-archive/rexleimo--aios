@@ -31,14 +31,14 @@ test('components can be imported', async () => {
 });
 
 test('screens can be imported', async () => {
-  const main = await import('../screens/MainScreen.tsx');
-  const setup = await import('../screens/SetupScreen.tsx');
-  const update = await import('../screens/UpdateScreen.tsx');
-  const uninstall = await import('../screens/UninstallScreen.tsx');
-  const doctor = await import('../screens/DoctorScreen.tsx');
-  const skills = await import('../screens/SkillPickerScreen.tsx');
-  const confirm = await import('../screens/ConfirmScreen.tsx');
-  const genealogy = await import('../screens/MemoryGenealogyScreen.tsx');
+  const main = await import('../screens/ops/MainScreen.tsx');
+  const setup = await import('../screens/setup/SetupScreen.tsx');
+  const update = await import('../screens/setup/UpdateScreen.tsx');
+  const uninstall = await import('../screens/setup/UninstallScreen.tsx');
+  const doctor = await import('../screens/ops/DoctorScreen.tsx');
+  const skills = await import('../screens/setup/SkillPickerScreen.tsx');
+  const confirm = await import('../screens/setup/ConfirmScreen.tsx');
+  const genealogy = await import('../screens/ops/MemoryGenealogyScreen.tsx');
 
   assert.ok(main.MainScreen, 'MainScreen should be exported');
   assert.ok(setup.SetupScreen, 'SetupScreen should be exported');
@@ -215,7 +215,7 @@ test('memory genealogy screen helpers gate empty and refresh states', async () =
     clampGenealogyCursor,
     formatGenealogyRefreshStatus,
     shouldShowGenealogyEmptyState,
-  } = await import('../screens/MemoryGenealogyScreen.tsx');
+  } = await import('../screens/ops/MemoryGenealogyScreen.tsx');
 
   assert.equal(
     shouldShowGenealogyEmptyState({ hasLoaded: false, isLoading: true, rowCount: 0, error: '' }),

@@ -1,27 +1,23 @@
-// scripts/lib/tui-ink/screens/SetupScreen.tsx
+// scripts/lib/tui-ink/screens/setup/UninstallScreen.tsx
 import React from 'react';
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { Checkbox } from '../components/Checkbox';
-import { getNativePreview } from '../views/native-preview';
-import type { SetupOptions, ComponentsConfig } from '../views/types';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { Checkbox } from '../../components/Checkbox';
+import { getNativePreview } from '../../views/native-preview';
+import type { UninstallOptions, ComponentsConfig } from '../../views/types';
 
-interface SetupScreenProps {
+interface UninstallScreenProps {
   rootDir: string;
-  options: SetupOptions;
+  options: UninstallOptions;
   onToggleComponent: (component: keyof ComponentsConfig) => void;
-  onCycleWrapMode: () => void;
-  onCycleWrapModePrevious: () => void;
   onCycleScope: () => void;
   onCycleScopePrevious: () => void;
   onCycleClient: () => void;
   onCycleClientPrevious: () => void;
-  onToggleSkipPlaywright: () => void;
-  onToggleSkipDoctor: () => void;
   onSelectSkills: () => void;
   onRun: () => void;
 }
@@ -34,24 +30,20 @@ const COMPONENTS_LABELS: Record<keyof ComponentsConfig, string> = {
   native: 'Native enhancements',
 };
 
-export function SetupScreen({
+export function UninstallScreen({
   rootDir,
   options,
   onToggleComponent,
-  onCycleWrapMode,
-  onCycleWrapModePrevious,
   onCycleScope,
   onCycleScopePrevious,
   onCycleClient,
   onCycleClientPrevious,
-  onToggleSkipPlaywright,
-  onToggleSkipDoctor,
   onSelectSkills,
   onRun,
-}: SetupScreenProps) {
+}: UninstallScreenProps) {
   const navigate = useNavigate();
   const [cursor, setCursor] = useState(0);
-  const maxCursor = 11;
+  const maxCursor = 8;
 
   useInput(
     useCallback(
@@ -64,44 +56,30 @@ export function SetupScreen({
           if (cursor >= 0 && cursor <= 3) {
             onToggleComponent(COMPONENTS_KEYS[cursor]);
           } else if (cursor === 4) {
-            onCycleWrapMode();
-          } else if (cursor === 5) {
             onCycleScope();
-          } else if (cursor === 6) {
+          } else if (cursor === 5) {
             onCycleClient();
-          } else if (cursor === 7) {
-            onToggleSkipPlaywright();
-          } else if (cursor === 8) {
-            onToggleSkipDoctor();
           }
         } else if (key.rightArrow) {
           if (cursor >= 0 && cursor <= 3) {
             onToggleComponent(COMPONENTS_KEYS[cursor]);
           } else if (cursor === 4) {
-            onCycleWrapMode();
-          } else if (cursor === 5) {
             onCycleScope();
-          } else if (cursor === 6) {
+          } else if (cursor === 5) {
             onCycleClient();
-          } else if (cursor === 7) {
-            onToggleSkipPlaywright();
-          } else if (cursor === 8) {
-            onToggleSkipDoctor();
           }
         } else if (key.leftArrow) {
           if (cursor === 4) {
-            onCycleWrapModePrevious();
-          } else if (cursor === 5) {
             onCycleScopePrevious();
-          } else if (cursor === 6) {
+          } else if (cursor === 5) {
             onCycleClientPrevious();
           }
         } else if (key.return) {
-          if (cursor === 9) {
+          if (cursor === 6) {
             onSelectSkills();
-          } else if (cursor === 10) {
+          } else if (cursor === 7) {
             onRun();
-          } else if (cursor === 11) {
+          } else if (cursor === 8) {
             navigate('/');
           }
         } else if (input === 'b' || input === 'B') {
@@ -111,14 +89,10 @@ export function SetupScreen({
       [
         cursor,
         onToggleComponent,
-        onCycleWrapMode,
-        onCycleWrapModePrevious,
         onCycleScope,
         onCycleScopePrevious,
         onCycleClient,
         onCycleClientPrevious,
-        onToggleSkipPlaywright,
-        onToggleSkipDoctor,
         onSelectSkills,
         onRun,
         navigate,
@@ -146,7 +120,7 @@ export function SetupScreen({
   return (
     <Box flexDirection="column" padding={1}>
       <Header rootDir={rootDir} />
-      <Text bold>Setup configuration</Text>
+      <Text bold>Uninstall configuration</Text>
       <Box flexDirection="column" marginY={1}>
         {COMPONENTS_KEYS.map((key, idx) => (
           <Checkbox
@@ -156,33 +130,22 @@ export function SetupScreen({
             active={cursor === idx}
           />
         ))}
-        {renderValueItem('Mode', options.wrapMode, 4)}
-        {renderValueItem('Skills scope', options.scope, 5)}
-        {renderValueItem('Client', options.client, 6)}
-        <Checkbox
-          label="Skip Playwright install"
-          checked={options.skipPlaywrightInstall}
-          active={cursor === 7}
-        />
-        <Checkbox
-          label="Skip doctor"
-          checked={options.skipDoctor}
-          active={cursor === 8}
-        />
-        {renderValueItem('Selected skills', selectedSkillsDisplay, 9)}
-        {renderActionItem('Run setup', 10)}
-        {renderActionItem('Back', 11)}
+        {renderValueItem('Skills scope', options.scope, 4)}
+        {renderValueItem('Client', options.client, 5)}
+        {renderValueItem('Selected skills', selectedSkillsDisplay, 6)}
+        {renderActionItem('Run uninstall', 7)}
+        {renderActionItem('Back', 8)}
       </Box>
       <Box flexDirection="column">
         {options.components.native ? (
           <>
-            <Text color="green">Native preview ({nativePreview.tier})</Text>
+            <Text color="yellow">Native uninstall preview ({nativePreview.tier})</Text>
             {nativePreview.lines.map((line, idx) => (
-              <Text key={`${idx}:${line}`} dimColor>  {line}</Text>
+              <Text key={`${idx}:${line}`} dimColor>  remove managed segments in: {line}</Text>
             ))}
           </>
         ) : (
-          <Text dimColor>Native enhancements are disabled for this run.</Text>
+          <Text dimColor>Native enhancements are not selected for uninstall.</Text>
         )}
       </Box>
       <Footer />

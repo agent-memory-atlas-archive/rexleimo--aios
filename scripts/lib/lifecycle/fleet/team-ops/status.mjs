@@ -4,9 +4,9 @@ import {
   filterSkillCandidateState,
   formatSkillCandidateDetails,
 } from '../../../hud/skill-candidates.mjs';
-import { buildWatchMeta } from '../../../hud/watch-meta.mjs';
-import { resolveWatchCadence } from '../../../hud/watch-cadence.mjs';
-import { createThrottledWatchRender, watchRenderLoop } from '../../../hud/watch.mjs';
+import { buildWatchMeta } from '../../../hud/watch/watch-meta.mjs';
+import { resolveWatchCadence } from '../../../hud/watch/watch-cadence.mjs';
+import { createThrottledWatchRender, watchRenderLoop } from '../../../hud/watch/watch.mjs';
 import { buildTeamWatchdogState } from '../watchdog.mjs';
 import {
   DEFAULT_WATCH_STALLED_MS,

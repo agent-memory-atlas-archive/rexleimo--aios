@@ -1,11 +1,11 @@
-// scripts/lib/tui-ink/screens/MainScreen.tsx
+// scripts/lib/tui-ink/screens/ops/MainScreen.tsx
 import React from 'react';
 
 import { useNavigate } from 'react-router';
 import { Box, Text } from 'ink';
 import { Select } from '@inkjs/ui';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 
 const MENU_OPTIONS = [
   { label: 'HUD', value: 'hud' },

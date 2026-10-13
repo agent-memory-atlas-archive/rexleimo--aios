@@ -8,7 +8,7 @@ import { writeFileAtomic } from './lib/fs/atomic-write.mjs';
 import { syncGeneratedAgents } from './lib/harness/team/orchestrator-agents.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const exportPath = path.join(rootDir, 'scripts', 'lib', 'specs', 'orchestrator-agents.json');
+const exportPath = path.join(rootDir, 'scripts', 'lib', 'specs', 'orchestrator', 'orchestrator-agents.json');
 
 function hasFlag(flag) {
   return process.argv.slice(2).includes(flag);

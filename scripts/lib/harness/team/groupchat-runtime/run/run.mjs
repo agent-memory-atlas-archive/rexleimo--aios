@@ -1,7 +1,7 @@
 import { normalizeOrchestratorAgentSpec } from '../../orchestrator-agents.mjs';
 import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../../../interception/index.mjs';
 import { resolveModelRoutingForRole } from '../../../../model-router.mjs';
-import agentSpec from '../../../../specs/orchestrator-agents.json' with { type: 'json' };
+import agentSpec from '../../../../specs/orchestrator/orchestrator-agents.json' with { type: 'json' };
 
 import { redactExecutionContextText } from '../../../ops/runtime-context-redaction.mjs';
 import { resolveBlueprintRounds } from './blueprint-rounds.mjs';

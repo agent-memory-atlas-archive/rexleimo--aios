@@ -35,6 +35,7 @@ export const EXEMPT_DIRS = Object.freeze({
   'mcp-server': 'TS package entry surface (package.json/tsconfig + src/scripts/tests); 7 configs immovable, floor is 9',
   'mcp-server/test-results': 'generated bench output',
   'config': 'user-facing config surface (documented stable paths in messages/installers/docs; loaders join rootDir+config+name)',
+  'client-sources/native-base': 'client registry surface (one dir per client, mirrors skill-sources precedent)',
 });
 
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
@@ -44,8 +45,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/harness/team/subagent-runtime': 24,
   'agent-sources/roles': 19,
   'docs': 13,
-  'scripts/lib/specs': 9,
-  'scripts/lib/tui-ink/screens': 9,
   'skill-sources/rexai-image-generation/scripts': 9,
 });
 

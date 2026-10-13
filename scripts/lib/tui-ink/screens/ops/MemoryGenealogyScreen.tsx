@@ -5,16 +5,16 @@ import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
 import path from 'node:path';
 
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 import {
   formatGenealogyRows,
   formatNodeDetails,
   formatRiskSummary,
   type GenealogyRow,
-} from '../views/genealogy-view';
-import { buildMemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/store/genealogy.ts';
-import type { MemoryGenealogyGraph } from '../../../../mcp-server/src/contextdb/store/genealogy.ts';
+} from '../../views/genealogy-view';
+import { buildMemoryGenealogyGraph } from '../../../../../mcp-server/src/contextdb/store/genealogy.ts';
+import type { MemoryGenealogyGraph } from '../../../../../mcp-server/src/contextdb/store/genealogy.ts';
 
 interface MemoryGenealogyScreenProps {
   rootDir: string;

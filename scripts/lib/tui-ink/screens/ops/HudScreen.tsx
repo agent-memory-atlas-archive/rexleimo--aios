@@ -1,19 +1,19 @@
-// scripts/lib/tui-ink/screens/HudScreen.tsx
+// scripts/lib/tui-ink/screens/ops/HudScreen.tsx
 import React from 'react';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { Checkbox } from '../components/Checkbox';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { Checkbox } from '../../components/Checkbox';
 
 import {
   HUD_PROVIDER_AGENT_MAP,
   listContextDbSessions,
   readHudState,
-} from '../../hud/state.mjs';
-import { normalizeHudPreset, renderHud } from '../../hud/render.mjs';
+} from '../../../hud/state.mjs';
+import { normalizeHudPreset, renderHud } from '../../../hud/render.mjs';
 
 type Provider = 'codex' | 'claude' | 'gemini';
 type Preset = 'minimal' | 'focused' | 'full';

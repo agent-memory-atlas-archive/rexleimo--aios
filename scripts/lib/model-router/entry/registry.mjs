@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import defaultRegistry from '../../specs/model-registry.json' with { type: 'json' };
+import defaultRegistry from '../../specs/registry/model-registry.json' with { type: 'json' };
 import { clonePlain, normalizeId } from './shared.mjs';
 
 const __filename = fileURLToPath(import.meta.url);

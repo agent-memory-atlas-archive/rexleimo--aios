@@ -1,13 +1,13 @@
-// scripts/lib/tui-ink/screens/DoctorScreen.tsx
+// scripts/lib/tui-ink/screens/ops/DoctorScreen.tsx
 import React from 'react';
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { Checkbox } from '../components/Checkbox';
-import type { DoctorOptions } from '../views/types';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { Checkbox } from '../../components/Checkbox';
+import type { DoctorOptions } from '../../views/types';
 
 interface DoctorScreenProps {
   rootDir: string;

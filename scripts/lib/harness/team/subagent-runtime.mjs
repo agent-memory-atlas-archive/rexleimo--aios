@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import agentSpec from '../../specs/orchestrator-agents.json' with { type: 'json' };
+import agentSpec from '../../specs/orchestrator/orchestrator-agents.json' with { type: 'json' };
 import { normalizeOrchestratorAgentSpec } from './orchestrator-agents.mjs';
 import {
   SUBAGENT_CLIENT_ENV,

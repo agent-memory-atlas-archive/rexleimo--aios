@@ -8,9 +8,9 @@ import {
   formatSkillCandidateDetails,
   formatSkillCandidatePatchTemplateDocument,
 } from '../../hud/skill-candidates.mjs';
-import { buildWatchMeta } from '../../hud/watch-meta.mjs';
-import { resolveWatchCadence } from '../../hud/watch-cadence.mjs';
-import { createThrottledWatchRender, watchRenderLoop } from '../../hud/watch.mjs';
+import { buildWatchMeta } from '../../hud/watch/watch-meta.mjs';
+import { resolveWatchCadence } from '../../hud/watch/watch-cadence.mjs';
+import { createThrottledWatchRender, watchRenderLoop } from '../../hud/watch/watch.mjs';
 
 const FAST_WATCH_DATA_REFRESH_MS = 1000;
 const DEFAULT_SKILL_CANDIDATE_LIMIT = 6;

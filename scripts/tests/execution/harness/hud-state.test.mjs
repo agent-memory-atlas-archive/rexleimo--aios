@@ -10,7 +10,7 @@ import { buildHindsightEval } from '../../../lib/harness/quality/hindsight-eval.
 import { initSoloRunJournal, writeSoloControl } from '../../../lib/harness/solo/solo-journal.mjs';
 import { readHudDispatchSummary, readHudState, selectHudSessionId } from '../../../lib/hud/state.mjs';
 import { renderHud } from '../../../lib/hud/render.mjs';
-import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/hud/watch.mjs';
+import { computeAdaptiveNextIntervalMs, createThrottledWatchRender, watchRenderLoop } from '../../../lib/hud/watch/watch.mjs';
 import { runHud } from '../../../lib/lifecycle/fleet/hud.mjs';
 import { runOrchestrate } from '../../../lib/lifecycle/run/orchestrate.mjs';
 import {

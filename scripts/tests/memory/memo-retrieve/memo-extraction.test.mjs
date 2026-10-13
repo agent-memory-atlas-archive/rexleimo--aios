@@ -55,7 +55,7 @@ test('confidence and evidence_ref accept only well-formed values', () => {
   assert.equal(normalizeExtractionConfidence('Medium'), 'medium');
   assert.equal(normalizeExtractionConfidence(''), 'medium');
   throwsCode(() => normalizeExtractionConfidence('certain'), 'extraction:bad-confidence');
-  assert.equal(normalizeExtractionEvidenceRef('scripts/lib/specs/orchestrator-agents.json:272'), 'scripts/lib/specs/orchestrator-agents.json:272');
+  assert.equal(normalizeExtractionEvidenceRef('scripts/lib/specs/orchestrator/orchestrator-agents.json:272'), 'scripts/lib/specs/orchestrator/orchestrator-agents.json:272');
   assert.equal(normalizeExtractionEvidenceRef(''), '');
   throwsCode(() => normalizeExtractionEvidenceRef(['a', 'b']), 'extraction:single-evidence-only');
   throwsCode(() => normalizeExtractionEvidenceRef('', { required: true }), 'extraction:missing-evidence');
@@ -74,13 +74,13 @@ test('a full five-element entry normalizes cleanly', () => {
     fact: 'CRLF checkout artifacts fixed by eol=lf',
     entities: ['drift-guard', '.gitattributes'],
     date: '2026-09-06',
-    evidenceRef: 'scripts/lib/specs/orchestrator-agents.json:272',
+    evidenceRef: 'scripts/lib/specs/orchestrator/orchestrator-agents.json:272',
     confidence: 'high',
   });
   assert.equal(entry.text, 'CRLF checkout artifacts fixed by eol=lf');
   assert.deepEqual(entry.entities, ['drift-guard', '.gitattributes']);
   assert.equal(entry.date, '2026-09-06');
-  assert.equal(entry.evidenceRef, 'scripts/lib/specs/orchestrator-agents.json:272');
+  assert.equal(entry.evidenceRef, 'scripts/lib/specs/orchestrator/orchestrator-agents.json:272');
   assert.equal(entry.confidence, 'high');
 });
 
