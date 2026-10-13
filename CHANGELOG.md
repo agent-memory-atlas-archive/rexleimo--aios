@@ -6,17 +6,23 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
-- feat(video): new standalone Remotion sub-app at `video/` producing the 60s / 1920x1080 / 30fps AIOS
-  promo film — 8 scenes drawn entirely with React + SVG (no external assets, offline-reproducible),
-  one timeline source (`video/src/timeline.json`) shared by `timeline.ts` and the render script, and
-  `video/scripts/render.mjs` printing visible render progress in three channels (TTY bar, non-TTY
-  percentage lines every 2.5% for agent capture, throttled `out/render-progress.json`). Every on-screen
-  claim carries a `file:line` citation listed in `video/README.md`; render artifacts stay gitignored.
+- feat(video): new standalone Remotion sub-app at `video/` producing the 30s / 1080x1920 / 30fps vertical
+  AIOS short for 抖音 / 小红书 / 视频号 — 8 story beats (`hook crash resume route work team proof cta`)
+  drawn entirely with React + SVG (no external assets, offline-reproducible) following one real task
+  (`/implement 重构浏览器层，测试全绿`) instead of a feature list. Hard subtitles carry the narration
+  because the platforms autoplay muted: cues live only in `video/src/timeline.json`, are injected by
+  `PromoVideo.tsx` through the single `SceneProps` contract, and `video/tests/timeline.test.mjs` rejects
+  any scene that inlines its own cues. The same file is the timeline source for `timeline.ts` and
+  `scripts/render.mjs`, which prints visible render progress in three channels (TTY bar, non-TTY
+  percentage lines every 2.5% for agent capture, throttled `out/render-progress.json`). On-screen
+  `file:line` pills were dropped as review artifacts; the claim-to-citation table moved to
+  `video/README.md`. Render artifacts stay gitignored.
 - feat(skills): `promo-video-pipeline` dispatches the storyboard as independent per-scene work items
-  (main thread freezes `src/components/**`, `theme.ts`, `PromoVideo.tsx` and `timeline.json`; each
-  subagent owns exactly one `src/scenes/<id>.tsx`), keeps the `aios work --dry-run` preview separate
-  from live approval, and gates completion on real render evidence (mp4 exists, progress json
-  `phase=done`, `renderedFrames == totalFrames`, typecheck and test exit 0). Certified with
+  (main thread freezes `src/components/**`, `theme.ts`, `PromoVideo.tsx`, `timeline.json` and the
+  `SceneProps` contract; each subagent owns exactly one `src/scenes/<id>.tsx`), keeps the
+  `aios work --dry-run` preview separate from live approval, and gates completion on real render evidence
+  (mp4 exists, progress json `phase=done`, `renderedFrames == totalFrames == 900`, typecheck and test exit
+  0, plus a vertical still-frame pass since layout defects only surface in rendered frames). Certified with
   `nonRegression: true` at `docs/evidence/skill-training/promo-video-pipeline-certification-*/state.json`.
 
 ## [6.3.0] - 2026-10-01

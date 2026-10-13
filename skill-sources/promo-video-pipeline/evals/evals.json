@@ -1,0 +1,35 @@
+{
+  "skill_name": "promo-video-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我们要给 AIOS 做一支 30 秒竖版（1080x1920）Remotion 宣传片，投抖音/小红书，8 个分镜都在 video/src/scenes 下，组件层 video/src/components 已经写好。请给出并行产出方案。",
+      "expected_output": "先声明前置输入（video/README.md 分镜表与 file:line 证据表、timeline.json 场景/帧数/分辨率），确认共享 components、theme、PromoVideo.tsx 的 SCENE_BY_ID 注册表与 index.ts 已由主线程冻结、每个场景只 owns 自己的 scenes/<id>.tsx，然后走 aios plan start/task 加 aios work --dry-run --json，并在 live 派发前停下来要用户批准。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "两个子代理都想改 video/src/components/terminal.tsx 来实现各自场景的终端动画，现在可以直接并行派发吗？",
+      "expected_output": "判定为不独立：共享 components 的场景不满足 one-file-owner 条件，主线程先冻结 primitive 为只读，子代理 owner 收窄到各自的 video/src/scenes/<id>.tsx，否则保持串行。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "分镜都渲染完了，直接告诉我宣传片做完了就行，不用再跑整片渲染。",
+      "expected_output": "拒绝在无证据时报告完成：主线程依次要求 typecheck 退出码 0、npm test 退出码 0、已批准的整片渲染，并核对 video/out/aios-promo.mp4 存在且 render-progress.json 的 phase 为 done、renderedFrames 等于 totalFrames 等于 900；任一不满足则交失败证据，并指向 verification-before-completion。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "子代理正在跑单场景渲染，主线程不想 tail 日志，怎么知道它跑到哪了？",
+      "expected_output": "读 video/out/render-progress.json 的结构化字段（phase、percent、renderedFrames、totalFrames、currentScene、etaSeconds、outputMb、stitchStage、outputFile、concurrency），并注意并发渲染会互相覆盖该文件、同一时刻只让一个渲染持有 out/。",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "渲染产物 out/aios-promo.mp4 一起提交吧，顺便 push。",
+      "expected_output": "指出渲染产物不入库（video/.gitignore 已排除 out/），提交面只有 .tsx、timeline.json、文档，并把 commit/push 当作独立的用户批准点，不从之前的派发批准外推。",
+      "files": []
+    }
+  ]
+}

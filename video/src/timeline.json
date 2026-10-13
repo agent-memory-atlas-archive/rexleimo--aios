@@ -1,0 +1,82 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "compositionId": "AiosPromo",
+  "scenes": [
+    {
+      "id": "hook",
+      "label": "一句话指令",
+      "frames": 90,
+      "captions": [
+        { "from": 0, "to": 46, "text": "让 AI 跑一个 40 分钟的活。" },
+        { "from": 46, "to": 90, "text": "一句话就派出去了。" }
+      ]
+    },
+    {
+      "id": "crash",
+      "label": "进程中断",
+      "frames": 100,
+      "captions": [
+        { "from": 0, "to": 40, "text": "第 18 分钟，进程被杀掉。" },
+        { "from": 40, "to": 100, "text": "上下文全丢，只能从头再跑。" }
+      ]
+    },
+    {
+      "id": "resume",
+      "label": "检查点续跑",
+      "frames": 110,
+      "captions": [
+        { "from": 0, "to": 58, "text": "AIOS 把每一步都落了检查点。" },
+        { "from": 58, "to": 110, "text": "早上八点对它说：接着跑。" }
+      ]
+    },
+    {
+      "id": "route",
+      "label": "显式意图路由",
+      "frames": 100,
+      "captions": [
+        { "from": 0, "to": 48, "text": "它不猜你想要什么。" },
+        { "from": 48, "to": 100, "text": "命令面声明意图，流程分三档。" }
+      ]
+    },
+    {
+      "id": "work",
+      "label": "真实改动与测试",
+      "frames": 120,
+      "captions": [
+        { "from": 0, "to": 42, "text": "接下来它一直在干活。" },
+        { "from": 42, "to": 80, "text": "diff 一行行长出来。" },
+        { "from": 80, "to": 120, "text": "测试也跟着跑完。" }
+      ]
+    },
+    {
+      "id": "team",
+      "label": "并行派发与闸门",
+      "frames": 120,
+      "captions": [
+        { "from": 0, "to": 56, "text": "活太大？拆成独立工作项并行跑。" },
+        { "from": 56, "to": 120, "text": "收口有一道闸门：不合格打回。" }
+      ]
+    },
+    {
+      "id": "proof",
+      "label": "证据信封",
+      "frames": 110,
+      "captions": [
+        { "from": 0, "to": 52, "text": "它说「做完了」不算数。" },
+        { "from": 52, "to": 110, "text": "每条主张都要留下可复核的证据。" }
+      ]
+    },
+    {
+      "id": "cta",
+      "label": "装上它",
+      "frames": 150,
+      "captions": [
+        { "from": 0, "to": 54, "text": "断掉能续，干完有证据。" },
+        { "from": 54, "to": 104, "text": "十个客户端，一套记忆。" },
+        { "from": 104, "to": 150, "text": "一条命令，今晚就交给它。" }
+      ]
+    }
+  ]
+}
