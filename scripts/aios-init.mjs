@@ -231,7 +231,7 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('');
     console.log('== Global Skill Install ==');
     try {
-      const { installContextDbSkills } = await import('./lib/components/skills/install.mjs');
+      const { installContextDbSkills } = await import('./lib/components/skills/lifecycle/install.mjs');
       await installContextDbSkills({
         // 中文注释：rootDir 必须是 AIOS 安装根（catalog 与 skill-sources 所在），
         // 不能传客户端工作区——否则 manifest 永远找不到，全局 skill 目录静默失败。

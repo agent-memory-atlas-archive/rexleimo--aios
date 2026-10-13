@@ -7,22 +7,22 @@ import {
   ensureParentDir,
   isLegacyManagedSkillLink,
   isManagedLink,
-} from '../../platform/fs.mjs';
+} from '../../../platform/fs.mjs';
 import {
   buildInstalledSkillMetadata,
   GENERATED_SKILL_META_FILE,
   INSTALLED_SKILL_META_FILE,
   isManagedInstalledSkill,
   writeInstalledSkillMetadata,
-} from '../../skills/install-metadata.mjs';
+} from '../../../skills/install-metadata.mjs';
 import {
   hashFileBuffer,
   snapshotDirectory,
   snapshotsEqual,
-} from '../../skills/directory-snapshot.mjs';
-import { materializeSkillTree } from '../../skills/source-tree.mjs';
+} from '../../../skills/directory-snapshot.mjs';
+import { materializeSkillTree } from '../../../skills/source-tree.mjs';
 
-import { arePathsEqual } from './path-utils.mjs';
+import { arePathsEqual } from '../path-utils.mjs';
 
 export { INSTALLED_SKILL_META_FILE };
 export { hashFileBuffer, snapshotDirectory, snapshotsEqual };

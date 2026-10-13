@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import {
   removeLegacyPiSkillRootInstalls,
   removeLegacySharedRootInstalls,
-} from './lib/components/skills/doctor.mjs';
+} from './lib/components/skills/lifecycle/doctor.mjs';
 import { getAgentsHome } from './lib/platform/paths.mjs';
 import { isDirectModuleInvocation } from './lib/platform/module-entry.mjs';
 

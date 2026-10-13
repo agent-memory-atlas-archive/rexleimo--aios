@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { collectUnexpectedSkillRootFindings } from '../../platform/fs.mjs';
-import { getAgentsHome } from '../../platform/paths.mjs';
-import { resolveClientSelection } from '../../clients/registry.mjs';
+import { collectUnexpectedSkillRootFindings } from '../../../platform/fs.mjs';
+import { getAgentsHome } from '../../../platform/paths.mjs';
+import { resolveClientSelection } from '../../../clients/registry.mjs';
 
-import { analyzeCatalogEntries, loadSkillsCatalog, resolveTargetRoot, tryLoadSkillsSyncManifest } from './catalog.mjs';
-import { GENERATED_SKILL_META_FILE } from '../../skills/install-metadata.mjs';
+import { analyzeCatalogEntries, loadSkillsCatalog, resolveTargetRoot, tryLoadSkillsSyncManifest } from '../catalog.mjs';
+import { GENERATED_SKILL_META_FILE } from '../../../skills/install-metadata.mjs';
 import {
   INSTALLED_SKILL_META_FILE,
   isLegacyManagedLinkInstall,
@@ -16,8 +16,8 @@ import {
   snapshotDirectory,
   snapshotsEqual,
 } from './install-targets.mjs';
-import { normalizeScope, resolveHomeMap } from './normalizers.mjs';
-import { assertProjectScopeAllowed, isSourceRepoProjectRoot } from './safety.mjs';
+import { normalizeScope, resolveHomeMap } from '../normalizers.mjs';
+import { assertProjectScopeAllowed, isSourceRepoProjectRoot } from '../safety.mjs';
 
 // 纯函数：把诊断输出中的路径统一成 POSIX 风格，避免 Windows 终端断言和文档示例漂移。
 function formatDisplayPath(inputPath) {

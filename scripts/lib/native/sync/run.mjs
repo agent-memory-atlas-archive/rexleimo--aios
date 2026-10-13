@@ -6,7 +6,7 @@ import { syncGeneratedSkills } from '../../skills/sync.mjs';
 import { supportsClientCapability } from '../../clients/registry.mjs';
 import { buildNativeOutputPlan, loadNativeSyncManifest, resolveNativeClients } from '../source-tree.mjs';
 
-import { installContextDbSkills } from '../../components/skills/install.mjs';
+import { installContextDbSkills } from '../../components/skills/lifecycle/install.mjs';
 import { applyRenderedOperations } from './apply.mjs';
 import { EMITTERS, SYNC_LOCK_NAME } from './constants.mjs';
 import { areSamePath, createDefaultFsOps, normalizeRepairOptions } from './fs-ops.mjs';

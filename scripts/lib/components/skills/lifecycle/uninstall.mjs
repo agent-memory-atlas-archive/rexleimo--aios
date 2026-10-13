@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { removeManagedDirectory, removeManagedLink } from '../../platform/fs.mjs';
-import { resolveClientSelection } from '../../clients/registry.mjs';
+import { removeManagedDirectory, removeManagedLink } from '../../../platform/fs.mjs';
+import { resolveClientSelection } from '../../../clients/registry.mjs';
 
-import { loadSkillsCatalog, resolveCatalogEntries, resolveTargetRoot, tryLoadSkillsSyncManifest } from './catalog.mjs';
+import { loadSkillsCatalog, resolveCatalogEntries, resolveTargetRoot, tryLoadSkillsSyncManifest } from '../catalog.mjs';
 import { isLegacyManagedLinkInstall, matchesManagedInstall } from './install-targets.mjs';
-import { normalizeScope, resolveHomeMap } from './normalizers.mjs';
-import { assertProjectScopeAllowed } from './safety.mjs';
+import { normalizeScope, resolveHomeMap } from '../normalizers.mjs';
+import { assertProjectScopeAllowed } from '../safety.mjs';
 
 export async function uninstallContextDbSkills({
   rootDir,

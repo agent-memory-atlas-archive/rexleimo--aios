@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { resolveClientSelection } from '../../clients/registry.mjs';
+import { resolveClientSelection } from '../../../clients/registry.mjs';
 
-import { loadSkillsCatalog, resolveCatalogEntries, resolveTargetRoot, tryLoadSkillsSyncManifest } from './catalog.mjs';
+import { loadSkillsCatalog, resolveCatalogEntries, resolveTargetRoot, tryLoadSkillsSyncManifest } from '../catalog.mjs';
 import {
   buildExpectedInstallMetadata,
   ensureLinkSourceAvailable,
@@ -16,8 +16,8 @@ import {
   snapshotDirectory,
   snapshotsEqual,
 } from './install-targets.mjs';
-import { normalizeInstallMode, normalizeScope, resolveHomeMap } from './normalizers.mjs';
-import { assertProjectScopeAllowed } from './safety.mjs';
+import { normalizeInstallMode, normalizeScope, resolveHomeMap } from '../normalizers.mjs';
+import { assertProjectScopeAllowed } from '../safety.mjs';
 
 export async function installContextDbSkills({
   rootDir,

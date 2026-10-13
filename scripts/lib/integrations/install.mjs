@@ -10,7 +10,7 @@ import path from 'node:path';
 
 import { getClientHomes } from '../platform/paths.mjs';
 import { resolveIntegrationClientCommand } from './clients.mjs';
-import { installContextDbSkills } from '../components/skills/install.mjs';
+import { installContextDbSkills } from '../components/skills/lifecycle/install.mjs';
 import {
   buildClientDesiredEntry,
   probeDocsMcp,

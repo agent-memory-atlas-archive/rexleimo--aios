@@ -12,7 +12,7 @@ import {
   doctorContextDbSkills,
   removeLegacyPiSkillRootInstalls,
   removeLegacySharedRootInstalls,
-} from '../../../../lib/components/skills/doctor.mjs';
+} from '../../../../lib/components/skills/lifecycle/doctor.mjs';
 import { assertProjectScopeAllowed, isSourceRepoProjectRoot } from '../../../../lib/components/skills/safety.mjs';
 
 async function makeTemp(prefix) {
