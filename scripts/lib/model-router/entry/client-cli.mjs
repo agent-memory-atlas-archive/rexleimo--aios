@@ -5,10 +5,10 @@ import {
   getClientModelRouting,
   getClientUnattendedArgs,
   getClientUnattendedInsertAfterToken,
-} from '../clients/registry.mjs';
+} from '../../clients/registry.mjs';
 
 import { defaultModelRegistry } from './registry.mjs';
-import { getModelConfig } from './selection.mjs';
+import { getModelConfig } from '../routing/selection.mjs';
 import { normalizeId } from './shared.mjs';
 
 const PROVIDER_CLIENT_MAP = Object.freeze(buildTeamProviderRuntimeClientMap('all'));

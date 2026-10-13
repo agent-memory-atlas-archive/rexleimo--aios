@@ -1,15 +1,15 @@
-import { buildCLICommand, providerToClientId } from './client-cli.mjs';
-import { defaultModelRegistry } from './registry.mjs';
+import { buildCLICommand, providerToClientId } from '../entry/client-cli.mjs';
+import { defaultModelRegistry } from '../entry/registry.mjs';
 import {
   getFallbackChain,
   getModelConfig,
   resolveModelForRole,
   resolveModelForTask,
 } from './selection.mjs';
-import { classifyTaskIntent, matchTaskTypeFromDescription, scoreTaskSignals } from './signals.mjs';
+import { classifyTaskIntent, matchTaskTypeFromDescription, scoreTaskSignals } from '../session/signals.mjs';
 import { modelProtocolSet } from './protocols.mjs';
-import { normalizeModelRouterProfile } from './profile.mjs';
-import { clonePlain, normalizeId } from './shared.mjs';
+import { normalizeModelRouterProfile } from '../session/profile.mjs';
+import { clonePlain, normalizeId } from '../entry/shared.mjs';
 
 // 纯函数：显式声明 -> 客户端跟随模型（provider 派生）；自动路由 -> 客户端跟随 worker。
 function routeClientIdFor(decision, provider, worker) {

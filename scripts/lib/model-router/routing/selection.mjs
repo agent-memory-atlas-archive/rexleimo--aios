@@ -1,9 +1,9 @@
-import { defaultModelRegistry, getActiveModel } from './registry.mjs';
-import { COST_ORDER, normalizeEnvKey, normalizeId, uniq } from './shared.mjs';
-import { scoreTaskSignals } from './signals.mjs';
+import { defaultModelRegistry, getActiveModel } from '../entry/registry.mjs';
+import { COST_ORDER, normalizeEnvKey, normalizeId, uniq } from '../entry/shared.mjs';
+import { scoreTaskSignals } from '../session/signals.mjs';
 import { modelProtocolSet } from './protocols.mjs';
 import { availabilityForModel } from './availability.mjs';
-import { clientSupportsModelProtocol, getClientModelRouting } from '../clients/registry.mjs';
+import { clientSupportsModelProtocol, getClientModelRouting } from '../../clients/registry.mjs';
 
 export function getModelConfig(modelId, registry) {
   const id = normalizeId(modelId);

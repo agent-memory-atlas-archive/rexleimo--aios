@@ -1,5 +1,5 @@
-import { defaultModelRegistry } from './registry.mjs';
-import { isDisabledEnvValue, normalizeId } from './shared.mjs';
+import { defaultModelRegistry } from '../entry/registry.mjs';
+import { isDisabledEnvValue, normalizeId } from '../entry/shared.mjs';
 
 export function isModelRouterEnabled(env = process.env) {
   if (env?.AIOS_MODEL_ROUTER === undefined && env?.AIOS_SUBAGENT_CLIENT && !env?.AIOS_MODEL_ROUTER_FORCE) return false;

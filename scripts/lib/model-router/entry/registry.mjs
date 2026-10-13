@@ -2,12 +2,12 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import defaultRegistry from '../specs/model-registry.json' with { type: 'json' };
+import defaultRegistry from '../../specs/model-registry.json' with { type: 'json' };
 import { clonePlain, normalizeId } from './shared.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
+const ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
 const REGISTRY_PATH = path.join(ROOT_DIR, 'memory', 'specs', 'model-registry.json');
 
 let registryCache = null;

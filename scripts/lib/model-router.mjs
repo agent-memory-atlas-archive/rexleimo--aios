@@ -5,25 +5,25 @@ export {
   normalizeEnvKey,
   normalizeId,
   uniq,
-} from './model-router/shared.mjs';
+} from './model-router/entry/shared.mjs';
 
 export {
   defaultModelRegistry,
   getActiveModel,
   loadRegistry,
-} from './model-router/registry.mjs';
+} from './model-router/entry/registry.mjs';
 
 export {
   isModelRouterEnabled,
   normalizeModelRouterProfile,
-} from './model-router/profile.mjs';
+} from './model-router/session/profile.mjs';
 
 export {
   classifyTaskIntent,
   keywordMatches,
   matchTaskTypeFromDescription,
   scoreTaskSignals,
-} from './model-router/signals.mjs';
+} from './model-router/session/signals.mjs';
 
 export {
   applyClientContract,
@@ -35,7 +35,7 @@ export {
   resolveModelForRole,
   resolveModelForTask,
   resolveModelForTaskDescription,
-} from './model-router/selection.mjs';
+} from './model-router/routing/selection.mjs';
 
 export {
   MODEL_PROTOCOLS,
@@ -43,7 +43,7 @@ export {
   modelProtocolSet,
   normalizeModelProtocol,
   protocolEndpoint,
-} from './model-router/protocols.mjs';
+} from './model-router/routing/protocols.mjs';
 
 export {
   AVAILABILITY_CACHE_REL_PATH,
@@ -54,31 +54,31 @@ export {
   effectiveAvailability,
   loadModelAvailability,
   recordModelAvailability,
-} from './model-router/availability.mjs';
+} from './model-router/routing/availability.mjs';
 
 export {
   buildCLICommand,
   buildClientModelArgs,
   providerToClientId,
-} from './model-router/client-cli.mjs';
+} from './model-router/entry/client-cli.mjs';
 
 export {
   buildModelRouterPromptSection,
   normalizeModelRouting,
   resolveModelRoutingForRole,
   resolveModelRoutingForTask,
-} from './model-router/routing.mjs';
+} from './model-router/routing/routing.mjs';
 
 export {
   buildModelStatsReport,
   buildModelSummaryTable,
   buildRoutingTableMarkdown,
   computeModelStats,
-} from './model-router/reporting.mjs';
+} from './model-router/session/reporting.mjs';
 
 export {
   loadModelDispatchHistory,
   recordModelDispatch,
-} from './model-router/history.mjs';
+} from './model-router/session/history.mjs';
 
-export { runModelRouterCommand } from './model-router/command.mjs';
+export { runModelRouterCommand } from './model-router/entry/command.mjs';

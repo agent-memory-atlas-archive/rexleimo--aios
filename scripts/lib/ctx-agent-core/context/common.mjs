@@ -2,11 +2,11 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getCommandSpawnSpec } from '../platform/process.mjs';
+import { getCommandSpawnSpec } from '../../platform/process.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
-export const SCRIPTS_DIR = path.resolve(__dirname, '..', '..');
+export const SCRIPTS_DIR = path.resolve(__dirname, '..', '..', '..');
 export const ROOT_DIR = path.resolve(SCRIPTS_DIR, '..');
 export const MCP_DIR = path.join(ROOT_DIR, 'mcp-server');
 export const CTX_AGENT_CLI_PATH = path.join(SCRIPTS_DIR, 'ctx-agent.mjs');

@@ -1,16 +1,16 @@
 // scripts/lib/ctx-agent-core/args.mjs — 统一参数解析
 // 目标：消除手写 parseArgs 循环，基于 Commander 声明式解析
 // 注意：这是库模块（被 run.mjs import），保持 export parseArgs 签名不变
-import { createCliParser } from '../../../src/shared/cli-parser.mjs';
-import { parsePositiveInteger, resolveWorkspaceRoot } from './common.mjs';
+import { createCliParser } from '../../../../src/shared/cli-parser.mjs';
+import { parsePositiveInteger, resolveWorkspaceRoot } from '../context/common.mjs';
 import {
   normalizeHarnessRouteProvider,
   normalizeOrchestrateBlueprint,
   normalizeRouteExecutionMode,
   normalizeRouteMode,
   normalizeTeamRouteProvider,
-} from './routes.mjs';
-import { resolveClientFromRuntimeId, resolveClientRuntimeIds } from '../clients/registry.mjs';
+} from '../routing/routes.mjs';
+import { resolveClientFromRuntimeId, resolveClientRuntimeIds } from '../../clients/registry.mjs';
 
 const cli = createCliParser({
   name: 'ctx-agent',

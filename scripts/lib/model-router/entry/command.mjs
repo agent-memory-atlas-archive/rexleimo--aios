@@ -4,14 +4,14 @@ import {
   buildModelSummaryTable,
   buildRoutingTableMarkdown,
   computeModelStats,
-} from './reporting.mjs';
-import { loadModelDispatchHistory } from './history.mjs';
-import { resolveModelRoutingForTask } from './routing.mjs';
+} from '../session/reporting.mjs';
+import { loadModelDispatchHistory } from '../session/history.mjs';
+import { resolveModelRoutingForTask } from '../routing/routing.mjs';
 import {
   AVAILABILITY_DEFAULTS,
   effectiveAvailability,
   loadModelAvailability,
-} from './availability.mjs';
+} from '../routing/availability.mjs';
 
 function getSubcommand(rawOptions) {
   return String(rawOptions.subcommand || rawOptions._?.[0] || 'list').trim();

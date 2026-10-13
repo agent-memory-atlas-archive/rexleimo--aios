@@ -1,6 +1,6 @@
-import { defaultModelRegistry } from './registry.mjs';
+import { defaultModelRegistry } from '../entry/registry.mjs';
 import { normalizeModelRouterProfile } from './profile.mjs';
-import { normalizeId } from './shared.mjs';
+import { normalizeId } from '../entry/shared.mjs';
 
 /* 北极星原则：程序只提供确定性路由，绝不用关键词表/正则从自由文本替模型判断
  * "这个任务是什么类型 / 用户想要什么"。

@@ -1,9 +1,9 @@
-import { getClientCommandName, resolveClientFromRuntimeId } from '../clients/registry.mjs';
-import { classifyChannelEvidence } from '../model-router/availability.mjs';
-import { ROOT_DIR, parsePositiveInteger, runCommand, runCommandWithInput } from './common.mjs';
-import { buildCodexMcpDisableArgs, buildRouteRuntimeEnv, buildCtxAgentRoutePreview, buildHarnessRoutePreview, normalizeOrchestrateBlueprint, normalizeRouteExecutionMode, normalizeRouteMode, resolveHarnessRouteProviderForAgent, resolveRoutedSubagentClient } from './routes.mjs';
-import { buildOpenCodePrompt } from './opencode-context.mjs';
-import { buildOpenCodeStrictAgentArgs } from '../opencode/strict-primary-agent.mjs';
+import { getClientCommandName, resolveClientFromRuntimeId } from '../../clients/registry.mjs';
+import { classifyChannelEvidence } from '../../model-router/routing/availability.mjs';
+import { ROOT_DIR, parsePositiveInteger, runCommand, runCommandWithInput } from '../context/common.mjs';
+import { buildCodexMcpDisableArgs, buildRouteRuntimeEnv, buildCtxAgentRoutePreview, buildHarnessRoutePreview, normalizeOrchestrateBlueprint, normalizeRouteExecutionMode, normalizeRouteMode, resolveHarnessRouteProviderForAgent, resolveRoutedSubagentClient } from '../routing/routes.mjs';
+import { buildOpenCodePrompt } from '../context/opencode-context.mjs';
+import { buildOpenCodeStrictAgentArgs } from '../../opencode/strict-primary-agent.mjs';
 
 const PENDING_SMOKE_ONE_SHOT_AGENTS = new Set([]);
 
@@ -175,7 +175,7 @@ export async function runRoutedOneShotTask(options = {}) {
   const io = createBufferedIo(outputChunks);
 
   if (spec.routeMode === 'harness') {
-    const { runHarnessCommand } = await import('../lifecycle/run/harness.mjs');
+    const { runHarnessCommand } = await import('../../lifecycle/run/harness.mjs');
     const result = await runHarnessCommand({
       subcommand: 'run', objective: String(options.taskPrompt || '').trim(), sessionId: String(options.sessionId || '').trim(),
       provider: spec.provider, profile: 'standard', worktree: true, baseRef: 'HEAD', maxIterations: spec.harnessMaxIterations,
@@ -184,7 +184,7 @@ export async function runRoutedOneShotTask(options = {}) {
     return { output: formatRoutedOutput(spec, outputChunks.join('\n').trim()), exitCode: result.exitCode ?? 1, preview: spec.preview, routeMode: spec.routeMode, executionMode: spec.executionMode };
   }
 
-  const { runOrchestrate } = await import('../lifecycle/run/orchestrate.mjs');
+  const { runOrchestrate } = await import('../../lifecycle/run/orchestrate.mjs');
   const useGroupChat = spec.routeMode === 'team' && spec.executionMode === 'live';
   const rootDir = options.workspaceRoot || process.cwd();
   const taskTitle = String(options.taskPrompt || '').trim();

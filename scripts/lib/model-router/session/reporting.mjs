@@ -1,5 +1,5 @@
-import { getModelConfig } from './selection.mjs';
-import { normalizeId } from './shared.mjs';
+import { getModelConfig } from '../routing/selection.mjs';
+import { normalizeId } from '../entry/shared.mjs';
 
 export function buildModelSummaryTable(registry) {
   if (!registry?.models) return '';

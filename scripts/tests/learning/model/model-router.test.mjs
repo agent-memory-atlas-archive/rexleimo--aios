@@ -140,16 +140,16 @@ test('model-router entrypoint stays a thin facade over focused modules', async (
   assert.equal(entryLines <= 180, true, `model-router.mjs is ${entryLines} lines; split responsibilities into scripts/lib/model-router/*`);
 
   for (const moduleName of [
-    'shared.mjs',
-    'registry.mjs',
-    'profile.mjs',
-    'signals.mjs',
-    'selection.mjs',
-    'client-cli.mjs',
-    'routing.mjs',
-    'reporting.mjs',
-    'history.mjs',
-    'command.mjs',
+    'entry/shared.mjs',
+    'entry/registry.mjs',
+    'session/profile.mjs',
+    'session/signals.mjs',
+    'routing/selection.mjs',
+    'entry/client-cli.mjs',
+    'routing/routing.mjs',
+    'session/reporting.mjs',
+    'session/history.mjs',
+    'entry/command.mjs',
   ]) {
     const source = await readFile(path.join(root, 'model-router', moduleName), 'utf8');
     assert.match(source, /export/u, `${moduleName} should expose focused model-router APIs`);

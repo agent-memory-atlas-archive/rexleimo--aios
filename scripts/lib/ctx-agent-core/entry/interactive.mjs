@@ -2,12 +2,12 @@
  * durable session finalization after the client process exits. */
 import { statSync } from 'node:fs';
 import path from 'node:path';
-import { workspaceMemoryEventsPath } from '../memo/care/workspace-memory.mjs';
-import { getClientCommandName, resolveClientFromRuntimeId } from '../clients/registry.mjs';
-import { ROOT_DIR, runCommand } from './common.mjs';
-import { buildCodexMcpDisableArgs } from './routes.mjs';
-import { buildOpenCodeStrictAgentArgs } from '../opencode/strict-primary-agent.mjs';
-import { finalizeSession } from '../lifecycle/run/session-hooks/finalize.mjs';
+import { workspaceMemoryEventsPath } from '../../memo/care/workspace-memory.mjs';
+import { getClientCommandName, resolveClientFromRuntimeId } from '../../clients/registry.mjs';
+import { ROOT_DIR, runCommand } from '../context/common.mjs';
+import { buildCodexMcpDisableArgs } from '../routing/routes.mjs';
+import { buildOpenCodeStrictAgentArgs } from '../../opencode/strict-primary-agent.mjs';
+import { finalizeSession } from '../../lifecycle/run/session-hooks/finalize.mjs';
 
 function commandForRuntime(agent) {
   const client = resolveClientFromRuntimeId(agent);

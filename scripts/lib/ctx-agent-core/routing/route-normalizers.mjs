@@ -6,14 +6,14 @@ import {
   formatShellArg,
   parseBoolEnv,
   parsePositiveInteger,
-} from './common.mjs';
+} from '../context/common.mjs';
 import {
   getClientRuntimeId,
   resolveClientFromRuntimeId,
   resolveClientHarnessProviders,
   resolveClientRuntimeIds,
   resolveClientTeamProviders,
-} from '../clients/registry.mjs';
+} from '../../clients/registry.mjs';
 
 export const ROUTE_MODES = new Set(['auto', 'single', 'team', 'subagent', 'harness']);
 export const ROUTE_EXECUTION_MODES = new Set(['dry-run', 'live']);

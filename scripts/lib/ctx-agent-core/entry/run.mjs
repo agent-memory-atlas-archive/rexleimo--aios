@@ -1,19 +1,19 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../interception/index.mjs';
-import { loadFacade, generateFacadeFromSession } from '../contextdb/facade.mjs';
-import { extractTouchedFilesFromText, writeContinuitySummary } from '../contextdb/continuity.mjs';
-import { resolveTasksRoot, toWorkspaceRelative } from '../aios/state-root.mjs';
-import { ensureBootstrapTask, isBootstrapEnabled } from '../../ctx-bootstrap.mjs';
-import { assertWorkspaceExists } from './common.mjs';
-import { ctx, extractCreatedSessionId, extractLatestSessionId } from './contextdb-cli.mjs';
-import { printStartupSummary } from './startup-summary.mjs';
-import { resolveTaskRouteDecision } from './routes.mjs';
+import { compressPostReceiveTurn, compressPreSendTurn, emitTurnCompressionLog, requireTurnCompression } from '../../interception/index.mjs';
+import { loadFacade, generateFacadeFromSession } from '../../contextdb/facade.mjs';
+import { extractTouchedFilesFromText, writeContinuitySummary } from '../../contextdb/continuity.mjs';
+import { resolveTasksRoot, toWorkspaceRelative } from '../../aios/state-root.mjs';
+import { ensureBootstrapTask, isBootstrapEnabled } from '../../../ctx-bootstrap.mjs';
+import { assertWorkspaceExists } from '../context/common.mjs';
+import { ctx, extractCreatedSessionId, extractLatestSessionId } from '../context/contextdb-cli.mjs';
+import { printStartupSummary } from '../context/startup-summary.mjs';
+import { resolveTaskRouteDecision } from '../routing/routes.mjs';
 import { classifyOneShotFailure, buildRoutedCommandSpec, runOneShotAgent, runRoutedOneShotTask } from './one-shot.mjs';
 import { runInteractiveAgentWithSaveGuard } from './interactive.mjs';
-import { handleWorkspaceCommand, runSaveGuardCheckpoint } from './workspace-commands.mjs';
+import { handleWorkspaceCommand, runSaveGuardCheckpoint } from '../routing/workspace-commands.mjs';
 import { parseArgs, resolveInitialWorkspace, validateOpts } from './args.mjs';
-import { buildMemoryDeclarationInstruction } from '../memo/flow/declaration.mjs';
+import { buildMemoryDeclarationInstruction } from '../../memo/flow/declaration.mjs';
 
 async function maybeCreateBootstrapTask(opts) {
   if (!opts.autoBootstrap || !isBootstrapEnabled(process.env)) return;
@@ -59,10 +59,10 @@ function resolveSession(opts) {
 
 async function ensureWorkspaceIndex(opts) {
   try {
-    const { initWorkspace } = await import('../contextdb/workspace.mjs');
+    const { initWorkspace } = await import('../../contextdb/workspace.mjs');
     const wsResult = await initWorkspace(opts.workspaceRoot);
     if (wsResult.created) {
-      const { buildSkillIndex, writeSkillIndex } = await import('../contextdb/skill-index.mjs');
+      const { buildSkillIndex, writeSkillIndex } = await import('../../contextdb/skill-index.mjs');
       const index = await buildSkillIndex(opts.workspaceRoot);
       await writeSkillIndex(opts.workspaceRoot, index);
       console.error(`[aios] Workspace initialized with ${index.skills.length} skills indexed`);
@@ -110,7 +110,7 @@ async function writeContinuityAndHandoff(opts, routedPrompt, output, summary, ne
     }
   }
   try {
-    const { normalizeHandoffPacket, writeHandoffPacket } = await import('../contextdb/handoff.mjs');
+    const { normalizeHandoffPacket, writeHandoffPacket } = await import('../../contextdb/handoff.mjs');
     const packet = normalizeHandoffPacket({ fromSessionId: opts.sessionId, agentType: opts.agent, role: 'implementer', intent: routedPrompt, progress: summary, nextActions: nextActions.split('|'), touchedFiles, confidence: exitCode === 0 ? 'high' : 'low' });
     await writeHandoffPacket(opts.workspaceRoot, opts.sessionId, packet);
   } catch (error) {
@@ -128,7 +128,7 @@ async function executePrompt(opts) {
     : null;
   let workflow = null;
   try {
-    const { runAutoGate } = await import('../planning/flow/auto-gate.mjs');
+    const { runAutoGate } = await import('../../planning/flow/auto-gate.mjs');
     workflow = runAutoGate({
       rootDir: opts.workspaceRoot,
       message: opts.prompt,
@@ -153,7 +153,7 @@ async function executePrompt(opts) {
     recall: { status: 'skipped', reason: 'workflow-unavailable', hits: 0 },
   };
   try {
-    const { collectTurnRecallResult } = await import('../planning/flow/turn-recall.mjs');
+    const { collectTurnRecallResult } = await import('../../planning/flow/turn-recall.mjs');
     const recallResult = await collectTurnRecallResult({
       rootDir: opts.workspaceRoot,
       message: opts.prompt,
@@ -227,7 +227,7 @@ async function executePrompt(opts) {
     routeMode: routeDecision.routeMode,
   });
   if (workflow?.capabilityCommand?.provider?.kind === 'agent') {
-    const { prepareAiosAgentProviderExecution } = await import('../workflows/adapters/rex-agent-provider.mjs');
+    const { prepareAiosAgentProviderExecution } = await import('../../workflows/adapters/rex-agent-provider.mjs');
     const prepared = await prepareAiosAgentProviderExecution({
       command: workflow.capabilityCommand,
       evidenceRoot: opts.workspaceRoot,
@@ -319,11 +319,11 @@ async function ingestRexProviderEvidence(opts, workflow, output, exitCode) {
   }
 
   try {
-    const { ingestCapabilityProviderOutput } = await import('../workflows/adapters/rex-capability-runtime.mjs');
+    const { ingestCapabilityProviderOutput } = await import('../../workflows/adapters/rex-capability-runtime.mjs');
 
     // host 侧判定闸门（opt-in）。默认关闭时 evaluateStageAdvanceGate 立即返回 advance，
     // 既不解析信封也不出网，rex 行为与引入闸门前一致。它只能收窄：advance | hold。
-    const { evaluateStageAdvanceGate } = await import('../judgment/stage-gate.mjs');
+    const { evaluateStageAdvanceGate } = await import('../../judgment/stage-gate.mjs');
     const gate = await evaluateStageAdvanceGate({ command, output, env: process.env });
     if (gate.gate !== 'disabled') {
       console.error(`[aios] judgment gate: ${gate.decision} (${gate.gate}) ${gate.reason}`);
@@ -408,7 +408,7 @@ async function runPromptFlow(opts) {
 
   let memoryWrite = { status: 'not-run' };
   try {
-    const { parseMemoryDeclaration } = await import('../memo/flow/declaration.mjs');
+    const { parseMemoryDeclaration } = await import('../../memo/flow/declaration.mjs');
     const declaration = parseMemoryDeclaration(output || protocolOutput || compactOutput);
 
     // Soft-trigger: the harness never decides whether a turn is worth keeping.
@@ -421,7 +421,7 @@ async function runPromptFlow(opts) {
     } else if (declaration.verified !== true) {
       memoryWrite = { status: 'skipped', reason: `declared-verified=${String(declaration.verified)}` };
     } else {
-      const { recordAutomaticMemory } = await import('../memo/flow/autopilot.mjs');
+      const { recordAutomaticMemory } = await import('../../memo/flow/autopilot.mjs');
       const refs = extractTouchedFilesFromText({ workspaceRoot: opts.workspaceRoot }, opts.prompt, output || protocolOutput || compactOutput);
       memoryWrite = await recordAutomaticMemory({
         workspaceRoot: opts.workspaceRoot,
@@ -453,8 +453,8 @@ async function runPromptFlow(opts) {
   // which recalled memos it actually used; those get marked useful. Best-effort
   // — must never fail the turn.
   try {
-    const { inferUsefulRecallEventIds } = await import('../planning/flow/turn-recall.mjs');
-    const { markMemoUseful } = await import('../memo/flow/autopilot.mjs');
+    const { inferUsefulRecallEventIds } = await import('../../planning/flow/turn-recall.mjs');
+    const { markMemoUseful } = await import('../../memo/flow/autopilot.mjs');
     const usefulIds = effectiveExitCode === 0
       ? inferUsefulRecallEventIds({
         results: memory.recall?.results || [],
@@ -490,7 +490,7 @@ export async function runCtxAgent(argv = process.argv.slice(2)) {
   // Deliberately NOT auto-injected into startup prompts (see
   // aios-long-running-harness SKILL policy) — it is a pull-based read.
   if (firstArg === 'workspace-view') {
-    const { handleWorkspaceViewCommand } = await import('./workspace-commands.mjs');
+    const { handleWorkspaceViewCommand } = await import('../routing/workspace-commands.mjs');
     await handleWorkspaceViewCommand(argv.slice(1), resolveInitialWorkspace({ workspaceRoot: '' }));
     return;
   }
@@ -506,8 +506,8 @@ export async function runCtxAgent(argv = process.argv.slice(2)) {
   // 失败只告警不阻塞；AIOS_CODEMAP_AUTO_INSTALL=0 可关）。放在 saveGuard
   // 分流之后，使交互与单发两种模式共用同一入口。
   try {
-    const { ensureCodemapInstalled } = await import('../components/codemap.mjs');
-    const { ROOT_DIR } = await import('./common.mjs');
+    const { ensureCodemapInstalled } = await import('../../components/codemap.mjs');
+    const { ROOT_DIR } = await import('../context/common.mjs');
     await ensureCodemapInstalled({
       projectRoot: opts.workspaceRoot,
       rootDir: ROOT_DIR,

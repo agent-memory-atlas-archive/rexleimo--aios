@@ -1,10 +1,10 @@
-import { runContextDbCli } from '../contextdb-cli.mjs';
+import { runContextDbCli } from '../../contextdb-cli.mjs';
 import {
   ensureWorkspaceMemorySession,
   normalizeWorkspaceMemorySpace,
-} from '../memo/care/workspace-memory.mjs';
+} from '../../memo/care/workspace-memory.mjs';
 
-import { normalizeId } from './shared.mjs';
+import { normalizeId } from '../entry/shared.mjs';
 
 function dispatchOutcomeSessionId(workspaceRoot, space = 'default') {
   const ws = normalizeWorkspaceMemorySpace(space);

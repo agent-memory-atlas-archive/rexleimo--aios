@@ -12,7 +12,7 @@ import {
   clientSupportsModelProtocol,
   getClientModelRouting,
 } from '../../../clients/registry.mjs';
-import { classifyChannelEvidence, recordModelAvailability } from '../../../model-router/availability.mjs';
+import { classifyChannelEvidence, recordModelAvailability } from '../../../model-router/routing/availability.mjs';
 
 import {
   SUBAGENT_CLAUDE_UNATTENDED_ENV,

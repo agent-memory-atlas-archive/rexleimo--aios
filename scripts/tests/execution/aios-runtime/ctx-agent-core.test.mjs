@@ -645,7 +645,7 @@ test('ctx-agent one-shot compresses prompt before client stdin and compacts rece
 
   try {
     const fakeCodex = path.join(binDir, process.platform === 'win32' ? 'codex-fake.mjs' : 'codex');
-    await writeFile(fakeCodex, `#!/usr/bin/env node\nimport { readFileSync, writeFileSync } from 'node:fs';\nconst input = readFileSync(0, 'utf8');\nwriteFileSync(process.env.AIOS_TEST_CAPTURE_PATH, input);\nprocess.stdout.write('${POST_SENTINEL}'.repeat(160) + '\\nscripts/lib/ctx-agent-core/run.mjs:211\\n');\n`, 'utf8');
+    await writeFile(fakeCodex, `#!/usr/bin/env node\nimport { readFileSync, writeFileSync } from 'node:fs';\nconst input = readFileSync(0, 'utf8');\nwriteFileSync(process.env.AIOS_TEST_CAPTURE_PATH, input);\nprocess.stdout.write('${POST_SENTINEL}'.repeat(160) + '\\nscripts/lib/ctx-agent-core/entry/run.mjs:211\\n');\n`, 'utf8');
     await chmod(fakeCodex, 0o755);
     if (process.platform === 'win32') {
       await writeFile(path.join(binDir, 'codex.cmd'), `@echo off\r\nnode "${fakeCodex}" %*\r\n`, 'utf8');
@@ -668,7 +668,7 @@ test('ctx-agent one-shot compresses prompt before client stdin and compacts rece
         '--workspace', workspaceRoot,
         '--project', 'tmp-project',
         '--session', sessionId,
-        '--prompt', `${PRE_SENTINEL.repeat(160)}\nscripts/lib/ctx-agent-core/run.mjs:189`,
+        '--prompt', `${PRE_SENTINEL.repeat(160)}\nscripts/lib/ctx-agent-core/entry/run.mjs:189`,
         '--no-bootstrap',
         '--no-auto-checkpoint',
       ],
