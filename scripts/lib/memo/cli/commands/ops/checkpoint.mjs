@@ -1,5 +1,5 @@
 import { appendPinnedMemo } from '../../../storage/govern/pinned.mjs';
-import { usageError } from '../../shared.mjs';
+import { usageError } from '../../core/shared.mjs';
 
 // Mirrors the memory_checkpoint MCP tool: one locked read-modify-write
 // append carrying the [checkpoint] prefix, so CLI callers and MCP callers

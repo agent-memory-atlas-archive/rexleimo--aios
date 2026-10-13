@@ -1,5 +1,5 @@
 /* 中文注释：Memo barrel，集中导出 persona/workspace-memory/storage 子路径中跨域消费的能力。 */
-export { buildPersonaOverlay } from './persona.mjs';
+export { buildPersonaOverlay } from './care/persona.mjs';
 
 export {
   ensureWorkspaceMemorySession,
@@ -9,7 +9,7 @@ export {
   workspaceMemoryPinnedPath,
   workspaceMemorySessionDir,
   workspaceMemorySessionId,
-} from './workspace-memory.mjs';
+} from './care/workspace-memory.mjs';
 
 export {
   appendMemoEvent,

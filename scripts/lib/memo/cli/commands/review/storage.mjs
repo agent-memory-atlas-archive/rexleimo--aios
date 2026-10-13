@@ -1,6 +1,6 @@
-import { printMemoDoctorReport, printMemoStorageStatus } from '../../rendering.mjs';
-import { usageError } from '../../shared.mjs';
-import { getActiveMemoStorage, loadMemoStorageApi } from '../../storage-api.mjs';
+import { printMemoDoctorReport, printMemoStorageStatus } from '../../surface/rendering.mjs';
+import { usageError } from '../../core/shared.mjs';
+import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
 
 export async function handleMemoStorageCommand({ secondary, rest, workspaceRoot, io, env = process.env }) {
   const action = String(secondary || 'status').toLowerCase();

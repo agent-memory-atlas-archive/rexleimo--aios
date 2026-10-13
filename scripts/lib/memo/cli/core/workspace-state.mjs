@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ensureParentDir, readTextIfExists, writeText } from '../../platform/fs.mjs';
+import { ensureParentDir, readTextIfExists, writeText } from '../../../platform/fs.mjs';
 import {
   DEFAULT_WORKSPACE_MEMORY_SPACE,
   WORKSPACE_MEMORY_AGENT,
@@ -11,7 +11,7 @@ import {
   workspaceMemorySessionDir,
   workspaceMemorySessionId,
   workspaceMemoryStatePath,
-} from '../workspace-memory.mjs';
+} from '../../care/workspace-memory.mjs';
 import { workspaceProjectName } from './shared.mjs';
 
 export function statePath(workspaceRoot) {

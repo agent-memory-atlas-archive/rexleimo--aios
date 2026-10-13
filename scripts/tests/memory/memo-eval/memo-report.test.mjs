@@ -6,7 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { buildMemoryReport, renderMemoryReport } from '../../../lib/memo/report.mjs';
+import { buildMemoryReport, renderMemoryReport } from '../../../lib/memo/care/report.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CLI_PATH = path.resolve(HERE, '..', '..', '..', 'aios.mjs');

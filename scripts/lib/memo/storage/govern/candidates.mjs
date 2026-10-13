@@ -8,7 +8,7 @@ import { collectEvents, readJsonlEvents } from '../events/events-read.mjs';
 import { appendText, sha256Hex } from '../base/fs-io.mjs';
 import { getActiveMemoStorage } from '../base/config.mjs';
 import { normalizeRuntimeIdentity } from './provenance.mjs';
-import { scanWorkspaceMemoryContent } from '../../safety.mjs';
+import { scanWorkspaceMemoryContent } from '../../care/safety.mjs';
 
 const GOVERNANCE_FILE = 'memory-candidates.jsonl';
 const SESSION_CANDIDATE_FILE = 'session-close-memory-candidate.json';
@@ -373,7 +373,7 @@ async function decideCandidate(action, {
       || (candidate.sourceType === 'session-close' ? text(candidate.candidateId).replace(/^.*?:/u, '') : '');
     if (sessionId) {
       try {
-        const { promoteAutoMemoriesForSession } = await import('../../autopilot.mjs');
+        const { promoteAutoMemoriesForSession } = await import('../../flow/autopilot.mjs');
         autoMemoryPromotion = await promoteAutoMemoriesForSession({
           workspaceRoot,
           sessionId,

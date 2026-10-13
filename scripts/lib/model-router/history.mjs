@@ -2,7 +2,7 @@ import { runContextDbCli } from '../contextdb-cli.mjs';
 import {
   ensureWorkspaceMemorySession,
   normalizeWorkspaceMemorySpace,
-} from '../memo/workspace-memory.mjs';
+} from '../memo/care/workspace-memory.mjs';
 
 import { normalizeId } from './shared.mjs';
 

@@ -3,18 +3,18 @@ import { existsSync } from 'node:fs';
 import { appendFile, mkdir, readdir, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { resolveContextDbRoot } from '../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../aios/state-root.mjs';
 import {
   SUPPORTED_MEMO_STORAGES,
   WORKSPACE_MEMORY_SESSION_PREFIX,
-} from './storage/base/constants.mjs';
-import { readTextIfExists } from './storage/base/fs-io.mjs';
+} from '../storage/base/constants.mjs';
+import { readTextIfExists } from '../storage/base/fs-io.mjs';
 import {
   PINNED_DEFAULT_MAX_CHARS,
   normalizePinnedContent,
   readPinnedByStorage,
   renderPinnedBlock,
-} from './storage/govern/pinned.mjs';
+} from '../storage/govern/pinned.mjs';
 
 /* E2 hygiene: the survey report feeds the approval queue from
  * docs/reports/2026-08-01-memory-hygiene-survey.md (identify → confirm →

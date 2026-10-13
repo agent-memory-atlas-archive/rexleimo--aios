@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
-import { getActiveMemoStorage } from './storage/base/config.mjs';
-import { collectEvents } from './storage/events/events-read.mjs';
+import { getActiveMemoStorage } from '../storage/base/config.mjs';
+import { collectEvents } from '../storage/events/events-read.mjs';
 
 /* F3 migration importers: bring external assistant-memory files into the
  * governed memo queue as candidates. Nothing is promoted here — imported
@@ -90,7 +90,7 @@ export async function importExternalMemories(workspaceRoot, {
     return { format, file, dryRun: true, imported: 0, skipped, facts };
   }
 
-  const storageApi = await import('./storage.mjs');
+  const storageApi = await import('../storage.mjs');
   const storage = await getActiveMemoStorage(workspaceRoot, { env });
   const turnId = `import-${format}-${new Date().toISOString()}`;
   // The importer acts as a plain tool identity with no publish capability, so

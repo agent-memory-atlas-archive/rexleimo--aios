@@ -1,5 +1,5 @@
-import { workspaceMemorySessionId } from '../workspace-memory.mjs';
-import { workspaceProjectName } from './shared.mjs';
+import { workspaceMemorySessionId } from '../../care/workspace-memory.mjs';
+import { workspaceProjectName } from '../core/shared.mjs';
 
 export function getStorageAvailability(status, storageName) {
   const available = status?.available && typeof status.available === 'object' ? status.available : {};

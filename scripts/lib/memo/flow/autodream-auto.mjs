@@ -1,5 +1,5 @@
-import { runDream } from '../lifecycle/evolve/dream/index.mjs';
-import { collectEvents } from './storage/events/events-read.mjs';
+import { runDream } from '../../lifecycle/evolve/dream/index.mjs';
+import { collectEvents } from '../storage/events/events-read.mjs';
 
 /* E1 Autodream Phase B: opt-in automatic triggers for the (already governed)
  * autodream pipeline. The engine itself (runDream) is deterministic, zero-LLM

@@ -5,8 +5,8 @@ import {
   resolvePersonaPath,
   resolveUserProfilePath,
   writePersonaLayer,
-} from '../../../persona.mjs';
-import { safePrintText, usageError } from '../../shared.mjs';
+} from '../../../care/persona.mjs';
+import { safePrintText, usageError } from '../../core/shared.mjs';
 
 export function handlePersonaCommand({ primary, secondary, rest, io, env = process.env }) {
   const layer = primary === 'persona' ? 'persona' : 'user';

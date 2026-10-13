@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { captureCommand } from '../../platform/process.mjs';
+import { captureCommand } from '../../../platform/process.mjs';
 import { MAX_PRINT_CHARS } from './constants.mjs';
 
 export function usageError(message) {

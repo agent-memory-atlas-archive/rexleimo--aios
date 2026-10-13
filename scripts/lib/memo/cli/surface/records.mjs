@@ -1,4 +1,4 @@
-import { sanitizeWorkspaceMemorySpaceForSessionId } from '../workspace-memory.mjs';
+import { sanitizeWorkspaceMemorySpaceForSessionId } from '../../care/workspace-memory.mjs';
 
 // 纯函数：从 memo 文本中提取 #tag，保持新增、搜索和旧格式镜像的标签规则一致。
 export function extractTags(text) {

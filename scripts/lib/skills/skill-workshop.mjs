@@ -13,7 +13,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { assertWorkspaceMemoryContentSafe } from '../memo/safety.mjs';
+import { assertWorkspaceMemoryContentSafe } from '../memo/care/safety.mjs';
 import { scanSkillsSources } from './source-tree.mjs';
 import { readInstallPolicy, checkPolicy, policyDenialError } from './install-policy.mjs';
 

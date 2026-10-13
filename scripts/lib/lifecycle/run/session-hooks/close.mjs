@@ -135,7 +135,7 @@ export async function runSessionClose(options, { rootDir = process.cwd(), stdout
   // close. Must never block or fail the close itself — everything is wrapped.
   let autodream = null;
   try {
-    const { runAutodreamPhaseB } = await import('../../../memo/autodream-auto.mjs');
+    const { runAutodreamPhaseB } = await import('../../../memo/flow/autodream-auto.mjs');
     autodream = await runAutodreamPhaseB({ rootDir, trigger: 'session-close', env });
   } catch (error) {
     autodream = { ran: false, enabled: true, shouldRun: false, reason: `autodream error: ${error?.message || error}` };

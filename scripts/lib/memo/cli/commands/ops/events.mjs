@@ -1,15 +1,15 @@
-import { assertMaxChars, assertSafeMemoText } from '../../capacity.mjs';
-import { splitFlags, splitRecallFlags } from '../../flags.mjs';
+import { assertMaxChars, assertSafeMemoText } from '../../core/capacity.mjs';
+import { splitFlags, splitRecallFlags } from '../../core/flags.mjs';
 import { resolveEmbedderFromEnv } from '../../../storage/mind/embedding.mjs';
-import { legacyMemoRows, mirrorMemoEventToLegacy } from '../../legacy.mjs';
-import { createMemoTurnId, extractTags } from '../../records.mjs';
+import { legacyMemoRows, mirrorMemoEventToLegacy } from '../../core/legacy.mjs';
+import { createMemoTurnId, extractTags } from '../../surface/records.mjs';
 import {
   memoRecordToRecallRow,
   renderMemoRow,
   renderRecallRow,
-} from '../../rendering.mjs';
-import { usageError } from '../../shared.mjs';
-import { getActiveMemoStorage, loadMemoStorageApi } from '../../storage-api.mjs';
+} from '../../surface/rendering.mjs';
+import { usageError } from '../../core/shared.mjs';
+import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
 import { findSupersedeCandidates } from '../../../storage/govern/temporal.mjs';
 import { normalizeExtractionDate } from '../../../storage/mind/extraction.mjs';
 

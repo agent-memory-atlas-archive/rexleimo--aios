@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 import { initWorkspace } from './lib/contextdb/workspace.mjs';
 import { buildSkillIndex, writeSkillIndex } from './lib/contextdb/skill-index.mjs';
-import { ensurePersonaLayer } from './lib/memo/persona.mjs';
-import { ensureWorkspaceMemorySession } from './lib/memo/workspace-memory.mjs';
+import { ensurePersonaLayer } from './lib/memo/care/persona.mjs';
+import { ensureWorkspaceMemorySession } from './lib/memo/care/workspace-memory.mjs';
 import { AGENT_CONFIG, detectAgents, ensureMarker } from './lib/aios-init/agent-config.mjs';
 import { ensureHook } from './lib/aios-init/hooks.mjs';
 import { ensureCompressionTools } from './lib/aios-init/compression-tools.mjs';

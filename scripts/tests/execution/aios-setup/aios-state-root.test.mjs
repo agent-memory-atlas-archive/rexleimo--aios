@@ -73,7 +73,7 @@ test('ContextDB registry writes into .aios and advertises dotdir sources', async
 
 test('workspace memory session writes under .aios context db', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-workspace-memory-dotdir-'));
-  const { ensureWorkspaceMemorySession, workspaceMemoryPinnedPath, workspaceMemoryStatePath } = await import('../../../lib/memo/workspace-memory.mjs');
+  const { ensureWorkspaceMemorySession, workspaceMemoryPinnedPath, workspaceMemoryStatePath } = await import('../../../lib/memo/care/workspace-memory.mjs');
 
   const result = ensureWorkspaceMemorySession(root);
 
@@ -84,7 +84,7 @@ test('workspace memory session writes under .aios context db', async () => {
 
 test('workspace memory session accepts object options without object-string session ids', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-workspace-memory-options-'));
-  const { ensureWorkspaceMemorySession, workspaceMemorySessionId } = await import('../../../lib/memo/workspace-memory.mjs');
+  const { ensureWorkspaceMemorySession, workspaceMemorySessionId } = await import('../../../lib/memo/care/workspace-memory.mjs');
 
   const result = ensureWorkspaceMemorySession(root, { space: 'default', project: 'tmp-project', agent: 'codex-cli' });
 
@@ -96,7 +96,7 @@ test('workspace memory session accepts object options without object-string sess
 test('workspace memory writes new state under .aios even when legacy context db exists', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-workspace-memory-legacy-'));
   await mkdir(path.join(root, 'memory', 'context-db'), { recursive: true });
-  const { ensureWorkspaceMemorySession, workspaceMemoryPinnedPath, workspaceMemoryStatePath } = await import('../../../lib/memo/workspace-memory.mjs');
+  const { ensureWorkspaceMemorySession, workspaceMemoryPinnedPath, workspaceMemoryStatePath } = await import('../../../lib/memo/care/workspace-memory.mjs');
 
   const result = ensureWorkspaceMemorySession(root);
 

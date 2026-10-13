@@ -1,5 +1,5 @@
-import { buildMemoryReport, renderMemoryReport } from '../../../report.mjs';
-import { usageError } from '../../shared.mjs';
+import { buildMemoryReport, renderMemoryReport } from '../../../care/report.mjs';
+import { usageError } from '../../core/shared.mjs';
 
 export async function handleMemoReportCommand({ rest = [], workspaceRoot, io }) {
   const usage = 'Usage: memo report [--json]';

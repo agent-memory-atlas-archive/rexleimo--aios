@@ -11,7 +11,7 @@ function memoStorageUnavailableError(cause) {
 
 export async function loadMemoStorageApi() {
   if (!memoStorageApiPromise) {
-    memoStorageApiPromise = import('../storage.mjs').catch((error) => {
+    memoStorageApiPromise = import('../../storage.mjs').catch((error) => {
       memoStorageApiPromise = undefined;
       throw memoStorageUnavailableError(error);
     });

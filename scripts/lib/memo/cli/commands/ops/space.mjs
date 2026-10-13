@@ -4,8 +4,8 @@ import { resolveContextDbRoot } from '../../../../aios/state-root.mjs';
 import {
   WORKSPACE_MEMORY_SESSION_PREFIX,
   sanitizeWorkspaceMemorySpaceForSessionId,
-} from '../../../workspace-memory.mjs';
-import { usageError } from '../../shared.mjs';
+} from '../../../care/workspace-memory.mjs';
+import { usageError } from '../../core/shared.mjs';
 
 export function handleMemoSpaceCommand({ secondary, workspaceRoot, activeSpace, io }) {
   if ((secondary || '').toLowerCase() !== 'list') {

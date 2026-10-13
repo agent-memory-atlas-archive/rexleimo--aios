@@ -3,7 +3,7 @@ import {
   ensureWorkspaceMemorySession,
   normalizeWorkspaceMemorySpace,
   workspaceMemorySessionId,
-} from '../memo/workspace-memory.mjs';
+} from '../memo/care/workspace-memory.mjs';
 
 const MIN_SAMPLE_DEFAULT = 3;
 

@@ -1,7 +1,7 @@
 export {
   buildMemoGuiLaunchPlan,
   runMemoGuiServer,
-} from './cli/gui.mjs';
+} from './cli/surface/gui.mjs';
 export {
   runMemo,
-} from './cli/run.mjs';
+} from './cli/core/run.mjs';

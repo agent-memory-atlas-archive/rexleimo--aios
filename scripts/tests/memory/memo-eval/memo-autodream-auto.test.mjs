@@ -9,7 +9,7 @@ import {
   AUTODREAM_IDLE_MINUTES_ENV,
   evaluateAutodreamTrigger,
   runAutodreamPhaseB,
-} from '../../../lib/memo/autodream-auto.mjs';
+} from '../../../lib/memo/flow/autodream-auto.mjs';
 import { runSessionClose } from '../../../lib/lifecycle/run/session-hooks/close.mjs';
 
 const NOW = new Date('2026-09-09T12:00:00.000Z');

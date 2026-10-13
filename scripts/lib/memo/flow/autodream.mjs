@@ -20,7 +20,7 @@ import { createReadStream } from 'node:fs';
 import { pipeline } from 'node:stream';
 import { stdin as input, stdout as output, stderr as err } from 'node:process';
 
-import { runDream } from '../lifecycle/evolve/dream/index.mjs';
+import { runDream } from '../../lifecycle/evolve/dream/index.mjs';
 
 // Simple argument parser
 function parseArgs(args) {

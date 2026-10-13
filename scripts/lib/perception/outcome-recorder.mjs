@@ -3,7 +3,7 @@ import {
   ensureWorkspaceMemorySession,
   normalizeWorkspaceMemorySpace,
   workspaceMemorySessionId,
-} from '../memo/workspace-memory.mjs';
+} from '../memo/care/workspace-memory.mjs';
 
 const HASHTAG_RE = /#([\p{L}\p{N}_-]+)/gu;
 

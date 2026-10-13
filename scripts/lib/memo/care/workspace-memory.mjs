@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolveContextDbRoot } from '../aios/state-root.mjs';
+import { resolveContextDbRoot } from '../../aios/state-root.mjs';
 
 export const DEFAULT_WORKSPACE_MEMORY_SPACE = 'default';
 export const WORKSPACE_MEMORY_AGENT = 'workspace-memory';

@@ -10,8 +10,8 @@ import {
   parseExternalFacts,
   parseRooModes,
   splitMarkdownFacts,
-} from '../../../lib/memo/import-external.mjs';
-import { importExternalMemories } from '../../../lib/memo/import-external.mjs';
+} from '../../../lib/memo/flow/import-external.mjs';
+import { importExternalMemories } from '../../../lib/memo/flow/import-external.mjs';
 import { collectEvents } from '../../../lib/memo/storage/events/events-read.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));

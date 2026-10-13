@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { recordAutomaticMemory } from '../../../lib/memo/autopilot.mjs';
+import { recordAutomaticMemory } from '../../../lib/memo/flow/autopilot.mjs';
 import { appendMemoEvent } from '../../../lib/memo/storage.mjs';
 import {
   normalizeExtractionConfidence,

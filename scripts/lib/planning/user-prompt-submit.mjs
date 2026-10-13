@@ -37,7 +37,7 @@ export async function runUserPromptSubmitHook({
     decision: output.decision,
   });
   if (recall) {
-    const { buildMemoryDeclarationInstruction } = await import('../memo/declaration.mjs');
+    const { buildMemoryDeclarationInstruction } = await import('../memo/flow/declaration.mjs');
     output.additionalContext = `${output.additionalContext || ''}${output.additionalContext ? '\n' : ''}${recall}\n${buildMemoryDeclarationInstruction()}`;
     if (output.hookSpecificOutput) {
       output.hookSpecificOutput.additionalContext = output.additionalContext;

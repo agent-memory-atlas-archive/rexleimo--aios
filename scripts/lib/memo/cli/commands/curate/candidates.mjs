@@ -1,5 +1,5 @@
-import { getActiveMemoStorage, loadMemoStorageApi } from '../../storage-api.mjs';
-import { usageError } from '../../shared.mjs';
+import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
+import { usageError } from '../../core/shared.mjs';
 
 function parseArgs(secondary, rest = []) {
   const tokens = [secondary, ...rest].filter((token) => token !== undefined);

@@ -12,7 +12,7 @@ import {
   renderHygieneReport,
   rotateSessionEvents,
   surveyWorkspaceMemoryHygiene,
-} from '../../../lib/memo/hygiene.mjs';
+} from '../../../lib/memo/care/hygiene.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CLI_PATH = path.resolve(HERE, '..', '..', '..', 'aios.mjs');

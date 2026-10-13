@@ -2,7 +2,7 @@
  * durable session finalization after the client process exits. */
 import { statSync } from 'node:fs';
 import path from 'node:path';
-import { workspaceMemoryEventsPath } from '../memo/workspace-memory.mjs';
+import { workspaceMemoryEventsPath } from '../memo/care/workspace-memory.mjs';
 import { getClientCommandName, resolveClientFromRuntimeId } from '../clients/registry.mjs';
 import { ROOT_DIR, runCommand } from './common.mjs';
 import { buildCodexMcpDisableArgs } from './routes.mjs';

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { DEFAULT_SUPERSEDE_THRESHOLD, proposeSupersedes } from '../../../storage/govern/temporal.mjs';
-import { usageError } from '../../shared.mjs';
-import { getActiveMemoStorage, loadMemoStorageApi } from '../../storage-api.mjs';
+import { usageError } from '../../core/shared.mjs';
+import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
 
 // A proposal is scanned against the whole space, so the read limit has to be
 // well above the list default — a stale fact 200 entries back is exactly the

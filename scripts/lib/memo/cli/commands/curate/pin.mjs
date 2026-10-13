@@ -1,11 +1,11 @@
 import fs from 'node:fs';
-import { workspaceMemorySessionId } from '../../../workspace-memory.mjs';
-import { assertMaxChars, assertSafeMemoText } from '../../capacity.mjs';
-import { mirrorPinnedMemoToLegacy } from '../../legacy.mjs';
-import { safePrintText, usageError } from '../../shared.mjs';
-import { getActiveMemoStorage, loadMemoStorageApi } from '../../storage-api.mjs';
+import { workspaceMemorySessionId } from '../../../care/workspace-memory.mjs';
+import { assertMaxChars, assertSafeMemoText } from '../../core/capacity.mjs';
+import { mirrorPinnedMemoToLegacy } from '../../core/legacy.mjs';
+import { safePrintText, usageError } from '../../core/shared.mjs';
+import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
 import { renderPinnedBlock } from '../../../storage/govern/pinned.mjs';
-import { pinnedPath, readPinned } from '../../workspace-state.mjs';
+import { pinnedPath, readPinned } from '../../core/workspace-state.mjs';
 
 export async function handleMemoPinCommand({
   secondary,

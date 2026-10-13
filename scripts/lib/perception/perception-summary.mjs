@@ -3,7 +3,7 @@ import {
   ensureWorkspaceMemorySession,
   normalizeWorkspaceMemorySpace,
   workspaceMemorySessionId,
-} from '../memo/workspace-memory.mjs';
+} from '../memo/care/workspace-memory.mjs';
 
 function parseJsonSafe(text) {
   try { return JSON.parse(text); } catch { return null; }

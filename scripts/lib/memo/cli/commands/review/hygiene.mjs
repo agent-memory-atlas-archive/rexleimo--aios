@@ -5,8 +5,8 @@ import {
   renderHygieneReport,
   rotateSessionEvents,
   surveyWorkspaceMemoryHygiene,
-} from '../../../hygiene.mjs';
-import { usageError } from '../../shared.mjs';
+} from '../../../care/hygiene.mjs';
+import { usageError } from '../../core/shared.mjs';
 
 function parsePositiveInteger(raw, flagName) {
   const value = Number.parseInt(String(raw ?? '').trim(), 10);

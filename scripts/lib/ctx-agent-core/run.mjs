@@ -13,7 +13,7 @@ import { classifyOneShotFailure, buildRoutedCommandSpec, runOneShotAgent, runRou
 import { runInteractiveAgentWithSaveGuard } from './interactive.mjs';
 import { handleWorkspaceCommand, runSaveGuardCheckpoint } from './workspace-commands.mjs';
 import { parseArgs, resolveInitialWorkspace, validateOpts } from './args.mjs';
-import { buildMemoryDeclarationInstruction } from '../memo/declaration.mjs';
+import { buildMemoryDeclarationInstruction } from '../memo/flow/declaration.mjs';
 
 async function maybeCreateBootstrapTask(opts) {
   if (!opts.autoBootstrap || !isBootstrapEnabled(process.env)) return;
@@ -148,7 +148,7 @@ async function executePrompt(opts) {
     // Corrections are no longer auto-detected by regex. The agent owns the
     // judgment "am I correcting a previously recorded fact" and expresses it
     // through the memory declaration block (verified/supersede path), not a
-    // program guessing at natural language. See memo/declaration.mjs.
+    // program guessing at natural language. See memo/flow/declaration.mjs.
     correction: { status: 'not-run' },
     recall: { status: 'skipped', reason: 'workflow-unavailable', hits: 0 },
   };
@@ -408,7 +408,7 @@ async function runPromptFlow(opts) {
 
   let memoryWrite = { status: 'not-run' };
   try {
-    const { parseMemoryDeclaration } = await import('../memo/declaration.mjs');
+    const { parseMemoryDeclaration } = await import('../memo/flow/declaration.mjs');
     const declaration = parseMemoryDeclaration(output || protocolOutput || compactOutput);
 
     // Soft-trigger: the harness never decides whether a turn is worth keeping.
@@ -421,7 +421,7 @@ async function runPromptFlow(opts) {
     } else if (declaration.verified !== true) {
       memoryWrite = { status: 'skipped', reason: `declared-verified=${String(declaration.verified)}` };
     } else {
-      const { recordAutomaticMemory } = await import('../memo/autopilot.mjs');
+      const { recordAutomaticMemory } = await import('../memo/flow/autopilot.mjs');
       const refs = extractTouchedFilesFromText({ workspaceRoot: opts.workspaceRoot }, opts.prompt, output || protocolOutput || compactOutput);
       memoryWrite = await recordAutomaticMemory({
         workspaceRoot: opts.workspaceRoot,
@@ -454,7 +454,7 @@ async function runPromptFlow(opts) {
   // — must never fail the turn.
   try {
     const { inferUsefulRecallEventIds } = await import('../planning/turn-recall.mjs');
-    const { markMemoUseful } = await import('../memo/autopilot.mjs');
+    const { markMemoUseful } = await import('../memo/flow/autopilot.mjs');
     const usefulIds = effectiveExitCode === 0
       ? inferUsefulRecallEventIds({
         results: memory.recall?.results || [],

@@ -7,7 +7,7 @@ import {
   workspaceMemorySessionDir,
   workspaceMemoryMetaPath,
   workspaceMemoryPinnedPath,
-} from '../../../memo/workspace-memory.mjs';
+} from '../../../memo/care/workspace-memory.mjs';
 import { normalizeText } from './text.mjs';
 
 function normalizeRoleMemoryKey(role) {

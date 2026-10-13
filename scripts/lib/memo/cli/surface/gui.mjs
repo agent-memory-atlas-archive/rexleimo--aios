@@ -1,12 +1,12 @@
 import { spawn } from 'node:child_process';
 import path from 'node:path';
-import { DEFAULT_AIOS_ROOT_DIR } from './constants.mjs';
+import { DEFAULT_AIOS_ROOT_DIR } from '../core/constants.mjs';
 import {
   detectWorkspaceRoot,
   parsePositivePort,
   usageError,
   workspaceProjectName,
-} from './shared.mjs';
+} from '../core/shared.mjs';
 
 function splitGuiFlags(argv) {
   const flags = {

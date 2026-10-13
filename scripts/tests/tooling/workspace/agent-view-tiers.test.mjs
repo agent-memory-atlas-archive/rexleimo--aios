@@ -45,7 +45,7 @@ async function makeViewFixture() {
     progress: ['landed hygiene command'],
     nextActions: [],
     blockers: [],
-    touchedFiles: ['scripts/lib/memo/hygiene.mjs'],
+    touchedFiles: ['scripts/lib/memo/care/hygiene.mjs'],
   }), 'utf8');
   return rootDir;
 }

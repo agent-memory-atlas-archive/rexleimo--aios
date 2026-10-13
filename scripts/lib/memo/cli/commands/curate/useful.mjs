@@ -1,5 +1,5 @@
-import { markMemoUseful } from '../../../autopilot.mjs';
-import { safePrintText, usageError } from '../../shared.mjs';
+import { markMemoUseful } from '../../../flow/autopilot.mjs';
+import { safePrintText, usageError } from '../../core/shared.mjs';
 
 // Explicit adoption mark for recalled memos: `memo useful <eventId...>`.
 // Complements the automatic impression trail written by turn recall; search

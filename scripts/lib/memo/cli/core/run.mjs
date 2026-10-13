@@ -1,29 +1,29 @@
 import path from 'node:path';
 
-import { getMemoHelpText } from '../../cli/help.mjs';
+import { getMemoHelpText } from '../../../cli/help.mjs';
 import {
   DEFAULT_AIOS_ROOT_DIR,
   DEFAULT_WORKSPACE_MEMO_ENTRY_MAX_CHARS,
   DEFAULT_WORKSPACE_PINNED_MAX_CHARS,
 } from './constants.mjs';
-import { buildMemoGuiLaunchPlan, runMemoGuiServer } from './gui.mjs';
+import { buildMemoGuiLaunchPlan, runMemoGuiServer } from '../surface/gui.mjs';
 import { detectWorkspaceRoot, parseBoundedIntegerEnv, usageError } from './shared.mjs';
 import {
   normalizeSpace,
   resolveActiveSpace,
   writeActiveSpaceToState,
 } from './workspace-state.mjs';
-import { handleMemoAddCommand, handleMemoListCommand, handleMemoRecallCommand, handleMemoSearchCommand } from './commands/ops/events.mjs';
-import { handleMemoHygieneCommand } from './commands/review/hygiene.mjs';
-import { handleMemoPinCommand } from './commands/curate/pin.mjs';
-import { handleMemoCheckpointCommand } from './commands/ops/checkpoint.mjs';
-import { handleMemoReportCommand } from './commands/review/report.mjs';
-import { handleMemoUsefulCommand } from './commands/curate/useful.mjs';
-import { handleMemoSpaceCommand } from './commands/ops/space.mjs';
-import { handleMemoStorageCommand } from './commands/review/storage.mjs';
-import { handleMemoSupersedeCommand } from './commands/curate/supersede.mjs';
-import { handleMemoCandidateCommand } from './commands/curate/candidates.mjs';
-import { handlePersonaCommand } from './commands/review/persona.mjs';
+import { handleMemoAddCommand, handleMemoListCommand, handleMemoRecallCommand, handleMemoSearchCommand } from '../commands/ops/events.mjs';
+import { handleMemoHygieneCommand } from '../commands/review/hygiene.mjs';
+import { handleMemoPinCommand } from '../commands/curate/pin.mjs';
+import { handleMemoCheckpointCommand } from '../commands/ops/checkpoint.mjs';
+import { handleMemoReportCommand } from '../commands/review/report.mjs';
+import { handleMemoUsefulCommand } from '../commands/curate/useful.mjs';
+import { handleMemoSpaceCommand } from '../commands/ops/space.mjs';
+import { handleMemoStorageCommand } from '../commands/review/storage.mjs';
+import { handleMemoSupersedeCommand } from '../commands/curate/supersede.mjs';
+import { handleMemoCandidateCommand } from '../commands/curate/candidates.mjs';
+import { handlePersonaCommand } from '../commands/review/persona.mjs';
 
 function resolveWorkspaceMemoLimits(env = process.env) {
   return {

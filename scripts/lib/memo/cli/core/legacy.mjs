@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ensureParentDir, readTextIfExists, writeText } from '../../platform/fs.mjs';
+import { ensureParentDir, readTextIfExists, writeText } from '../../../platform/fs.mjs';
 import {
   workspaceMemoryEventsPath,
   workspaceMemorySessionId,
-} from '../workspace-memory.mjs';
+} from '../../care/workspace-memory.mjs';
 import { DEFAULT_LIST_LIMIT } from './constants.mjs';
-import { createMemoTurnId } from './records.mjs';
+import { createMemoTurnId } from '../surface/records.mjs';
 import {
   ensureWorkspaceMemorySession,
   sessionDir,

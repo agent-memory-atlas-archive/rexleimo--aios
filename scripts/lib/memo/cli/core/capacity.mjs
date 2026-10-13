@@ -1,4 +1,4 @@
-import { assertWorkspaceMemoryContentSafe } from '../safety.mjs';
+import { assertWorkspaceMemoryContentSafe } from '../../care/safety.mjs';
 
 export function assertSafeMemoText(text, target = 'memo content') {
   assertWorkspaceMemoryContentSafe(text, {

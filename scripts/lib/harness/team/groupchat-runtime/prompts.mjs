@@ -1,4 +1,4 @@
-import { buildPersonaOverlay } from '../../../memo/persona.mjs';
+import { buildPersonaOverlay } from '../../../memo/care/persona.mjs';
 import { buildModelRouterPromptSection } from '../../../model-router.mjs';
 import { normalizeText } from './shared.mjs';
 

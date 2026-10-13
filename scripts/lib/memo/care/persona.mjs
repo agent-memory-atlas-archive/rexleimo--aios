@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { ensureParentDir, readTextIfExists, writeText } from '../platform/fs.mjs';
+import { ensureParentDir, readTextIfExists, writeText } from '../../platform/fs.mjs';
 import { assertWorkspaceMemoryContentSafe, scanWorkspaceMemoryContent } from './safety.mjs';
 
 const LAYER_NAMES = {

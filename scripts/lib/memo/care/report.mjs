@@ -1,18 +1,18 @@
-import { getActiveMemoStorage } from './storage/base/config.mjs';
+import { getActiveMemoStorage } from '../storage/base/config.mjs';
 import {
   foldCandidateTerminalStates,
   readCandidateGovernanceReceipts,
-} from './storage/govern/candidates.mjs';
-import { SUPPORTED_MEMO_STORAGES } from './storage/base/constants.mjs';
-import { collectEvents } from './storage/events/events-read.mjs';
-import { readMemoFeedbackScores } from './storage/mind/feedback.mjs';
+} from '../storage/govern/candidates.mjs';
+import { SUPPORTED_MEMO_STORAGES } from '../storage/base/constants.mjs';
+import { collectEvents } from '../storage/events/events-read.mjs';
+import { readMemoFeedbackScores } from '../storage/mind/feedback.mjs';
 import {
   PINNED_DEFAULT_MAX_CHARS,
   normalizePinnedContent,
   readPinnedByStorage,
   renderPinnedBlock,
-} from './storage/govern/pinned.mjs';
-import { normalizeMemoStorageName } from './storage/base/normalizers.mjs';
+} from '../storage/govern/pinned.mjs';
+import { normalizeMemoStorageName } from '../storage/base/normalizers.mjs';
 
 /* G2 observability: one report over the memo plane — per-space volume,
  * invalidation ratio, candidate backlog, feedback adoption, pinned budget.
