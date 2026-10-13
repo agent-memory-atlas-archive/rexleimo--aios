@@ -20,9 +20,12 @@ repoTargets: [codex, claude, gemini, opencode, hermes, grok, agents, workbuddy, 
 - 分镜脚本 + 证据合同：`video/README.md` 的分镜表（帧区间、画面、字幕）与「画面主张与代码证据」表
   （每条主张 → `file:line`）。派发前以它为准；改画面不改证据表等于交付假主张。
 - 场景清单：`video/src/timeline.json` 的 `scenes[].id / label / frames / captions`；当前 8 个场景
-  （`hook crash resume route work team proof cta`）、900 帧、30fps、1080x1920 竖版、`compositionId` 为 `AiosPromo`。
+  （`hook crash resume route work team proof cta`）、1355 帧、30fps（45.2 秒）、1080x1920 竖版、`compositionId` 为 `AiosPromo`。
 - 时长与台词唯一真源：`video/src/timeline.ts` 与 `video/scripts/render.mjs` 读同一份 json，帧区间只在
   `timeline.ts` 累加；字幕只写在 json 里，由 `PromoVideo.tsx` 注入场景。其他文件不得硬编码帧数或自带 cues。
+- 片长由旁白决定：json 里的字幕同时是配音稿（`npm run srt` 导出 SRT 给剪映「文本朗读」），所以每一拍的
+  `frames / fps` 必须 ≥ 该拍字幕朗读所需秒数（估算器 `video/scripts/narration.mjs`，4.5 字/秒 + 每句 0.12s 换气）。
+  `npm test` 的「每拍窗口放得下该拍的旁白」会在砍帧数或加文案时先红 —— 那是硬门禁，不是建议。
 - 冻结点：webpack 入口 `video/src/index.ts`（`render.mjs` 的 ENTRY，只做 `registerRoot`）、场景注册表
   `SCENE_BY_ID`（在 `video/src/PromoVideo.tsx`）、场景入参契约 `SceneProps`（`video/src/timeline.ts`）、
   共享 primitive `video/src/components/**`（`stage` `panel` `terminal` `text` `diagram` `ide`）与
@@ -54,7 +57,7 @@ aios work --task "<宣传片目标>" --dry-run --json
 
 ## 4. 审批边界（强制）
 
-- 无 `--scene` 的整片渲染（900 帧）与 live 模型派发都消耗时间/费用并写大产物，开工前取得用户明确批准。
+- 无 `--scene` 的整片渲染（1355 帧，实测 07:06）与 live 模型派发都消耗时间/费用并写大产物，开工前取得用户明确批准。
 - live 派发、整片渲染、commit/push 是三道独立批准，前一次批准不外推到后一次。
 - 单场景 `--scene` 渲染与单帧 `--still` 属于已批准派发范围内的小颗粒可逆产物。
 - 渲染产物不入库：`video/.gitignore` 已把 `out/` 挡在提交之外；提交面只有 `.tsx`、`timeline.json`、文档。
@@ -64,9 +67,10 @@ aios work --task "<宣传片目标>" --dry-run --json
 ```bash
 cd video && npm run render -- --output out/aios-promo.mp4
 cd video && npm run render -- --scene hook --output out/scene-hook.mp4
-cd video && npm run render -- --still --frame "45,145,255,355,470,505,595,660,700,820,880"   # 一次 bundle 出多张静帧
+cd video && npm run render -- --still --frame "14,75,164,250,319,420,489,570,639,700,760,814,900,999,1090,1164,1290,1345"   # 一次 bundle 出多张静帧
 cd video && npm run typecheck
 cd video && npm test
+cd video && npm run srt        # 导出 out/aios-promo.srt 配音稿（与字幕同一真源）
 cd video && npm run studio
 ```
 
@@ -84,8 +88,11 @@ cd video && npm run studio
 
 - 子代理返回结构化结果：`scene_id`、`files_touched`、`typecheck_exit_code`、`still_path`、`scene_render_exit_code`、`segment_output`。
 - 主线程合并顺序固定：接线 `video/src/PromoVideo.tsx` 的 `SCENE_BY_ID` → `cd video && npm run typecheck` 退出码 0 → `cd video && npm test` 退出码 0 → 已批准的整片渲染。
-- 完成判据四项同时为真：`video/out/aios-promo.mp4` 存在且 size > 0；进度 json 的 `phase` 等于 `done`；`renderedFrames` 等于 `totalFrames` 等于 `timeline.json` 帧数之和（当前 900）；typecheck 与 test 退出码为 0。
+- 完成判据四项同时为真：`video/out/aios-promo.mp4` 存在且 size > 0；进度 json 的 `phase` 等于 `done`；`renderedFrames` 等于 `totalFrames` 等于 `timeline.json` 帧数之和（当前 1355）；typecheck 与 test 退出码为 0。
 - 竖版排版（面板撞字、diff 出框、字幕折行留孤字、轨道压进度条）只有静帧能暴露，代码审查看不见：整片渲染前先出上面那组验收帧，逐张看过。
+- 验收帧要按 `场景起点+14` 覆盖每一拍的**入场窗口**，不能只抽落定时刻：落定帧全绿、成片里却有一整秒空屏是真实发生过的缺陷（900 帧那一版的 `team` 卡片等到 local 30 才淡入，整片第 547 帧中间整块空）。判据是「这一拍内任意一帧都不留无内容的大块空白」，不是「这一拍结束时长什么样」。
+- 改帧数（重切节奏、拉长片长）会让每一拍边界右移，入场验收帧号必须按新起点重新算，旧帧号落在新时间轴上是另一拍的画面。
+- 整片渲完后用仓库自带的 ffmpeg 从**成片**里回抽问题帧复核（`video/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe -i out/aios-promo.mp4 -ss <帧号/30> -frames:v 1 out/recheck.png`）：静帧从源码渲染，编码后的真实画面才是观众看到的。
 - 分辨率与时长用仓库自带的 ffprobe 核对（本机没有全局 ffmpeg）：`video/node_modules/@remotion/compositor-win32-x64-msvc/ffprobe.exe -v error -show_entries format=duration:stream=width,height -of default=nw=1 out/aios-promo.mp4`。
 - 任一判据为假 → 交出失败证据（命令、退出码、错误摘要），不报告完成；声称完成前走 `verification-before-completion`。
 - `video/tests/` 缺失时 `npm test`（`node --test "tests/*.test.mjs"`）以非零退出码失败：把它记成待补的门禁，不当作已验证。

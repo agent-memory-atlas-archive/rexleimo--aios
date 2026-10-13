@@ -11,6 +11,7 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "render": "node scripts/render.mjs",
+    "srt": "node scripts/export-srt.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test \"tests/*.test.mjs\""
   },

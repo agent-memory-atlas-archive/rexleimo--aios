@@ -6,7 +6,7 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
-- feat(video): new standalone Remotion sub-app at `video/` producing the 30s / 1080x1920 / 30fps vertical
+- feat(video): new standalone Remotion sub-app at `video/` producing the 45s / 1080x1920 / 30fps (1355-frame) vertical
   AIOS short for 抖音 / 小红书 / 视频号 — 8 story beats (`hook crash resume route work team proof cta`)
   drawn entirely with React + SVG (no external assets, offline-reproducible) following one real task
   (`/implement 重构浏览器层，测试全绿`) instead of a feature list. Hard subtitles carry the narration
@@ -21,9 +21,21 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
   (main thread freezes `src/components/**`, `theme.ts`, `PromoVideo.tsx`, `timeline.json` and the
   `SceneProps` contract; each subagent owns exactly one `src/scenes/<id>.tsx`), keeps the
   `aios work --dry-run` preview separate from live approval, and gates completion on real render evidence
-  (mp4 exists, progress json `phase=done`, `renderedFrames == totalFrames == 900`, typecheck and test exit
+  (mp4 exists, progress json `phase=done`, `renderedFrames == totalFrames == 1355`, typecheck and test exit
   0, plus a vertical still-frame pass since layout defects only surface in rendered frames). Certified with
   `nonRegression: true` at `docs/evidence/skill-training/promo-video-pipeline-certification-*/state.json`.
+- feat(video): the hard subtitles are now also the voiceover script, so 剪映 can narrate the film without a
+  second source of truth. `video/scripts/narration.mjs` estimates Mandarin speech at 4.5 syllables/second plus
+  0.12s of breath per cue, `npm run srt` exports frame-accurate `video/out/aios-promo.srt` (18 cues, read-aloud
+  42.60s against a 45.17s film), and `video/tests/timeline.test.mjs` asserts every beat's window fits its own
+  narration — that assertion, not a taste-based "quick cut" bound, is what sets the film's length. Rendering
+  stays audio-free and offline-reproducible; the audio track is produced locally in 剪映 from the exported cues.
+- fix(video): three beats shipped a blank screen because acceptance stills only sampled each beat's *settled*
+  state. `team` fan-out cards faded in at local frame 30, so the film's middle held an empty block for a full
+  second while every still frame looked clean; `resume`'s right column and `cta`'s layered chips arrived late
+  the same way. Entrance timings moved forward (`team` gate 66→54, `resume` cards 30→14, `cta` clients 34→18)
+  and the verification frame list now includes `beat start + 14` for every beat, re-checked by extracting frames
+  from the encoded mp4 rather than from source.
 
 ## [6.3.0] - 2026-10-01
 

@@ -16,7 +16,7 @@ export const ResumeScene: React.FC<SceneProps> = ({
   durationInFrames,
   captions,
 }) => {
-  const cardsIn = interpolate(localFrame, [30, 56], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cardsIn = interpolate(localFrame, [14, 36], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <Stage localFrame={localFrame} durationInFrames={durationInFrames} glow={color.green} enter="slide">
       <Kicker text="DAY 2 · 08:02" localFrame={localFrame} tone={color.green} />
@@ -45,7 +45,7 @@ export const ResumeScene: React.FC<SceneProps> = ({
             body="迭代结论、关键改动、证据路径，逐轮写进会话状态。"
             tone={color.green}
             width={CARD_W}
-            localFrame={localFrame - 34}
+            localFrame={localFrame - 18}
             badge=".aios/"
           />
           <Panel
@@ -53,12 +53,12 @@ export const ResumeScene: React.FC<SceneProps> = ({
             body="人来决定要不要继续；上一轮遗留的操作者门不会被自动放行。"
             tone={color.cyan}
             width={CARD_W}
-            localFrame={localFrame - 50}
+            localFrame={localFrame - 30}
             badge="--session"
           />
           <div style={{ display: "flex", gap: 16, marginTop: 4 }}>
-            <Chip label="08:02 接着跑" tone={color.green} localFrame={localFrame - 62} filled />
-            <Chip label="不从零开始" tone={color.textDim} localFrame={localFrame - 68} />
+            <Chip label="08:02 接着跑" tone={color.green} localFrame={localFrame - 40} filled />
+            <Chip label="不从零开始" tone={color.textDim} localFrame={localFrame - 46} />
           </div>
         </div>
       </div>

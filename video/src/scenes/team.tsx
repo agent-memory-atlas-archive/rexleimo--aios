@@ -25,8 +25,8 @@ export const TeamScene: React.FC<SceneProps> = ({
   captions,
 }) => {
   const planIn = interpolate(localFrame, [4, 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const gateIn = interpolate(localFrame, [66, 82], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const sealed = interpolate(localFrame, [86, 100], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const gateIn = interpolate(localFrame, [54, 70], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sealed = interpolate(localFrame, [76, 90], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <Stage localFrame={localFrame} durationInFrames={durationInFrames} glow={color.violet} enter="rise">
       <Kicker text="活大了就拆开" localFrame={localFrame} tone={color.violet} />
@@ -59,7 +59,7 @@ export const TeamScene: React.FC<SceneProps> = ({
           from={[CONTENT_W / 2, GRID_TOP - 62]}
           to={[CONTENT_W / 2, GRID_TOP - 14]}
           localFrame={localFrame}
-          delay={22}
+          delay={12}
           tone={`${color.violet}AA`}
           width={4}
         />
@@ -81,8 +81,8 @@ export const TeamScene: React.FC<SceneProps> = ({
                 sub={w.sub}
                 tone={w.tone}
                 width={CARD_W}
-                active={localFrame > 40 + i * 8 && localFrame < 74 + i * 4}
-                localFrame={localFrame - (30 + i * 6)}
+                active={localFrame > 26 + i * 6 && localFrame < 70 + i * 3}
+                localFrame={localFrame - (16 + i * 5)}
               />
             </div>
           );
@@ -94,7 +94,7 @@ export const TeamScene: React.FC<SceneProps> = ({
           to={[CONTENT_W / 2, GATE_TOP - 10]}
           localFrame={localFrame}
           period={26}
-          delay={44}
+          delay={32}
           tone={color.cyan}
         />
 
@@ -128,8 +128,8 @@ export const TeamScene: React.FC<SceneProps> = ({
         </div>
 
         <div style={{ position: "absolute", top: GATE_TOP + 116, left: 0, display: "flex", gap: 16 }}>
-          <Chip label="默认 status=simulated" tone={color.amber} localFrame={localFrame - 92} />
-          <Chip label="live 需人工批准" tone={color.red} localFrame={localFrame - 98} filled />
+          <Chip label="默认 status=simulated" tone={color.amber} localFrame={localFrame - 82} />
+          <Chip label="live 需人工批准" tone={color.red} localFrame={localFrame - 88} filled />
         </div>
       </div>
 

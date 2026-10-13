@@ -1,20 +1,22 @@
-// 时间线不变量测试：竖版画幅、快切节奏、字幕覆盖与场景文件一一对应。
+// 时间线不变量测试：竖版画幅、旁白密度、字幕覆盖与场景文件一一对应。
 // 这是渲染前的机械门禁，不是靠人眼检查分镜表。
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { narrationSeconds } from "../scripts/narration.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const timeline = JSON.parse(fs.readFileSync(path.join(ROOT, "src", "timeline.json"), "utf8"));
 
-const TOTAL_FRAMES = 900;
+const TOTAL_FRAMES = 1355;
 const WIDTH = 1080;
 const HEIGHT = 1920;
 const FPS = 30;
-// 竖版短视频节奏：单场不超过 5 秒，否则滑走；不少于 3 秒，否则来不及读完字幕。
-const MIN_SCENE_SECONDS = 3;
-const MAX_SCENE_SECONDS = 5;
+// 竖版短视频节奏：单场不多于 MAX 秒，否则滑走；不少于 MIN 秒，否则来不及读完字幕。
+// 上限由旁白密度决定（45 秒装 18 句口播），不再是「快切」的 5 秒。
+const MIN_SCENE_SECONDS = 4;
+const MAX_SCENE_SECONDS = 7;
 // 字幕必须一行放下（折行会在中文里留下孤字）。阈值与 src/theme.ts 对齐：
 // caption 52 + letterSpacing 1，盒子 920 - 左右内边距 68 = 852px 可用。
 const CAPTION_PX = 53;
@@ -53,12 +55,25 @@ test("场景帧区间连续、无重叠、无空洞", () => {
   assert.equal(cursor, TOTAL_FRAMES);
 });
 
-test(`每场时长在 ${MIN_SCENE_SECONDS}~${MAX_SCENE_SECONDS} 秒之间（快切节奏）`, () => {
+test(`每场时长在 ${MIN_SCENE_SECONDS}~${MAX_SCENE_SECONDS} 秒之间`, () => {
   for (const scene of timeline.scenes) {
     const seconds = scene.frames / timeline.fps;
     assert.ok(
       seconds >= MIN_SCENE_SECONDS && seconds <= MAX_SCENE_SECONDS,
       `${scene.id} 时长 ${seconds.toFixed(2)}s 超出 ${MIN_SCENE_SECONDS}~${MAX_SCENE_SECONDS}s`,
+    );
+  }
+});
+
+// 配音由这些字幕朗读而来：窗口放不下，剪映里就只能压语速或砍句子。
+// 这条断言是 45 秒片长的真正约束，改文案或改帧数都会先在这里红。
+test("每拍窗口放得下该拍的旁白", () => {
+  for (const scene of timeline.scenes) {
+    const need = narrationSeconds(scene.captions);
+    const window = scene.frames / timeline.fps;
+    assert.ok(
+      window >= need,
+      `${scene.id} 旁白需要 ${need.toFixed(2)}s，窗口只有 ${window.toFixed(2)}s（差 ${(need - window).toFixed(2)}s）`,
     );
   }
 });

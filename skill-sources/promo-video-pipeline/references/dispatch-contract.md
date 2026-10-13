@@ -11,7 +11,7 @@
 ```json
 {
   "work_item": "scene-hook",
-  "objective": "实现 video/src/scenes/hook.tsx：冷开场 · 一句话指令（timeline.json 帧区间 0-89，竖版 1080x1920）",
+  "objective": "实现 video/src/scenes/hook.tsx：冷开场 · 一句话指令（timeline.json 帧区间 0-149，竖版 1080x1920）",
   "owner": "subagent-scene-hook",
   "tools": ["read", "edit", "bash:cd video && npm run typecheck", "bash:cd video && npm run render -- --scene hook"],
   "model": "kimi-k2.6",
@@ -56,7 +56,7 @@
   "status": "done | blocked | partial",
   "files_touched": ["video/src/scenes/hook.tsx"],
   "typecheck_exit_code": 0,
-  "still_path": "video/out/still-0045.png",
+  "still_path": "video/out/still-0014.png",
   "scene_render_exit_code": 0,
   "segment_output": "video/out/scene-hook.mp4",
   "evidence": {
@@ -64,8 +64,8 @@
       { "claim": "冷开场展示一句话指令触发 planned 路由", "code_ref": "video/src/scenes/hook.tsx:10" }
     ],
     "progress_json_phase": "still-done",
-    "rendered_frames": 90,
-    "total_frames": 90
+    "rendered_frames": 150,
+    "total_frames": 150
   },
   "assumptions": [],
   "blockers": []
@@ -83,7 +83,7 @@ cd video && npm run typecheck                 # 退出码 0
 cd video && npm test                          # 退出码 0（timeline 不变量，需 video/tests/）
 cd video && npm run render -- --output out/aios-promo.mp4 --concurrency 8
 node -e "const p=require('./video/out/render-progress.json');console.log(p.phase,p.renderedFrames,p.totalFrames)"
-# 期望：done 900 900，且 video/out/aios-promo.mp4 存在、size > 0
+# 期望：done 1355 1355，且 video/out/aios-promo.mp4 存在、size > 0
 ```
 
 进度 json 由 `render.mjs` 的 `writeProgress()` 写出：节流 >350ms，`final: true` 时立刻写；

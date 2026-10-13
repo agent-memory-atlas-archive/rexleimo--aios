@@ -17,9 +17,9 @@ export const CtaScene: React.FC<SceneProps> = ({
 }) => {
   const { fps } = useVideoConfig();
   const mark = spring({ frame: localFrame, fps, config: { damping: 15, stiffness: 130, mass: 0.9 } });
-  const clientsIn = interpolate(localFrame, [34, 54], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cmdIn = interpolate(localFrame, [50, 66], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const chipsIn = interpolate(localFrame, [88, 104], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const clientsIn = interpolate(localFrame, [18, 38], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cmdIn = interpolate(localFrame, [34, 50], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const chipsIn = interpolate(localFrame, [70, 86], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <Stage localFrame={localFrame} durationInFrames={durationInFrames} glow={color.brand} enter="rise">
@@ -85,7 +85,7 @@ export const CtaScene: React.FC<SceneProps> = ({
               fontFamily: font.mono,
               fontSize: size.micro - 4,
               color: color.textDim,
-              opacity: clientsIn * interpolate(localFrame, [36 + i * 2, 44 + i * 2], [0.2, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+              opacity: clientsIn * interpolate(localFrame, [20 + i * 2, 28 + i * 2], [0.2, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
             }}
           >
             {name}

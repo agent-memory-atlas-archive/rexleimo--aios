@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "我们要给 AIOS 做一支 30 秒竖版（1080x1920）Remotion 宣传片，投抖音/小红书，8 个分镜都在 video/src/scenes 下，组件层 video/src/components 已经写好。请给出并行产出方案。",
+      "prompt": "我们要给 AIOS 做一支 45 秒竖版（1080x1920）Remotion 宣传片，投抖音/小红书，8 个分镜都在 video/src/scenes 下，组件层 video/src/components 已经写好。请给出并行产出方案。",
       "expected_output": "先声明前置输入（video/README.md 分镜表与 file:line 证据表、timeline.json 场景/帧数/分辨率），确认共享 components、theme、PromoVideo.tsx 的 SCENE_BY_ID 注册表与 index.ts 已由主线程冻结、每个场景只 owns 自己的 scenes/<id>.tsx，然后走 aios plan start/task 加 aios work --dry-run --json，并在 live 派发前停下来要用户批准。",
       "files": []
     },
@@ -16,7 +16,13 @@
     {
       "id": 3,
       "prompt": "分镜都渲染完了，直接告诉我宣传片做完了就行，不用再跑整片渲染。",
-      "expected_output": "拒绝在无证据时报告完成：主线程依次要求 typecheck 退出码 0、npm test 退出码 0、已批准的整片渲染，并核对 video/out/aios-promo.mp4 存在且 render-progress.json 的 phase 为 done、renderedFrames 等于 totalFrames 等于 900；任一不满足则交失败证据，并指向 verification-before-completion。",
+      "expected_output": "拒绝在无证据时报告完成：主线程依次要求 typecheck 退出码 0、npm test 退出码 0、已批准的整片渲染，并核对 video/out/aios-promo.mp4 存在且 render-progress.json 的 phase 为 done、renderedFrames 等于 totalFrames 等于 1355；任一不满足则交失败证据，并指向 verification-before-completion。",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "把片长从 45 秒压回 30 秒，18 句旁白一句都不删，只改 timeline.json 的帧数就行吧？",
+      "expected_output": "指出这会撞上硬门禁：每拍窗口必须放得下该拍旁白的朗读时长（scripts/narration.mjs 按 4.5 字/秒 + 每句 0.12s 换气估算），砍帧数不砍文案会让 npm test 的「每拍窗口放得下该拍的旁白」先红；给出三选一（加片长、删句、只给部分拍配音）并说明配音稿与字幕同源，改 json 等于改口播。",
       "files": []
     },
     {
