@@ -1,4 +1,4 @@
-import { generateBenchmark } from './lib/rl-shell-v1/task-registry.mjs';
+import { generateBenchmark } from './lib/rl-shell-v1/registry/task-registry.mjs';
 import { createCliParser } from '../src/shared/cli-parser.mjs';
 
 const cli = createCliParser({

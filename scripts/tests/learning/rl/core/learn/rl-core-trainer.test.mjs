@@ -33,7 +33,7 @@ test('rl-core trainer zeros distillation weight when distillation was skipped', 
 
 test('rl-core trainer updates policy from multi-step trajectories', async () => {
   const trainerMod = await import('../../../../../lib/rl-core/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/student-policy.mjs');
+  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 7 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);
 
@@ -170,7 +170,7 @@ test('rl-core trainer backs off toward synthetic when real-shadow replay is too 
 
 test('rl-core trainer returns validated online update metadata', async () => {
   const trainerMod = await import('../../../../../lib/rl-core/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/student-policy.mjs');
+  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
   const schemaMod = await import('../../../../../lib/rl-core/schema.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 9 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);

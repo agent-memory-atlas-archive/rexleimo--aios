@@ -5,7 +5,7 @@ import path from 'node:path';
  * Hermetic `rl-shell-v1` benchmark corpus.
  *
  * The library resolves seeds, configs, generated tasks, and the invalid-task report
- * under `<rootDir>/.aios/experiments/rl-shell-v1/**` (see `lib/rl-shell-v1/task-registry.mjs`).
+ * under `<rootDir>/.aios/experiments/rl-shell-v1/**` (see `lib/rl-shell-v1/registry/task-registry.mjs`).
  * Tests therefore have to seed that exact tree. This used to be duplicated inline in
  * each test file and drifted: the copy wrote to `<rootDir>/experiments/**`, so the
  * fixtures landed where nothing read them and the suites failed with ENOENT the first

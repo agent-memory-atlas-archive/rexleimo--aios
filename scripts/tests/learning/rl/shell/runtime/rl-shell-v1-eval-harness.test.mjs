@@ -23,7 +23,7 @@ function makeHeldOutOnlyRegistry() {
 }
 
 test('eval harness selects best checkpoint deterministically', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const best = mod.pickBestCheckpoint([
     { step: 200, successRate: 0.5, regressionFreeFixRate: 0.6, invalidStepRatio: 0.2, repeatedNoProgressRate: 0.3, avgTokenCount: 100 },
     { step: 300, successRate: 0.5, regressionFreeFixRate: 0.6, invalidStepRatio: 0.1, repeatedNoProgressRate: 0.1, avgTokenCount: 130 },
@@ -33,7 +33,7 @@ test('eval harness selects best checkpoint deterministically', async () => {
 });
 
 test('eval harness summarizes 2A invalid-step and repeated-no-progress metrics', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const summary = mod.summarizeEvalResults([
     {
       success: 1,
@@ -82,7 +82,7 @@ test('eval harness summarizes 2A invalid-step and repeated-no-progress metrics',
 });
 
 test('eval harness compares 2A checkpoints against v1 and untrained multi-step baseline', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const comparison = mod.comparePhase2ABaseline({
     currentSummary: {
       successRate: 0.55,
@@ -108,7 +108,7 @@ test('eval harness compares 2A checkpoints against v1 and untrained multi-step b
 });
 
 test('held-out evaluation never mutates student weights or trainer counters', async () => {
-  const evalMod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const evalMod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const policy = makePolicyCheckpoint();
   const snapshot = JSON.stringify(policy);
 
@@ -123,7 +123,7 @@ test('held-out evaluation never mutates student weights or trainer counters', as
 });
 
 test('eval harness summarizes real-task shadow repeatability metrics', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const summary = mod.summarizeRealShadowEval({
     pool_status: 'limited-pool',
     admitted_tasks: 2,
@@ -140,7 +140,7 @@ test('eval harness summarizes real-task shadow repeatability metrics', async () 
 });
 
 test('eval harness summarizes phase 2 ablation deltas and warnings', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const summary = mod.summarizePhase2Ablation({
     phase2a: { successRate: 0.4, avgTokenCount: 100 },
     phase2b: { repeatedRepairRate: 0.2 },
@@ -154,7 +154,7 @@ test('eval harness summarizes phase 2 ablation deltas and warnings', async () =>
 });
 
 test('eval harness reports better/same/worse and comparison_failed counts', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/eval-harness.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/eval-harness.mjs');
   const summary = await mod.evaluatePhase3Run({
     episodeRecords: [
       { comparison_status: 'completed', relative_outcome: 'better', teacher_shaping_score: 0.7 },
@@ -184,7 +184,7 @@ test('eval harness reports better/same/worse and comparison_failed counts', asyn
 });
 
 test('contextdb summary includes checkpoint lineage and rollback evidence', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/contextdb-summary.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/contextdb-summary.mjs');
   const payload = mod.buildRunSummaryPayload({
     run: {
       runId: 'run-003',

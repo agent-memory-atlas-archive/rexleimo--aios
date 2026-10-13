@@ -2,8 +2,8 @@ import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { collectFailingTests } from './temp-runner/command.mjs';
-import { validateTaskManifest } from './schema.mjs';
+import { collectFailingTests } from '../eval/temp-runner/command.mjs';
+import { validateTaskManifest } from '../eval/schema.mjs';
 
 function createDeterministicOrder(items, seed) {
   return [...items]
@@ -12,7 +12,7 @@ function createDeterministicOrder(items, seed) {
     .map((entry) => entry.item);
 }
 
-import { computeHash } from '../../../src/shared/normalize.mjs';
+import { computeHash } from '../../../../src/shared/normalize.mjs';
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));

@@ -2,7 +2,7 @@
 import { runBrowserHoldout } from '../rl-browser-v1/eval-harness.mjs';
 import { createOrchestratorAdapter } from '../rl-orchestrator-v1/adapter.mjs';
 import { runOrchestratorHoldout } from '../rl-orchestrator-v1/eval-harness.mjs';
-import { runShellHoldoutValidation } from '../rl-shell-v1/eval-harness.mjs';
+import { runShellHoldoutValidation } from '../rl-shell-v1/eval/eval-harness.mjs';
 import { createShellMixedAdapter } from './shell-adapter.mjs';
 
 export function createDefaultAdapters({

@@ -1,6 +1,6 @@
 ﻿import { readFile, writeFile } from 'node:fs/promises';
 
-import { normalizePatchDiff } from '../action-protocol.mjs';
+import { normalizePatchDiff } from '../../training/action-protocol.mjs';
 import { resolveWorkspacePath } from './workspace.mjs';
 
 export function parsePatchOperations(diffText) {

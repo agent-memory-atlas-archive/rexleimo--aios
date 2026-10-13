@@ -8,7 +8,7 @@ import {
   validateTeacherResponse,
   validateEpisodeRecord,
   validateRunSummary,
-} from '../../../../../lib/rl-shell-v1/schema.mjs';
+} from '../../../../../lib/rl-shell-v1/eval/schema.mjs';
 
 function makeValidEpisodeRecord() {
   return {

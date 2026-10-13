@@ -1,7 +1,7 @@
 import { appendFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { validateEpisodeRecord } from './schema.mjs';
+import { validateEpisodeRecord } from '../eval/schema.mjs';
 
 async function writeJson(filePath, value) {
   await mkdir(path.dirname(filePath), { recursive: true });

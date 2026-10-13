@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { loadTaskRegistry } from '../task-registry.mjs';
-import { buildMixedReplayBatch } from '../trainer.mjs';
+import { loadTaskRegistry } from '../../registry/task-registry.mjs';
+import { buildMixedReplayBatch } from '../../training/trainer.mjs';
 import { pickBestCheckpoint } from '../eval-harness.mjs';
-import { loadReplayPool } from '../replay-pool.mjs';
-import { runOnlineCampaign } from '../../rl-core/campaign-controller.mjs';
+import { loadReplayPool } from '../../registry/replay-pool.mjs';
+import { runOnlineCampaign } from '../../../rl-core/campaign-controller.mjs';
 import { runRealShadowEval } from './shadow-eval.mjs';
 import { runTrainingRun } from './training-run.mjs';
 

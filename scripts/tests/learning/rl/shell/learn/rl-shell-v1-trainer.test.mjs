@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('trainer computes advantages from multi-step reward sequences', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const { advantages } = mod.computeAdvantages({ rewards: [0, 0.25, 1] });
   assert.deepEqual(advantages, [1.25, 1.25, 1]);
 });
 
 test('trainer computes total_loss with rl, distill, and kl components', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const result = mod.computeLosses({
     rlLoss: 0.6,
     distillLoss: 0.5,
@@ -20,7 +20,7 @@ test('trainer computes total_loss with rl, distill, and kl components', async ()
 });
 
 test('trainer zeros distillation weight when distillation was skipped', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const result = mod.computeLosses({
     rlLoss: 0.6,
     distillLoss: 99,
@@ -32,8 +32,8 @@ test('trainer zeros distillation weight when distillation was skipped', async ()
 });
 
 test('trainer updates policy from multi-step trajectories', async () => {
-  const trainerMod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/student-policy.mjs');
+  const trainerMod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
+  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 7 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);
 
@@ -59,7 +59,7 @@ test('trainer updates policy from multi-step trajectories', async () => {
 });
 
 test('trainer refreshes the frozen reference policy every 100 updates', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const policy = { weights: { feature: [1, 2, 3] } };
   const reference = { weights: { feature: [0, 0, 0] } };
 
@@ -75,7 +75,7 @@ test('trainer refreshes the frozen reference policy every 100 updates', async ()
 });
 
 test('trainer prefers qualified real-shadow samples in replay batches', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const batch = mod.buildMixedReplayBatch({
     pool: {
       realShadow: {
@@ -101,7 +101,7 @@ test('trainer prefers qualified real-shadow samples in replay batches', async ()
 });
 
 test('trainer backs off toward synthetic when real-shadow replay is too duplicated', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const batch = mod.buildMixedReplayBatch({
     pool: {
       realShadow: {
@@ -129,8 +129,8 @@ test('trainer backs off toward synthetic when real-shadow replay is too duplicat
 });
 
 test('trainer runOnlineUpdateBatch returns deterministic checkpoint metadata', async () => {
-  const trainerMod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
-  const policyMod = await import('../../../../../lib/rl-shell-v1/student-policy.mjs');
+  const trainerMod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
+  const policyMod = await import('../../../../../lib/rl-shell-v1/training/student-policy.mjs');
   const policy = policyMod.createStudentPolicy({ seed: 9 });
   const referencePolicy = trainerMod.createReferencePolicyFrom(policy);
 
@@ -156,7 +156,7 @@ test('trainer runOnlineUpdateBatch returns deterministic checkpoint metadata', a
 });
 
 test('trainer runOnlineUpdateBatch surfaces update failures without mutating checkpoint ids', async () => {
-  const trainerMod = await import('../../../../../lib/rl-shell-v1/trainer.mjs');
+  const trainerMod = await import('../../../../../lib/rl-shell-v1/training/trainer.mjs');
   const result = trainerMod.runOnlineUpdateBatch({
     batchId: 'batch-002',
     checkpointId: 'ckpt-a',

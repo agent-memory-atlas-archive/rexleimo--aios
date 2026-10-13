@@ -1,4 +1,4 @@
-import runSummarySchema from '../../specs/rl-shell-v1-run-summary.schema.json' with { type: 'json' };
+import runSummarySchema from '../../../specs/rl-shell-v1-run-summary.schema.json' with { type: 'json' };
 import { assertArray, assertInteger, assertNumber, assertObject, assertString, assertStringArray, assertNoUnknownKeys } from './assertions.mjs';
 
 export function validateRunSummary(raw) {

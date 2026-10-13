@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { clone, computeHash } from '../../../src/shared/normalize.mjs';
+import { clone, computeHash } from '../../../../src/shared/normalize.mjs';
 
 function average(values) {
   if (!Array.isArray(values) || values.length === 0) return 0;

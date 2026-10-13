@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('parseStudentAction accepts read/run/patch/stop and rejects unsupported actions', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/action-protocol.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/action-protocol.mjs');
 
   assert.deepEqual(mod.parseStudentAction('{"action":"read","path":"src/math.mjs"}'), {
     action: 'read',
@@ -31,7 +31,7 @@ test('parseStudentAction accepts read/run/patch/stop and rejects unsupported act
 });
 
 test('normalizePatchDiff normalizes line endings and validateStudentAction enforces required fields', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/action-protocol.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/training/action-protocol.mjs');
 
   assert.equal(
     mod.normalizePatchDiff('--- a/src/math.mjs\r\n+++ b/src/math.mjs'),

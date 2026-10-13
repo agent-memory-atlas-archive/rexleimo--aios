@@ -1,6 +1,6 @@
 ﻿import { readFile } from 'node:fs/promises';
 
-import { validateStudentAction } from '../action-protocol.mjs';
+import { validateStudentAction } from '../../training/action-protocol.mjs';
 import { checkForbiddenCommand, runCommand } from './command.mjs';
 import { recordObservation } from './observations.mjs';
 import { ensureBudgets, createDefaultExecutionPolicy } from './policy.mjs';

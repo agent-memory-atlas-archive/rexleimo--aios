@@ -76,7 +76,7 @@ async function makeFixtureTaskRoot() {
 }
 
 test('run orchestrator marks campaign as insufficient-valid-tasks when registry gates fail', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   const result = await mod.runCampaign({
     config: makeConfig(),
     deps: {
@@ -88,7 +88,7 @@ test('run orchestrator marks campaign as insufficient-valid-tasks when registry 
 });
 
 test('runTrainingRun persists a multi-step synthetic episode before trainer update', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   const { rootDir, task } = await makeFixtureTaskRoot();
   let requestCount = 0;
 
@@ -258,7 +258,7 @@ test('entrypoint phase3-train command prints rollback metrics and summary path',
 });
 
 test('contextdb summary writer validates required fields and keeps write failures non-fatal', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/contextdb-summary.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/contextdb-summary.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v1-summary-'));
   const summary = {
     run_id: 'run-001',
@@ -287,7 +287,7 @@ test('contextdb summary writer validates required fields and keeps write failure
 });
 
 test('contextdb summary payload carries phase and replay pool status', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/contextdb-summary.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/contextdb-summary.mjs');
   const summary = mod.buildRunSummaryPayload({
     run: {
       runId: 'run-002',
@@ -310,7 +310,7 @@ test('contextdb summary payload carries phase and replay pool status', async () 
 });
 
 test('runPhase3Campaign opens first collection epoch and triggers update after four admitted trajectories', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   const result = await mod.runPhase3Campaign({
     config: {
       rootDir: REPO_ROOT,
@@ -336,7 +336,7 @@ test('runPhase3Campaign opens first collection epoch and triggers update after f
 });
 
 test('runPhase3Campaign reopens monitoring after replay_only without promoting a new batch', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   let counter = 0;
   const result = await mod.runPhase3Campaign({
     config: {
@@ -375,7 +375,7 @@ test('runPhase3Campaign reopens monitoring after replay_only without promoting a
 });
 
 test('runPhase3Campaign auto-rolls back after three worse outcomes without an intervening better', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   let counter = 0;
   const result = await mod.runPhase3Campaign({
     config: {
@@ -412,7 +412,7 @@ test('runPhase3Campaign auto-rolls back after three worse outcomes without an in
 });
 
 test('runPhase3Campaign resumes from persisted control snapshot without reapplying duplicate events', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-shell-v3-resume-'));
   let counter = 0;
   const deps = {
@@ -462,7 +462,7 @@ test('runPhase3Campaign resumes from persisted control snapshot without reapplyi
 });
 
 test('runPhase3Campaign enters frozen_failure mode when rollback fails and blocks further updates', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   let counter = 0;
   const result = await mod.runPhase3Campaign({
     config: {
@@ -502,7 +502,7 @@ test('runPhase3Campaign enters frozen_failure mode when rollback fails and block
 });
 
 test('real-task shadow eval does not update trainer state and repeats tasks across seed-attempt pairs', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   let trainerUpdates = 0;
 
   const result = await mod.runRealShadowEval({
@@ -543,7 +543,7 @@ test('real-task shadow eval does not update trainer state and repeats tasks acro
 });
 
 test('runCampaign reports phase 2C replay and shadow metrics', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/run-orchestrator.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/eval/run-orchestrator.mjs');
   const result = await mod.runCampaign({
     config: makeConfig({
       rootDir: REPO_ROOT,

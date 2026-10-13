@@ -128,7 +128,7 @@ async function makeRunRoot() {
 }
 
 test('trajectory store writes one episode json plus full artifact files for truncated outputs', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trajectory-store.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/trajectory-store.mjs');
   const rootDir = await makeRunRoot();
   const runDir = await mod.createRunLayout({ rootDir, runId: 'run-001' });
   const record = await mod.persistEpisode({
@@ -147,7 +147,7 @@ test('trajectory store writes one episode json plus full artifact files for trun
 });
 
 test('trajectory store appends metrics and keeps latest/best checkpoint metadata separate', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trajectory-store.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/trajectory-store.mjs');
   const rootDir = await makeRunRoot();
   const runDir = await mod.createRunLayout({ rootDir, runId: 'run-002' });
 
@@ -176,7 +176,7 @@ test('trajectory store appends metrics and keeps latest/best checkpoint metadata
 });
 
 test('trajectory store keeps update_failed and diagnostic_only records separate from replay lanes', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/trajectory-store.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/trajectory-store.mjs');
   const rootDir = await makeRunRoot();
   const runDir = await mod.createRunLayout({ rootDir, runId: 'run-003' });
 

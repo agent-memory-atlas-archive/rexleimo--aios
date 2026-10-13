@@ -21,7 +21,7 @@ function makeCommandRunner(resultByCommand) {
 }
 
 test('real-task registry admits only stable reproducible failing tasks', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/real-task-registry.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/real-task-registry.mjs');
   const commandRunner = makeCommandRunner({
     'npm run test:scripts': {
       status: 1,
@@ -51,7 +51,7 @@ test('real-task registry admits only stable reproducible failing tasks', async (
 });
 
 test('real-task registry marks limited-pool when fewer than three tasks are admitted', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/real-task-registry.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/real-task-registry.mjs');
   const commandRunner = makeCommandRunner({
     'npm run test:scripts': {
       status: 1,

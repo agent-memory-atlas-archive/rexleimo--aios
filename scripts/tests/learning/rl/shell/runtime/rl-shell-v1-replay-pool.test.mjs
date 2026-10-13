@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 test('replay pool keeps synthetic and real-shadow pools separate', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/replay-pool.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/replay-pool.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-replay-pool-'));
   const pool = await mod.createReplayPool({ rootDir });
   await mod.addReplayEpisode({
@@ -22,7 +22,7 @@ test('replay pool keeps synthetic and real-shadow pools separate', async () => {
 });
 
 test('replay pool ignores ineligible episodes', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/replay-pool.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/replay-pool.mjs');
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-rl-replay-pool-'));
   const pool = await mod.createReplayPool({ rootDir });
   await mod.addReplayEpisode({
@@ -35,7 +35,7 @@ test('replay pool ignores ineligible episodes', async () => {
 });
 
 test('replay pool keeps comparison_failed and update_failed trajectories out of training lanes', async () => {
-  const mod = await import('../../../../../lib/rl-shell-v1/replay-pool.mjs');
+  const mod = await import('../../../../../lib/rl-shell-v1/registry/replay-pool.mjs');
 
   assert.equal(
     mod.classifyReplayRoute({

@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { runContextDbCli } from '../contextdb-cli.mjs';
+import { runContextDbCli } from '../../contextdb-cli.mjs';
 import { validateRunSummary } from './schema.mjs';
 
 async function writeJson(filePath, value) {

@@ -1,12 +1,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { loadTaskRegistry, sampleTrainingTask } from '../task-registry.mjs';
-import { createStudentPolicy } from '../student-policy.mjs';
-import { buildStudentFeatureKey, requestStudentAction } from '../student-runner.mjs';
-import { computeTerminalReward, fuseReward } from '../reward-fusion.mjs';
-import { applyPpoUpdate, buildMixedReplayBatch, createReferencePolicyFrom, createTrainerConfig, maybeRefreshReferencePolicy } from '../trainer.mjs';
-import { appendMetrics, createRunLayout, persistEpisode, writeCheckpointMetadata } from '../trajectory-store.mjs';
+import { loadTaskRegistry, sampleTrainingTask } from '../../registry/task-registry.mjs';
+import { createStudentPolicy } from '../../training/student-policy.mjs';
+import { buildStudentFeatureKey, requestStudentAction } from '../../training/student-runner.mjs';
+import { computeTerminalReward, fuseReward } from '../../training/reward-fusion.mjs';
+import { applyPpoUpdate, buildMixedReplayBatch, createReferencePolicyFrom, createTrainerConfig, maybeRefreshReferencePolicy } from '../../training/trainer.mjs';
+import { appendMetrics, createRunLayout, persistEpisode, writeCheckpointMetadata } from '../../registry/trajectory-store.mjs';
 import { runHeldOutEval } from '../eval-harness.mjs';
 import { buildRunSummaryPayload, writeRunSummary } from '../contextdb-summary.mjs';
 import {
@@ -18,7 +18,7 @@ import {
   runBaselineFailureCheck,
   runVerification,
 } from '../temp-runner.mjs';
-import { loadReplayPool } from '../replay-pool.mjs';
+import { loadReplayPool } from '../../registry/replay-pool.mjs';
 import { buildEpisodeRecord } from './episode-record.mjs';
 import { clone, createRunId, createTeacherFailureResponse, shouldStopRun } from './helpers.mjs';
 

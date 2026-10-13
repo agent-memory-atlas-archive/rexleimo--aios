@@ -3,7 +3,7 @@ import {
   callTeacher as callCoreTeacher,
   defaultTeacherTransport,
   normalizeTeacherResponse as normalizeCoreTeacherResponse,
-} from '../rl-core/teacher-gateway.mjs';
+} from '../../rl-core/teacher-gateway.mjs';
 
 const SHELL_TO_CORE_CALL_STATUS = {
   ok: 'complete',

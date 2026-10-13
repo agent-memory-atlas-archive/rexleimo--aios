@@ -2,8 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { createDefaultExecutionPolicy, runVerification } from '../temp-runner.mjs';
-import { collectRealTasks } from '../real-task-registry.mjs';
-import { createEpisodeWorktree, destroyEpisodeWorktree } from '../worktree-runner.mjs';
+import { collectRealTasks } from '../../registry/real-task-registry.mjs';
+import { createEpisodeWorktree, destroyEpisodeWorktree } from '../../training/worktree-runner.mjs';
 import { summarizeRealShadowEval } from '../eval-harness.mjs';
 
 async function runDefaultShadowAttempt({ rootDir, task, seed, attempt }) {

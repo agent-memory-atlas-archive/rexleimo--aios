@@ -4,7 +4,7 @@ import {
   createReplayPool as createCoreReplayPool,
   loadReplayPool as loadCoreReplayPool,
   sampleReplayBatch,
-} from '../rl-core/replay-pool.mjs';
+} from '../../rl-core/replay-pool.mjs';
 
 export { addReplayEpisode, classifyReplayRoute, sampleReplayBatch };
 

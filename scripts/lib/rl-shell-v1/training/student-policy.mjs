@@ -7,7 +7,7 @@ const RUN_COMMAND_TOKENS = ['"node --test"', '"cat src/math.mjs"', '"cat src/nor
 const PATCH_DIFF_TOKENS = ['"*** Begin Patch\\n*** End Patch\\n"'];
 const STOP_MESSAGE_TOKENS = ['"done"', '"unable_to_continue"'];
 
-import { computeHash } from '../../../src/shared/normalize.mjs';
+import { computeHash } from '../../../../src/shared/normalize.mjs';
 
 function nextRandom(policy) {
   let state = policy.rngState >>> 0;
