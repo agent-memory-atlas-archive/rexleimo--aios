@@ -103,7 +103,7 @@ export function removeManagedJsonFragment(existingObject) {
 }
 
 export function readSharedMarkdownParts(rootDir) {
-  return readNativePartials(rootDir, ['core-instructions.md', 'contextdb.md', 'browser-mcp.md']);
+  return readNativePartials(rootDir, ['core/core-instructions.md', 'core/contextdb.md', 'clients/browser-mcp.md']);
 }
 
 // 读取一组共享 native partials，按给定顺序返回非空段落，供能力感知渲染器选取。

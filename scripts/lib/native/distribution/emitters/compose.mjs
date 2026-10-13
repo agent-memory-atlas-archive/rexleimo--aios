@@ -10,7 +10,7 @@ import {
 } from './shared.mjs';
 
 // Keep the compact shared core deterministic across every AGENTS.md client.
-const ALWAYS_LOADED_PARTIALS = Object.freeze(['core-instructions.md']);
+const ALWAYS_LOADED_PARTIALS = Object.freeze(['core/core-instructions.md']);
 
 // Append a project overlay only for a client-specific instruction file.
 export function composeNativeMarkdown({ rootDir, client }) {

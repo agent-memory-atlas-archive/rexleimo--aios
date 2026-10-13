@@ -18,7 +18,7 @@ const ACTIVE_CLIENT_INSTRUCTION_FILES = Object.freeze([
   'AGENTS.md',
   'CLAUDE.md',
   'GEMINI.md',
-  'client-sources/native-base/shared/partials/agent-routing.md',
+  'client-sources/native-base/shared/partials/clients/agent-routing.md',
 ]);
 
 test('AIOS exposes only the Rex workflow surface', async () => {

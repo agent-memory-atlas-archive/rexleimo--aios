@@ -41,17 +41,20 @@ async function writeNativeManifest(rootDir) {
 
 async function writeNativeSources(rootDir) {
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials'), { recursive: true });
+  for (const sub of ['core', 'clients', 'ops']) {
+    await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', sub), { recursive: true });
+  }
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'codex', 'project'), { recursive: true });
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'claude', 'project'), { recursive: true });
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'gemini', 'project'), { recursive: true });
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'opencode', 'project'), { recursive: true });
   await mkdir(path.join(rootDir, 'client-sources', 'native-base', 'grok', 'project'), { recursive: true });
 
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'core-instructions.md'), 'Shared native instructions.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'contextdb.md'), 'ContextDB bridge enabled.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'core', 'core-instructions.md'), 'Shared native instructions.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'core', 'contextdb.md'), 'ContextDB bridge enabled.\n', 'utf8');
 
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'client-capabilities.md'), 'Client capability gates enabled.\n', 'utf8');  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'token-discipline.md'), 'AIOS Token Discipline: minimal | balanced | full. Use strategic compact after exploration, before implementation. Do not replace AIOS interception runtime.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'browser-mcp.md'), `Browser MCP is available through the repo-local AIOS server and should be preferred for browser work.
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'clients', 'client-capabilities.md'), 'Client capability gates enabled.\n', 'utf8');  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'ops', 'token-discipline.md'), 'AIOS Token Discipline: minimal | balanced | full. Use strategic compact after exploration, before implementation. Do not replace AIOS interception runtime.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'clients', 'browser-mcp.md'), `Browser MCP is available through the repo-local AIOS server and should be preferred for browser work.
 
 For browser tasks, use this operating pattern unless the user explicitly asks otherwise:
 - Connect to a visible CDP browser first: \`chrome.launch_cdp\` then \`browser.connect_cdp\`.
@@ -63,11 +66,11 @@ For browser tasks, use this operating pattern unless the user explicitly asks ot
 - For complex browser tasks, first summarize the current page, then state the next single action, then execute it.
 - When \`mcp-browser-use\` is available, use its browser-use toolchain (\`chrome.*\` / \`browser.*\` / \`page.*\`) for normal business flows instead of \`chrome-devtools\`.
 `, 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'agent-routing.md'), 'Section AGENT-ROUTING-CAP only.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'codemap.md'), 'Section CODEMAP-NATIVE for all.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'team-provider.md'), 'Section TEAM-PROVIDER-CAP only.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'model-router.md'), 'Section MODEL-ROUTER-CAP only.\n', 'utf8');
-  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'harness.md'), 'Section HARNESS for all.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'clients', 'agent-routing.md'), 'Section AGENT-ROUTING-CAP only.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'core', 'codemap.md'), 'Section CODEMAP-NATIVE for all.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'clients', 'team-provider.md'), 'Section TEAM-PROVIDER-CAP only.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'ops', 'model-router.md'), 'Section MODEL-ROUTER-CAP only.\n', 'utf8');
+  await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials', 'core', 'harness.md'), 'Section HARNESS for all.\n', 'utf8');
   await writeFile(path.join(rootDir, 'client-sources', 'native-base', 'codex', 'project', 'AGENTS.md'), 'Codex native block.\n', 'utf8');
   await writeJson(path.join(rootDir, 'client-sources', 'native-base', 'codex', 'project', 'hooks.json'), {
     hooks: {

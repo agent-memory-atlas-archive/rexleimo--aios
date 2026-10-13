@@ -34,6 +34,7 @@ export const EXEMPT_DIRS = Object.freeze({
   'pptx-ai-coding-share/pptxgenjs_helpers': 'vendored helpers',
   'mcp-server': 'TS package entry surface (package.json/tsconfig + src/scripts/tests); 7 configs immovable, floor is 9',
   'mcp-server/test-results': 'generated bench output',
+  'config': 'user-facing config surface (documented stable paths in messages/installers/docs; loaders join rootDir+config+name)',
 });
 
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
@@ -41,7 +42,6 @@ export const EXEMPT_DIRS = Object.freeze({
 export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib': 55,
   'scripts/lib/harness/team/subagent-runtime': 24,
-  'scripts/lib/harness/subagent-runtime': 24,
   'agent-sources/roles': 19,
   'scripts/tests/harness-runtime': 17,
   'docs': 13,
@@ -50,8 +50,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/harness/solo-runtime': 12,
   'scripts/lib/lifecycle/harness': 11,
   'scripts/lib/lifecycle/orchestrate': 11,
-  'client-sources/native-base/shared/partials': 10,
-  'config': 10,
   'mcp-server/src/browser': 10,
   'mcp-server/src/contextdb': 10,
   'scripts/lib/harness/groupchat-runtime': 10,

@@ -61,11 +61,14 @@ async function seedNativeRoot(rootDir) {
   });
   const partials = path.join(rootDir, 'client-sources', 'native-base', 'shared', 'partials');
   await mkdir(partials, { recursive: true });
-  for (const name of ['core-instructions', 'contextdb', 'client-capabilities', 'token-discipline', 'agent-routing', 'codemap', 'browser-mcp', 'team-provider', 'model-router', 'harness']) {
+  for (const sub of ['core', 'clients', 'ops']) {
+    await mkdir(path.join(partials, sub), { recursive: true });
+  }
+  for (const name of ['core/core-instructions', 'core/contextdb', 'clients/client-capabilities', 'ops/token-discipline', 'clients/agent-routing', 'core/codemap', 'clients/browser-mcp', 'clients/team-provider', 'ops/model-router', 'core/harness']) {
     await writeFile(path.join(partials, `${name}.md`), `${name} partial\n`, 'utf8');
   }
   await writeFile(
-    path.join(partials, 'token-discipline.md'),
+    path.join(partials, 'ops', 'token-discipline.md'),
     'AIOS Token Discipline: minimal | balanced | full. Use strategic compact after exploration, before implementation. Do not replace AIOS interception runtime.\n',
     'utf8',
   );

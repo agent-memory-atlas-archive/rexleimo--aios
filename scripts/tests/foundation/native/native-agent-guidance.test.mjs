@@ -15,16 +15,16 @@ import { readNativePartials, bakeRuntimeCliValues, readClientJsonSource } from '
 
 const AGENTS_CLIENTS = Object.freeze(['codex', 'opencode', 'hermes', 'grok']);
 const LEGACY_ALWAYS_LOADED_PARTIALS = Object.freeze([
-  'core-instructions.md',
-  'contextdb.md',
-  'client-capabilities.md',
-  'token-discipline.md',
-  'agent-routing.md',
-  'codemap.md',
-  'browser-mcp.md',
-  'team-provider.md',
-  'model-router.md',
-  'harness.md',
+  'core/core-instructions.md',
+  'core/contextdb.md',
+  'clients/client-capabilities.md',
+  'ops/token-discipline.md',
+  'clients/agent-routing.md',
+  'core/codemap.md',
+  'clients/browser-mcp.md',
+  'clients/team-provider.md',
+  'ops/model-router.md',
+  'core/harness.md',
 ]);
 
 function markdownOperationContent(rendered) {
