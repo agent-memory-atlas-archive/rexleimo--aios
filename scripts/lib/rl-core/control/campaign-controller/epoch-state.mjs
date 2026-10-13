@@ -1,4 +1,4 @@
-import { seedEpoch } from '../epoch-ledger.mjs';
+import { seedEpoch } from '../../state/epoch-ledger.mjs';
 import { formatSequenceId } from './ids.mjs';
 
 // 纯函数：把控制状态压缩成 checkpoint 指针补丁输入。

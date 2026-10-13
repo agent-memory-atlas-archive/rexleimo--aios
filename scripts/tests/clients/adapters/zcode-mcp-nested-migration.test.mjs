@@ -8,7 +8,7 @@ import { migrateOneMcpJsonFile } from '../../../lib/components/browser/mcp/mcp-m
 import { migrateOneZcodeJsonFile, normalizeZcodeServerEntry } from '../../../lib/components/browser/mcp/formats/mcp-zcode.mjs';
 import { collectClientMcpTargets } from '../../../lib/components/browser/mcp/mcp-targets.mjs';
 import { PRIMARY_BROWSER_ALIAS } from '../../../lib/components/browser/constants.mjs';
-import { getClientMcpTarget } from '../../../lib/clients/native/index.mjs';
+import { getClientMcpTarget } from '../../../lib/clients/integration/native/index.mjs';
 
 async function makeTemp() {
   return mkdtemp(path.join(os.tmpdir(), 'aios-zcode-mcp-'));

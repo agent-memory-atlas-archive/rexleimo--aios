@@ -4,7 +4,7 @@
 import { constants as fsConstants, promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { CLIENT_DEFINITIONS } from '../registry.mjs';
+import { CLIENT_DEFINITIONS } from '../../registry.mjs';
 
 const PENDING_SMOKE_CLIENTS = new Set([]);
 const SUPPORTED_CANDIDATES = new Set(['codex', 'claude', 'opencode']);

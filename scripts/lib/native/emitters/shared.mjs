@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 
 import { stripManagedBlock } from '../../platform/fs.mjs';
-import { ALL_CLIENTS } from '../../clients/core/definitions.mjs';
-import { orderByPriority } from '../../clients/core/ordering.mjs';
-import { getClientInstructionFileName } from '../../clients/native/index.mjs';
+import { ALL_CLIENTS } from '../../clients/selection/core/definitions.mjs';
+import { orderByPriority } from '../../clients/selection/core/ordering.mjs';
+import { getClientInstructionFileName } from '../../clients/integration/native/index.mjs';
 import { resolveNativeSourcePath, resolveSharedNativePartialPath } from '../source-tree.mjs';
 
 export const AIOS_NATIVE_BEGIN_MARK = '<!-- AIOS NATIVE BEGIN -->';

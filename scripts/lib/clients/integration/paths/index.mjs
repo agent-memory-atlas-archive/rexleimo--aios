@@ -1,13 +1,13 @@
 import {
   CLIENT_DEFINITIONS,
   SHARED_AGENT_SKILL_ROOT,
-} from '../core/definitions.mjs';
+} from '../../selection/core/definitions.mjs';
 import {
   assertKnownClient,
   isKnownClient,
   normalizeClientValue,
   resolveClientSelection,
-} from '../core/selection.mjs';
+} from '../../selection/core/selection.mjs';
 
 // 纯函数：读取单个客户端路径定义，不直接访问磁盘。
 function getClientDefinition(client) {

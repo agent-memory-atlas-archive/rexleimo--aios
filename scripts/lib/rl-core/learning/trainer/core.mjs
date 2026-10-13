@@ -5,7 +5,7 @@
 // （2026-09-22 审计修复：之前只写了 re-export，nextRandom 的 seed===0 分支会抛
 // ReferenceError: computeHash is not defined；平时被 bandit-state.mjs 预先初始化
 // rngState 掩盖，属潜伏崩溃）。
-import { clone, computeHash } from '../../../../src/shared/normalize.mjs';
+import { clone, computeHash } from '../../../../../src/shared/normalize.mjs';
 
 export { clone, computeHash };
 

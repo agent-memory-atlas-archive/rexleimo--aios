@@ -5,7 +5,7 @@ import { constants as fsConstants, promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { CLIENT_DEFINITIONS, getClientCommandNames } from '../registry.mjs';
+import { CLIENT_DEFINITIONS, getClientCommandNames } from '../../registry.mjs';
 
 const NATIVE_SHIM_MARK = 'AIOS_NATIVE_SHIM managed';
 

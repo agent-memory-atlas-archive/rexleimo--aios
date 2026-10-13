@@ -22,7 +22,7 @@ import { evaluateGraphFreshness, inspectGraphFreshness } from '../../../lib/comp
 import { ensureOpencodePlugin } from '../../../lib/components/codemap/targets/opencode-plugin.mjs';
 import { getCodemapHelpText } from '../../../lib/cli/help/codemap.mjs';
 import { buildCrgEntryForTarget } from '../../../lib/components/codemap/targets/mcp-targets/entries.mjs';
-import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../../../lib/clients/mcp/zcode-schema.mjs';
+import { ZCODE_SERVER_FIELDS_ALLOWLIST } from '../../../lib/clients/integration/mcp/zcode-schema.mjs';
 import { buildAiosPiMcpServers } from '../../../lib/components/pi/mcp-adapter.mjs';
 import { getClientMcpTarget, getClientInstructionFileName, ALL_CLIENTS } from '../../../lib/clients/registry.mjs';
 

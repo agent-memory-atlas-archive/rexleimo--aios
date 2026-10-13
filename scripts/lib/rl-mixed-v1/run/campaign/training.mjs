@@ -1,5 +1,5 @@
-﻿import { applyPointerTransition } from '../../../rl-core/checkpoint-registry.mjs';
-import { applyTrajectoryUpdate, runOnlineUpdateBatch } from '../../../rl-core/trainer.mjs';
+﻿import { applyPointerTransition } from '../../../rl-core/state/checkpoint-registry.mjs';
+import { applyTrajectoryUpdate, runOnlineUpdateBatch } from '../../../rl-core/learning/trainer.mjs';
 import { buildBatchCombinations } from '../../evidence/control.mjs';
 import { clone } from '../../shared.mjs';
 import { summarizeBanditRewardRows } from '../../rewards/reward-tuning.mjs';

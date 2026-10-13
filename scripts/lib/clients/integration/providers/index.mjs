@@ -1,5 +1,5 @@
-import { resolveClientsWithCapability } from '../capabilities/index.mjs';
-import { getClientRuntimeId } from '../runtime/identifiers.mjs';
+import { resolveClientsWithCapability } from '../../reporting/capabilities/index.mjs';
+import { getClientRuntimeId } from '../../execution/runtime/identifiers.mjs';
 
 // 纯函数：返回 team workflow 支持的 provider，opencode 等不支持者会被显式过滤。
 export function resolveClientTeamProviders(client = 'all') {

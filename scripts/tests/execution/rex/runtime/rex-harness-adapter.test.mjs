@@ -9,7 +9,7 @@ import {
   startSoftwareWorkflow,
   supportedClients,
 } from '../../../../../rex-harness/src/index.mjs';
-import { resolveClientsWithCapability } from '../../../../lib/clients/capabilities/index.mjs';
+import { resolveClientsWithCapability } from '../../../../lib/clients/reporting/capabilities/index.mjs';
 import {
   AIOS_REX_PROVIDER_BINDINGS,
   advanceAiosSoftwareWorkflow,

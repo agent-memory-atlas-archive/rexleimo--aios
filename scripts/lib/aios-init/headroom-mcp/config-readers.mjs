@@ -3,8 +3,8 @@ import path from 'node:path';
 
 import { parse as parseYaml } from 'yaml';
 
-import { resolveClientFromRuntimeId } from '../../clients/runtime/identifiers.mjs';
-import { resolveClientMcpTargetPaths } from '../../clients/native/index.mjs';
+import { resolveClientFromRuntimeId } from '../../clients/execution/runtime/identifiers.mjs';
+import { resolveClientMcpTargetPaths } from '../../clients/integration/native/index.mjs';
 import { getClientHomes } from '../../platform/paths.mjs';
 
 function objectRecord(value) {

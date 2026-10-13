@@ -1,5 +1,5 @@
 import { createControlStateStore, applyControlEvent, readControlSnapshot, writeControlSnapshot } from '../control-state-store.mjs';
-import { runOnlineUpdateBatch } from '../trainer.mjs';
+import { runOnlineUpdateBatch } from '../../learning/trainer.mjs';
 import { processCollectionEpisode } from './collection.mjs';
 import { createInitialSnapshot } from './epoch-state.mjs';
 import { pullAdmittedEpisode } from './episode-source.mjs';

@@ -17,7 +17,7 @@ import {
 } from '../../../../lib/interception/index.mjs';
 import { CLIENT_ORDER } from '../../../../lib/interception/transport/clients/capabilities.mjs';
 import { readMetricsRecords } from '../../../../lib/interception/observability/metrics/metrics-sink.mjs';
-import { ALL_CLIENTS } from '../../../../lib/clients/core/definitions.mjs';
+import { ALL_CLIENTS } from '../../../../lib/clients/selection/core/definitions.mjs';
 
 const PRE_SEND_SENTINEL = 'UNIQUE_PRE_SEND_AGENT_PROMPT_SENTINEL';
 const POST_RECEIVE_SENTINEL = 'UNIQUE_POST_RECEIVE_AGENT_OUTPUT_SENTINEL';

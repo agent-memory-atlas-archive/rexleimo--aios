@@ -1,4 +1,4 @@
-import { validateHoldoutValidationResult } from '../rl-core/schema.mjs';
+import { validateHoldoutValidationResult } from '../rl-core/state/schema.mjs';
 import { compareOrchestratorAgainstReference, createOrchestratorHarness, runOrchestratorEpisode } from './adapter.mjs';
 import { createCiFixtureOrchestratorHarness } from './decision-runner.mjs';
 import { validateOrchestratorHoldoutResult } from './schema.mjs';

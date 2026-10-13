@@ -1,4 +1,4 @@
-﻿import { computeContextualBanditPolicyDistribution, evaluateContextualBanditOpe } from '../../rl-core/ope-eval.mjs';
+﻿import { computeContextualBanditPolicyDistribution, evaluateContextualBanditOpe } from '../../rl-core/learning/ope-eval.mjs';
 import { clamp } from '../shared.mjs';
 import { ORCHESTRATOR_OPE_DEFAULT } from '../rewards/reward-config.mjs';
 

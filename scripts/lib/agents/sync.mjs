@@ -12,8 +12,8 @@ import { renderCodexAgent } from './emitters/codex.mjs';
 import { renderGrokAgent } from './emitters/grok.mjs';
 import { renderOpencodeAgent } from './emitters/opencode.mjs';
 import { loadCanonicalAgents } from './source-tree.mjs';
-import { resolveClientAgentTargets } from '../clients/capabilities/index.mjs';
-import { getClientAgentTargetRoot } from '../clients/paths/index.mjs';
+import { resolveClientAgentTargets } from '../clients/reporting/capabilities/index.mjs';
+import { getClientAgentTargetRoot } from '../clients/integration/paths/index.mjs';
 
 const TARGET_ROOTS = Object.fromEntries(
   resolveClientAgentTargets('all').map((target) => [target, getClientAgentTargetRoot(target)])

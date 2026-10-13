@@ -1,1 +1,1 @@
-export { applyPointerTransition } from '../../rl-core/checkpoint-registry.mjs';
+export { applyPointerTransition } from '../../rl-core/state/checkpoint-registry.mjs';

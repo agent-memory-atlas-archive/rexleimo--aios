@@ -1,4 +1,4 @@
-import { validateComparisonResult } from './schema.mjs';
+import { validateComparisonResult } from '../state/schema.mjs';
 
 export function normalizeEpisodeComparison(episode) {
   const normalized = {

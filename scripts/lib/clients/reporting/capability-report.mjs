@@ -4,9 +4,9 @@ import {
   ALL_CLIENTS,
   getClientMcpTarget,
   getClientRuntimeId,
-} from './registry.mjs';
-import { buildAgentCatalogue } from '../agents/catalogue.mjs';
-import { listWorkflowRecipes } from '../workflows/recipes.mjs';
+} from '../registry.mjs';
+import { buildAgentCatalogue } from '../../agents/catalogue.mjs';
+import { listWorkflowRecipes } from '../../workflows/recipes.mjs';
 import {
   readHostCapabilities,
   statusForClient,
@@ -34,7 +34,7 @@ export async function buildClientCapabilityReport({
     workflowsReady: workflowRecipeReport.summary.blockedWorkflowIds.length === 0,
   };
   const clients = await Promise.all(ALL_CLIENTS.map(async (clientId) => {
-    const CLIENT_DEFINITIONS = (await import('./registry.mjs')).CLIENT_DEFINITIONS;
+    const CLIENT_DEFINITIONS = (await import('../registry.mjs')).CLIENT_DEFINITIONS;
     const definition = CLIENT_DEFINITIONS[clientId];
     const status = statusForClient(clientId);
     const verification = await readClientVerification(clientId, { rootDir, evidenceRoot });

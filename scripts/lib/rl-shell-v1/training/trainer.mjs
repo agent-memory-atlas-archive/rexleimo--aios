@@ -1,1 +1,1 @@
-export * from '../../rl-core/trainer.mjs';
+export * from '../../rl-core/learning/trainer.mjs';

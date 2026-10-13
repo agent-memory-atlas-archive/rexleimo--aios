@@ -3,7 +3,7 @@ import {
   createControlStateStore as createCoreControlStateStore,
   readControlSnapshot,
   writeControlSnapshot,
-} from '../../rl-core/control-state-store.mjs';
+} from '../../rl-core/control/control-state-store.mjs';
 
 export async function createControlStateStore({ rootDir }) {
   return createCoreControlStateStore({

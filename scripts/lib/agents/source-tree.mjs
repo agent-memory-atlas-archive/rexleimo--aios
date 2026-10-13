@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { resolveClientAgentTargets } from '../clients/capabilities/index.mjs';
+import { resolveClientAgentTargets } from '../clients/reporting/capabilities/index.mjs';
 import { parseFrontmatter } from '../skills/frontmatter.mjs';
 
 const ROOT_DIR_NAME = 'agent-sources';

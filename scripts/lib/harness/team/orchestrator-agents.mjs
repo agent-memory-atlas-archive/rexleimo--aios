@@ -5,7 +5,7 @@ import {
   renderManagedAgentContent,
 } from '../../agents/emitters/shared.mjs';
 import { resolveAgentTargets, syncCanonicalAgents } from '../../agents/sync.mjs';
-import { resolveClientAgentTargets } from '../../clients/capabilities/index.mjs';
+import { resolveClientAgentTargets } from '../../clients/reporting/capabilities/index.mjs';
 
 const LEGACY_TARGET_MAP = {
   '.claude/agents': 'claude',

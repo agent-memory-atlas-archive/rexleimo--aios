@@ -4,7 +4,7 @@ import { INTERCEPTION_PACKET_TYPE } from '../core/types.mjs';
 import { buildCapabilityMatrix, CLIENT_ORDER } from '../../transport/clients/capabilities.mjs';
 import { estimateTokensFromBytes } from '../../observability/metrics/token-estimator.mjs';
 import { writeMetricsRecord } from '../../observability/metrics/metrics-sink.mjs';
-import { ALL_CLIENTS } from '../../../clients/core/definitions.mjs';
+import { ALL_CLIENTS } from '../../../clients/selection/core/definitions.mjs';
 
 export const TURN_COMPRESSION_CLIENT_IDS = Object.freeze(unique([
   ...CLIENT_ORDER,

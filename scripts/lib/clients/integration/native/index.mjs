@@ -3,11 +3,11 @@ import path from 'node:path';
 import {
   CLIENT_DEFINITIONS,
   CLIENT_MCP_TARGETS,
-} from '../core/definitions.mjs';
+} from '../../selection/core/definitions.mjs';
 import {
   assertKnownClient,
   normalizeClientValue,
-} from '../core/selection.mjs';
+} from '../../selection/core/selection.mjs';
 
 // 纯函数：读取单个客户端定义，不触发任何文件系统或环境副作用。
 function getClientDefinition(client) {

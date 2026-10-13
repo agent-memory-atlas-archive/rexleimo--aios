@@ -1,4 +1,4 @@
-﻿import { applyPointerTransition } from '../../../rl-core/checkpoint-registry.mjs';
+﻿import { applyPointerTransition } from '../../../rl-core/state/checkpoint-registry.mjs';
 import { loadPolicyCheckpoint, persistPolicyCheckpoint } from '../../policy/checkpoint.mjs';
 import { clone } from '../../shared.mjs';
 

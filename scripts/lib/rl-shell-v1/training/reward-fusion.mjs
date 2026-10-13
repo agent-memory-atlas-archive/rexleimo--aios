@@ -2,7 +2,7 @@ import {
   computeTerminalReward,
   fuseReward as fuseCoreReward,
   summarizeReward,
-} from '../../rl-core/reward-engine.mjs';
+} from '../../rl-core/learning/reward-engine.mjs';
 
 const SHELL_TO_CORE_CALL_STATUS = {
   ok: 'complete',

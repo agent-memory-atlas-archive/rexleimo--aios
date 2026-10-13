@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { loadCanonicalAgents } from '../../../../lib/agents/source-tree.mjs';
 import { parseArgs } from '../../../../lib/cli/parse-args.mjs';
 import { getCommandHelpText } from '../../../../lib/cli/help.mjs';
-import { CLIENT_CAPABILITIES, CLIENT_DEFINITIONS } from '../../../../lib/clients/core/definitions.mjs';
+import { CLIENT_CAPABILITIES, CLIENT_DEFINITIONS } from '../../../../lib/clients/selection/core/definitions.mjs';
 import { runDoctorSuite } from '../../../../lib/doctor/aggregate.mjs';
 import { normalizeComponents } from '../../../../lib/lifecycle/govern/options.mjs';
 import { listWorkflowRecipes } from '../../../../lib/workflows/recipes.mjs';

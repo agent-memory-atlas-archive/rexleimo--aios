@@ -1,9 +1,9 @@
-import { captureCommand } from '../platform/process.mjs';
+import { captureCommand } from '../../platform/process.mjs';
 import {
   buildRuntimeClientProviderMap,
   getClientCommandName,
   resolveClientRuntimeIds,
-} from '../clients/registry.mjs';
+} from '../../clients/registry.mjs';
 import { validateTeacherResponse } from './schema.mjs';
 
 const RUNTIME_CLIENT_PROVIDER_MAP = buildRuntimeClientProviderMap('all');

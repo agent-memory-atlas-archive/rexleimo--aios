@@ -1,5 +1,5 @@
-import { ALL_CLIENTS } from '../../clients/core/definitions.mjs';
-import { getClientInstructionFileName } from '../../clients/native/index.mjs';
+import { ALL_CLIENTS } from '../../clients/selection/core/definitions.mjs';
+import { getClientInstructionFileName } from '../../clients/integration/native/index.mjs';
 
 export const CRG_MCP_ALIAS = 'code-review-graph';
 export const STATE_FILE_NAME = 'codemap.json';

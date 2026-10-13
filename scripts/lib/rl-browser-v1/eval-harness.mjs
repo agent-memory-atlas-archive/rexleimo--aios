@@ -1,4 +1,4 @@
-import { validateHoldoutValidationResult } from '../rl-core/schema.mjs';
+import { validateHoldoutValidationResult } from '../rl-core/state/schema.mjs';
 import { compareBrowserAgainstReference, runBrowserEpisode } from './adapter.mjs';
 import { createFixtureBrowserDriver } from './browser-runner.mjs';
 import { validateBrowserHoldoutResult, validateBrowserTask } from './schema.mjs';

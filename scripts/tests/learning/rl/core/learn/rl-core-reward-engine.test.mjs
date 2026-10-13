@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('rl-core reward engine implements full fused-reward math and teacher-term clamping', async () => {
-  const mod = await import('../../../../../lib/rl-core/reward-engine.mjs');
+  const mod = await import('../../../../../lib/rl-core/learning/reward-engine.mjs');
 
   assert.deepEqual(
     mod.fuseReward({ terminalReward: 1, shapingScore: -1, callStatus: 'complete' }),
@@ -23,7 +23,7 @@ test('rl-core reward engine implements full fused-reward math and teacher-term c
 });
 
 test('rl-core reward engine computes terminal rewards from baseline, final, and new failures', async () => {
-  const mod = await import('../../../../../lib/rl-core/reward-engine.mjs');
+  const mod = await import('../../../../../lib/rl-core/learning/reward-engine.mjs');
 
   assert.equal(
     mod.computeTerminalReward({

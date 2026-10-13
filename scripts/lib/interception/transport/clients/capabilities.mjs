@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ALL_CLIENTS } from '../../../clients/core/definitions.mjs';
+import { ALL_CLIENTS } from '../../../clients/selection/core/definitions.mjs';
 
 export {
   buildAiosMcpProxyServer,

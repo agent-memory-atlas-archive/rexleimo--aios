@@ -13,7 +13,7 @@ import test from 'node:test';
  *
  *   - `scripts/lib/rl-orchestrator-v1/decision-runner/shared.mjs` (`normalizeText`, A8,
  *     v6.0.7) — repaired 10 tests.
- *   - `scripts/lib/rl-core/trainer/core.mjs` (`computeHash`, audit F1, v6.0.12) — latent
+ *   - `scripts/lib/rl-core/learning/trainer/core.mjs` (`computeHash`, audit F1, v6.0.12) — latent
  *     because `bandit-state.mjs` seeds `rngState` first, so the branch rarely ran.
  *
  * Repairing instances twice without a guard is what let the class recur, so the rule is

@@ -1,4 +1,4 @@
-import { reduceDegradationStreak as reduceDegradationStreakFromResults } from '../comparison-engine.mjs';
+import { reduceDegradationStreak as reduceDegradationStreakFromResults } from '../../learning/comparison-engine.mjs';
 
 // 纯函数：根据监控摘要和安全门结果决定 epoch 下一步状态。
 export function computeEpochOutcome({

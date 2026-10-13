@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { CLIENT_DEFINITIONS } from '../../../lib/clients/core/definitions.mjs';
+import { CLIENT_DEFINITIONS } from '../../../lib/clients/selection/core/definitions.mjs';
 import {
   INTEGRATION_CLIENT_TABLE,
   formatInvocation,

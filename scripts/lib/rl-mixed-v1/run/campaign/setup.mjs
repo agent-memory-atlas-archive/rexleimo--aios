@@ -1,5 +1,5 @@
-﻿import { applyControlEvent, createControlStateStore, readControlSnapshot, writeControlSnapshot } from '../../../rl-core/control-state-store.mjs';
-import { createTrainerConfig } from '../../../rl-core/trainer.mjs';
+﻿import { applyControlEvent, createControlStateStore, readControlSnapshot, writeControlSnapshot } from '../../../rl-core/control/control-state-store.mjs';
+import { createTrainerConfig } from '../../../rl-core/learning/trainer.mjs';
 import { createDefaultAdapters } from '../../adapters.mjs';
 import { buildControlSnapshot, normalizeEnvironmentCounts } from '../../evidence/control.mjs';
 import {

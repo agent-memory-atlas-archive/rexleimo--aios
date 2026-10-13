@@ -4,7 +4,7 @@
 // "unverified" 并打印待人工执行的命令，而不是假装已安装成功。
 import path from 'node:path';
 
-import { CLIENT_DEFINITIONS } from '../clients/core/definitions.mjs';
+import { CLIENT_DEFINITIONS } from '../clients/selection/core/definitions.mjs';
 
 // 覆盖顺序：先本机已实测的客户端，再是证据不足的客户端。
 export const INTEGRATION_CLIENT_ORDER = Object.freeze([

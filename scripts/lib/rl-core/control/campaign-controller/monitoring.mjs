@@ -1,10 +1,10 @@
-import { applyPointerTransition } from '../checkpoint-registry.mjs';
+import { applyPointerTransition } from '../../state/checkpoint-registry.mjs';
 import {
   normalizeEpisodeComparison,
   reduceDegradationStreak as reduceDegradationStreakFromResults,
   summarizeComparisonResults,
-} from '../comparison-engine.mjs';
-import { recordComparisonResults, reopenEpoch } from '../epoch-ledger.mjs';
+} from '../../learning/comparison-engine.mjs';
+import { recordComparisonResults, reopenEpoch } from '../../state/epoch-ledger.mjs';
 import { buildEpoch, buildPointerState } from './epoch-state.mjs';
 import { computeEpochOutcome } from './outcome.mjs';
 import { formatSequenceId } from './ids.mjs';

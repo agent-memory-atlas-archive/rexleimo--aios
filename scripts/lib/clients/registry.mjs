@@ -8,10 +8,10 @@ export {
   CLIENT_MCP_TARGETS,
   CLIENT_SELECTIONS,
   SHARED_AGENT_SKILL_ROOT,
-} from './core/definitions.mjs';
+} from './selection/core/definitions.mjs';
 export {
   orderByPriority,
-} from './core/ordering.mjs';
+} from './selection/core/ordering.mjs';
 export {
   assertKnownCapability,
   assertKnownClient,
@@ -20,7 +20,7 @@ export {
   normalizeCapabilityValue,
   normalizeClientValue,
   resolveClientSelection,
-} from './core/selection.mjs';
+} from './selection/core/selection.mjs';
 export {
   getClientCapability,
   resolveClientAgentTargets,
@@ -28,21 +28,21 @@ export {
   resolveClientNativeClients,
   resolveClientsWithCapability,
   supportsClientCapability,
-} from './capabilities/index.mjs';
+} from './reporting/capabilities/index.mjs';
 export {
   getClientAgentTargetRoot,
   getClientNativeMetadataRoot,
   getClientProjectSkillRoot,
   getClientSkillFormat,
   resolveClientSkillRoots,
-} from './paths/index.mjs';
+} from './integration/paths/index.mjs';
 export {
   getClientInstructionFileName,
   getClientMcpTarget,
   getClientNativeProjectSourceFile,
   resolveClientMcpTargetPath,
   resolveClientMcpTargetPaths,
-} from './native/index.mjs';
+} from './integration/native/index.mjs';
 export {
   buildRuntimeClientProviderMap,
   buildRuntimeClientModelArgs,
@@ -60,12 +60,12 @@ export {
   resolveClientFromCommandName,
   resolveClientFromRuntimeId,
   resolveClientRuntimeIds,
-} from './runtime/index.mjs';
+} from './execution/runtime/index.mjs';
 export {
   buildTeamProviderRuntimeClientMap,
   resolveClientHarnessProviders,
   resolveClientTeamProviders,
-} from './providers/index.mjs';
+} from './integration/providers/index.mjs';
 export {
   buildClientCapabilityReport,
-} from './capability-report.mjs';
+} from './reporting/capability-report.mjs';

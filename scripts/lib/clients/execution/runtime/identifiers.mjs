@@ -1,9 +1,9 @@
-import { CLIENT_DEFINITIONS } from '../core/definitions.mjs';
+import { CLIENT_DEFINITIONS } from '../../selection/core/definitions.mjs';
 import {
   assertKnownClient,
   normalizeClientValue,
   resolveClientSelection,
-} from '../core/selection.mjs';
+} from '../../selection/core/selection.mjs';
 
 // 纯函数：读取单个客户端运行时定义，不依赖 PATH、环境变量或文件系统。
 export function getClientRuntimeDefinition(client) {

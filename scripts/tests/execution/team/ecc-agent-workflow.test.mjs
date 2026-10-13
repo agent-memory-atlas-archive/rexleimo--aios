@@ -6,7 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { buildAgentCatalogue } from '../../../lib/agents/catalogue.mjs';
-import { buildClientCapabilityReport } from '../../../lib/clients/capability-report.mjs';
+import { buildClientCapabilityReport } from '../../../lib/clients/reporting/capability-report.mjs';
 import { buildAiosStatus } from '../../../lib/lifecycle/fleet/status.mjs';
 import { buildWorkflowDryRun, listWorkflowRecipes } from '../../../lib/workflows/recipes.mjs';
 import { parseArgs } from '../../../lib/cli/parse-args.mjs';

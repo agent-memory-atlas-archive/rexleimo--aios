@@ -174,6 +174,6 @@ test('I8 the on-disk scanner still resolves hub modules and the real test univer
   const index = buildImpactIndex({ rootDir: ROOT, testFiles: universe });
   assert.deepEqual(index.unreadable, [], 'every scanned file must be readable');
   // 客户端注册表是全仓枢纽：扫描器一旦改坏，这里会立刻掉到 0，而不是静默漏测。
-  assert.equal(index.dependents.get('scripts/lib/clients/core/definitions.mjs').length > 80, true);
+  assert.equal(index.dependents.get('scripts/lib/clients/selection/core/definitions.mjs').length > 80, true);
   assert.equal(index.dependents.get('scripts/lib/platform/paths.mjs').length > 30, true);
 });

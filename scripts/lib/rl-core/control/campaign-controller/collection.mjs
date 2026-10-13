@@ -1,5 +1,5 @@
-import { applyPointerTransition } from '../checkpoint-registry.mjs';
-import { reopenEpoch } from '../epoch-ledger.mjs';
+import { applyPointerTransition } from '../../state/checkpoint-registry.mjs';
+import { reopenEpoch } from '../../state/epoch-ledger.mjs';
 import { buildEpoch, buildPointerState } from './epoch-state.mjs';
 import { formatSequenceId } from './ids.mjs';
 

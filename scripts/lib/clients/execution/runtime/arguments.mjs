@@ -1,7 +1,7 @@
 import {
   isKnownClient,
   normalizeClientValue,
-} from '../core/selection.mjs';
+} from '../../selection/core/selection.mjs';
 import {
   getClientRuntimeDefinition,
   resolveClientFromCommandName,

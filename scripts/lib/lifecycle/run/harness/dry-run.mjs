@@ -3,7 +3,7 @@ import path from 'node:path';
 import { resolveContextDbRoot } from '../../../aios/state-root.mjs';
 import { checkSoloHarnessProfileReadiness } from '../../../harness/solo/solo-profiles.mjs';
 import { resolveClientSkillRoots } from '../../../clients/registry.mjs';
-import { CLIENT_MCP_TARGETS } from '../../../clients/core/definitions.mjs';
+import { CLIENT_MCP_TARGETS } from '../../../clients/selection/core/definitions.mjs';
 
 const SKILL_DIRS = resolveClientSkillRoots('all');
 

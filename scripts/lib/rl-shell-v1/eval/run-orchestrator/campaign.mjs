@@ -5,7 +5,7 @@ import { loadTaskRegistry } from '../../registry/task-registry.mjs';
 import { buildMixedReplayBatch } from '../../training/trainer.mjs';
 import { pickBestCheckpoint } from '../eval-harness.mjs';
 import { loadReplayPool } from '../../registry/replay-pool.mjs';
-import { runOnlineCampaign } from '../../../rl-core/campaign-controller.mjs';
+import { runOnlineCampaign } from '../../../rl-core/control/campaign-controller.mjs';
 import { runRealShadowEval } from './shadow-eval.mjs';
 import { runTrainingRun } from './training-run.mjs';
 

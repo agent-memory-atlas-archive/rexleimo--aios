@@ -1,5 +1,5 @@
-import { validateMixedEpisode, validateReplayCandidate } from '../rl-core/schema.mjs';
-import { classifyReplayRoute } from '../rl-core/replay-pool.mjs';
+import { validateMixedEpisode, validateReplayCandidate } from '../rl-core/state/schema.mjs';
+import { classifyReplayRoute } from '../rl-core/learning/replay-pool.mjs';
 import { createFixtureBrowserDriver } from './browser-runner.mjs';
 import { validateBrowserEvidence, validateBrowserTask } from './schema.mjs';
 import { loadBrowserTasks, sampleBrowserTask } from './task-registry.mjs';

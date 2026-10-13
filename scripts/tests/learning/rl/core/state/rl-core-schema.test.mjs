@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('validateCheckpointLineage accepts canonical active/pre_update_ref/last_stable pointers', async () => {
-  const mod = await import('../../../../../lib/rl-core/schema.mjs');
+  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
   assert.doesNotThrow(() => mod.validateCheckpointLineage({
     active_checkpoint_id: 'ckpt-a',
     pre_update_ref_checkpoint_id: null,
@@ -11,7 +11,7 @@ test('validateCheckpointLineage accepts canonical active/pre_update_ref/last_sta
 });
 
 test('validateComparisonResult requires relative_outcome for completed comparisons', async () => {
-  const mod = await import('../../../../../lib/rl-core/schema.mjs');
+  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
   assert.throws(
     () => mod.validateComparisonResult({
       comparison_status: 'completed',
@@ -26,7 +26,7 @@ test('validateComparisonResult requires relative_outcome for completed compariso
 });
 
 test('validateReplayCandidate rejects training admission for diagnostic_only routes', async () => {
-  const mod = await import('../../../../../lib/rl-core/schema.mjs');
+  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
   assert.throws(
     () => mod.validateReplayCandidate({
       replay_route: 'diagnostic_only',
@@ -41,7 +41,7 @@ test('validateReplayCandidate rejects training admission for diagnostic_only rou
 });
 
 test('validateTeacherResponse enforces normalized backend, call_status, and shaping bounds', async () => {
-  const mod = await import('../../../../../lib/rl-core/schema.mjs');
+  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
   assert.doesNotThrow(() => mod.validateTeacherResponse({
     backend_used: 'codex-cli',
     call_status: 'complete',
@@ -66,7 +66,7 @@ test('validateTeacherResponse enforces normalized backend, call_status, and shap
 });
 
 test('validateOnlineUpdateResult requires deterministic batch and checkpoint ids', async () => {
-  const mod = await import('../../../../../lib/rl-core/schema.mjs');
+  const mod = await import('../../../../../lib/rl-core/state/schema.mjs');
   assert.doesNotThrow(() => mod.validateOnlineUpdateResult({
     status: 'ok',
     batch_id: 'batch-001',

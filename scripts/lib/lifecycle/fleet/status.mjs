@@ -1,5 +1,5 @@
 import { buildAgentCatalogue } from '../../agents/catalogue.mjs';
-import { buildClientCapabilityReport } from '../../clients/capability-report.mjs';
+import { buildClientCapabilityReport } from '../../clients/reporting/capability-report.mjs';
 import { listWorkflowRecipes } from '../../workflows/recipes.mjs';
 
 export async function buildAiosStatus({
