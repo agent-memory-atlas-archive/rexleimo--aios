@@ -2,13 +2,13 @@
   LOCAL_CONTROL_EXECUTOR,
   LOCAL_MERGE_GATE_EXECUTOR,
   LOCAL_PHASE_EXECUTOR,
-} from '../orchestrator-executors.mjs';
+} from '../../orchestrator-executors.mjs';
 
 export const EXECUTOR_CAPABILITY_KEYS = Object.freeze(['read', 'write', 'network', 'browser', 'sideEffect']);
 const EXECUTOR_CAPABILITY_LEVELS = new Set(['yes', 'no', 'unknown']);
 const EXECUTOR_CAPABILITY_KEY_SET = new Set(EXECUTOR_CAPABILITY_KEYS);
 
-import { normalizeText } from '../../../../../src/shared/normalize.mjs';
+import { normalizeText } from '../../../../../../src/shared/normalize.mjs';
 
 // 纯函数：把能力值收敛到统一枚举，避免报告、策略、质量门各自处理异常输入。
 export function normalizeExecutorCapabilityLevel(value, fallback = 'unknown') {

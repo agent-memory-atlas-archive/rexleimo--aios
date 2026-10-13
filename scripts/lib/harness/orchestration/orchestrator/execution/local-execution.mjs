@@ -1,9 +1,9 @@
-import { normalizeHandoffPayload } from '../../solo/handoff.mjs';
-import { createLocalDispatchExecutorRegistry, resolveLocalDispatchExecutor } from '../orchestrator-executors.mjs';
+import { normalizeHandoffPayload } from '../../../solo/handoff.mjs';
+import { createLocalDispatchExecutorRegistry, resolveLocalDispatchExecutor } from '../../orchestrator-executors.mjs';
 import { createHandoffFromPhase, mergeParallelHandoffs } from './handoffs.mjs';
-import { normalizeDispatchPlan } from './normalizers.mjs';
-import { buildLocalDispatchPlan } from './local-dispatch-plan.mjs';
-import { buildOrchestrationPlan, collectExecutorDetails } from './plan.mjs';
+import { normalizeDispatchPlan } from '../reporting/normalizers.mjs';
+import { buildLocalDispatchPlan } from '../planning/local-dispatch-plan.mjs';
+import { buildOrchestrationPlan, collectExecutorDetails } from '../planning/plan.mjs';
 
 export function getPhaseForJob(plan, job) {
   return plan.phases.find((phase) => phase.id === job.phaseId);

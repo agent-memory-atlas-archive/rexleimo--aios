@@ -1,4 +1,4 @@
-﻿import { normalizeText } from './shared.mjs';
+﻿import { normalizeText } from '../shared.mjs';
 import { normalizeWorkItems } from './work-items.mjs';
 
 // 纯函数集合：把外部 dispatch/overlay 输入规整成稳定 schema，主流程不再写 if/else 容错。

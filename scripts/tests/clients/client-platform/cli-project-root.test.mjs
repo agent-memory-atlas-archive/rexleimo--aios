@@ -83,8 +83,8 @@ test('the project root channel is declared in the parser, specs, and help text',
   for (const relativePath of [
     'lib/cli/parse-args/top-level.mjs',
     'lib/cli/parse-args/platform/internal.mjs',
-    'lib/cli/commander/specs/lifecycle.mjs',
-    'lib/cli/commander/specs/internal.mjs',
+    'lib/cli/commander/specs/core/lifecycle.mjs',
+    'lib/cli/commander/specs/io/internal.mjs',
     'lib/cli/help/commands/basic.mjs',
   ]) {
     assert.match(read(relativePath), /--project-root <path>/u, `${relativePath} must document the flag`);

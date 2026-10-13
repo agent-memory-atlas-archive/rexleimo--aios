@@ -1,7 +1,7 @@
 import { MERGE_GATE_BLOCK_STATUSES, MERGE_GATE_CONFLICT_RULE } from './blueprints.mjs';
-import { LOCAL_PHASE_EXECUTOR } from '../orchestrator-executors.mjs';
+import { LOCAL_PHASE_EXECUTOR } from '../../orchestrator-executors.mjs';
 import { collectExecutorDetails, resolvePhaseExecutorSelection, buildOrchestrationPlan } from './plan.mjs';
-import { normalizeWorkItems } from './work-items.mjs';
+import { normalizeWorkItems } from '../reporting/work-items.mjs';
 import {
   assertEditableParallelOwnership,
   buildBoundedWorkItemQueue,
@@ -10,7 +10,7 @@ import {
   createPhaseJobWithOverrides,
   getDispatchParallelism,
   resolveWorkItemsForPhase,
-} from './local-jobs.mjs';
+} from '../execution/local-jobs.mjs';
 
 export function buildLocalDispatchPlan(input = {}, options = {}) {
   const plan = Array.isArray(input.phases) ? input : buildOrchestrationPlan(input);

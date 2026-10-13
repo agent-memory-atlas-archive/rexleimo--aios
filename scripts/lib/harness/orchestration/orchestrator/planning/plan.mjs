@@ -1,8 +1,8 @@
-import { LOCAL_PHASE_EXECUTOR, listLocalDispatchExecutors } from '../orchestrator-executors.mjs';
-import { normalizeExecutorCapabilityManifest } from './executor-capabilities.mjs';
+import { LOCAL_PHASE_EXECUTOR, listLocalDispatchExecutors } from '../../orchestrator-executors.mjs';
+import { normalizeExecutorCapabilityManifest } from '../execution/executor-capabilities.mjs';
 import { getOrchestratorBlueprint } from './blueprints.mjs';
-import { normalizeText } from './shared.mjs';
-import { buildDecomposedWorkItems, normalizeWorkItems } from './work-items.mjs';
+import { normalizeText } from '../shared.mjs';
+import { buildDecomposedWorkItems, normalizeWorkItems } from '../reporting/work-items.mjs';
 import {
   normalizeDispatchEvidence,
   normalizeDispatchPlan,
@@ -10,7 +10,7 @@ import {
   normalizeDispatchPreflight,
   normalizeDispatchRun,
   normalizeLearnEvalOverlay,
-} from './normalizers.mjs';
+} from '../reporting/normalizers.mjs';
 
 export function collectExecutorDetails(jobs = []) {
   const usedExecutorIds = new Set(

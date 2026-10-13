@@ -1,5 +1,5 @@
 // 中文注释：provider 候选来自客户端能力注册表，新增客户端时帮助文本不再滞后。
-import { getClientHelpList } from '../../../clients/registry.mjs';
+import { getClientHelpList } from '../../../../clients/registry.mjs';
 
 function providerHelpChoices() {
   return getClientHelpList().clientNames.join(', ');

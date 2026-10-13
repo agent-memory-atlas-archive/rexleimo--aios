@@ -1,4 +1,4 @@
-﻿import { normalizeText } from './shared.mjs';
+﻿import { normalizeText } from '../shared.mjs';
 
 const DEFAULT_WORK_ITEM_LIMIT = 4;
 const DEFAULT_OWNED_PATH_HINTS = Object.freeze(['scripts/', 'mcp-server/', 'docs/']);

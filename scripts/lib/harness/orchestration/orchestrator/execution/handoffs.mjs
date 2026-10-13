@@ -1,6 +1,6 @@
-import { normalizeHandoffPayload, validateHandoffPayload } from '../../solo/handoff.mjs';
-import { ROLE_CARDS } from './blueprints.mjs';
-import { normalizeText } from './shared.mjs';
+import { normalizeHandoffPayload, validateHandoffPayload } from '../../../solo/handoff.mjs';
+import { ROLE_CARDS } from '../planning/blueprints.mjs';
+import { normalizeText } from '../shared.mjs';
 
 export function createHandoffFromPhase(plan, phase, overrides = {}) {
   return normalizeHandoffPayload({

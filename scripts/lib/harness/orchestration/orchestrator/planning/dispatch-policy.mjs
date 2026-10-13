@@ -1,4 +1,4 @@
-import { normalizeDispatchPlan, normalizeDispatchPolicy, normalizeDispatchPreflight } from './normalizers.mjs';
+import { normalizeDispatchPlan, normalizeDispatchPolicy, normalizeDispatchPreflight } from '../reporting/normalizers.mjs';
 
 export function buildRequiredActions(recommendations = []) {
   const seen = new Set();

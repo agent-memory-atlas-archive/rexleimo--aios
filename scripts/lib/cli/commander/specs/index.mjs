@@ -1,15 +1,15 @@
-import { BOOTSTRAP_COMMAND_SPECS } from './bootstrap.mjs';
-import { EXECUTION_COMMAND_SPECS } from './execution.mjs';
-import { HEALTH_COMMAND_SPECS } from './health.mjs';
-import { INTERNAL_COMMAND_SPECS } from './internal.mjs';
-import { INTEGRATION_COMMAND_SPECS } from './integration.mjs';
-import { JUDGMENT_COMMAND_SPECS } from './judgment.mjs';
-import { LIFECYCLE_COMMAND_SPECS } from './lifecycle.mjs';
-import { MEMORY_COMMAND_SPECS } from './memory.mjs';
-import { INSIGHT_COMMAND_SPECS } from './insight.mjs';
-import { TOOL_OUTPUT_COMMAND_SPECS } from './tool-output.mjs';
-import { WORKFLOW_COMMAND_SPECS } from './workflow.mjs';
-import { WORK_COMMAND_SPECS } from './work.mjs';
+import { BOOTSTRAP_COMMAND_SPECS } from './core/bootstrap.mjs';
+import { EXECUTION_COMMAND_SPECS } from './core/execution.mjs';
+import { HEALTH_COMMAND_SPECS } from './intel/health.mjs';
+import { INTERNAL_COMMAND_SPECS } from './io/internal.mjs';
+import { INTEGRATION_COMMAND_SPECS } from './io/integration.mjs';
+import { JUDGMENT_COMMAND_SPECS } from './intel/judgment.mjs';
+import { LIFECYCLE_COMMAND_SPECS } from './core/lifecycle.mjs';
+import { MEMORY_COMMAND_SPECS } from './intel/memory.mjs';
+import { INSIGHT_COMMAND_SPECS } from './intel/insight.mjs';
+import { TOOL_OUTPUT_COMMAND_SPECS } from './io/tool-output.mjs';
+import { WORKFLOW_COMMAND_SPECS } from './core/workflow.mjs';
+import { WORK_COMMAND_SPECS } from './core/work.mjs';
 
 export const COMMAND_SPECS = [
   ...BOOTSTRAP_COMMAND_SPECS,

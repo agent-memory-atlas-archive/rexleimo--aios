@@ -1,5 +1,5 @@
 import { renderOrchestrationReportContent } from './report.mjs';
-import { buildOrchestrationPlan } from './plan.mjs';
+import { buildOrchestrationPlan } from '../planning/plan.mjs';
 
 export function renderOrchestrationReport(input = {}) {
   const plan = Array.isArray(input.phases)

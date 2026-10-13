@@ -1,7 +1,7 @@
 ﻿import {
   EXECUTOR_CAPABILITY_KEYS,
   normalizeExecutorCapabilityManifest,
-} from './executor-capabilities.mjs';
+} from '../execution/executor-capabilities.mjs';
 
 function normalizeWorkItemStatus(value = '') {
   const normalized = String(value || '').trim().toLowerCase();

@@ -1,9 +1,9 @@
-﻿import { resolveModelRoutingForRole } from '../../../model-router.mjs';
-import { resolveAgentRefIdForRole } from '../../team/orchestrator-agents.mjs';
-import { LOCAL_MERGE_GATE_EXECUTOR, LOCAL_PHASE_EXECUTOR } from '../orchestrator-executors.mjs';
-import { MERGE_GATE_BLOCK_STATUSES, MERGE_GATE_CONFLICT_RULE } from './blueprints.mjs';
-import { hasWildcardOwnedPrefix, normalizeOwnedPathPrefixes, normalizeText } from './shared.mjs';
-import { normalizeOwnedPathHints, normalizeWorkItems } from './work-items.mjs';
+﻿import { resolveModelRoutingForRole } from '../../../../model-router.mjs';
+import { resolveAgentRefIdForRole } from '../../../team/orchestrator-agents.mjs';
+import { LOCAL_MERGE_GATE_EXECUTOR, LOCAL_PHASE_EXECUTOR } from '../../orchestrator-executors.mjs';
+import { MERGE_GATE_BLOCK_STATUSES, MERGE_GATE_CONFLICT_RULE } from '../planning/blueprints.mjs';
+import { hasWildcardOwnedPrefix, normalizeOwnedPathPrefixes, normalizeText } from '../shared.mjs';
+import { normalizeOwnedPathHints, normalizeWorkItems } from '../reporting/work-items.mjs';
 
 // 纯函数集合：负责 local dispatch job 构造和路径归属校验。
 export function createPhaseJob(
