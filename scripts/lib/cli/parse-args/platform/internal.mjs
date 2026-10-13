@@ -11,7 +11,7 @@ import {
   normalizeWrapMode,
   parsePositiveInteger,
   parsePrivacyMode,
-} from './shared.mjs';
+} from '../shared.mjs';
 
 // 根据不同 target/action 组合动态构建 Commander spec
 function buildInternalCli(target, action) {

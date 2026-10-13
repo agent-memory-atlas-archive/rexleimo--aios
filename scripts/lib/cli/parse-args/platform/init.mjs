@@ -1,6 +1,6 @@
 /* 中文注释：init 解析只校验 agent 名称和初始化开关——基于 Commander 声明式替代手写 for 循环。 */
 import { Command } from 'commander';
-import { INIT_AGENT_NAMES } from './shared.mjs';
+import { INIT_AGENT_NAMES } from '../shared.mjs';
 
 const INIT_CLI = new Command()
   .name('init')

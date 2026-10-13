@@ -1,10 +1,10 @@
 /* 中文注释：参数解析层识别 interception/refs 子命令，并把它们交给专用分发器。 */
 import { Command } from 'commander';
-import { parseHarnessArgs, parseHudArgs, parseTeamArgs, parseWorkArgs } from './parse-args/execution.mjs';
-import { parseInterceptionArgs } from './parse-args/interception.mjs';
-import { parseIntegrationArgs } from './parse-args/integration.mjs';
-import { parseJudgmentArgs } from './parse-args/judgment.mjs';
-import { parseEvolutionArgs } from './parse-args/evolution.mjs';
+import { parseHarnessArgs, parseHudArgs, parseTeamArgs, parseWorkArgs } from './parse-args/run/execution.mjs';
+import { parseInterceptionArgs } from './parse-args/platform/interception.mjs';
+import { parseIntegrationArgs } from './parse-args/platform/integration.mjs';
+import { parseJudgmentArgs } from './parse-args/govern/judgment.mjs';
+import { parseEvolutionArgs } from './parse-args/knowledge/evolution.mjs';
 import {
   parseCanvasArgs,
   parseDreamArgs,

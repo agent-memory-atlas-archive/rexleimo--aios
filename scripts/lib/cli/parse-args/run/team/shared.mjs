@@ -1,5 +1,5 @@
 /* 中文注释：team 子命令共用归一化逻辑，避免每个解析器重复维护 provider/session 规则。 */
-import { TEAM_PROVIDER_CLIENT_MAP, normalizeTeamProvider } from '../shared.mjs';
+import { TEAM_PROVIDER_CLIENT_MAP, normalizeTeamProvider } from '../../shared.mjs';
 
 export function finalizeTeamProvider(options) {
   options.provider = normalizeTeamProvider(options.provider);

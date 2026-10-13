@@ -1,6 +1,6 @@
 /* 中文注释：team history 解析——基于 Commander 声明式替代手写 for 循环。 */
 import { Command } from 'commander';
-import { normalizeTeamProvider, parsePositiveInteger } from '../shared.mjs';
+import { normalizeTeamProvider, parsePositiveInteger } from '../../shared.mjs';
 import { createDefaultTeamHistoryOptions } from './defaults.mjs';
 import { finalizeTeamProvider, normalizeQualityCategoryPrefixMode, normalizeSinceIso } from './shared.mjs';
 

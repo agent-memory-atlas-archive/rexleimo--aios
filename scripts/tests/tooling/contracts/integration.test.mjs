@@ -40,7 +40,7 @@ import {
   resolveIntegration,
 } from '../../../lib/integrations/registry.mjs';
 import { stripAiosFrontmatter } from '../../../lib/skills/frontmatter.mjs';
-import { parseIntegrationArgs } from '../../../lib/cli/parse-args/integration.mjs';
+import { parseIntegrationArgs } from '../../../lib/cli/parse-args/platform/integration.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..', '..', '..');
 const UPSTREAM_SKILL_MD = `---

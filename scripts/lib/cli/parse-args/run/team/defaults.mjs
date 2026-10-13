@@ -1,5 +1,5 @@
 /* 中文注释：team 默认值集中维护，具体子命令解析器只覆盖自己的字段。 */
-import { TEAM_PROVIDER_CLIENT_MAP } from '../shared.mjs';
+import { TEAM_PROVIDER_CLIENT_MAP } from '../../shared.mjs';
 
 export function createDefaultTeamOptions() {
   return {

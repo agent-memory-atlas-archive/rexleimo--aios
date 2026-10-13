@@ -438,7 +438,7 @@ test('skillIndexScan handles empty skill-sources/', async () => {
 // ---------------------------------------------------------------------------
 
 test('parseSkillArgs recognizes workshop subcommands', async () => {
-  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/skill.mjs');
+  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/govern/skill.mjs');
 
   const proposeParsed = parseSkillArgs(['skill', 'propose', 'my new skill']);
   assert.equal(proposeParsed.options.subcommand, 'propose');
@@ -463,7 +463,7 @@ test('parseSkillArgs recognizes workshop subcommands', async () => {
 });
 
 test('parseSkillArgs validates required positional args for workshop subcommands', async () => {
-  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/skill.mjs');
+  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/govern/skill.mjs');
 
   assert.throws(() => parseSkillArgs(['skill', 'review']), /skill review requires a proposal id/);
   assert.throws(() => parseSkillArgs(['skill', 'apply']), /skill apply requires a proposal id/);
@@ -471,7 +471,7 @@ test('parseSkillArgs validates required positional args for workshop subcommands
 });
 
 test('parseSkillArgs validate --action flags for review', async () => {
-  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/skill.mjs');
+  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/govern/skill.mjs');
 
   const approveParsed = parseSkillArgs(['skill', 'review', 'prop-1', '--approve']);
   assert.equal(approveParsed.options.action, 'approve');
@@ -484,7 +484,7 @@ test('parseSkillArgs validate --action flags for review', async () => {
 });
 
 test('parseSkillArgs defaults index scan to true', async () => {
-  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/skill.mjs');
+  const { parseSkillArgs } = await import('../../../../lib/cli/parse-args/govern/skill.mjs');
   const parsed = parseSkillArgs(['skill', 'index']);
   assert.equal(parsed.options.scan, true);
 });

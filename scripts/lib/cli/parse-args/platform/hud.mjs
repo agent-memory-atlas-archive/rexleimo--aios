@@ -1,4 +1,4 @@
-/* 中文注释：team status 解析——基于 Commander 声明式替代手写 for 循环。 */
+/* 中文注释：hud 解析——基于 Commander 声明式替代手写 for 循环。保留 watch 逻辑等原有业务语义。 */
 import { Command } from 'commander';
 import {
   SKILL_CANDIDATE_VIEWS,
@@ -7,61 +7,57 @@ import {
   normalizeTeamProvider,
   parsePositiveInteger,
   parseWatchInterval,
+  takeValue,
 } from '../shared.mjs';
-import { createDefaultTeamStatusOptions } from './defaults.mjs';
-import { finalizeTeamProvider, hydrateSessionFromResume } from './shared.mjs';
+import { createDefaultHudOptions } from '../shared.mjs';
 
-const TEAM_STATUS_CLI = new Command()
-  .name('team-status')
+const HUD_CLI = new Command()
+  .name('hud')
   .helpOption(false)
   .exitOverride()
-  .allowUnknownOption(true)
-  .allowExcessArguments(true)
-  .argument('[sessionId]')
-  .option('--provider <name>', 'Provider name')
+  .allowUnknownOption(false)
+  .allowExcessArguments(false)
   .option('--session <id>', 'Session ID')
-  .option('--resume <id>', 'Resume from session ID')
-  .option('--preset <name>', 'Display preset')
+  .option('--workspace <path>', 'Workspace root')
+  .option('--provider <name>', 'Provider name')
+  .option('--preset <name>', 'Display preset: focused|minimal|full')
   .option('-w, --watch', 'Watch mode')
   .option('--fast', 'Fast refresh')
   .option('--no-fast', 'Disable fast refresh')
-  .option('--show-skill-candidates [view]', 'Show skill candidates')
-  .option('--skill-candidate-view <view>', 'Skill candidate view')
-  .option('--export-skill-candidate-patch-template', 'Export patch template')
-  .option('--draft-id <id>', 'Draft ID')
+  .option('--show-skill-candidates [view]', 'Show skill candidates (optional view: inline|detail|list)')
+  .option('--skill-candidate-view <view>', 'Skill candidate view: inline|detail|list')
+  .option('--export-skill-candidate-patch-template', 'Export skill candidate patch template')
+  .option('--draft-id <id>', 'Skill candidate draft ID')
   .option('--skill-candidate-limit <n>', 'Max skill candidates')
   .option('--json', 'JSON output')
   .option('--watchdog', 'Watchdog mode')
-  .option('--interval-ms <n>', 'Watch interval (ms or "auto")');
+  .option('--interval-ms <n>', 'Watch interval in ms or "auto"');
 
-export function parseTeamStatusArgs(argv) {
-  const rest = argv.slice(2);
+export function parseHudArgs(argv) {
+  const rest = argv.slice(1);
   const help = rest.includes('-h') || rest.includes('--help');
-  const options = createDefaultTeamStatusOptions();
-  let presetExplicit = false;
-  let fastExplicit = false;
 
   try {
-    const parsed = TEAM_STATUS_CLI.parse(rest, { from: 'user' });
+    const parsed = HUD_CLI.parse(rest, { from: 'user' });
     const flags = parsed.opts();
-    const positionalArgs = parsed.args || [];
+    const options = createDefaultHudOptions();
+    let presetExplicit = false;
+    let fastExplicit = false;
 
-    // 位置参数：sessionId
-    const posSession = positionalArgs.find(a => !String(a).startsWith('-'));
-    if (posSession) options.sessionId = String(posSession).trim();
-
-    if (flags.provider) options.provider = normalizeTeamProvider(flags.provider);
     if (flags.session) options.sessionId = String(flags.session).trim();
-    if (flags.resume) options.resumeSessionId = String(flags.resume).trim();
-    if (flags.preset) { presetExplicit = true; options.preset = normalizeHudPreset(flags.preset); }
+    if (flags.workspace) options.workspaceRoot = String(flags.workspace).trim();
+    if (flags.provider) options.provider = normalizeTeamProvider(flags.provider);
+    if (flags.preset) {
+      presetExplicit = true;
+      options.preset = normalizeHudPreset(flags.preset);
+    }
     if (flags.watch) options.watch = true;
     if (flags.fast) { options.fast = true; fastExplicit = true; }
     if (flags.fast === false) { options.fast = false; fastExplicit = true; }
     if (flags.json) options.json = true;
     if (flags.watchdog) options.watchdog = true;
-    if (flags.intervalMs) options.intervalMs = parseWatchInterval(flags.intervalMs, '--interval-ms');
 
-    // skill-candidates
+    // show-skill-candidates 可以是 boolean 或 string（view 可选值）
     if (flags.showSkillCandidates !== undefined) {
       options.showSkillCandidates = true;
       if (typeof flags.showSkillCandidates === 'string') {
@@ -79,27 +75,46 @@ export function parseTeamStatusArgs(argv) {
       options.exportSkillCandidatePatchTemplate = true;
       options.showSkillCandidates = true;
     }
-    if (flags.draftId) { options.draftId = String(flags.draftId).trim(); options.showSkillCandidates = true; }
+    if (flags.draftId) {
+      options.draftId = String(flags.draftId).trim();
+      options.showSkillCandidates = true;
+    }
     if (flags.skillCandidateLimit) {
       options.skillCandidateLimit = parsePositiveInteger(flags.skillCandidateLimit, '--skill-candidate-limit');
       options.showSkillCandidates = true;
     }
+    if (flags.intervalMs) {
+      options.intervalMs = parseWatchInterval(flags.intervalMs, '--interval-ms');
+    }
 
-    finalizeTeamProvider(options);
-    hydrateSessionFromResume(options);
-    if (options.watch && !presetExplicit) options.preset = 'minimal';
+    // 后处理逻辑
+    if (options.watch && !presetExplicit) {
+      options.preset = 'minimal';
+    }
     const intervalAutoFastEligible = options.intervalMs === 'auto'
       || (Number.isFinite(options.intervalMs) && options.intervalMs <= 500);
-    if (!fastExplicit && options.watch && options.preset === 'minimal' && intervalAutoFastEligible) options.fast = true;
+    if (!fastExplicit && options.watch && options.preset === 'minimal' && intervalAutoFastEligible) {
+      options.fast = true;
+    }
 
-    return { mode: help ? 'help' : 'command', help, command: 'team', options };
+    return {
+      mode: help ? 'help' : 'command',
+      help,
+      command: 'hud',
+      options,
+    };
   } catch (e) {
     if (e instanceof Error && (
       e.message.includes('must be one of') ||
       e.message.includes('must be a positive integer') ||
       e.message.includes('must be a number') ||
-      e.message.includes('must not be empty'))) throw e;
-    finalizeTeamProvider(options);
-    return { mode: 'help', help: true, command: 'team', options };
+      e.message.includes('must not be empty') ||
+      e.message.includes('action must be'))) throw e;
+    return {
+      mode: 'help',
+      help: true,
+      command: 'hud',
+      options: createDefaultHudOptions(),
+    };
   }
 }

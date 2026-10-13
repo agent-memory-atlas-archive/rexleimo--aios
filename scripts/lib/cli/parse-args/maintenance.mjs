@@ -1,12 +1,12 @@
 /* 中文注释：maintenance 是兼容 facade；真实解析已按命令拆到同级模块。 */
-export { parseCanvasArgs, parseRefsArgs } from './offload.mjs';
-export { parseDreamArgs } from './dream.mjs';
-export { parsePlanArgs } from './plan.mjs';
-export { parseInitArgs } from './init.mjs';
-export { parseInternalArgs } from './internal.mjs';
-export { parseMemoArgs } from './memo.mjs';
-export { parseModelRouterArgs } from './model-router.mjs';
-export { parsePerceptionArgs } from './perception.mjs';
-export { parseSearchArgs } from './search.mjs';
-export { parseSessionArgs } from './session.mjs';
-export { parseSkillArgs } from './skill.mjs';
+export { parseCanvasArgs, parseRefsArgs } from './knowledge/offload.mjs';
+export { parseDreamArgs } from './knowledge/dream.mjs';
+export { parsePlanArgs } from './govern/plan.mjs';
+export { parseInitArgs } from './platform/init.mjs';
+export { parseInternalArgs } from './platform/internal.mjs';
+export { parseMemoArgs } from './knowledge/memo.mjs';
+export { parseModelRouterArgs } from './govern/model-router.mjs';
+export { parsePerceptionArgs } from './knowledge/perception.mjs';
+export { parseSearchArgs } from './knowledge/search.mjs';
+export { parseSessionArgs } from './run/session.mjs';
+export { parseSkillArgs } from './govern/skill.mjs';

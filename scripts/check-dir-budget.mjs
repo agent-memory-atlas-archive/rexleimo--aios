@@ -45,7 +45,6 @@ export const BASELINE_COUNTS = Object.freeze({
   'scripts/lib/harness/team/groupchat-runtime': 10,
   'scripts/lib/lifecycle/run/harness': 11,
   'scripts/lib/lifecycle/run/orchestrate': 11,
-  'scripts/lib/cli/parse-args': 25,
   'scripts/lib/harness/subagent-runtime': 24,
   'scripts/lib/rl-shell-v1': 22,
   'agent-sources/roles': 19,

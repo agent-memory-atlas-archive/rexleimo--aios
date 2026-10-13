@@ -7,7 +7,7 @@ import {
   normalizeTeamProvider,
   parsePositiveInteger,
   parseTeamSpec,
-} from '../shared.mjs';
+} from '../../shared.mjs';
 import { createDefaultTeamOptions } from './defaults.mjs';
 import { finalizeTeamProvider, hydrateSessionFromResume } from './shared.mjs';
 

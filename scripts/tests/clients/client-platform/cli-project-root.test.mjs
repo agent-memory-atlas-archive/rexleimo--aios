@@ -82,7 +82,7 @@ test('the project root channel is declared in the parser, specs, and help text',
   const read = (relativePath) => fs.readFileSync(path.join(SCRIPT_ROOT, relativePath), 'utf8');
   for (const relativePath of [
     'lib/cli/parse-args/top-level.mjs',
-    'lib/cli/parse-args/internal.mjs',
+    'lib/cli/parse-args/platform/internal.mjs',
     'lib/cli/commander/specs/lifecycle.mjs',
     'lib/cli/commander/specs/internal.mjs',
     'lib/cli/help/commands/basic.mjs',

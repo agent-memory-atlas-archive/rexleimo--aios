@@ -11,7 +11,7 @@ import {
   normalizeHarnessProfile,
   normalizeSoloHarnessProvider,
   parsePositiveInteger,
-} from './shared.mjs';
+} from '../shared.mjs';
 
 // 中文注释：turn 超时校验与 execute-turn 的 clamp 边界保持一致（1s - 6h），避免静默改值。
 function parseTurnTimeoutMs(raw) {
