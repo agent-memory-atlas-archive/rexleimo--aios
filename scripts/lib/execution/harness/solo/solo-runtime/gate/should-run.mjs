@@ -7,13 +7,14 @@
  * - run：执行下一轮；
  * - wait：睡到 nextWakeMs 再问（不消耗 iteration）；
  * - ask：挂起等操作者（attended 下表现为停机，resume 仍须显式）；
- * - quiet：无人值守下的 unchanged-poll 停机建议；
- * - self_repair：保留动作——需要注册修复白名单 lane 后才会返回，v1 不产出。
+ * - quiet：无人值守下的 unchanged-poll 停机建议。
  *
+ * 枚举可达性：没有真实 call site 的动作不进枚举（ADR 0002）；
+ * self-repair lane 尚未实现，等 call site 就绪再连同 lane 一起加回。
  * 全部输入来自 journal 数据（声明字段），不做关键词/文本猜测。
  */
 
-export const SHOULD_RUN_ACTIONS = Object.freeze(['run', 'wait', 'ask', 'self_repair', 'quiet']);
+export const SHOULD_RUN_ACTIONS = Object.freeze(['run', 'wait', 'ask', 'quiet']);
 
 const MIN_WAKE_MS = 1_000;
 

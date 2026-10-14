@@ -39,6 +39,20 @@ test('iteration contract maps only success to material turn outcomes', () => {
   assert.equal(mapIterationToTurnContract({ outcome: 'blocked', failureClass: 'host-unsupported' }).failureKind, 'host_unsupported');
 });
 
+test('the AIOS bridge emits exactly the three host-owned outcomes (ADR 0002)', () => {
+  const produced = new Set();
+  for (const outcome of ['success', 'noop', 'blocked', 'infra-retry', 'human-gate', 'stopped', 'failed']) {
+    for (const shouldStop of [false, true]) {
+      produced.add(mapIterationToTurnContract({ outcome, shouldStop }).turnOutcome);
+    }
+  }
+  assert.deepEqual([...produced].sort(), ['blocked', 'validated_completion', 'validated_progress']);
+  // repair_required / replan_required 保留在子模块公开 wire 契约里，由外部宿主产出；
+  // 桥不得为了“用满枚举”自行映射——它们属 material，映射会让失败轮消耗额度（ADR 0002）。
+  assert.equal(produced.has('repair_required'), false);
+  assert.equal(produced.has('replan_required'), false);
+});
+
 test('buildTurnEnvelope produces a normalized envelope bound to the execution token', () => {
   const envelope = buildTurnEnvelope({
     activationId: 'workflow-checkout',

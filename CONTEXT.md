@@ -60,3 +60,25 @@
 **为什么**：它是判断一个项目是否在参照范围内的依据。2026-10-12 据它移除了 OpenClaw（`portfolio.remove.openclaw.reason`）——面向终端用户的多渠道 agent 产品在范围外。
 
 > **口径的外延尚未裁决。** 同属范围外的 archive 条目（Hermes / OpenViking / mem0 / OpenHarness）是否一并移除，是 `docs/reports/2026-10-12-competitor-refresh.md` §6.1 的待裁决项；在 operator 拍板前，本条术语只记录**已确立**的定义与一次**已发生**的适用，不代表口径已一致适用于全部条目。
+
+---
+
+## 子模块与发布边界
+
+### 落点边界
+
+**定义**：一个变更属于 `rex-harness/` 子模块，当且仅当它属于「第三方可独立安装使用」的公开产品面（状态内核、契约、CLI、公开 schema）；不属于的留在父仓库（适配层、solo 编排、AIOS 集成如 plan 同步 / offload / continuity）。裁决与拒绝项见 `docs/architecture/adr/0001-submodule-landing-boundary.md`。
+
+**为什么**：在父仓库侧二次实现同一条语义（例如「什么算完成」）会让一条规则有两个 owner——这正是 2026-10-14 评审认定的「决策语义外泄」缺陷；子模块是独立公开仓库（`@rexleimo/rex-harness`），语义只实现一次，下游使用者同样受益。
+
+### 公开面（public face）
+
+**定义**：父仓库唯一允许 import 的子模块入口是 `rex-harness/src/index.mjs`（对应 package `exports` 的 `.`）；`rex-harness/src/**` 其余内部模块禁止 deep import，`bin/` 只允许通过进程调用（`rex-harness verify` / `settle`）。
+
+**为什么**：子模块已有向内的边界测试（`rex-harness/tests/architecture/import-boundaries.test.mjs`），但向外的检查缺失——`scripts/lib/execution/harness/solo/turn-settlement.mjs:4` 就是一处未受约束的 deep import。没有检查的边界不是边界。
+
+### 可达性（枚举）
+
+**定义**：一个枚举成员只有在存在**真实 call site** 时才允许留在该枚举里；没有 call site 的能力不进 public enum / CLI flag / event schema / 空 adapter。反向地，公开 wire 契约里的成员可以由**外部宿主**产出，宿主桥不得为了“用满枚举”自行映射。
+
+**为什么**：两侧都会腐化：① 声明了不可达的能力（父 `SHOULD_RUN_ACTIONS.self_repair` 永不返回）会让契约撒谎；② 桥为了填满枚举把失败轮映射成 material outcome（`repair_required`）会静默改变结算与额度语义。裁决见 `docs/architecture/adr/0002-turn-outcome-reachability.md`。

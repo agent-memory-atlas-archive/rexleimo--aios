@@ -1,7 +1,9 @@
 /* 中文注释：Turn 契约桥（借鉴 LoopX settlement，见 docs/plans/2026-09-12-loopx-adoption-turn-contract-cadence-unattended.md）。
  * harness 迭代契约 → rex.turn-result.v1 envelope → 独立 verify 进程放行 → settle 进程结算。
- * 映射只读 agent 显式声明的 outcome/failureClass/shouldStop 字段，不做任何文本猜测。 */
-import { deriveEffectRef, normalizeTurnResult } from '../../../../../rex-harness/src/domain/turn-contract.mjs';
+ * 映射只读 agent 显式声明的 outcome/failureClass/shouldStop 字段，不做任何文本猜测。
+ * 只依赖子模块公开入口 `rex-harness/src/index.mjs`（ADR 0001「公开面」）；
+ * `rex-harness/bin/rex-harness.mjs` 走进程调用，不作为模块 import。 */
+import { deriveEffectRef, normalizeTurnResult } from '../../../../../rex-harness/src/index.mjs';
 import { captureCommand } from '../../../foundation/platform/process.mjs';
 import { normalizeText } from './solo-runtime/support/normalizers.mjs';
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  SHOULD_RUN_ACTIONS,
   resolveShouldRun,
 } from '../../../../../lib/execution/harness/solo/solo-runtime/gate/should-run.mjs';
 import {
@@ -81,6 +82,20 @@ test('should-run decision matrix follows the documented priority chain', () => {
     resolveShouldRun({ operatorGateAcknowledged: true, nowMs: NOW }),
     { action: 'run', reasonCode: 'eligible', nextWakeMs: 0, cadenceClass: null },
   );
+});
+
+test('every declared should-run action is producible (no unreachable enum member)', () => {
+  // ADR 0002：没有真实 call site 的动作不进枚举。这条断言就是那个门——
+  // 声明的集合必须与决策函数在真实输入下能产出的集合完全一致，
+  // 否则「声明了但永不返回」会像 self_repair 那样默默存活。
+  const inputs = [
+    { operatorGateAcknowledged: true, nowMs: NOW },
+    { lastOutcome: 'human-gate', nowMs: NOW },
+    { operatorGateAcknowledged: true, cadenceState: { cadenceClass: 'monitor_wait', delayMs: 1000, untilMs: NOW + 1000 }, nowMs: NOW },
+    { operatorGateAcknowledged: true, consecutiveNoop: 3, quietThreshold: 3, nowMs: NOW },
+  ];
+  const produced = new Set(inputs.map((input) => resolveShouldRun(input).action));
+  assert.deepEqual([...produced].sort(), [...SHOULD_RUN_ACTIONS].sort());
 });
 
 test('cadence ladder widens on non-material outcomes and resets on material progress', () => {

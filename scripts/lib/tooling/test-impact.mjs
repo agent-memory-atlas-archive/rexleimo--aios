@@ -49,7 +49,9 @@ const REFERENCE_PATTERNS = Object.freeze([
 // 目标不是字面量的动态 import 无法枚举：命中的文件登记为 imprecise，改动它一律全量。
 const IMPRECISE_PATTERN = /(?:^|\s)(?:import|require)\s*\(\s*(?!['"`])/;
 
-function collectReferences(source) {
+// 导出供第二消费者复用：`scripts/tests/execution/rex/runtime/rex-import-boundaries.test.mjs`
+// 的边界扫描必须与影响图用同一套引用抽取，否则两处正则漂移会让边界静默漏检。
+export function collectReferences(source) {
   const specs = new Set();
   for (const pattern of REFERENCE_PATTERNS) {
     for (const match of source.matchAll(pattern)) specs.add(match[1]);
