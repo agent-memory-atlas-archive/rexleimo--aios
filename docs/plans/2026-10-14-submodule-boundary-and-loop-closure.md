@@ -431,11 +431,12 @@ required evidence refs：上面每条 verification 命令的真实输出。
 
 | 测试 | 症状 | 定性 |
 |---|---|---|
-| `rex-v2-case-selection.test.mjs` | 训练认证 gate 报 `blocked`（hash 已匹配，失败在确定性重跑比对） | 存量；`docs/reference/outstanding-work.md` A3 同形 |
-| `llms-txt.test.mjs` ×2 | `docs-site/llms.txt` 与生成器不一致 | **已修（2026-10-14）**；原定性错——不是「生成物未再生」，而是 Windows checkout 的 CRLF 咭上按字节比对的漂移守卫（committed blob 内 CRLF 个数 = 0，生成器输出与它完全一致） |
-| `cli-project-root.test.mjs` | guard 拒绝消息断言 0 !== 1 | 存量；与 Rex/harness 无关 |
+| `rex-v2-case-selection.test.mjs` | 训练认证 gate 报 `blocked`（hash 已匹配，失败在确定性重跑比对） | **已修（2026-10-14）**：嵌套仓 Skill 的基线 = 父仓库记录的子模块 gitlink 修订（`git show <rev>:skill-sources/...`），所以每次 bump 指针都会重画基线、使 09-28 的出证正当失效；已用合规入口 `aios skill certify` 重出证（baseline/candidate 真实重算 3 task 全 hard 通，非复制旧 state） |
+| `llms-txt.test.mjs` ×2 | `docs-site/llms.txt` 与生成器不一致 | **已修（2026-10-14）**；原定性错——不是「生成物未再生」，而是 Windows checkout 的 CRLF 撞上按字节比对的漂移守卫（committed blob 内 CRLF 个数 = 0，生成器输出与它完全一致） |
+| `cli-project-root.test.mjs` | guard 拒绝消息断言 0 !== 1 | **已修（2026-10-14）**：产品行为一直正确（仓根跑 doctor 确实 exit 1 + 可执行行）——测试侧 `repoRoot = resolve(SCRIPT_ROOT, '..','..','..')` 多算两层而落到仓库外，子进程在 runtime root 之外 → 守卫不触发 → status 0 |
 
 因此 **convergenceGate 第 2 项"父仓库 test:affected 绿"未满足**，但失败均非本次改动引入。
+2026-10-14 补记：这 4 项存量失败已全部收敛（上表三行）；本宿主唯一残留是 A18 的环境级无树杀（健康 Windows 宿主下全绿）。
 
 ## ledger
 
@@ -447,6 +448,10 @@ facts:
   - 生产源码越界数 1 → 0；测试树内部耦合 6 处已冻结为只许收缩的基线
   - work-1 无需子模块公开面改动（rex-harness/src/index.mjs:69-78 已导出所需符号）
   - 存量失败 4 项 / 3 文件，与本改动集影响图不可达
+  - （2026-10-14 收敛）4 项全部修完：llms-txt ×2 = 行尾归一（前提更正，非生成物未再生）；
+    cli-project-root = 测试侧目录层数错（产品行为本就正确）；rex-v2-case-selection = 子模块指针移动重画基线，
+    已重出证并验过门。教训：**bump 子模块指针后要准备重跑一次 `aios skill certify`**，
+    因为嵌套 Skill 的新鲜度契约绑定在 gitlink 修订上，不重出证则发布门会正当 block
   - work-5 第二半（刷新纪律）已由 install.mjs:167 + client-install.test.mjs:71/216 覆盖，不新做
   - work-5 删除对象：80 个备份根 / 7 客户端 / 1.1MB，80/80 冗余、0 孤儿，增长停止于 2026-08-17
   - work-5 删除被安全门（packages/aios-pi/lib/gates.mjs:6）硬阻且无授权入口 → 仅能由 operator 在自己终端执行

@@ -107,7 +107,10 @@ test('the parsers map --project-root into the dispatch options', async () => {
 });
 
 test('a guard refusal prints one actionable line instead of a stack trace', () => {
-  const repoRoot = path.resolve(SCRIPT_ROOT, '..', '..', '..');
+  // SCRIPT_ROOT 是 scripts/，仓库根只剩一层；之前按三层向上算跳到了仓库外，
+  // 子进程在 runtime root 之外跑 doctor→守卫本身不触发，于是 status=0、这条
+  // 断言“守卫生效”的钉定测被环境隔空拆了（测试目录下沉后未同步层数）。
+  const repoRoot = path.resolve(SCRIPT_ROOT, '..');
   const result = spawnSync(
     process.execPath,
     [path.join(SCRIPT_ROOT, 'aios.mjs'), 'internal', 'skills', 'doctor', '--client', 'codex', '--scope', 'project'],
