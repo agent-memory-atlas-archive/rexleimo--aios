@@ -17,4 +17,6 @@ export {
   spawnCommandWithInput,
   runCommand,
   splitExecutionOptions,
+  terminateChildTree,
+  TASKKILL_TIMEOUT_MS,
 } from './process/spawn.mjs';

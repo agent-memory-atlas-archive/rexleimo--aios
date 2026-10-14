@@ -1,7 +1,7 @@
 # Outstanding work
 
 > Living register. Updated whenever an item opens or closes — update it in the same commit as the change.
-> Last updated: 2026-10-14: A17 opened (the turn settlement gate has no production importer). Previous: 2026-09-22, after the zcode verification — A14 closed, A15/A16 remain open.
+> Last updated: 2026-10-14 (third round): A18 mitigated by work-9 (taskkill wait capped at 1500 ms; the environment-side degradation stays open) and work-8 shipped in rex-harness 0.10.0 (recovery backups are now pruned on successful installs); C5 added for the still-pending operator deletion of the 93 historical backups. Previous: A17 opened (the turn settlement gate has no production importer); 2026-09-22, after the zcode verification — A14 closed, A15/A16 remain open.
 > Source of truth for the current work item: `docs/plans/2026-09-18-triage-the-82-test-files-that-no-test-entry-reaches-23-currently.md`.
 
 Items are split by **who owns the fix**, because that is what decides where the change lands:
@@ -152,13 +152,14 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Structural cause**: `buildTurnEnvelope` requires an `activationId` and an `executionToken`, i.e. the solo harness must own and advance a rex standalone workflow. It owns no rex workflow state today, so wiring means a session↔activation binding plus token rotation and crash recovery — not a one-line change.
 - **Next**: decide between (A) wire settlement into the live loop, (B) add a parent-side independent completion gate without rex settlement, and (C) delete the dead bridge and correct the release notes. Until one lands, do **not** add contract logic to the settlement gate — it would be dead code. Analysis: `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` §work-4.
 
-### A18 — OPEN: `taskkill.exe` hits its own ~60 s RPC timeout inside some host shells, stalling the Windows kill-escalation path
+### A18 — MITIGATED (2026-10-14, work-9): `taskkill.exe` RPC degrades to a ~60 s timeout in some host sessions
 
-- **Status**: open (environment-interaction defect; deterministic on the pi bash harness on this Windows box as of 2026-10-14 — the same HEAD passed these tests from another client terminal the same day).
-- **Symptom**: `scripts/tests/tooling/runtime-probe/process-spawn-timeout.test.mjs` fails `timeout settled after 62189ms` (assert budget 3000 ms), both timed-out-spawn tests, standalone and inside full runs.
-- **Evidence chain (2026-10-14 probes)**: ① `spawnSync('taskkill', ['/pid', <fresh node pid>, '/t'|'/f'])` → ~61.5 s, status 1, GBK stderr “操作超时”类消息，目标进程此时仍健康；② 同目标 `child.kill()` 立即生效（`waitForChildTreeGone` 随后报 treeAlive=false）；③ `taskkill` 未被 PATH 遮蔽（解析到 `C:\Windows\system32\taskkill.exe`）；④ 失败与 2026-10-14 工作项改动集因果独立：测试只依赖 `scripts/lib/foundation/platform/process/spawn.mjs`，该批 diff 未触碰 `foundation/platform/**`。
-- **Why it matters (medium)**: every Windows timeout/abort of a captured spawn (harness turns, client live gates) can stall ~60 s in hosts where the taskkill RPC degrades — the escalation path inherits taskkill's unbounded internal timeout.
-- **Next (proposed work-9, needs operator approval — it changes the shared platform layer's kill guarantees)**: bound the taskkill wait (`spawnSync(..., { timeout: ~1500 })`), keep the `child.kill()` fallback ordering, and pin the budget with a test injecting a fake slow killer.
+- **Status**: **repo-side mitigation LANDED 2026-10-14（work-9）**；环境本身的 taskkill 退化仍开放（非仓库可修）。
+- **Symptom（修复前）**: `scripts/tests/tooling/runtime-probe/process-spawn-timeout.test.mjs` fails `timeout settled after 62189ms`，两个超时结算用例都挂。
+- **Evidence chain (2026-10-14 probes)**: ① `spawnSync('taskkill', ['/pid', <fresh node pid>, '/t'|'/f'])` → ~61.5 s, status 1, GBK stderr “操作超时”；② **决定性对照**：从裸 bash 对无关目标 `ping.exe` 直接 `taskkill //PID x //T //F` 同样 60s+ 失败 → taskkill 在本宿主会话系统性退化，与 node/仓库无关；③ `child.kill()`（TerminateProcess）立即生效；④ `taskkill` 未被 PATH 遮蔽（`C:\Windows\system32\taskkill.exe`）。
+- **Mitigation (work-9, landed)**: `terminateChildTree` 给 taskkill 的 `spawnSync` 加 `timeout: TASKKILL_TIMEOUT_MS(1500ms)` 封顶（并传 `killSignal: 'SIGKILL'`），失败仍走 `child.kill()` 兜底；钉定测试 `A18: the taskkill wait is capped and child.kill() fallback still reap the tree (win32)` 用假慢杀手验证封顶传递与兜底有效；结算预算断言改为按封顶总和推导（SETTLE_BUDGET_MS = 750+1500+2000+300，仍能抓住 60s 级回归）。
+- **Verification evidence (2026-10-14, this degraded host)**: 修复前同一用例 `timeout settled after 62189ms`；修复后 shell-shim 用例结算耗时 3313ms（在 4250ms 推导预算内）、direct-child 用例 2277ms 绿、A18 钉定用例 342ms 绿（假杀手想挂 10s，被传入的 300ms 上限截断后 `child.kill()` 兜底仍完成树回收）。剩余唯一失败即下方环境残留。
+- **Known residual (environment, not repo)**: 在 taskkill 退化的宿主里，shell-shim 用例的孙子进程无法被树杀（唯一树杀机制就是 taskkill），`waitForExit(grandchild)` 仍失败——断言故意保持严格，不因环境退化而放宽；健康 Windows 宿主（taskkill 正常）下两用例全绿。若未来需要无 taskkill 的树杀，候选方案是 PowerShell CIM 枚举 + Stop-Process（新依赖，未批准，未实现）。
 
 ## B. rex-harness / MCP adapter
 
@@ -175,6 +176,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **C2 — RESOLVED 2026-09-21 (v6.0.6, code fix — the premise was wrong).** `codebuddy` 2.137.1's `mcp add` has **no `--agent` option at all** (`codebuddy mcp add --help`: only `-s/--scope`, `-t/--transport`, `-e/--env`, `-H/--header`), and `-t` accepts `http`. Verified by running it: `codebuddy mcp add typesafe-docs <url> -t http` wrote `{"type":"http","url":...}` into an `mcpServers` namespace — exactly the key name AIOS reported as unverified. WorkBuddy moved from `manualHttpEntry` to a verified config-plane entry, so it now reports `planned`/`registered` instead of `manual-step-required`. **One divergence worth knowing**: the CLI's `-s user` scope writes to `~/.codebuddy/.mcp.json`, while AIOS owns `~/.workbuddy/mcp.json` (which `codebuddy mcp list` does read). AIOS keeps writing its own file so ledger, backup, and scoped-removal semantics stay intact.
 - **C3 — hermes (open, correctly classified, exact command below).** Earlier note "no `mcp` subcommand" was wrong: `hermes mcp` exists (a TUI) and `hermes mcp add` has `--url`. The `pending-interactive` classification is nevertheless **correct and re-verified**: non-TTY runs print `Connecting to <url>` then `Does this server require authentication? [Y/n]:` and then **hang forever** (timeout 124) — including with `--auth header` supplied, because the prompt fires during connection/discovery before that flag is applied. So this stays a real manual step. **Run in a real terminal**: `hermes mcp add typesafe-docs --url https://docs.typesafe.ai/mcp` and answer the auth prompt.
 - **C4 — RESOLVED 2026-09-21.** `~/.rexcil/aios` was 5.20.0 because no 6.x GitHub Release object existed (the `release` workflow was failing, see D). Once v6.0.5 published, `aios update` self-updated the installed runtime to 6.0.5; `aios --version` and `~/.rexcil/aios/VERSION` now agree.
+- **C5 — OPEN: delete the 93 historical `.rex-projection-recovery` backups (operator terminal only; agent execution is hard-blocked by the safety gate).** Growth is fixed in code by work-8 (rex-harness 0.10.0 prunes per skill on successful installs), but the pre-existing debris — 93 backups / 7 roots / ~1.16 MB, latest 2026-08-17, verified 93/93 redundant and 0 orphans — is gitignored and outside the repo, so it only leaves the machine when you run the archived command. Command and inventory: `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` §work-5 (a rename-first variant is listed if you want a reversible week).
 
 ---
 

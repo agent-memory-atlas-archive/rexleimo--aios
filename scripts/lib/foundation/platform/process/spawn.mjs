@@ -70,6 +70,10 @@ export function captureCommand(command, args = [], options = {}) {
 const TREE_TERM_GRACE_MS = 3000;
 const TREE_KILL_WAIT_MS = 2000;
 const TREE_POLL_INTERVAL_MS = 50;
+/* 中文注释：taskkill 自身 RPC 在部分宿主里会挂到它自己的 ~60s 内部超时才失败（A18）；
+   kill 升级路径不得继承这个无界等待——封顶后由 child.kill() 兜底。上限需留在
+   process-spawn-timeout 测试的 3s 结算预算内（750ms 触发 + 本上限 + 树消失轮询）。 */
+const TASKKILL_TIMEOUT_MS = 1500;
 
 function isProcessAlive(pid) {
   if (!Number.isInteger(pid) || pid <= 0) return false;
@@ -144,16 +148,23 @@ async function waitForChildTreeGone(child, { ownsGroup, timeoutMs }) {
 
 /* 中文注释：三段式进程树清理（对齐已在本机其他项目验证过的模式）：
    SIGTERM 树 → 宽限 → SIGKILL 树 → 校验。close 事件不触发也要能结算，
-   返回 treeAlive 供上层决定是否 fail-closed。 */
-async function terminateChildTree(child, { ownsGroup = false } = {}) {
+   返回 treeAlive 供上层决定是否 fail-closed。
+   taskkillRunner/taskkillTimeoutMs 仅供测试注入假慢杀手（A18 钉定），生产走默认 spawnSync。 */
+async function terminateChildTree(child, {
+  ownsGroup = false,
+  taskkillTimeoutMs = TASKKILL_TIMEOUT_MS,
+  taskkillRunner = spawnSync,
+} = {}) {
   if (process.platform === 'win32') {
     let terminated = false;
     if (Number.isInteger(child?.pid) && child.pid > 0) {
       try {
         // Shell shims can leave the real CLI alive after child.kill().
-        const result = spawnSync('taskkill', ['/pid', String(child.pid), '/t', '/f'], {
+        const result = taskkillRunner('taskkill', ['/pid', String(child.pid), '/t', '/f'], {
           stdio: 'ignore',
           windowsHide: true,
+          timeout: taskkillTimeoutMs,
+          killSignal: 'SIGKILL',
         });
         terminated = result.status === 0;
       } catch {
@@ -372,3 +383,6 @@ export function runCommand(command, args = [], options = {}) {
 
   return result;
 }
+
+/* 中文注释：导出仅供测试钉定 A18（taskkill 封顶）；生产代码不得绕过 spawnCommand 直接终止进程树。 */
+export { terminateChildTree, TASKKILL_TIMEOUT_MS };
