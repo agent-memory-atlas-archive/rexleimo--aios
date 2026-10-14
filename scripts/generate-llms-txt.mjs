@@ -42,8 +42,16 @@ function repoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 }
 
+/* 中文注释：守卫按字节比对产物，但 Windows 工作树在 core.autocrlf 下是 CRLF，
+   而生成器写回时又会混入 LF 行——干跑一次就会把产物改得半 CRLF 半 LF。
+   统一在读入口归一为 LF：生成结果永远 LF、比对永远同口径，
+   漂移守卫不再被 checkout 平台骗（Linux CI 绿 / Windows 工作树误报的根因）。 */
+function normalizeEol(text) {
+  return text.replace(/\r\n/g, '\n');
+}
+
 async function readText(filePath) {
-  return readFile(filePath, 'utf8');
+  return normalizeEol(await readFile(filePath, 'utf8'));
 }
 
 /** Read the current release version from VERSION. */

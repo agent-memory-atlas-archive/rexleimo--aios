@@ -7,6 +7,7 @@ skill-sources/**/SKILL.md text eol=lf
 agent-sources/**/*.md text eol=lf
 agent-sources/**/*.json text eol=lf
 scripts/lib/tooling/specs/*.json text eol=lf
+docs-site/llms.txt text eol=lf
 /AGENTS.md text eol=lf
 /CLAUDE.md text eol=lf
 /GEMINI.md text eol=lf

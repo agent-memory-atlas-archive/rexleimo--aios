@@ -432,7 +432,7 @@ required evidence refs：上面每条 verification 命令的真实输出。
 | 测试 | 症状 | 定性 |
 |---|---|---|
 | `rex-v2-case-selection.test.mjs` | 训练认证 gate 报 `blocked`（hash 已匹配，失败在确定性重跑比对） | 存量；`docs/reference/outstanding-work.md` A3 同形 |
-| `llms-txt.test.mjs` ×2 | `docs-site/llms.txt` 与生成器不一致 | 存量；生成物自 2026-10-02 未再生 |
+| `llms-txt.test.mjs` ×2 | `docs-site/llms.txt` 与生成器不一致 | **已修（2026-10-14）**；原定性错——不是「生成物未再生」，而是 Windows checkout 的 CRLF 咭上按字节比对的漂移守卫（committed blob 内 CRLF 个数 = 0，生成器输出与它完全一致） |
 | `cli-project-root.test.mjs` | guard 拒绝消息断言 0 !== 1 | 存量；与 Rex/harness 无关 |
 
 因此 **convergenceGate 第 2 项"父仓库 test:affected 绿"未满足**，但失败均非本次改动引入。
@@ -462,6 +462,12 @@ facts:
   - work-5 复核：备份 93 个（首次盘点 80 漏计 opencode `_purged-20260826_204215` 历史桶 13 个），93/93 有活体投影、0 孤儿、最新仍为 2026-08-17；删除命令已入档 work-5 节，仍由 operator 终端执行
   - work-4 裁决 D+C 已执行：删父侧桥 turn-settlement.mjs + 子套件；harness-runtime 47/47（-6 为被删用例）；边界测试 B2 fixture 换现存路径 3/3；rex-integration 绿；ADR 0002/CONTEXT/A17/CHANGELOG 同步；子模块 settle/verify/start CLI 保留（人工透传是确认消费者）→ 无子模块公开面变化，无需发布流
   - 全量 affected 2113/2098/6fail/9skip：6 失败均因果独立（2×llms-txt 存量 HEAD 对照实验证实；2×G1 存量；2×spawn-timeout 新登 A18=本宿主 taskkill RPC 60s 超时，非本批引入，修复提案 work-9 待批）
+  - **llms-txt 两条存量失败已定位并修复（前提更正）**：committed blob 与生成器输出本来就一致（blob 里 0 个 CRLF），
+    失败来自 `core.autocrlf` 把工作树实体列成 CRLF、而守卫是字节比对——所以只会 Windows 误报、Linux CI 绿。
+    修法：生成器唯一读入口 `readText` 归一 CRLF→LF（产物永远 LF、比对同口径），
+    `.gitattributes` 按现有漂移守卫先例钉 `docs-site/llms.txt text eol=lf`，测试侧 `readLlms()` 也归一。
+    双向反例均实测：本 CRLF 工作树（磁盘 149 个 CRLF）下守卫通过；注入真实内容漂移时 `--check` 仍 exit 1（守卫未变宽）；
+    `llms-txt.test.mjs` 5/5，且 `generate-llms-txt.mjs` 报 `unchanged`——产物无改动，无重生噪声
   - operator「继续没有完成的事情」视为 work-8/work-9 签字（与 work-6 S1 同口径），两项均已交付：
   - **work-9 已交付**：taskkill `spawnSync` 封顶 1500ms + `killSignal: SIGKILL`，失败走 `child.kill()` 兜底；
     结算预算改为推导（`SETTLE_BUDGET_MS = 750+1500+2000+300`）；新增 win32 钉定用例（假慢杀手注入，342ms 绿）；

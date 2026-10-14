@@ -12,7 +12,9 @@ import { isMaintenanceRelease } from '../../../lib/diagnostics/release-impact.mj
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
 async function readLlms() {
-  return readFile(path.join(rootDir, 'docs-site', 'llms.txt'), 'utf8');
+  const raw = await readFile(path.join(rootDir, 'docs-site', 'llms.txt'), 'utf8');
+  // 守卫必须与 checkout 平台无关：按字节段落解析前先归一行尾（Windows 工作树可以是 CRLF）。
+  return raw.replace(/\r\n/g, '\n');
 }
 
 async function canonicalPostSlugs() {
