@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted（2026-10-14）。裁决原话："work-3 不做映射"。
+Accepted（2026-10-14）。裁决原话：“work-3 不做映射”。
+
+2026-10-14 更新（work-4 裁决 C）：父侧桥已删除（零生产 importer，见
+`docs/reference/outstanding-work.md` A17）。本 ADR 对子模块公开枚举的完整性与 material 定性仍然有效；
+“父桥只产 3 个”的测试钉随桥自然消失。若将来重新接线（裁决 A 分支），必须带真实调用点重新引入双向钉定。
 
 ## Context
 

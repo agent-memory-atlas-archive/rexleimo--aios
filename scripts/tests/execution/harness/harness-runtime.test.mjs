@@ -2,7 +2,6 @@ import './infra/core/core.mjs';
 import './infra/phase/phase-job.mjs';
 import './infra/solo/solo-loop.mjs';
 import './infra/command/command.mjs';
-import './infra/core/turn-settlement.mjs';
 import './infra/pacing/pacing.mjs';
 import './infra/pacing/pacing-loop.mjs';
 import './infra/core/host-probes.mjs';

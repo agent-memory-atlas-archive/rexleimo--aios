@@ -6,6 +6,8 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ## [Unreleased]
 
+- fix(harness): correct the v5.13/v5.14 turn-settlement claim — the typed `rex.turn-result.v1` bridge was defined and test-covered but never wired into the live solo loop (zero production importers; settlement was reachable only through the manual `aios rex settle` pass-through). Record: `docs/reference/outstanding-work.md` A17.
+- remove(harness): delete the unreachable bridge `scripts/lib/execution/harness/solo/turn-settlement.mjs` and its sub-suite per operator decision (work-4 option C, `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md`). The submodule standalone CLI surface (`settle`/`verify`/`start`) is unchanged — it has a confirmed human consumer path.
 - feat(video): new standalone Remotion sub-app at `video/` producing the 45s / 1080x1920 / 30fps (1355-frame) vertical
   AIOS short for 抖音 / 小红书 / 视频号 — 8 story beats (`hook crash resume route work team proof cta`)
   drawn entirely with React + SVG (no external assets, offline-reproducible) following one real task

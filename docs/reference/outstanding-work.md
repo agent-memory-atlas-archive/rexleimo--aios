@@ -142,12 +142,23 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Status**: open (low). The module calls itself a "core infrastructure barrel" and its header documents the intended import path, but no module in `scripts/`, `src/`, `packages/`, or `mcp-server/src/` imports it.
 - **Next**: delete it, or adopt it as the entry point its header describes. It is also why the ESM guard needed comment-aware scanning: its only "uses" were names listed in a comment.
 
-### A17 — OPEN: the turn settlement gate is unreachable in production
+### A17 — CLOSED (2026-10-14, operator 裁决 D+C): the turn settlement gate is unreachable in production
+
+- **Status**: **CLOSED 2026-10-14 by option C**。父侧桥 `scripts/lib/execution/harness/solo/turn-settlement.mjs` 及其测试套件（`scripts/tests/execution/harness/infra/core/turn-settlement.mjs`、`harness-runtime.test.mjs` 的 import）已删除；发布说明在 CHANGELOG [Unreleased] 里更正。子模块 standalone CLI（`settle`/`verify`/`start`）**保留**——它有确认消费者：人工 `aios rex settle`（`scripts/lib/tooling/cli/dispatch/dispatch.mjs` 透传），不属于“无消费者 CLI”。选项 A（把结算接进 live loop）仍是未来可重提的新工作项；若重提，必须同时接上调用点并恢复 ADR 0002 的双向钉定，不得先建桥后接线。
+- 以下为原始记录（保持不动供审计）：
 
 - **Status**: open. `scripts/lib/execution/harness/solo/turn-settlement.mjs` (`buildTurnEnvelope` / `settleTurnEnvelope` / `mapIterationToTurnContract`) has no production importer — only `scripts/tests/execution/harness/infra/core/turn-settlement.mjs` and the aggregator that imports it. `git log -S settleTurnEnvelope --all` returns only the introducing commit `513df243` (the v5.13/v5.14 LoopX adoption) and no later call-site addition.
 - **Why it matters (high)**: the live solo harness loop (`scripts/lib/execution/lifecycle/run/harness/execution/execute-turn.mjs`, reached from `commands.mjs`) contains zero rex calls, so no turn is verified or settled. The v5.13/v5.14 release notes state that every provider turn now settles into a typed envelope that the executor cannot self-verify; in production that is exercised by tests only. The same holds for the submodule's `settleStandaloneTurn` / `startStandaloneWorkflow` (no production caller under `scripts/`). Settlement is currently reachable only when a human types `aios rex settle` — the `rex` dispatch in `scripts/lib/tooling/cli/dispatch/dispatch.mjs` is a pass-through proxy.
 - **Structural cause**: `buildTurnEnvelope` requires an `activationId` and an `executionToken`, i.e. the solo harness must own and advance a rex standalone workflow. It owns no rex workflow state today, so wiring means a session↔activation binding plus token rotation and crash recovery — not a one-line change.
 - **Next**: decide between (A) wire settlement into the live loop, (B) add a parent-side independent completion gate without rex settlement, and (C) delete the dead bridge and correct the release notes. Until one lands, do **not** add contract logic to the settlement gate — it would be dead code. Analysis: `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` §work-4.
+
+### A18 — OPEN: `taskkill.exe` hits its own ~60 s RPC timeout inside some host shells, stalling the Windows kill-escalation path
+
+- **Status**: open (environment-interaction defect; deterministic on the pi bash harness on this Windows box as of 2026-10-14 — the same HEAD passed these tests from another client terminal the same day).
+- **Symptom**: `scripts/tests/tooling/runtime-probe/process-spawn-timeout.test.mjs` fails `timeout settled after 62189ms` (assert budget 3000 ms), both timed-out-spawn tests, standalone and inside full runs.
+- **Evidence chain (2026-10-14 probes)**: ① `spawnSync('taskkill', ['/pid', <fresh node pid>, '/t'|'/f'])` → ~61.5 s, status 1, GBK stderr “操作超时”类消息，目标进程此时仍健康；② 同目标 `child.kill()` 立即生效（`waitForChildTreeGone` 随后报 treeAlive=false）；③ `taskkill` 未被 PATH 遮蔽（解析到 `C:\Windows\system32\taskkill.exe`）；④ 失败与 2026-10-14 工作项改动集因果独立：测试只依赖 `scripts/lib/foundation/platform/process/spawn.mjs`，该批 diff 未触碰 `foundation/platform/**`。
+- **Why it matters (medium)**: every Windows timeout/abort of a captured spawn (harness turns, client live gates) can stall ~60 s in hosts where the taskkill RPC degrades — the escalation path inherits taskkill's unbounded internal timeout.
+- **Next (proposed work-9, needs operator approval — it changes the shared platform layer's kill guarantees)**: bound the taskkill wait (`spawnSync(..., { timeout: ~1500 })`), keep the `child.kill()` fallback ordering, and pin the budget with a test injecting a fake slow killer.
 
 ## B. rex-harness / MCP adapter
 

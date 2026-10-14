@@ -75,7 +75,7 @@
 
 **定义**：父仓库唯一允许 import 的子模块入口是 `rex-harness/src/index.mjs`（对应 package `exports` 的 `.`）；`rex-harness/src/**` 其余内部模块禁止 deep import，`bin/` 只允许通过进程调用（`rex-harness verify` / `settle`）。
 
-**为什么**：子模块已有向内的边界测试（`rex-harness/tests/architecture/import-boundaries.test.mjs`），但向外的检查缺失——`scripts/lib/execution/harness/solo/turn-settlement.mjs:4` 就是一处未受约束的 deep import。没有检查的边界不是边界。
+**为什么**：子模块已有向内的边界测试（`rex-harness/tests/architecture/import-boundaries.test.mjs`），但向外的检查缺失——历史上的 `scripts/lib/execution/harness/solo/turn-settlement.mjs:4` 就是一处未受约束的 deep import（该模块已于 2026-10-14 被 work-4 C 裁决删除：零生产 importer）。没有检查的边界不是边界。
 
 ### 可达性（枚举）
 

@@ -5,6 +5,7 @@
  * `rex-harness/src/domain/turn-contract.mjs`（内部模块）。子模块只有向内的检查
  * （rex-harness/tests/architecture/import-boundaries.test.mjs：src 不得 import AIOS 内部），
  * 没有向外的检查，所以那次越界无人拦，一直存活到 2026-10-14 的架构评审。
+ * （该桥模块后因零生产 importer 被 work-4 C 裁决删除；这里的反例 fixture 改用现存适配层路径。）
  *
  * User goal:
  *   子模块之所以是子模块，是因为它的内部不能成为父仓库的事实契约。父仓库新增文件
@@ -118,7 +119,7 @@ const readFromDisk = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 
 test('B2: submodule internals are violations, the public entry and the parent adapter are not', () => {
   const sources = {
-    'scripts/lib/execution/harness/solo/turn-settlement.mjs': importLine(up(5), 'rex-harness', 'src', 'domain', 'turn-contract.mjs'),
+    'scripts/lib/execution/workflows/adapters/rex-capability-runtime.mjs': importLine(up(5), 'rex-harness', 'src', 'domain', 'turn-contract.mjs'),
     'scripts/tests/execution/rex/runtime/rex-release-gate.test.mjs': importLine(up(5), 'rex-harness', 'src', 'clients', 'projection-manifest.mjs'),
     'scripts/lib/execution/workflows/adapters/rex-harness-adapter.mjs': importLine(up(5), 'rex-harness', 'src', 'index.mjs'),
     // 父仓库自己的适配目录：名字里带 rex-harness，但不是子模块。
@@ -131,7 +132,7 @@ test('B2: submodule internals are violations, the public entry and the parent ad
     readFile: (file) => sources[file],
   });
   assert.deepEqual(violations, [
-    'scripts/lib/execution/harness/solo/turn-settlement.mjs -> rex-harness/src/domain/turn-contract.mjs',
+    'scripts/lib/execution/workflows/adapters/rex-capability-runtime.mjs -> rex-harness/src/domain/turn-contract.mjs',
     'scripts/tests/execution/rex/runtime/rex-release-gate.test.mjs -> rex-harness/src/clients/projection-manifest.mjs',
   ]);
 });

@@ -86,15 +86,29 @@ work-7 interaction contract    [deferred，operator 排序在后]
 **残留性质：纯历史碎屑，零功能影响**
 
 - 语义：`install.mjs:298-310 preserveRecovery()` **仅在回滚失败时**触发；备份是失败安装的副本。
-- 冗余性验证：**80/80 备份均有活体投影，0 孤儿** → 删掉不会丢任何当前可用内容。
+- 冗余性验证：**93/93 备份均有活体投影，0 孤儿** → 删掉不会丢任何当前可用内容。
 - 增长已停止：最新备份 2026-08-17（近 2 个月前）；当前成功路径已有清理断言（上方第三条）。
-- 体量：7 个根目录，约 1.1 MB，全部 gitignored。
-- 分布：`.agents` 11 / `.claude` 16 / `.codex` 5 / `.gemini` 15 / `.opencode` 2 / `.grok` 16 / `.hermes` 15。
+- 体量：7 个根目录，约 1.16 MB，全部 gitignored。
+- 分布（2026-10-14 复核）：`.agents` 11 / `.claude` 16 / `.codex` 5 / `.gemini` 15 / `.opencode` 15 / `.grok` 16 / `.hermes` 15 = **93**。
+  首次盘点报 80 是口径遗漏：`.opencode` 的 `_purged-20260826_204215` 历史桶（13 个备份）未被计入。
 
 **删除被安全门阻，交由 operator：** 门是文本模式硬拦
 （`packages/aios-pi/lib/gates.mjs:6`，连命令文本里出现该字符串都会拦），
 且门的测试（`scripts/tests/clients/pi-agent/pi-extension.test.mjs:28-35`）只断言“必须拦”，
 **未定义任何授权放行入口**。因此这一条不由 agent 执行，也不绕道其它工具执行。
+
+**删除方式（operator 在其终端执行，agent 不代执也不绕行）**：
+
+```bash
+# Git Bash / zsh，项目根目录
+d="rm -rf .agents/.rex-projection-recovery .claude/.rex-projection-recovery \
+  .codex/.rex-projection-recovery .gemini/.rex-projection-recovery \
+  .opencode/.rex-projection-recovery .grok/.rex-projection-recovery \
+  .hermes/.rex-projection-recovery"
+eval "$d"
+```
+
+或先改名后删（可反悔）：把 `rm -rf` 换成 `mv <dir> /tmp/recovery-trash-$(date +%s)/`，确认一周无事再清。
 
 **根因（新发现，属子模块产品面）：** 没有任何机制回收 recovery 目录——
 `install.mjs` 只在成功路径清自己的 `.rex-install-*` 临时目录，从不修剪 `.rex-projection-recovery/**`。
@@ -147,6 +161,25 @@ rex 工作流状态。接线 = 给 solo harness 引入 session ↔ activation �
 **建议**：先 **D**（零风险、防继续误判），再按你的目标选 **A**（真兑现）或 **C**（不再声称）。
 不推荐 **B**：收益低于 A 且仍在父侧持有“什么算完成”的最终解释权。
 
+#### 裁决与交付记录（2026-10-14，operator：“D+C”）
+
+**D（明账）**：`docs/reference/outstanding-work.md` A17 已建档（侦察时即写入），本次标 **CLOSED** 并记录裁决；
+CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历史条目不改写）。
+
+**C（删死代码）**：
+
+| 动作 | 对象 |
+|---|---|
+| 删除 | `scripts/lib/execution/harness/solo/turn-settlement.mjs`（零生产 importer 的桥） |
+| 删除 | `scripts/tests/execution/harness/infra/core/turn-settlement.mjs`（桥的 6 个子用例随桥消失） |
+| 同步 | `harness-runtime.test.mjs` 去掉其 import；`rex-import-boundaries.test.mjs` B2 反例 fixture 改用现存适配层路径 `workflows/adapters/rex-capability-runtime.mjs`（头注释保留历史缘由） |
+| 文档锚点 | ADR 0002 追加更新段（桥钉随桥消失，子模块枚举钉仍绑定；重接须恢复双向钉定）；CONTEXT.md 公开面词条标历史实例已删 |
+| **保留** | 子模块 `settle`/`verify`/`start` CLI —— 有确认消费者（人工 `aios rex settle` 经 dispatch 透传），不属“无消费者 CLI”，子模块公开面无变化，**无需发布流** |
+
+**验证**：`rex-import-boundaries` 3/3；`harness-runtime` 47/47（-6 为被删用例）；全仓 `grep turn-settlement scripts/**/*.mjs` 仅剩边界测试头注释；`npm run test:affected`（bail 全量）2113 项 / 2098 通过 / 6 失败 / 9 跳过。6 项失败均与本改动集因果独立：2× llms-txt（存量，HEAD 原样 CHANGELOG 对照实验同样失败：生成物 2026-10-02 后未再生 + Windows CRLF split）、2× 存量（G1 已记录的 case-selection / cli-project-root）、2× spawn-timeout（新登记 A18：本宿主 shell 内 taskkill RPC 自限时 ~60s，同 HEAD 昨日异客户端终端通过；probe 链见 A18）。
+
+**遗留**：选项 A（接通 live 结算）作为未来新工作项保留；若重提，必须先有调用点再建桥（ADR 0002 更新段）。
+
 ### work-6 — 单一真相源收敛
 
 - **dependsOn**: []
@@ -185,12 +218,13 @@ rex 工作流状态。接线 = 给 solo harness 引入 session ↔ activation �
 
 | 方案 | 内容 | 代价 | 处理缺口 |
 |---|---|---|---|
-| **S1 单写者** | `appendSoloIteration` 回归纯产物写入；summary 只由 `persistIterationState` 写 | 小，但**变更已测契约**（`harness-journal.test.mjs:118-121` 断言 append 的副作用），需把断言迁到正确 owner | G1 |
+| **S1 单写者** | ✅ **已实现 2026-10-14**（operator “继续”视为签字）：`appendSoloIteration` 回归纯账本写入；summary 只由 `persistIterationState` 写；旧断言迁入正确 owner 并新增单写者钉定 | 小，但**变更已测契约**（`harness-journal.test.mjs` 断言 append 的副作用），需把断言迁到正确 owner | G1 |
 | **S2 漂移检测** | ✅ **已实现 2026-10-14**：新增 `checkRunSummaryConsistency`（只读比对，不改写）；reconcile 复用它并把漂移记入 `summaryDrift` | 中 | G2 |
 | **S3 replay/修复** | `replaySummary(journal) -> summary`，使投影可从账本**重建**（不只检测） | 中大 | G2 升级 |
 | **S4 恢复改源** | ✅ **已实现 2026-10-14**：`reconcile.mjs` 的 `lastCompletedIteration` 改从 iteration 账本推导（新增 `readLastCompletedIteration`），不再取 summary 投影 | 小 | G3 |
 
 **建议**：S4 → S1 → S2。**S3 暂不做**：无实测漂移证据时不值得造 replay 框架（rex-engineering-standards §2）。
+**范围决定**：convergenceGate 第 6 条“崩溃注入后重放一致”按 S1–S4 范围解释为：单写者消除双写 + 漂移可检测可报警（S2）+ 恢复信任账本（S4）；S3 重放框架明确不纳入。
 **scope 边界**：只限 solo harness 自身状态；continuity 与结构化 plan 属其它子系统，保持“尽力而为外部副作用”，不纳入本项。
 
 #### S4 + S2 交付记录（2026-10-14）
@@ -221,7 +255,27 @@ rex 工作流状态。接线 = 给 solo harness 引入 session ↔ activation �
 | 反例 M2：账本换成空（投影自比） | 正常路径测试失败（已拦） |
 | `npm run test:affected` | subset 38/214 文件，699 项 / 698 通过 / 0 失败 / 1 跳过 |
 
-**剩余**：S1（G1 summary 双写，需签字）。S3 仍不建议做（无实测漂移证据）。
+**剩余**：无。G1/G2/G3 三条缺口已全部闭合（见下方 S1 交付记录）。
+
+#### S1 交付记录（2026-10-14，消 summary 双写）
+
+签字形式：operator 对含“work-6 S1 待你签字”的台账回复“继续这些工作量开发”，视为对该契约变更的批准。
+
+| 文件 | 改动 |
+|---|---|
+| `solo-journal/lifecycle/iteration.mjs` | 删除 `appendSoloIteration` 内部的 `readSoloRunSummary`+`writeSoloRunSummary` 回写块及其 import；模块头注释改为“唯一 summary 写者是 `persistIterationState`，勿再引入双写” |
+| `solo-journal/content/consistency.mjs` | 漂移成因注释同步：从“一轮双写”改为“账本先写/投影后写，崩溃落在两次写之间时投影滞后”（S2 检测仍然必要） |
+| `scripts/tests/execution/harness/harness-journal.test.mjs` | 投影断言（iterationCount/lastOutcome/latestEvidence…）从 append 后迁到 `persistIterationState` 后；新增钉定：append 后 summary 必须保持初始值（单写者契约）+ 正常写入路径下 `checkRunSummaryConsistency` 报一致 |
+
+**验证**：
+
+| 命令 | 结果 |
+|---|---|
+| `node --test scripts/tests/execution/harness/harness-journal.test.mjs` | 3/3 通过 |
+| `node --test scripts/tests/execution/session/session-reconciliation*.test.mjs` | 8/8 通过 |
+| `node --test scripts/tests/execution/harness/harness-runtime.test.mjs` | 53/53 通过 |
+| 反例：把双写临时加回 append | 契约测试失败（已拦），还原后 3/3 绿 |
+| `npm run test:affected` | 699 项 / 698 通过 / 0 失败 / 1 跳过（与 S2/S4 交付时基线一致） |
 
 ### work-7 — interaction contract 决策编译器 [deferred]
 
@@ -237,20 +291,20 @@ rex 工作流状态。接线 = 给 solo harness 引入 session ↔ activation �
 | 状态 | work |
 |---|---|
 | ready | — |
-| design-ready | work-6（S4 ✅ S2 ✅ 已交付；剩 S1 需签字） |
-| awaiting-decision | work-4（结算门从未接线 → 形态待裁决 A/B/C） |
-| operator-gated | work-5（删除需人工在终端执行；第二半已由现有门禁满足） |
-| proposed | work-8（子模块修剪 recovery 目录，根因修复） |
+| design-ready | — |
+| awaiting-decision | —（work-4 已于 2026-10-14 裁决 D+C 并交付） |
+| operator-gated | work-5（删除 93 个备份需 operator 在终端执行；命令已入档；第二半已由现有门禁满足） |
+| proposed | work-8（子模块修剪 recovery 目录，根因修复；待批准） |
 | blocked | — |
-| deferred | work-7（operator 排序在 work-6 之后） |
+| deferred | work-7（已随 work-6 完成而解锁；入图时需重新确认范围） |
 | in_progress | — |
-| done | work-1, work-2, work-3（2026-10-14） |
+| done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做） |
 
 ## parallelGroups
 
 - **G1** = [work-1, work-2, work-3, work-5] —— ✅ 已执行（work-5 外，见交付记录）；work-1/2 纯父仓库，work-3 含一次子模块测试改动
-- **G2** = [work-4] —— dependsOn work-1（已解除）
-- **G3** = [work-6] —— 与 G1/G2 无共享文件，但体量最大，建议独立进行；完成后才解锁 work-7
+- **G2** = [work-4] —— ✅ 已执行（2026-10-14 裁决 D+C；子模块公开面无变化，无需 tag/npm 发布流）
+- **G3** = [work-6] —— ✅ 已完成（2026-10-14，S1/S2/S4）；work-7 因此解锁
 
 ## convergenceGate
 
@@ -364,10 +418,14 @@ facts:
   - work-6 S4 已交付：新增 readLastCompletedIteration（账本权威），reconcile.mjs 不再信任 summary 投影；8/8 + 3/3 绿，反例已拦，affected 699/698/0
   - work-6 S2 已交付：新增 content/consistency.mjs（checkRunSummaryConsistency，只读比对不改写）；reconcile 记入 summaryDrift；读取器重整为 readLatestIterationRecord；M1/M2 反例均被拦；affected subset 38/214、699/698/0
   - 处理 G1 只差 S1（消 summary 双写，需签字）
+  - work-6 S1 已交付（operator “继续”视为签字）：appendSoloIteration 回归纯账本写入，summary 唯一写者 persistIterationState；投影断言迁入正确 owner + 新增单写者钉定；反例（双写加回）被拦；journal 3/3、reconcile 8/8、runtime 53/53、affected 699/698/0 → G1/G2/G3 全闭合，work-6 done，work-7 解锁
+  - work-5 复核：备份 93 个（首次盘点 80 漏计 opencode `_purged-20260826_204215` 历史桶 13 个），93/93 有活体投影、0 孤儿、最新仍为 2026-08-17；删除命令已入档 work-5 节，仍由 operator 终端执行
+  - work-4 裁决 D+C 已执行：删父侧桥 turn-settlement.mjs + 子套件；harness-runtime 47/47（-6 为被删用例）；边界测试 B2 fixture 换现存路径 3/3；rex-integration 绿；ADR 0002/CONTEXT/A17/CHANGELOG 同步；子模块 settle/verify/start CLI 保留（人工透传是确认消费者）→ 无子模块公开面变化，无需发布流
+  - 全量 affected 2113/2098/6fail/9skip：6 失败均因果独立（2×llms-txt 存量 HEAD 对照实验证实；2×G1 存量；2×spawn-timeout 新登 A18=本宿主 taskkill RPC 60s 超时，非本批引入，修复提案 work-9 待批）
 assignment:
-  work-5: implementer   # 删除 285 个残留目录前需 human 确认
-  work-6: design-first  # 先出子设计，再实现
-  work-4: implementer   # 关键路径下一站，产物需走子模块发布流
+  work-5: operator      # 删 93 个备份，命令已入档，仅 operator 终端执行
+  work-6: done          # S1/S2/S4 交付，S3 按范围决定不做
+  work-4: done          # 裁决 D+C 执行；选项 A 若重提须先有调用点再建桥
 ```
 
-G1 已交付；等 operator 选择下一批（work-4 / work-6 子设计 / work-5 确认）。
+待 operator：① work-5 终端执行删除（命令已入档）；② work-8 是否批准入图（子模块发布流）；③ work-7 已解锁，入图需重确认范围。代码侧 work-1/2/3/4/6 均已交付；若重提结算接线（选项 A），必须先有调用点再建桥（ADR 0002 更新段）。
