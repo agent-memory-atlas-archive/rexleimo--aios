@@ -277,6 +277,46 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
 | 反例：把双写临时加回 append | 契约测试失败（已拦），还原后 3/3 绿 |
 | `npm run test:affected` | 699 项 / 698 通过 / 0 失败 / 1 跳过（与 S2/S4 交付时基线一致） |
 
+### work-8 — recovery 备份修剪（子模块产品面）[done 2026-10-14]
+
+- **dependsOn**: [work-5]
+- **来源**：work-5 根因调查——`install.mjs` 从不修剪 `.rex-projection-recovery/**`，恢复点只增不减。
+- **observable outcome**：成功安装轮结束后按 skill 修剪 recovery 根，每个 skill 只保留最近 2 份
+  `.rex-backup-*`（mtime 排序），被删路径经 `prunedRecoveryBackups` 只读数组回报。
+- **落点**：按 ADR 0001 属子模块产品面 → 新模块 `rex-harness/src/clients/recovery-prune.mjs`，
+  由 `installClientProjection` 调用。
+- **保守规则（刻意不放宽）**：无法归属到已知 `skillId` 的条目（废弃 skill 备份、`_purged-*` 等非备份形态）
+  一律不动——无法归属就没资格替 operator 决定删除；有 conflict/error 的轮次完全不修剪，保留最多恢复点；
+  单条删除失败尽力而为，不影响安装结果。
+- **交付证据（2026-10-14）**：`node --test rex-harness/tests/contract/client-install.test.mjs` 22/22
+  （含 work-8 正向修剪 + 「冲突轮不修剪」反例）；`npm --prefix rex-harness test` 218/218；
+  `npm --prefix rex-harness run doctor` `errors: []`。
+- **发布**：子模块 0.9.1 → **0.10.0**（CHANGELOG + `docs/provider-contract.md` 同步公开结果字段），
+  父仓库指针在同一批更新。
+- **与 work-5 的边界**：本项修的是「不再增长」；已存在的 93 个历史备份属 work-5 的 operator 终端删除，
+  不由本项回收。
+
+### work-9 — A18：taskkill 封顶（父仓库共享平台层）[done 2026-10-14]
+
+- **dependsOn**: []（与 work-1/2/3/4/6 改动集因果独立）
+- **来源**：`docs/reference/outstanding-work.md` A18——本宿主 `taskkill.exe` RPC 退化到自身 ~60s 超时，
+  kill 升级路径继承了这个无界等待，导致超时结算从毫秒级劣化到 62s。
+- **observable outcome**：`terminateChildTree` 给 taskkill 的 `spawnSync` 传入 `timeout: TASKKILL_TIMEOUT_MS(1500)`
+  与 `killSignal: 'SIGKILL'`，失败仍走 `child.kill()` 兜底；超时结算预算断言由硬编码 3000ms 改为按封顶总和
+  推导（`SETTLE_BUDGET_MS`），回归到 60s 级仍会被抓住。
+- **改动面**：`scripts/lib/foundation/platform/process/spawn.mjs`（+ `process.mjs` 出口）；
+  `terminateChildTree` / `TASKKILL_TIMEOUT_MS` 仅为测试钉定导出，注释已声明生产代码不得绕过 `spawnCommand`
+  直接终止进程树。
+- **交付证据（2026-10-14）**：`node --test scripts/tests/tooling/runtime-probe/process-spawn-timeout.test.mjs`
+  —— 新增 win32 钉定用例用假慢杀手（想挂 10s、被传入的 300ms 上限截断）验证封顶传递 + 兜底有效
+  （`killEscalated=true`、`treeAlive=false`、342ms 完成）；direct-child 用例 2277ms 绿；
+  shell-shim 用例结算时间断言通过（修复前 62189ms → 现在 <4250ms 预算内），剩余失败是已记录的
+  环境残留（见下）。
+- **已知残留（环境，非仓库）**：taskkill 退化的宿主里，shell-shim 后面的孙子进程无机制树杀
+  （Windows 唯一树杀手段就是 taskkill），`waitForExit(pid)` 仍失败。断言**故意保持严格**，不因环境退化放宽；
+  健康 Windows 宿主下两用例全绿。若需要无 taskkill 的树杀，候选是 PowerShell CIM 枚举 + `Stop-Process`
+  （新依赖、未批准、未实现）。
+
 ### work-7 — interaction contract 决策编译器 [deferred]
 
 - **dependsOn**: [work-6]
@@ -294,11 +334,11 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
 | design-ready | — |
 | awaiting-decision | —（work-4 已于 2026-10-14 裁决 D+C 并交付） |
 | operator-gated | work-5（删除 93 个备份需 operator 在终端执行；命令已入档；第二半已由现有门禁满足） |
-| proposed | work-8（子模块修剪 recovery 目录，根因修复；待批准） |
+| proposed | —（work-8/work-9 已于 2026-10-14 经 operator「继续」授权并交付，见 done 行） |
 | blocked | — |
 | deferred | work-7（已随 work-6 完成而解锁；入图时需重新确认范围） |
 | in_progress | — |
-| done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做） |
+| done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做）, work-8（2026-10-14，子模块 0.10.0）, work-9（2026-10-14，A18 封顶；环境残留另记） |
 
 ## parallelGroups
 
@@ -422,10 +462,20 @@ facts:
   - work-5 复核：备份 93 个（首次盘点 80 漏计 opencode `_purged-20260826_204215` 历史桶 13 个），93/93 有活体投影、0 孤儿、最新仍为 2026-08-17；删除命令已入档 work-5 节，仍由 operator 终端执行
   - work-4 裁决 D+C 已执行：删父侧桥 turn-settlement.mjs + 子套件；harness-runtime 47/47（-6 为被删用例）；边界测试 B2 fixture 换现存路径 3/3；rex-integration 绿；ADR 0002/CONTEXT/A17/CHANGELOG 同步；子模块 settle/verify/start CLI 保留（人工透传是确认消费者）→ 无子模块公开面变化，无需发布流
   - 全量 affected 2113/2098/6fail/9skip：6 失败均因果独立（2×llms-txt 存量 HEAD 对照实验证实；2×G1 存量；2×spawn-timeout 新登 A18=本宿主 taskkill RPC 60s 超时，非本批引入，修复提案 work-9 待批）
+  - operator「继续没有完成的事情」视为 work-8/work-9 签字（与 work-6 S1 同口径），两项均已交付：
+  - **work-9 已交付**：taskkill `spawnSync` 封顶 1500ms + `killSignal: SIGKILL`，失败走 `child.kill()` 兜底；
+    结算预算改为推导（`SETTLE_BUDGET_MS = 750+1500+2000+300`）；新增 win32 钉定用例（假慢杀手注入，342ms 绿）；
+    实测修复前 62189ms → 修复后 shell-shim 用例结算断言在预算内通过；唯一残留失败是环境级无树杀（A18 已记录，断言不放宽）
+  - **work-8 已交付**：新模块 `rex-harness/src/clients/recovery-prune.mjs`（每 skill 保留最近 2 份，归属不明不动，
+    冲突/错误轮不修剪）；`installClientProjection` 成功后修剪并回报 `prunedRecoveryBackups`；
+    子模块 0.9.1→0.10.0 + CHANGELOG + provider-contract 同步；证据 client-install 契约 22/22、子模块全量 218/218、doctor errors []
 assignment:
   work-5: operator      # 删 93 个备份，命令已入档，仅 operator 终端执行
   work-6: done          # S1/S2/S4 交付，S3 按范围决定不做
   work-4: done          # 裁决 D+C 执行；选项 A 若重提须先有调用点再建桥
 ```
 
-已 cap（05bbfc6c..90b5db34，两个独立 commit：e965c5c2 S1 / 90b5db34 work-4 D+C），工作区干净。待 operator：① work-5 终端执行删除（命令已入档）；② work-8 是否批准入图（子模块发布流）；③ work-9（A18 修复）是否批准；④ work-7 已解锁，入图需重确认范围。代码侧 work-1/2/3/4/6 均已交付；若重提结算接线（选项 A），必须先有调用点再建桥（ADR 0002 更新段）。
+已 cap（05bbfc6c..90b5db34，两个独立 commit：e965c5c2 S1 / 90b5db34 work-4 D+C），工作区干净。
+2026-10-14 第三轮：operator「继续没有完成的事情」授权 work-8（子模块 0.10.0，recovery 修剪）与
+work-9（A18 taskkill 封顶）并已交付。待 operator：① work-5 终端执行删除（命令已入档）；
+② work-7 已解锁，入图需重确认范围。代码侧 work-1/2/3/4/6 均已交付；若重提结算接线（选项 A），必须先有调用点再建桥（ADR 0002 更新段）。
