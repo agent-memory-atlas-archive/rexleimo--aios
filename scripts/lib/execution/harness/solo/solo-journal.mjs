@@ -11,7 +11,8 @@ export {
 export { clearSoloHarnessStop, readSoloControl, requestSoloHarnessStop, writeSoloControl } from './solo-journal/lifecycle/control.mjs';
 export { initSoloRunJournal } from './solo-journal/lifecycle/init.mjs';
 export { renderObjectiveMarkdown, safeReadJson } from './solo-journal/plumbing/io.mjs';
-export { appendSoloIteration } from './solo-journal/lifecycle/iteration.mjs';
+export { appendSoloIteration, readLatestIterationRecord } from './solo-journal/lifecycle/iteration.mjs';
+export { RUN_SUMMARY_CONSISTENCY_KIND, checkRunSummaryConsistency } from './solo-journal/content/consistency.mjs';
 export { appendSoloHookEvent } from './solo-journal/plumbing/hooks.mjs';
 export { claimSessionOwner, isProcessAlive, readSessionOwner } from './solo-journal/content/owner.mjs';
 export { installSessionSignalHandlers } from './solo-journal/lifecycle/signals.mjs';

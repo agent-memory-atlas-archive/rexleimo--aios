@@ -1,11 +1,11 @@
 /**
  * Reconcile sessions that stopped without reaching the normal session-end hook.
  *
- * A solo journal only persists `updatedAt`, not a process owner/heartbeat.
- * Therefore reconciliation is deliberately conservative: a running/backoff
- * session is considered interrupted only after the stale threshold expires.
- * The last checkpoint remains immutable; reconciliation adds an auditable
- * interruption record and a reviewable memory candidate.
+ * The run summary persists `updatedAt` but carries no owner field, so staleness alone
+ * cannot prove a session is dead. Reconciliation is therefore conservative and combines
+ * two signals: the session-owner liveness record (when present) and a stale-threshold
+ * backstop for a running/backoff session. The last checkpoint remains immutable;
+ * reconciliation adds an auditable interruption record and a reviewable memory candidate.
  */
 
 import { promises as fs } from 'node:fs';
@@ -13,6 +13,7 @@ import path from 'node:path';
 import { resolveContextDbRoot } from '../../../../environment/aios/state-root.mjs';
 import { atomicWriteText } from '../../../../memory/memo/storage/base/fs-io.mjs';
 import { getSoloHarnessPaths } from '../../../harness/solo/solo-journal/plumbing/paths.mjs';
+import { checkRunSummaryConsistency } from '../../../harness/solo/solo-journal/content/consistency.mjs';
 import { readSoloRunSummary } from '../../../harness/solo/solo-journal/content/summary.mjs';
 import { isProcessAlive, readSessionOwner } from '../../../harness/solo/solo-journal/content/owner.mjs';
 import { autoMemoSessionClose, readSessionCloseCandidate } from './close.mjs';
@@ -125,6 +126,10 @@ export async function reconcileUnclosedSessions({
     }
 
     const incompleteIteration = await latestStartedWithoutCompletion(rootDir, sessionId);
+    // 完成数与漂移判定同源：完成数取账本（iteration 记录），不取 summary 投影。投影在崩溃窗口内
+    // 可能滞后，若拿它当证据，恢复记录本身会报出账本不支持的轮数。
+    const consistency = await checkRunSummaryConsistency({ rootDir, sessionId, summary });
+    const lastCompletedIteration = consistency.ledger.lastIteration;
     const ownerDead = Boolean(owner && !isProcessAlive(owner.pid));
     const interruptionReason = ownerDead
       ? 'process-crashed-during-iteration'
@@ -138,14 +143,23 @@ export async function reconcileUnclosedSessions({
       reason: interruptionReason,
       detectedAt: now.toISOString(),
       lastCheckpointAt: summary.updatedAt || null,
-      lastCompletedIteration: Number.isFinite(summary.lastIteration) ? summary.lastIteration : 0,
+      lastCompletedIteration,
       incompleteIteration,
       resumeAvailable: true,
       evidenceRefs: [
-        `checkpoint:session/${sessionId}/iteration-${String(summary.lastIteration || 0).padStart(4, '0')}`,
+        `checkpoint:session/${sessionId}/iteration-${String(lastCompletedIteration).padStart(4, '0')}`,
         `journal:session/${sessionId}/run-summary.json`,
       ],
     };
+    if (!consistency.consistent) {
+      // 只记录，不修复：恢复记录必须能解释“为什么完成数与投影不一致”，
+      // 而静默改写会把被观测的漂移事实消掉。修复属独立决定（work-6 S3）。
+      interruption.summaryDrift = {
+        fields: consistency.driftFields,
+        projected: consistency.projected,
+        ledger: consistency.ledger,
+      };
+    }
     await atomicWriteText(interruptionPath(rootDir, sessionId, env), `${JSON.stringify(interruption, null, 2)}\n`);
 
     // Candidate generation remains proposal-only. The immutable interruption

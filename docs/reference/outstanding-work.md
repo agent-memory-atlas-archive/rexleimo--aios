@@ -1,7 +1,7 @@
 # Outstanding work
 
 > Living register. Updated whenever an item opens or closes — update it in the same commit as the change.
-> Last updated: 2026-09-22, after the zcode verification: A14 closed (ZCode HTTP key name read out of its own runtime schema; its strict server-schema allowlist fixed); A15/A16 remain open.
+> Last updated: 2026-10-14: A17 opened (the turn settlement gate has no production importer). Previous: 2026-09-22, after the zcode verification — A14 closed, A15/A16 remain open.
 > Source of truth for the current work item: `docs/plans/2026-09-18-triage-the-82-test-files-that-no-test-entry-reaches-23-currently.md`.
 
 Items are split by **who owns the fix**, because that is what decides where the change lands:
@@ -141,6 +141,13 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 
 - **Status**: open (low). The module calls itself a "core infrastructure barrel" and its header documents the intended import path, but no module in `scripts/`, `src/`, `packages/`, or `mcp-server/src/` imports it.
 - **Next**: delete it, or adopt it as the entry point its header describes. It is also why the ESM guard needed comment-aware scanning: its only "uses" were names listed in a comment.
+
+### A17 — OPEN: the turn settlement gate is unreachable in production
+
+- **Status**: open. `scripts/lib/execution/harness/solo/turn-settlement.mjs` (`buildTurnEnvelope` / `settleTurnEnvelope` / `mapIterationToTurnContract`) has no production importer — only `scripts/tests/execution/harness/infra/core/turn-settlement.mjs` and the aggregator that imports it. `git log -S settleTurnEnvelope --all` returns only the introducing commit `513df243` (the v5.13/v5.14 LoopX adoption) and no later call-site addition.
+- **Why it matters (high)**: the live solo harness loop (`scripts/lib/execution/lifecycle/run/harness/execution/execute-turn.mjs`, reached from `commands.mjs`) contains zero rex calls, so no turn is verified or settled. The v5.13/v5.14 release notes state that every provider turn now settles into a typed envelope that the executor cannot self-verify; in production that is exercised by tests only. The same holds for the submodule's `settleStandaloneTurn` / `startStandaloneWorkflow` (no production caller under `scripts/`). Settlement is currently reachable only when a human types `aios rex settle` — the `rex` dispatch in `scripts/lib/tooling/cli/dispatch/dispatch.mjs` is a pass-through proxy.
+- **Structural cause**: `buildTurnEnvelope` requires an `activationId` and an `executionToken`, i.e. the solo harness must own and advance a rex standalone workflow. It owns no rex workflow state today, so wiring means a session↔activation binding plus token rotation and crash recovery — not a one-line change.
+- **Next**: decide between (A) wire settlement into the live loop, (B) add a parent-side independent completion gate without rex settlement, and (C) delete the dead bridge and correct the release notes. Until one lands, do **not** add contract logic to the settlement gate — it would be dead code. Analysis: `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` §work-4.
 
 ## B. rex-harness / MCP adapter
 

@@ -10,7 +10,7 @@ import {
   DEFAULT_STALE_AFTER_MS,
 } from '../../../lib/execution/lifecycle/run/session-hooks/reconcile.mjs';
 import { readSessionCloseCandidate } from '../../../lib/execution/lifecycle/run/session-hooks/close.mjs';
-import { getSoloHarnessPaths } from '../../../lib/execution/harness/solo/solo-journal/plumbing/paths.mjs';
+import { getSoloHarnessPaths, iterationFileName } from '../../../lib/execution/harness/solo/solo-journal/plumbing/paths.mjs';
 import { claimSessionOwner } from '../../../lib/execution/harness/solo/solo-journal/content/owner.mjs';
 import { resolveContextDbRoot } from '../../../lib/environment/aios/state-root.mjs';
 
@@ -23,7 +23,20 @@ async function withWorkspace(prefix, fn) {
   }
 }
 
-async function seedSession(rootDir, sessionId, { status = 'running', updatedAt, lastIteration = 3 } = {}) {
+/**
+ * Seed a session journal.
+ *
+ * `completedIterations` is the ledger: iteration records that were actually written. The
+ * summary projection is derived from it by default, so a plain fixture is drift-free; pass
+ * `summaryLastIteration` to simulate a projection that lags behind the ledger — the crash
+ * window reconciliation must not trust.
+ */
+async function seedSession(rootDir, sessionId, {
+  status = 'running',
+  updatedAt,
+  completedIterations = [],
+  summaryLastIteration = completedIterations.length > 0 ? Math.max(...completedIterations) : 0,
+} = {}) {
   const sessionRoot = path.join(resolveContextDbRoot(rootDir, { preferLegacyExisting: true }), 'sessions', sessionId);
   const journal = getSoloHarnessPaths({ rootDir, sessionId });
   await fs.mkdir(journal.dir, { recursive: true });
@@ -33,9 +46,28 @@ async function seedSession(rootDir, sessionId, { status = 'running', updatedAt, 
     sessionId,
     status,
     objective: `Objective for ${sessionId}`,
-    lastIteration,
+    iterationCount: summaryLastIteration,
+    lastIteration: summaryLastIteration,
+    lastOutcome: completedIterations.length > 0 ? 'success' : '',
+    lastFailureClass: 'none',
+    lastStage: 'development',
     updatedAt,
   }, null, 2)}\n`, 'utf8');
+  for (const iteration of completedIterations) {
+    await fs.writeFile(
+      path.join(journal.iterationDir, iterationFileName(iteration)),
+      `${JSON.stringify({
+        schemaVersion: 1,
+        kind: 'solo-harness.iteration',
+        sessionId,
+        iteration,
+        outcome: 'success',
+        failureClass: 'none',
+        stage: 'development',
+      }, null, 2)}\n`,
+      'utf8',
+    );
+  }
 }
 
 test('reconcile records a stale running session and creates a candidate', async () => {
@@ -44,7 +76,7 @@ test('reconcile records a stale running session and creates a candidate', async 
     await seedSession(rootDir, 'stale-session', {
       status: 'running',
       updatedAt: new Date(now.getTime() - DEFAULT_STALE_AFTER_MS - 1).toISOString(),
-      lastIteration: 4,
+      completedIterations: [4],
     });
 
     const result = await reconcileUnclosedSessions({ rootDir, now, logger: { log() {} } });
@@ -56,10 +88,39 @@ test('reconcile records a stale running session and creates a candidate', async 
     assert.equal(record.previousStatus, 'running');
     assert.equal(record.lastCompletedIteration, 4);
     assert.equal(record.resumeAvailable, true);
+    assert.equal(record.summaryDrift, undefined, 'a drift-free fixture must not carry a drift report');
     assert.ok(record.evidenceRefs.some((ref) => ref.startsWith('checkpoint:')));
 
     const candidate = await readSessionCloseCandidate({ rootDir, sessionId: 'stale-session' });
     assert.equal(candidate.claimStatus, 'candidate');
+  });
+});
+
+test('reconcile derives the completed-iteration count from the ledger, not the summary projection', async () => {
+  await withWorkspace('aios-reconcile-ledger-', async (rootDir) => {
+    const now = new Date('2026-08-22T12:00:00Z');
+    // summary 是投影：它在崩溃窗口内可能滞后。账本只认实际写下的 iteration 记录。
+    await seedSession(rootDir, 'lagging-session', {
+      status: 'running',
+      updatedAt: new Date(now.getTime() - DEFAULT_STALE_AFTER_MS - 1).toISOString(),
+      completedIterations: [1, 2],
+      summaryLastIteration: 4,
+    });
+
+    const result = await reconcileUnclosedSessions({ rootDir, now, logger: { log() {} } });
+    assert.equal(result.reconciled.length, 1);
+
+    const record = JSON.parse(await fs.readFile(interruptionPath(rootDir, 'lagging-session'), 'utf8'));
+    assert.equal(record.lastCompletedIteration, 2, 'must not report a count the ledger does not support');
+    assert.ok(
+      record.evidenceRefs.some((ref) => ref.endsWith('iteration-0002')),
+      `evidence ref must point at the ledger-derived iteration, got ${record.evidenceRefs.join(', ')}`,
+    );
+    // 漂移只记录、不修复：恢复记录必须能解释“为什么完成数与投影不一致”。
+    assert.deepEqual(record.summaryDrift.fields, ['iterationCount', 'lastIteration']);
+    assert.equal(record.summaryDrift.projected.lastIteration, 4);
+    assert.equal(record.summaryDrift.ledger.lastIteration, 2);
+    assert.match(record.summaryDrift.ledger.lastOutcome, /^success$/u);
   });
 });
 
