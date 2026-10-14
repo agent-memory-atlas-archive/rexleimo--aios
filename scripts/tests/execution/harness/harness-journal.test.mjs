@@ -7,12 +7,16 @@ import test from 'node:test';
 import {
   appendSoloHookEvent,
   appendSoloIteration,
+  checkRunSummaryConsistency,
   getSoloHarnessPaths,
   initSoloRunJournal,
+  readLatestIterationRecord,
   readSoloControl,
   readSoloRunStatus,
+  readSoloRunSummary,
   requestSoloHarnessStop,
 } from '../../../lib/execution/harness/solo/solo-journal.mjs';
+import { persistIterationState } from '../../../lib/execution/harness/solo/solo-runtime/support/state.mjs';
 
 test('initSoloRunJournal writes objective summary and control artifacts', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-journal-'));
@@ -54,7 +58,7 @@ test('initSoloRunJournal writes objective summary and control artifacts', async 
   }
 });
 
-test('appendSoloIteration persists iteration artifact and stop control can be requested', async () => {
+test('appendSoloIteration writes the ledger only; persistIterationState is the sole summary writer', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-journal-'));
 
   try {
@@ -107,6 +111,30 @@ test('appendSoloIteration persists iteration artifact and stop control can be re
     assert.equal(iterationPayload.stage, 'planning');
     assert.deepEqual(iterationPayload.evidence, ['docs/checklist.md drafted']);
 
+    // 契约 S1（work-6）：append 只写账本，不得碰 summary 投影（历史上此处会双写）。
+    const ledger = await readLatestIterationRecord({ rootDir, sessionId: 'solo-session' });
+    assert.equal(ledger.iteration, 1);
+    assert.equal(ledger.outcome, 'success');
+    assert.equal(ledger.recordUnreadable, false);
+    const summaryAfterAppend = await readSoloRunSummary({ rootDir, sessionId: 'solo-session' });
+    assert.equal(summaryAfterAppend.iterationCount, 0);
+    assert.equal(summaryAfterAppend.lastIteration, 0);
+    assert.equal(summaryAfterAppend.lastOutcome, '');
+
+    // 投影断言迁到正确 owner：summary 字段只由 persistIterationState 写入。
+    const persisted = await persistIterationState({
+      rootDir,
+      sessionId: 'solo-session',
+      summary: summaryAfterAppend,
+      outcome: iteration.outcome,
+      checkpointWriter: async () => ({ persisted: false, reason: 'test-disabled' }),
+    });
+    assert.equal(persisted.iterationCount, 1);
+    assert.equal(persisted.lastIteration, 1);
+    assert.equal(persisted.lastOutcome, 'success');
+    assert.equal(persisted.lastStage, 'planning');
+    assert.deepEqual(persisted.latestEvidence, ['docs/checklist.md drafted']);
+
     await requestSoloHarnessStop({
       rootDir,
       sessionId: 'solo-session',
@@ -122,6 +150,14 @@ test('appendSoloIteration persists iteration artifact and stop control can be re
     assert.equal(status.lastStage, 'planning');
     assert.deepEqual(status.latestEvidence, ['docs/checklist.md drafted']);
     assert.equal(status.stopRequested, true);
+
+    // 反例：账本与投影单写者后仍应同源一致（S2 漂移检测在正常写入下不应报漂移）。
+    const consistency = await checkRunSummaryConsistency({
+      rootDir,
+      sessionId: 'solo-session',
+      summary: await readSoloRunSummary({ rootDir, sessionId: 'solo-session' }),
+    });
+    assert.equal(consistency.consistent, true, `drift: ${consistency.driftFields.join(',')}`);
   } finally {
     await rm(rootDir, { recursive: true, force: true });
   }

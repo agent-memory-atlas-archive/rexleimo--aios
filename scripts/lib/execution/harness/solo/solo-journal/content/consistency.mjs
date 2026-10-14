@@ -8,8 +8,8 @@ export const RUN_SUMMARY_CONSISTENCY_KIND = 'solo-run-summary-consistency.v1';
 /**
  * 投影与账本的一致性检查。
  *
- * 为什么需要：`summary` 一轮内被两个写者写两次（`appendSoloIteration` 内部一次、
- * `persistIterationState` 一次），崩溃落在中间时 summary 会滞后于 iteration 记录。
+ * 为什么需要：一轮内账本先写（`appendSoloIteration`）、投影后写（`persistIterationState`，
+ * 唯一 summary 写者，见 work-6 S1），崩溃落在两次写之间时 summary 会滞后于 iteration 记录。
  * 没有这个检查时，恢复路径会把滞后值当成事实（G3），而读侧完全看不出区别（G2）。
  *
  * @param {object} input

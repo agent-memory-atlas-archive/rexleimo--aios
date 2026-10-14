@@ -1,11 +1,12 @@
-/* 中文注释：iteration 模块只负责单轮结果和日志追加，并同步摘要的 latest 字段。 */
+/* 中文注释：iteration 模块只负责单轮账本（iteration 记录 + 日志）写入。
+   run-summary 投影的唯一写者是 `persistIterationState`（solo-runtime/support/state.mjs）——
+   本模块不得回写 summary，否则一轮内出现两个 summary 写者（work-6 S1 已消除，勿再引入）。 */
 import { appendFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { writeFileAtomic } from '../../../../../environment/fs/atomic-write.mjs';
 import { normalizeIterationOutcome, normalizeOptionalStage, normalizeText } from '../content/normalizers.mjs';
 import { getSoloHarnessPaths, iterationFileName, iterationLogFileName } from '../plumbing/paths.mjs';
-import { readSoloRunSummary, writeSoloRunSummary } from '../content/summary.mjs';
 
 export async function appendSoloIteration({ rootDir, sessionId, iteration, outcome, logEntries = [] } = {}) {
   const normalizedOutcome = normalizeIterationOutcome({ ...outcome, sessionId, iteration });
@@ -26,21 +27,8 @@ export async function appendSoloIteration({ rootDir, sessionId, iteration, outco
     await writeFile(logPath, '', { encoding: 'utf8' });
   }
 
-  const existingSummary = await readSoloRunSummary({ rootDir, sessionId });
-  if (existingSummary) {
-    await writeSoloRunSummary({
-      rootDir,
-      ...existingSummary,
-      iterationCount: Math.max(existingSummary.iterationCount, normalizedOutcome.iteration),
-      lastIteration: normalizedOutcome.iteration,
-      lastOutcome: normalizedOutcome.outcome,
-      lastFailureClass: normalizedOutcome.failureClass,
-      lastStage: normalizedOutcome.stage,
-      latestEvidence: normalizedOutcome.evidence,
-      updatedAt: new Date().toISOString(),
-    });
-  }
-
+  // S1（work-6）：此处曾重读并回写 summary，与 persistIterationState 形成一轮双写，
+  // 两次内容还不一致（后者含 status/backoff）。账本与投影各只有一个写者。
   return {
     outcome: normalizedOutcome,
     iterationPath,
@@ -54,8 +42,9 @@ const ITERATION_RECORD_PATTERN = /^iteration-(\d+)\.json$/u;
  * 已完成轮次的权威账本读取器：iteration 记录只在 turn 收尾时写入（appendSoloIteration），
  * 因此“目录里存在 iteration-NNNN.json”等价于“第 N 轮已完成”。
  *
- * `summary.lastIteration` 是投影，两个写者之间的崩溃窗口内可能滞后，恢复与一致性校验
- * 不得把它当作证据（见 docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md §work-6 G3）。
+ * `summary.lastIteration` 是投影，由 persistIterationState 在账本写入之后另一次落盘，
+ * 崩溃落在两次写之间时投影会滞后于账本，恢复与一致性校验不得把它当作证据
+ * （见 docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md §work-6 G3）。
  *
  * @returns 最新一轮的 `{ iteration, outcome, failureClass, stage, recordUnreadable }`；无记录时返回 null。
  */
