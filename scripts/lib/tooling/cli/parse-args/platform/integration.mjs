@@ -1,4 +1,4 @@
-// scripts/lib/tooling/cli/parse-args/integration.mjs — `aios integration` 参数解析。
+// scripts/lib/tooling/cli/parse-args/platform/integration.mjs — `aios integration` 参数解析。
 import { Command } from 'commander';
 
 const ALL_SUBCOMMANDS = ['list', 'add', 'doctor', 'remove'];

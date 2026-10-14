@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/zcode/agents-plugin.mjs — AIOS ZCode agents plugin.
+// scripts/lib/tooling/components/integrations/zcode/agents-plugin.mjs — AIOS ZCode agents plugin.
 // ZCode has no project-scope subagent-definition surface (no .zcode/agents
 // discovery upstream); executable custom agents are contributed by plugins via
 // their agents/ directory (verified against the official document-skills

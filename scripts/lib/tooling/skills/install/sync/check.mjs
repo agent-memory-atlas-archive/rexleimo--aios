@@ -1,4 +1,4 @@
-// scripts/lib/tooling/skills/sync/check.mjs — 技能同步检查模块
+// scripts/lib/tooling/skills/install/sync/check.mjs — 技能同步检查模块
 // 从 sync.mjs 拆分出的独立模块，专注 checkGeneratedSkillsSync 逻辑
 
 import fs from 'node:fs';

@@ -1,4 +1,4 @@
-// scripts/lib/tooling/cli/dispatch.mjs — barrel index + 剩余的 createAiosDispatch 路由逻辑
+// scripts/lib/tooling/cli/dispatch/dispatch.mjs — barrel index + 剩余的 createAiosDispatch 路由逻辑
 // 原文件 425 行拆分为 helpers.mjs（printHelp/applyResultExitCode/runInteractiveTui）+ 本文件（路由表）
 
 import { chooseInteractiveCommand } from '../commander/interactive.mjs';

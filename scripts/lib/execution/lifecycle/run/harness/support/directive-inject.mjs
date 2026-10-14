@@ -12,7 +12,7 @@
  *     "mode_presets": { ... }
  *   }
  *
- * 参考: scripts/lib/execution/lifecycle/options/default-mode.mjs (已有的 preset 定义)
+ * 参考: scripts/lib/execution/lifecycle/govern/options/default-mode.mjs (已有的 preset 定义)
  */
 
 import { readFileSync, existsSync } from 'node:fs';

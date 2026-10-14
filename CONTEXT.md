@@ -9,7 +9,7 @@
 
 ### interception refs
 
-**定义**：`scripts/lib/foundation/interception/core/engine.mjs:15 interceptToolResult()` 在工具结果边界把 ≥2048 字节（`core/types.mjs:4 minRawBytes`）的原文写入本地 `.raw` ref，上下文只保留 summary + errorLines + keyLines + ref_id + 召回命令。
+**定义**：`scripts/lib/foundation/interception/runtime/core/engine.mjs:15 interceptToolResult()` 在工具结果边界把 ≥2048 字节（`scripts/lib/foundation/interception/runtime/core/types.mjs:4 minRawBytes`）的原文写入本地 `.raw` ref，上下文只保留 summary + errorLines + keyLines + ref_id + 召回命令。
 
 **为什么**：把「完整证据留在本地、可召回」和「上下文里只放可行动信号」拆成两件事，使压缩不必以丢失可诊断性为代价。
 
@@ -27,13 +27,13 @@
 
 ### 产物形状（压缩产物的信号保留）
 
-**定义**：一次自动压缩**留在上下文里的东西**。refs 层留 summary + errorLines + keyLines + ref_id + 召回命令（`scripts/lib/foundation/interception/packets/compact-packet.mjs:32-34`）；Pi 层留 handle + 2000 字符头 + 800 字符尾（`packages/aios-pi/lib/offload.mjs:39-42`）。
+**定义**：一次自动压缩**留在上下文里的东西**。refs 层留 summary + errorLines + keyLines + ref_id + 召回命令（`scripts/lib/foundation/interception/runtime/packets/compact-packet.mjs:32-34`）；Pi 层留 handle + 2000 字符头 + 800 字符尾（`packages/aios-pi/lib/offload.mjs:39-42`）。
 
 **为什么**：这是取回轮次方差的根因判据——产物保留了信号，模型就少回读；只留头尾，模型想要中段就必须回读且回读几次由模型自定。所以修法在产物侧，不在「谁决定取回」侧。推论状态为**待验证**（v3 计划段 B1 的对照实验），尚未证实。
 
 ### ledger layer
 
-**定义**：`scripts/lib/foundation/interception/metrics/ledger.mjs:11 LEDGER_LAYERS` 的四层枚举 `['refs','pi_usage','headroom','rtk_ab']`，每层在统一 JSONL 账本里独立计账。
+**定义**：`scripts/lib/foundation/interception/observability/metrics/ledger.mjs:11 LEDGER_LAYERS` 的四层枚举 `['refs','pi_usage','headroom','rtk_ab']`，每层在统一 JSONL 账本里独立计账。
 
 **为什么**：让每 token 事件可归因到机制，使 A/B 结论能被拆解而非整体宣称。**写入点与枚举成员是两个概念**——枚举里有名字不等于有生产写入点（`headroom` 就是只有枚举、无写入点）。
 

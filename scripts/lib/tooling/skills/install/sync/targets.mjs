@@ -1,4 +1,4 @@
-// scripts/lib/tooling/skills/sync/targets.mjs — 技能目标收集与管理函数
+// scripts/lib/tooling/skills/install/sync/targets.mjs — 技能目标收集与管理函数
 // 从 sync.mjs 拆分出的独立模块
 
 import fs from 'node:fs';

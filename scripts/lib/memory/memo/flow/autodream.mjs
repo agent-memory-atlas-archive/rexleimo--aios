@@ -3,15 +3,15 @@
  * Auto-dream CLI (Phase A: manual)
  *
  * Usage:
- *   node scripts/lib/memory/memo/autodream.mjs --root <path> [--mode preview|apply] [--space <name>]...
+ *   node scripts/lib/memory/memo/flow/autodream.mjs --root <path> [--mode preview|apply] [--space <name>]...
  *
  *   --root <path>   Required. Workspace root directory.
  *   --mode          Either 'preview' (default) or 'apply'.
  *   --space         Can be repeated to specify multiple spaces. Default: ['default']
  *
  * Example:
- *   node scripts/lib/memory/memo/autodream.mjs --root /tmp/my-workspace --mode preview
- *   node scripts/lib/memory/memo/autodream.mjs --root /tmp/my-workspace --mode apply --space default --space project_shared
+ *   node scripts/lib/memory/memo/flow/autodream.mjs --root /tmp/my-workspace --mode preview
+ *   node scripts/lib/memory/memo/flow/autodream.mjs --root /tmp/my-workspace --mode apply --space default --space project_shared
  */
 
 import { fileURLToPath } from 'node:url';

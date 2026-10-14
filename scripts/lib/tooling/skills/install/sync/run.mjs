@@ -1,4 +1,4 @@
-// scripts/lib/tooling/skills/sync/run.mjs — 技能生成同步执行模块
+// scripts/lib/tooling/skills/install/sync/run.mjs — 技能生成同步执行模块
 // 从 sync.mjs 拆分出的独立模块，专注 syncGeneratedSkills 执行逻辑
 
 import fs from 'node:fs';

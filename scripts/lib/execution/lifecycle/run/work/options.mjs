@@ -1,4 +1,4 @@
-// scripts/lib/execution/lifecycle/work/options.mjs — aios work 命令的纯函数选项契约
+// scripts/lib/execution/lifecycle/run/work/options.mjs — aios work 命令的纯函数选项契约
 // 中文注释：work 是 orchestrate 的语义化薄包装：默认 live 并发调度，dry-run 需显式；--serial 强制并发度 1。
 
 import { buildDispatchRuntimeEnv } from '../../../harness/orchestration/orchestrator-runtimes/env.mjs';

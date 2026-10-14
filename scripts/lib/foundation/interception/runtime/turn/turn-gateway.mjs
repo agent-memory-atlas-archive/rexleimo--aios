@@ -278,7 +278,7 @@ function buildProofText({ clientId, eventKind, sessionId }) {
   const sentinel = `AIOS_TURN_${eventKind}_${clientId}_${sessionId}`.replace(/[^a-zA-Z0-9_]/g, '_');
   return [
     `AIOS turn compression proof for ${clientId} ${eventKind}.`,
-    'Preserve actionable path scripts/lib/foundation/interception/turn/turn-gateway.mjs:1',
+    'Preserve actionable path scripts/lib/foundation/interception/runtime/turn/turn-gateway.mjs:1',
     sentinel.repeat(120),
     `Next: verify ${eventKind} compact packet metrics for ${clientId}.`,
   ].join('\n');

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * UserPromptSubmit hook runner for Claude / Codex / Grok.
- * Usage: node scripts/lib/foundation/planning/hook-user-prompt.mjs
+ * Usage: node scripts/lib/foundation/planning/flow/hook-user-prompt.mjs
  * Reads hook JSON from stdin, writes JSON additionalContext to stdout.
  */
 

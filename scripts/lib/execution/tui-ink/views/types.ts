@@ -1,4 +1,4 @@
-// scripts/lib/execution/tui-ink/types.ts
+// scripts/lib/execution/tui-ink/views/types.ts
 
 export type WrapMode = 'all' | 'repo-only' | 'opt-in' | 'off';
 export type Scope = 'global' | 'project';

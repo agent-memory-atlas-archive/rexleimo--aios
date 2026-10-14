@@ -1,4 +1,4 @@
-// scripts/lib/execution/lifecycle/install-state.mjs
+// scripts/lib/execution/lifecycle/setup/install-state.mjs
 // 幂等安装状态：记录每个 component 的完成状态，支持 --retry 断点续跑。
 // 状态文件放在 .aios/install-state.json（AIOS 状态根内，gitignored）。
 

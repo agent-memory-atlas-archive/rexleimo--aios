@@ -1,4 +1,4 @@
-// scripts/lib/tooling/cli/parse-args/work.mjs — aios work 参数解析
+// scripts/lib/tooling/cli/parse-args/run/work.mjs — aios work 参数解析
 // 中文注释：work 无子命令，只有选项 + 位置任务标题；解析后直接归一化，让 CLI 与运行入口共享同一契约。
 
 import { Command } from 'commander';

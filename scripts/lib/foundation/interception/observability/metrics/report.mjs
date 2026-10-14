@@ -1,4 +1,4 @@
-// scripts/lib/foundation/interception/metrics/report.mjs — `aios tokens report` builder
+// scripts/lib/foundation/interception/observability/metrics/report.mjs — `aios tokens report` builder
 // and renderer. Reads the unified ledger (metrics JSONL) and aggregates savings
 // per layer; one command answers "which layer saved how much".
 import { readLedgerRecords, aggregateLedgerByLayer } from './ledger.mjs';

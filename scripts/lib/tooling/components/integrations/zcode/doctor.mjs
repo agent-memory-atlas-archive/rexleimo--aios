@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/zcode/doctor.mjs — ZCode agents plugin health check.
+// scripts/lib/tooling/components/integrations/zcode/doctor.mjs — ZCode agents plugin health check.
 // Verifies the inline plugin (rex role cards as executable ZCode subagents)
 // is materialized, fresh against the AIOS install's agent-sources, and
 // registered in the user-level plugins.dirs config. Repair hints use the

@@ -43,7 +43,7 @@
 `video/scripts/render.mjs` 的 `sceneRange()` 现算，字幕由 `PromoVideo.tsx` 从同一份 json 下发，
 子代理不要把帧数或 cues 抄进场景代码。
 
-`model` 必须落在 `scripts/lib/specs/model-registry.json` 中该 `task_type` 的候选链里
+`model` 必须落在 `scripts/lib/tooling/specs/registry/model-registry.json` 中该 `task_type` 的候选链里
 （`routingRules[].primary` 或 `.fallback`）；`frontend` 的 primary 是 `claude-sonnet-5`，
 `kimi-k2.6` 是其 fallback 之一（多子代理并行 + 前端 UI 是它注册表里的 strengths），所以示例选它是有条件的，
 不是默认值。不声明 `task_type` 时路由会退回 `general`，不要指望程序从描述里猜。

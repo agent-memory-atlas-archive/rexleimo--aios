@@ -1,4 +1,4 @@
-// scripts/lib/foundation/clients/capability-report.mjs — barrel index，re-export 子模块公共 API
+// scripts/lib/foundation/clients/reporting/capability-report.mjs — barrel index，re-export 子模块公共 API
 // 原文件 447 行拆分为 evidence.mjs + shim.mjs + builder（内联），此文件只做组装和导出
 import {
   ALL_CLIENTS,

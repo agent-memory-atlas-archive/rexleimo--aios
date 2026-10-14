@@ -1,4 +1,4 @@
-// scripts/lib/execution/lifecycle/work.mjs — aios work 统一并发调度入口
+// scripts/lib/execution/lifecycle/run/work.mjs — aios work 统一并发调度入口
 // 中文注释：work 只做语义翻译（选项 → env → runOrchestrate），调度/守卫/证据全部复用既有引擎。
 
 import { runOrchestrate } from './orchestrate.mjs';

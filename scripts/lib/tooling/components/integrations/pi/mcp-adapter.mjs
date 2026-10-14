@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/pi/mcp-adapter.mjs — Pi MCP bridge setup.
+// scripts/lib/tooling/components/integrations/pi/mcp-adapter.mjs — Pi MCP bridge setup.
 // Pi carries MCP through one of two carriers that both read the same
 // Pi-global mcp.json: the built-in `mcp` extension (pi >= 0.99.0) or the
 // pinned third-party MCP-client extension (pi-mcp-adapter, required before

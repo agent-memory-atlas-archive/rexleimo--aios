@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/pi/doctor.mjs — Pi MCP bridge health check.
+// scripts/lib/tooling/components/integrations/pi/doctor.mjs — Pi MCP bridge health check.
 // Reports the AIOS-managed servers inside the Pi-global mcp.json plus the
 // carrier state: pi >= 0.99.0 serves mcp.json through its built-in MCP
 // extension (an installed pi-mcp-adapter only shadows it — informational),

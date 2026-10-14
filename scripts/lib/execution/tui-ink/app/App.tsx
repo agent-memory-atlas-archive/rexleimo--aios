@@ -1,4 +1,4 @@
-// scripts/lib/execution/tui-ink/App.tsx
+// scripts/lib/execution/tui-ink/app/App.tsx
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { MemoryRouter, Routes, Route, useNavigate } from 'react-router';

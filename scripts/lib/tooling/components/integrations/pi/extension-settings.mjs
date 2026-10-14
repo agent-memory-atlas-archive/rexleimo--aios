@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/pi/extension-settings.mjs — Pi extension registration.
+// scripts/lib/tooling/components/integrations/pi/extension-settings.mjs — Pi extension registration.
 // Pi discovers extensions from settings.json `extensions` path arrays
 // (global ~/.pi/agent/settings.json, project .pi/settings.json).
 // AIOS init points Pi at the bundled extension entry so `aios init

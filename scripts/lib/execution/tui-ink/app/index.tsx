@@ -1,4 +1,4 @@
-// scripts/lib/execution/tui-ink/index.tsx
+// scripts/lib/execution/tui-ink/app/index.tsx
 
 import { render } from 'ink';
 import fs from 'node:fs';

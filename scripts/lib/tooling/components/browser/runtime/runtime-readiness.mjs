@@ -1,4 +1,4 @@
-// scripts/lib/tooling/components/browser/runtime-readiness.mjs — browser MCP runtime readiness.
+// scripts/lib/tooling/components/browser/runtime/runtime-readiness.mjs — browser MCP runtime readiness.
 // Single owner of the question "can this AIOS root actually serve browser MCP?".
 // Callers that want to advertise a browser server to a client (the Pi-global
 // mcp.json) ask here instead of re-deriving browser paths on their own.

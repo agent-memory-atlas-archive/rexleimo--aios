@@ -1,4 +1,4 @@
-// scripts/lib/foundation/clients/capability-report/evidence.mjs — 客户端证据验证辅助函数
+// scripts/lib/foundation/clients/reporting/capability-report/evidence.mjs — 客户端证据验证辅助函数
 // 从 capability-report.mjs 拆分出的独立模块
 
 import { constants as fsConstants, promises as fs } from 'node:fs';

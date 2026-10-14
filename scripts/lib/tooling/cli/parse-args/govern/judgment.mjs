@@ -1,4 +1,4 @@
-// scripts/lib/tooling/cli/parse-args/judgment.mjs — `aios judgment` 参数解析。
+// scripts/lib/tooling/cli/parse-args/govern/judgment.mjs — `aios judgment` 参数解析。
 import { Command } from 'commander';
 
 const ALL_SUBCOMMANDS = ['status', 'enable', 'disable', 'ask'];

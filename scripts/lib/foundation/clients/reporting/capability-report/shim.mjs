@@ -1,4 +1,4 @@
-// scripts/lib/foundation/clients/capability-report/shim.mjs — native shim 检测辅助函数
+// scripts/lib/foundation/clients/reporting/capability-report/shim.mjs — native shim 检测辅助函数
 // 从 capability-report.mjs 拆分出的独立模块
 
 import { constants as fsConstants, promises as fs } from 'node:fs';

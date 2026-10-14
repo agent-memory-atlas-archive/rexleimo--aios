@@ -1,4 +1,4 @@
-// scripts/lib/foundation/interception/metrics/ledger.mjs — unified per-layer token ledger.
+// scripts/lib/foundation/interception/observability/metrics/ledger.mjs — unified per-layer token ledger.
 // Shares the metrics-sink JSONL file (one per session) so there is exactly one
 // sink; records gain a `layer` field ('refs' | 'pi_usage' | 'headroom' |
 // 'rtk_ab') so savings can be attributed per mechanism. Records still carry
