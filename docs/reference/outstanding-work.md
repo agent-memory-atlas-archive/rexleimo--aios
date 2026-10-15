@@ -219,6 +219,11 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Interim discipline**: register work items through `plan auto-gate --explicit-intent plan` alone, and
   if a `plan start` was run first, move the orphan document out of `docs/plans/` instead of leaving both
   (done for A20: orphan parked at `.aios/tmp/orphan-plan-a20-from-plan-start.md`).
+- **Status 2026-10-15**: reproduced a second time while registering the next item (A21 itself produced
+  `…two-plan-ledgers.md` + `…-2.md`), so the behaviour is deterministic rather than a race. It is now a live
+  work item — `docs/plans/2026-10-15-a21-one-work-item-must-not-produce-two-plan-ledgers-2.md` — with facts
+  H1-H5, a declared target set, and one unsigned decision: reuse must be keyed on an explicit work-item id
+  (E-c + E-a, the stated default) and never on objective-text similarity.
 
 ## B. rex-harness / MCP adapter
 
