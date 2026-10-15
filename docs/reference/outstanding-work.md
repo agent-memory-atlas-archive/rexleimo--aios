@@ -173,6 +173,13 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Same-move residue also fixed**: the wiring guard's refresh instruction and the snapshot note it generates still said `scripts/tests/test-suite-wiring.test.mjs` after the test-tree move — the documented refresh command could not run. Corrected to `scripts/tests/tooling/suites/`; regenerating now reproduces the committed snapshot byte-for-byte (no drift).
 - **Open question this raises (not fixed, needs a decision)**: `runPlanCommand`'s catch-all on a parse failure returns help mode with `subcommand: 'status'`, which is the same substitution shape one level up. It at least prints usage instead of a green exit, so it is not the observed defect; recorded rather than changed.
 
+### A20 — OPEN (found 2026-10-15 during release-read): `skill certify --base HEAD` can never satisfy the release preflight for a Skill that changed since the last tag
+
+- **The trap, measured**: the release preflight verifies evidence with `--base <previous tag>` (`scripts/release-preflight.sh:171-177`, `TRAINING_BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD^)`) while the docs and the 2026-10-14 lesson teach certifying at `--base HEAD`. A change-cert stores `baseline = git show <base>:<skill>`, so the two bases resolve to **different blobs** whenever the Skill content moved since the tag, and the same evidence cannot satisfy both consumers.
+- **Repro on this repo state (v6.3.0 → HEAD)**: `verify-training --changed --base v6.3.0` reported **blocked** for 5 Skills (aios-project-system, memo, promo-video-pipeline, rexai-image-generation, verification-loop). Certifying them with `--base HEAD` left the gate **still blocked** (only the current-hash half healed); re-certifying the same five with `--base v6.3.0` turned the gate **verified** 5/5, with no test regressions (tracked-evidence suites 21/21).
+- **Two things follow**: ① the preflight's own incident guard is what makes this dangerous — untracked or uncommitted certification output *also* fails the release (`release-preflight.sh:184-192`), so half-done recovery looks like progress and isn't; ② nothing in the tooling tells the operator which base to certify against. Candidate fixes (undecided): make `certify` accept `--base release`/auto-derive the previous tag, or have the preflight print the exact `certify --base <tag> --skill <list>` command when it blocks. Not implemented — needs a decision on which surface owns the release base.
+- **Current state**: the five base-correct certs are committed; A19's ledger note stands.
+
 ## B. rex-harness / MCP adapter
 
 ### B1 — The planning evidence gate cannot be satisfied through the documented surface
