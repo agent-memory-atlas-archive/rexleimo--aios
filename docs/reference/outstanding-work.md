@@ -180,6 +180,29 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Two things follow**: ① the preflight's own incident guard is what makes this dangerous — untracked or uncommitted certification output *also* fails the release (`release-preflight.sh:184-192`), so half-done recovery looks like progress and isn't; ② nothing in the tooling tells the operator which base to certify against. Candidate fixes (undecided): make `certify` accept `--base release`/auto-derive the previous tag, or have the preflight print the exact `certify --base <tag> --skill <list>` command when it blocks. Not implemented — needs a decision on which surface owns the release base.
 - **Current state**: the five base-correct certs are committed; A19's ledger note stands.
 
+### A21 — OPEN: `plan start` followed by `plan auto-gate --explicit-intent plan` creates a SECOND plan for one work item
+
+- **Observed 2026-10-15 while registering A20**: `plan start --title … --task …` persisted a plan
+  (`status: active`, `route: unknown`, `skills: []` — no capability bound), then
+  `plan auto-gate --explicit-intent plan` returned `action: started, created: True` and wrote a **second**
+  document (`…-release-pre-2.md`) holding the activation and Command. Two ledgers, one work item, and the
+  file names differ only by a `-2` suffix — which is precisely the class of ambiguity that made the stale
+  `executing` ledger misleading before A19 was fixed.
+- **Also worth noting**: `plan auto-gate --explicit-intent implement` yields `disposition: guarded`,
+  `capabilityDecision: null`, `action: none` — it does **not** bind the active plan either. Only
+  `--explicit-intent plan` selects a capability (`software.planning.sequence`, required evidence
+  `dependency-graph-recorded` / `step-verification-recorded`). So there is currently no declaration that
+  says "run the plan I just started".
+- **Candidate fixes (undecided)**: ① auto-gate reuses the active plan when its objective matches the
+  continuation key instead of creating a sibling; ② `plan start` runs the policy itself and refuses to
+  persist an unbound plan (reporting `route: unknown` as an incomplete state); ③ expose an explicit
+  `plan bind --capability <id>` declaration. Not implemented — needs a decision on whether matching is
+  textual (forbidden by the prompt-authoring norms) or must be an explicit id, which is why this is
+  registered rather than guessed.
+- **Interim discipline**: register work items through `plan auto-gate --explicit-intent plan` alone, and
+  if a `plan start` was run first, move the orphan document out of `docs/plans/` instead of leaving both
+  (done for A20: orphan parked at `.aios/tmp/orphan-plan-a20-from-plan-start.md`).
+
 ## B. rex-harness / MCP adapter
 
 ### B1 — The planning evidence gate cannot be satisfied through the documented surface
