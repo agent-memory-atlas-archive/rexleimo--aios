@@ -1,8 +1,17 @@
 import {
-  SOLO_FAILURE_CLASSES,
   SOLO_OUTCOMES,
   SOLO_STAGES,
 } from './constants.mjs';
+// work-7：outcome → 后果 的映射只有一个 owner（turn-consequences.mjs）。
+// 本文件不再自己推，只接受声明 + 查表。
+import {
+  deriveBackoffAction,
+  deriveCheckpointStatus,
+  deriveFailureClass,
+  isMaterialTurn,
+  normalizeSelfReport,
+  stopsByDefault,
+} from './turn-consequences.mjs';
 
 // 纯函数：统一 solo harness 文本归一化，并保留兜底值。
 // 注意：`export ... from` 不创建本地绑定，必须先 import 才能在本文件内调用。
@@ -36,41 +45,6 @@ function deriveEvidence(input = {}) {
   return [`outcome: ${normalizeText(input.outcome, 'unknown')}`];
 }
 
-function inferFailureClass(input = {}) {
-  const normalized = normalizeText(input.failureClass);
-  if (SOLO_FAILURE_CLASSES.has(normalized)) {
-    return normalized;
-  }
-
-  const outcome = normalizeText(input.outcome, 'failed');
-  if (outcome === 'success' || outcome === 'noop') return 'none';
-  if (outcome === 'blocked') return 'no-progress';
-  if (outcome === 'infra-retry') return 'runtime-error';
-  if (outcome === 'human-gate') return 'safety-gate';
-  if (outcome === 'stopped') return 'stop-requested';
-  return 'runtime-error';
-}
-
-function inferBackoffAction(outcome = '', failureClass = '') {
-  const normalizedOutcome = normalizeText(outcome);
-  const normalizedFailure = normalizeText(failureClass);
-  if (normalizedOutcome === 'infra-retry'
-    && ['runtime-error', 'tool-error', 'rate-limited', 'provider-overloaded'].includes(normalizedFailure)) {
-    return 'retry-with-backoff';
-  }
-  if (normalizedOutcome === 'human-gate') return 'human-gate';
-  if (normalizedOutcome === 'blocked') return 'shrink-scope';
-  return 'none';
-}
-
-function inferCheckpointStatus(outcome = '', shouldStop = false) {
-  const normalizedOutcome = normalizeText(outcome);
-  if (normalizedOutcome === 'success' || normalizedOutcome === 'noop') {
-    return shouldStop ? 'done' : 'running';
-  }
-  if (normalizedOutcome === 'stopped') return 'done';
-  return 'blocked';
-}
 
 export function normalizeSoloIterationOutcome(input = {}) {
   const sessionId = normalizeText(input.sessionId);
@@ -82,13 +56,14 @@ export function normalizeSoloIterationOutcome(input = {}) {
   const outcome = SOLO_OUTCOMES.has(normalizeText(input.outcome))
     ? normalizeText(input.outcome)
     : 'failed';
-  const failureClass = inferFailureClass({
+  const failureClass = deriveFailureClass({
     failureClass: input.failureClass,
     outcome,
   });
-  const shouldStopDefault = outcome === 'human-gate'
-    || outcome === 'stopped'
-    || outcome === 'failed';
+  // S 通道：自报是声明字段，未声明就是缺席（不从 summary 文本猜进展）。
+  const selfReport = normalizeSelfReport(input.selfReport);
+  const material = isMaterialTurn({ outcome, selfReport });
+  const shouldStopDefault = stopsByDefault(outcome);
   const shouldStop = input.shouldStop === true || shouldStopDefault;
 
   return {
@@ -106,8 +81,11 @@ export function normalizeSoloIterationOutcome(input = {}) {
     nextAction: normalizeText(input.nextAction),
     shouldStop,
     failureClass,
-    backoffAction: normalizeText(input.backoffAction, inferBackoffAction(outcome, failureClass)),
-    checkpointStatus: normalizeText(input.checkpointStatus, inferCheckpointStatus(outcome, shouldStop)),
+    selfReport,
+    // D3：材料性需 S 通道确认；loop 的额度/节奏读这个字段而不是比 outcome 字符串。
+    material,
+    backoffAction: normalizeText(input.backoffAction, deriveBackoffAction({ outcome, failureClass })),
+    checkpointStatus: normalizeText(input.checkpointStatus, deriveCheckpointStatus({ outcome, shouldStop })),
     createdAt: normalizeText(input.createdAt, new Date().toISOString()),
   };
 }

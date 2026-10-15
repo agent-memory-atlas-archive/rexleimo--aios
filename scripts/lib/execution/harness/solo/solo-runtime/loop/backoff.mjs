@@ -11,6 +11,12 @@
  */
 
 import { normalizeText } from '../support/normalizers.mjs';
+// work-7：退避不是本文件自己的字符串规则——outcome → 后果 归 turn-consequences.mjs。
+// 本文件以前还自带一份 RETRYABLE_FAILURE_CLASSES（与 normalizers 里的集合重复），已合并到 owner。
+import {
+  deriveBackoffAction,
+  derivesBackoffReset,
+} from '../support/turn-consequences.mjs';
 
 const BACKOFF_BASE_MS = 30_000;
 const BACKOFF_CAP_MS = 300_000;
@@ -64,8 +70,12 @@ export function resolveSoloBackoffState({ previous = null, outcome = {}, nowIso 
   const normalizedOutcome = normalizeText(outcome?.outcome);
   const failureClass = normalizeText(outcome?.failureClass);
 
-  // 成功/noop 重置所有计数器
-  if (normalizedOutcome === 'success' || normalizedOutcome === 'noop') {
+  // 成功/noop 重置所有计数器（D3：success 需要 S 通道确认，裸字符串不配重置）。
+  const outcomeDeclared = normalizedOutcome !== '';
+  if (outcomeDeclared && derivesBackoffReset({
+    outcome: normalizedOutcome,
+    material: outcome?.material === true,
+  })) {
     return {
       consecutiveInfraFailures: 0,
       consecutiveFailures: 0,
@@ -82,8 +92,11 @@ export function resolveSoloBackoffState({ previous = null, outcome = {}, nowIso 
 
   // 只有 infra-retry + 可重试失败类才走退避；rate-limited / provider-overloaded
   // 有专属节奏（见 should-run/cadence），host-unsupported / budget-exhausted 不允许盲目重试。
-  const RETRYABLE_FAILURE_CLASSES = new Set(['runtime-error', 'tool-error', 'rate-limited', 'provider-overloaded']);
-  if (normalizedOutcome === 'infra-retry' && RETRYABLE_FAILURE_CLASSES.has(failureClass)) {
+  // 可重试集合的拥有者在 turn-consequences.mjs。
+  const backoffAction = outcomeDeclared
+    ? deriveBackoffAction({ outcome: normalizedOutcome, failureClass })
+    : 'none';
+  if (backoffAction === 'retry-with-backoff') {
     const previousDelay = Number.isFinite(current.nextDelayMs) ? Math.max(0, Math.floor(current.nextDelayMs)) : 0;
     const nextDelayMs = previousDelay > 0 ? Math.min(previousDelay * 2, BACKOFF_CAP_MS) : BACKOFF_BASE_MS;
     return {

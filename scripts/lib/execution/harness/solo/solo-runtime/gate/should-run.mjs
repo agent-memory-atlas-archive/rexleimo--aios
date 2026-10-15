@@ -14,6 +14,8 @@
  * 全部输入来自 journal 数据（声明字段），不做关键词/文本猜测。
  */
 
+import { requiresOperatorRelease } from '../support/turn-consequences.mjs';
+
 export const SHOULD_RUN_ACTIONS = Object.freeze(['run', 'wait', 'ask', 'quiet']);
 
 const MIN_WAKE_MS = 1_000;
@@ -48,7 +50,10 @@ export function resolveShouldRun({
   nowMs = Date.now(),
 } = {}) {
   // 1. 操作者门未解除 → ask（resume 是显式动作，门不会自己消失）。
-  if (!operatorGateAcknowledged && (lastOutcome === 'human-gate' || lastStatus === 'human-gate')) {
+  // “这个 outcome 需要操作者放行”是表的属性，不在这里比字符串（work-7）。
+  // lastStatus 是 run-summary 的状态词表（另一个通道），仍按声明值判——未入本表所有权。
+  const outcomeNeedsOperator = requiresOperatorRelease(lastOutcome);
+  if (!operatorGateAcknowledged && (outcomeNeedsOperator || lastStatus === 'human-gate')) {
     return decision({ action: 'ask', reasonCode: 'operator_gate', cadenceState });
   }
 

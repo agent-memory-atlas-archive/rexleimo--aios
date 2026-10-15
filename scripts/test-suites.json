@@ -57,6 +57,7 @@
       "scripts/tests/execution/aios-setup/ctx-bootstrap.test.mjs",
       "scripts/tests/execution/harness/groupchat-runtime.test.mjs",
       "scripts/tests/execution/harness/harness-journal.test.mjs",
+      "scripts/tests/execution/harness/harness-turn-consequences.test.mjs",
       "scripts/tests/execution/harness/harness-profiles.test.mjs",
       "scripts/tests/execution/harness/harness-runtime.test.mjs",
       "scripts/tests/execution/harness/harness-worktree.test.mjs",
@@ -282,6 +283,7 @@
     "files": [
       "scripts/tests/execution/aios-runtime/aios-harness.test.mjs",
       "scripts/tests/execution/harness/harness-journal.test.mjs",
+      "scripts/tests/execution/harness/harness-turn-consequences.test.mjs",
       "scripts/tests/execution/harness/harness-runtime.test.mjs",
       "scripts/tests/execution/harness/harness-worktree.test.mjs",
       "scripts/tests/execution/harness/harness-profiles.test.mjs"

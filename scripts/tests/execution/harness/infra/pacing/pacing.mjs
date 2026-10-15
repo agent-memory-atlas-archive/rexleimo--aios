@@ -116,9 +116,25 @@ test('cadence ladder widens on non-material outcomes and resets on material prog
   });
   assert.equal(capped.delayMs, 1000); // cap 生效
 
-  const material = resolveCadenceState({ previous: capped, outcome: { outcome: 'success' }, nowMs: NOW, config });
+  // D3：材料性由 S 通道确认——声明了 progressMade 才能回基准。
+  const material = resolveCadenceState({
+    previous: capped,
+    outcome: { outcome: 'success', material: true },
+    nowMs: NOW,
+    config,
+  });
   assert.equal(material.cadenceClass, 'active_work');
   assert.equal(material.delayMs, 100); // 回基准
+
+  // 反例：裸 `outcome: 'success'` 而无 S 通道声明，不得拿到 active_work（继续放宽）。
+  const undeclaredSuccess = resolveCadenceState({
+    previous: capped,
+    outcome: { outcome: 'success' },
+    nowMs: NOW,
+    config,
+  });
+  assert.equal(undeclaredSuccess.cadenceClass, 'monitor_wait');
+  assert.equal(undeclaredSuccess.delayMs, 1000);
 
   const gate = resolveCadenceState({ outcome: { outcome: 'human-gate' }, nowMs: NOW, config });
   assert.equal(gate.cadenceClass, 'human_gate');

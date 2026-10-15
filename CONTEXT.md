@@ -82,3 +82,23 @@
 **定义**：一个枚举成员只有在存在**真实 call site** 时才允许留在该枚举里；没有 call site 的能力不进 public enum / CLI flag / event schema / 空 adapter。反向地，公开 wire 契约里的成员可以由**外部宿主**产出，宿主桥不得为了“用满枚举”自行映射。
 
 **为什么**：两侧都会腐化：① 声明了不可达的能力（父 `SHOULD_RUN_ACTIONS.self_repair` 永不返回）会让契约撒谎；② 桥为了填满枚举把失败轮映射成 material outcome（`repair_required`）会静默改变结算与额度语义。裁决见 `docs/architecture/adr/0002-turn-outcome-reachability.md`。
+
+## Solo 循环的决策契约
+
+### 声明通道（F / S / O）
+
+**定义**：solo 循环的一次 turn 只从三个**声明**来源取信息——**F 事实**：`solo-journal` 账本已记录的轮次与额度（work-6 的单一写者）；**S 自报**：provider 的 `selfReport{progressMade, blockedReason, summary}`（`support/turn-consequences.mjs:normalizeSelfReport`）；**O 操作者**：显式声明（resume ack / 门放行）。程序不从 summary 文本猜进展，也不从缺字段推意图。
+
+**为什么**：迁移前这些语义由 ≥6 处手写字符串分支各自推断（`normalizers.mjs` 的三个 `infer*`、`backoff.mjs`、`cadence.mjs`、`checkpoint.mjs`、`state.mjs` 的 runStatus、`should-run.mjs`），加一个 outcome 要同时改多处且无守卫证明它们一致。声明是字段，猜测是分歧的源头。
+
+### 材料性（material）
+
+**定义**：一轮 turn 有资格产生**副作用**（扣额度、把节奏拉回基准、推进工作流、以成功收尾）当且仅当 `TURN_CONSEQUENCES[outcome].material === true` **且** S 通道声明 `selfReport.progressMade === true`（`support/turn-consequences.mjs:isMaterialTurn`）。裸 `outcome: 'success'` 而无声明：归类照常，副作用一律不给。
+
+**为什么**：executor 不得自验完成声明（turn 契约 §前言），而"字符串等于成功"曾经是唯一的进展证据。实测现网 provider 根本不声明 success（`execute-turn.mjs` / `execute-turn-pi-rpc.mjs` 只发 stopped/blocked/infra-retry/human-gate），所以这条收紧不剥夺任何真实声明，只堵住"给裸字符串就能白拿额度与节奏"。safe_bypass 封印是它的第二道防线。
+
+### 后果表（单一 owner）
+
+**定义**：`outcome → 全部后果`（failureClass / backoffAction / checkpointStatus / runStatus / verificationResult / cadenceClass / stopByDefault / requiresOperator / countsAsNoopPoll / material）只登记在 `support/turn-consequences.mjs:TURN_CONSEQUENCES` 一处；其余模块调用 `derive*` / `turnConsequencesFor`，未登记名字直接抛错。`findTurnTableGaps()` 是这张表与 `SOLO_OUTCOMES` 的一致性检查，`scripts/tests/execution/harness/harness-turn-consequences.test.mjs` T7 额外扫描运行时源码，禁止第二处 outcome 字符串比较。
+
+**为什么**：D1 裁决保留 rex `TURN_OUTCOMES` 与 `SOLO_OUTCOMES` 两套词表（不跨表映射，直到有真实 call site——见 ADR 0002 的「可达性（枚举）」），前提是映射所有权唯一。没有这个约束，"两套词表"就会退化成"两套互相漂移的推理"。

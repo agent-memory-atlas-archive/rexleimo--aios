@@ -54,6 +54,7 @@ test('pacing disabled keeps loop behavior identical: every turn executes, no wai
         turns += 1;
         return {
           outcome: 'success',
+          selfReport: { progressMade: true, summary: `progress ${iteration}` },
           summary: `progress ${iteration}`,
           shouldStop: iteration === 3,
           failureClass: 'none',
@@ -114,7 +115,7 @@ test('quota gate waits instead of burning a turn when the window is exhausted', 
         maxIterations: 10,
         executeTurn: async () => {
           turns += 1;
-          return { outcome: 'success', summary: 'material progress', shouldStop: false, failureClass: 'none' };
+          return { outcome: 'success', selfReport: { progressMade: true }, summary: 'material progress', shouldStop: false, failureClass: 'none' };
         },
         sleepImpl: async (ms) => {
           waits.push(ms);
@@ -141,7 +142,7 @@ test('cadence gate spaces turns by the ladder and resets on material progress', 
     await prepareRun(rootDir);
     const outcomes = [
       { outcome: 'noop', summary: 'polling', shouldStop: false, failureClass: 'no-progress' },
-      { outcome: 'success', summary: 'material progress', shouldStop: true, failureClass: 'none' },
+      { outcome: 'success', selfReport: { progressMade: true }, summary: 'material progress', shouldStop: true, failureClass: 'none' },
     ];
     let turns = 0;
     const waits = [];
@@ -188,7 +189,14 @@ test('safe-bypass grants exactly one read-only turn and seals its material claim
           return { outcome: 'human-gate', summary: 'needs operator decision', shouldStop: true, failureClass: 'ownership-gate' };
         }
         // 绕行轮试图声称 material 进展 —— 必须被封印降级。
-        return { outcome: 'success', summary: 'claiming material progress from bypass', shouldStop: false, failureClass: 'none' };
+        // 这里故意把 S 通道声明满：如果降级是因为“没声明”而不是封印，本测试就会空转。
+        return {
+          outcome: 'success',
+          selfReport: { progressMade: true },
+          summary: 'claiming material progress from bypass',
+          shouldStop: false,
+          failureClass: 'none',
+        };
       },
     });
 

@@ -380,6 +380,19 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
 
 ---
 
+### work-10 — turn 契约接线（D2 遗留）[proposed，未入图]
+
+- **dependsOn**: [work-7]
+- **入图前提（ADR 0002，不得绕过）**：必须先有**真实调用点**再建桥。work-7 交付后调用点仍未成立：
+  父侧 loop 现在消费的是自己的 `SOLO_OUTCOMES` + S 通道声明，不消费 rex `turn-result`；
+  所以现在建 `SOLO ↔ TURN` 映射就是死代码（work-4 已删过一个同型桥，别重复）。
+- **什么情况下成立**：当 loop 需要 rex 侧的 `effectRef` 幂等 / 独立校验进程结算时（即结算门真的接入执行），
+  那一轮就是调用点——同时把映射表加进 `turn-consequences.mjs` 并更新 ADR 0002。
+- **范围（待到时再确认，不口头传递）**：跨词表映射 owner、session↔activation 绑定、token 轮换、崩溃恢复。
+- **非目标**：不为“用满枚举”自行映射失败轮为 material outcome（ADR 0002 反向约束）。
+
+---
+
 ## frontier
 
 | 状态 | work |
@@ -388,11 +401,11 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
 | design-ready | — |
 | awaiting-decision | —（work-4 已于 2026-10-14 裁决 D+C 并交付） |
 | operator-gated | work-5（删除 93 个备份需 operator 在终端执行；命令已入档；第二半已由现有门禁满足） |
-| proposed | —（work-8/work-9 已于 2026-10-14 经 operator「继续」授权并交付，见 done 行） |
+| proposed | work-10（D2 遗留：rex turn 契约 ↔ solo 词表的接线——ADR 0002 要求先有调用点再建桥）；work-8/work-9 已于 2026-10-14 经 operator「继续」授权并交付，见 done 行 |
 | blocked | — |
-| deferred | work-7（已随 work-6 完成而解锁；范围已于 2026-10-15 从代码事实重推导并入库，待 operator 签 D1-D3） |
+| deferred | —（work-7 已于 2026-10-15 按默认签 D1-D3 并交付父侧范围） |
 | in_progress | — |
-| done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做）, work-8（2026-10-14，子模块 0.10.0）, work-9（2026-10-14，A18 封顶；环境残留另记） |
+| done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做）, work-8（2026-10-14，子模块 0.10.0）, work-9（2026-10-14，A18 封顶；环境残留另记）, **work-7（2026-10-15，父侧范围：TURN_CONSEQUENCES 单一后果 owner + S 通道 material）** |
 
 ## parallelGroups
 
@@ -548,6 +561,15 @@ facts:
     零消费者、loop 跑在第二套词表上、1 个语义映射被手写复制在 ≥6 处、模型自报通道父侧根本不存在、操作者信号被压成 1 个 bool。
     **教训（入库规则）：deferred 项的范围不得只存活在会话里**——“见本次会话的分析”等于把范围交给压缩机制去销毁，
     下次 resume 只能猜测；范围必须写进工单本体，带可复核命令。入图阻塞在 D1-D3 三个决策，已给出默认值。
+  - **work-7 已交付（2026-10-15，operator「按默认」= D1 保留两套词表 + 单一 owner、D2 先只做父侧、D3 缺声明即无 material 资格）**：
+    新 owner `solo-runtime/support/turn-consequences.mjs`（TURN_CONSEQUENCES 7 行全字段 + 严格查表抛错 + findTurnTableGaps）；
+    六处推理副本全部改为读表：normalizers 的三个 infer*（已删）、backoff（含它自带的第二份 RETRYABLE 集合）、cadence、
+    checkpoint、state.mjs 的 runStatus（八个字符串分支）、should-run；loop 的扣额度/noop 计数/bypass 授予/exit 语义不再比字符串。
+    词表（cadence 归类 / run 状态 / 退避动作 / checkpoint 状态）归 constants.mjs；从未被 import 的 CADENCE_CLASSES 导出直接退役而不是复制。
+    **行为保持到分支**：infra-retry 在失败类门之前的优先级已钉（T5）；**唯一收紧**是 material 需 S 通道，而现网 provider 本来就不发 success（实测 grep）——
+    所以不剥任何真实声明。证据：T1-T7 7/7（T2 用合成 outcome 证守卫非空转、T7 扫描源码禁第二处 owner（插一处字符串比较只挂 T7）、
+    T4 只挂于关掉 S 门）、harness-runtime+core 57/57、safe-bypass 封印测试仍可区分（关掉封印必挂——说明改 fixture 是保留力量而非遮盖）、
+    接线守卫 W1/W2/W3/W5/W6 6/6 且快照无漂移。遗留：D2（turn 契约接线，需先有调用点）登记为 work-10；deriveEvidence 的文本回退链（F6）本次不动。
 assignment:
   work-5: operator      # 删 93 个备份，命令已入档，仅 operator 终端执行
   work-6: done          # S1/S2/S4 交付，S3 按范围决定不做

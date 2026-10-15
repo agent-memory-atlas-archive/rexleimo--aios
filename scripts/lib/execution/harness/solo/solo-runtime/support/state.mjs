@@ -8,20 +8,8 @@ import {
   summarizeIterationForContinuity,
 } from './normalizers.mjs';
 import { buildCheckpointLogEntry, writeSoloIterationCheckpoint } from '../gate/checkpoint.mjs';
-
-function deriveRunStatus(outcome = {}) {
-  const normalizedOutcome = normalizeText(outcome.outcome);
-  const failureClass = normalizeText(outcome.failureClass);
-  if (normalizedOutcome === 'infra-retry') return 'backoff';
-  if (normalizedOutcome === 'human-gate' || failureClass === 'ownership-gate' || failureClass === 'safety-gate') {
-    return 'human-gate';
-  }
-  if (normalizedOutcome === 'stopped') return 'stopped';
-  if (normalizedOutcome === 'failed') return 'failed';
-  if (normalizedOutcome === 'blocked') return outcome.shouldStop === true ? 'blocked' : 'running';
-  if (outcome.shouldStop === true) return 'done';
-  return 'running';
-}
+// work-7：run summary 状态词表不在本文件推——outcome/失败类 → 状态 归 turn-consequences.mjs。
+import { deriveRunStatus } from './turn-consequences.mjs';
 
 export function buildStopOutcome({ sessionId, iteration } = {}) {
   return normalizeSoloIterationOutcome({
@@ -105,7 +93,11 @@ export async function persistIterationState({
     outcome,
     nowIso: outcome.createdAt,
   });
-  const nextStatus = deriveRunStatus(outcome);
+  const nextStatus = deriveRunStatus({
+    outcome: outcome.outcome,
+    failureClass: outcome.failureClass,
+    shouldStop: outcome.shouldStop === true,
+  });
 
   return await writeSoloRunSummary({
     rootDir,

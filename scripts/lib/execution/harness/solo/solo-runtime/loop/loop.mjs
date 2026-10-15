@@ -11,6 +11,8 @@ import { evaluateDryRunReadiness, formatDryRunReadiness } from '../gate/dry-run-
 import { writeSoloIterationCheckpoint } from '../gate/checkpoint.mjs';
 import { invokeLifecycleHook } from '../support/hooks.mjs';
 import { normalizeSoloIterationOutcome } from '../support/normalizers.mjs';
+// work-7：loop 不再自己比 outcome 字符串——材料性由 S 通道确认，其余归类查表。
+import { countsAsNoopPoll, requiresOperatorRelease, terminatesSuccessfully } from '../support/turn-consequences.mjs';
 import { buildStopOutcome, persistIterationState } from '../support/state.mjs';
 
 export async function runSoloHarnessLoop({
@@ -343,14 +345,15 @@ export async function runSoloHarnessLoop({
       const pacingState = summary.pacing || {};
       const spend = chargeQuotaSpend({
         spend: pacingState.quota?.spend,
-        material: effectiveOutcome.outcome === 'success',
+        // D3：扣额度的资格来自 S 通道确认的 material，不是 `outcome === 'success'` 的裸字符串。
+        material: effectiveOutcome.material === true,
         nowMs: now,
         config: quotaConfig,
       });
       const cadence = cadenceConfig?.enabled
         ? resolveCadenceState({ previous: pacingState.cadence, outcome: effectiveOutcome, nowMs: now, config: cadenceConfig })
         : null;
-      const consecutiveNoop = effectiveOutcome.outcome === 'noop'
+      const consecutiveNoop = countsAsNoopPoll(effectiveOutcome.outcome)
         ? (Number.isFinite(pacingState.consecutiveNoop) ? pacingState.consecutiveNoop : 0) + 1
         : 0;
       summary = {
@@ -455,7 +458,7 @@ export async function runSoloHarnessLoop({
             tool: `harness-turn-${iteration}`,
             input: rawTurn?.prompt || summary.objective || '',
             output: outputStr,
-            exitCode: effectiveOutcome.outcome === 'success' ? 0 : 1,
+            exitCode: terminatesSuccessfully(effectiveOutcome.outcome) ? 0 : 1,
             durationMs: 0,
           },
           { workspaceRoot: rootDir, storage, config },
@@ -468,7 +471,7 @@ export async function runSoloHarnessLoop({
 
     // safe_bypass 授予：human-gate 停机前，unattended 档允许恰好一次只读绕行。
     if (effectiveOutcome.shouldStop
-      && effectiveOutcome.outcome === 'human-gate'
+      && requiresOperatorRelease(effectiveOutcome.outcome)
       && pacingEnabled
       && pacing.safeBypass === true
       && !bypassUsed) {

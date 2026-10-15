@@ -3,6 +3,9 @@ import path from 'node:path';
 import { resolveContextDbRoot } from '../../../../../environment/aios/state-root.mjs';
 import { runContextDbCli } from '../../../../../memory/contextdb-cli.mjs';
 import { normalizeStringArray, normalizeText } from '../support/normalizers.mjs';
+// work-7：验证结果归类不再在本文件比字符串，归 turn-consequences.mjs 拥有。
+import { deriveVerificationResult } from '../support/turn-consequences.mjs';
+import { SOLO_OUTCOMES } from '../support/constants.mjs';
 
 function sessionMetaPath(rootDir, sessionId) {
   return path.join(resolveContextDbRoot(rootDir, { preferLegacyExisting: true }), 'sessions', sessionId, 'meta.json');
@@ -10,10 +13,9 @@ function sessionMetaPath(rootDir, sessionId) {
 
 function mapOutcomeToVerificationResult(outcome = {}) {
   const normalizedOutcome = normalizeText(outcome.outcome);
-  if (normalizedOutcome === 'success' || normalizedOutcome === 'noop') return 'passed';
-  if (normalizedOutcome === 'failed' || normalizedOutcome === 'infra-retry') return 'failed';
-  if (normalizedOutcome === 'blocked' || normalizedOutcome === 'human-gate' || normalizedOutcome === 'stopped') return 'partial';
-  return 'unknown';
+  // 未登记的 outcome 不猜：显式归 unknown（缺席 ≠ 通过）。
+  if (!SOLO_OUTCOMES.has(normalizedOutcome)) return 'unknown';
+  return deriveVerificationResult(normalizedOutcome);
 }
 
 function buildCheckpointEvidence(outcome = {}) {
