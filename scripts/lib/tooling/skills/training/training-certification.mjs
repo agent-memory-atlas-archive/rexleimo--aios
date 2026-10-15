@@ -4,6 +4,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { evaluateSkillComplianceLive } from '../compliance/compliance-live.mjs';
+import { normalizeEolText } from '../frontmatter.mjs';
 import { validateTrainingEvidence } from './training-evidence-validator.mjs';
 
 const ARTIFACT_NAMES = Object.freeze({
@@ -293,7 +294,10 @@ export async function validateCertifiedTrainingEvidence({
   }
   const [tasks, baselineContent, baselineRaw, baselineScored, candidateRaw, candidateScored] = await Promise.all([
     readJson(artifactPaths.tasks),
-    fs.readFile(artifactPaths.baselineSkill, 'utf8').catch(() => null),
+    // 中文注释：基线产物是跟 Git blob 做内容哈希比对的字节约定。仓库存 LF，
+    // 但 core.autocrlf 的 Windows 工作树会把产物实体刷成 CRLF——不在读入口归一，
+    // 同一份证据在干净检出后会被自己的守卫推翻（与 llms.txt 守卫同型的平台依赖缺陷）。
+    fs.readFile(artifactPaths.baselineSkill, 'utf8').then(normalizeEolText).catch(() => null),
     readJson(artifactPaths.baselineRaw),
     readJson(artifactPaths.baselineScored),
     readJson(artifactPaths.candidateRaw),
@@ -305,7 +309,7 @@ export async function validateCertifiedTrainingEvidence({
   const expectedBaseline = readBaselineSkill({ rootDir, sourcePath, skillId, base });
   if (expectedBaseline === null
     || expectedBaseline.kind !== state.baseline?.kind
-    || sha256(baselineContent) !== sha256(expectedBaseline.content)
+    || sha256(baselineContent) !== sha256(normalizeEolText(expectedBaseline.content))
     || state.baseline?.contentSha256 !== sha256(baselineContent)) {
     return { ok: false, reason: 'stored baseline does not match the Git baseline for this release check' };
   }

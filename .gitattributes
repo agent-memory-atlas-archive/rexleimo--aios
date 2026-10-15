@@ -8,6 +8,10 @@ agent-sources/**/*.md text eol=lf
 agent-sources/**/*.json text eol=lf
 scripts/lib/tooling/specs/*.json text eol=lf
 docs-site/llms.txt text eol=lf
+# Skill 训练认证产物是跟 Git blob 做内容哈希比对的字节约定（baseline-skill.md 等），
+# 所以它和上面几条一样必须钉 LF：否则 Windows 检出把证据刷成 CRLF，
+# 已接受的认证会在下一次干净检出时被自己的基线守卫推翻。
+docs/evidence/skill-training/** text eol=lf
 /AGENTS.md text eol=lf
 /CLAUDE.md text eol=lf
 /GEMINI.md text eol=lf

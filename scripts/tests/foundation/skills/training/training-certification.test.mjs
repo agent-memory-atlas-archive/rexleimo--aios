@@ -133,3 +133,47 @@ test('training certification records reproducible evidence and rejects a forged 
   const newSkillState = JSON.parse(await readFile(newSkillCertification.skills[0].statePath, 'utf8'));
   assert.equal(newSkillState.baseline.kind, 'no-skill-control');
 });
+
+test('accepted evidence still verifies after a CRLF checkout of the stored baseline artifact', async () => {
+  const fixture = await createGitSkillFixture();
+  const certification = await certifySkillTraining({
+    rootDir: fixture.rootDir,
+    changedFiles: [fixture.relativeSkillPath],
+    base: 'HEAD',
+  });
+  assert.equal(certification.status, 'verified', JSON.stringify(certification));
+  const state = JSON.parse(await readFile(certification.skills[0].statePath, 'utf8'));
+  const baselinePath = path.join(path.dirname(certification.skills[0].statePath), state.artifacts.baselineSkill);
+
+  // 基线产物是跟 Git blob 做内容哈希比对的字节约定，但 core.autocrlf 的检出会把
+  // 工作树实体刷成 CRLF——守卫假设“内容就是 Git 里那东西”，所以它必须与行尾无关。
+  const lfContent = await readFile(baselinePath, 'utf8');
+  await writeFile(baselinePath, lfContent.replace(/\n/gu, '\r\n'), 'utf8');
+
+  const validated = await validateCertifiedTrainingEvidence({
+    rootDir: fixture.rootDir,
+    statePath: certification.skills[0].statePath,
+    state,
+    skillId: 'release-safety',
+    sourcePath: fixture.relativeSkillPath,
+    currentSkillHash: state.acceptedSkillHash,
+    base: 'HEAD',
+  });
+  assert.equal(validated.ok, true, JSON.stringify(validated));
+  const gate = await verifySkillTrainingGate({
+    rootDir: fixture.rootDir,
+    changedFiles: [fixture.relativeSkillPath],
+    base: 'HEAD',
+  });
+  assert.equal(gate.status, 'verified', JSON.stringify(gate));
+
+  // 反证：归一化只折叠行尾，不放宽内容——真实的基线漂移仍必须被拦。
+  await writeFile(baselinePath, '---\r\nname: release-safety\r\ndescription: tampered baseline\r\n---\r\n', 'utf8');
+  const tampered = await verifySkillTrainingGate({
+    rootDir: fixture.rootDir,
+    changedFiles: [fixture.relativeSkillPath],
+    base: 'HEAD',
+  });
+  assert.equal(tampered.status, 'blocked', JSON.stringify(tampered));
+  assert.match(tampered.skills[0].reason, /stale|incomplete|missing the hash/iu, JSON.stringify(tampered.skills[0]));
+});

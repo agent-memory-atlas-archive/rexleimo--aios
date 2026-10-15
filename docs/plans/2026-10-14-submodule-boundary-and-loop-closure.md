@@ -452,6 +452,11 @@ facts:
     cli-project-root = 测试侧目录层数错（产品行为本就正确）；rex-v2-case-selection = 子模块指针移动重画基线，
     已重出证并验过门。教训：**bump 子模块指针后要准备重跑一次 `aios skill certify`**，
     因为嵌套 Skill 的新鲜度契约绑定在 gitlink 修订上，不重出证则发布门会正当 block
+  - （同一批后续）重出证后发现了次生隐患并已补：认证校验器拿 `baseline-skill.md` 文件内容跟 Git blob 做哈希比对，
+    而 autocrlf 检出会把产物刷成 CRLF → 刚出的证据在下一个干净检出会被自己推翻（实测：把产物改成 CRLF
+    后 gate 直接 blocked）。修法：校验器两侧归一行尾（复用 `skills/frontmatter.mjs:normalizeEolText`，
+    `generate-llms-txt.mjs` 也改用同一把手而非自带副本）+ `.gitattributes` 钉 `docs/evidence/skill-training/** eol=lf`。
+    新测兼双向：CRLF 产物过门 ✓，被改写的基线（无论行尾）仍 blocked ✓——只折叠行尾，不放宽内容
   - work-5 第二半（刷新纪律）已由 install.mjs:167 + client-install.test.mjs:71/216 覆盖，不新做
   - work-5 删除对象：80 个备份根 / 7 客户端 / 1.1MB，80/80 冗余、0 孤儿，增长停止于 2026-08-17
   - work-5 删除被安全门（packages/aios-pi/lib/gates.mjs:6）硬阻且无授权入口 → 仅能由 operator 在自己终端执行
