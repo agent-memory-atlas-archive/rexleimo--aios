@@ -202,12 +202,12 @@ export async function certifySkillTraining({
     try {
       candidateContent = await fs.readFile(candidatePath, 'utf8');
     } catch (error) {
-      skills.push({ skillId, sourcePath, status: 'blocked', reason: `unable to read current Skill: ${error.message}` });
+      skills.push({ skillId, sourcePath, status: 'blocked', code: 'current-skill-unreadable', reason: `unable to read current Skill: ${error.message}` });
       continue;
     }
     const baseline = readBaselineSkill({ rootDir, sourcePath, skillId, base });
     if (baseline === null) {
-      skills.push({ skillId, sourcePath, status: 'blocked', reason: `unable to read Git baseline ${base}:${sourcePath}` });
+      skills.push({ skillId, sourcePath, status: 'blocked', code: 'git-baseline-unreadable', reason: `unable to read Git baseline ${base}:${sourcePath}` });
       continue;
     }
     const baselineContent = baseline.content;
@@ -256,6 +256,7 @@ export async function certifySkillTraining({
       status: accepted ? 'accepted' : 'blocked',
       statePath,
       reason: accepted ? '' : 'candidate did not pass deterministic scenarios without regression',
+      code: accepted ? '' : 'scenarios-regress-or-incomplete-pass',
     });
   }
   return {
@@ -278,19 +279,19 @@ export async function validateCertifiedTrainingEvidence({
   base = 'HEAD',
 } = {}) {
   if (state?.schemaVersion !== 2 || state?.kind !== 'aios.skill-training-certification.v2') {
-    return { ok: false, reason: 'accepted state has no auditable training artifacts' };
+    return { ok: false, code: 'evidence-schema-v2-missing', reason: 'accepted state has no auditable training artifacts' };
   }
   if (state.skillId !== skillId || state.sourcePath !== sourcePath || state.acceptedSkillHash !== currentSkillHash) {
-    return { ok: false, reason: 'certification state does not match the current Skill identity or hash' };
+    return { ok: false, code: 'skill-identity-or-hash-mismatch', reason: 'certification state does not match the current Skill identity or hash' };
   }
   if (state.status !== 'accepted' || state.nonRegression !== true) {
-    return { ok: false, reason: 'certification state is not an accepted non-regression result' };
+    return { ok: false, code: 'result-not-accepted-non-regression', reason: 'certification state is not an accepted non-regression result' };
   }
   const artifacts = state.artifacts || {};
   const required = Object.keys(ARTIFACT_NAMES);
   const artifactPaths = Object.fromEntries(required.map((key) => [key, artifactPath(rootDir, statePath, artifacts[key])]));
   if (Object.values(artifactPaths).some((value) => !value)) {
-    return { ok: false, reason: 'certification state references an unsafe or missing artifact path' };
+    return { ok: false, code: 'artifact-path-unsafe-or-missing', reason: 'certification state references an unsafe or missing artifact path' };
   }
   const [tasks, baselineContent, baselineRaw, baselineScored, candidateRaw, candidateScored] = await Promise.all([
     readJson(artifactPaths.tasks),
@@ -304,24 +305,30 @@ export async function validateCertifiedTrainingEvidence({
     readJson(artifactPaths.candidateScored),
   ]);
   if (!Array.isArray(tasks) || typeof baselineContent !== 'string' || !baselineRaw || !baselineScored || !candidateRaw || !candidateScored) {
-    return { ok: false, reason: 'certification artifacts are incomplete or unreadable' };
+    return { ok: false, code: 'artifacts-incomplete-or-unreadable', reason: 'certification artifacts are incomplete or unreadable' };
   }
   const expectedBaseline = readBaselineSkill({ rootDir, sourcePath, skillId, base });
-  if (expectedBaseline === null
-    || expectedBaseline.kind !== state.baseline?.kind
-    || sha256(baselineContent) !== sha256(normalizeEolText(expectedBaseline.content))
-    || state.baseline?.contentSha256 !== sha256(baselineContent)) {
-    return { ok: false, reason: 'stored baseline does not match the Git baseline for this release check' };
+  if (expectedBaseline === null || expectedBaseline.kind !== state.baseline?.kind) {
+    // Git 那边根本读不到基线 blob，或 kind 变了：这不是“证据旧”，是无从比对。
+    return { ok: false, code: 'git-baseline-unreadable', reason: `unable to read the Git baseline at ${base} for this Skill` };
+  }
+  if (state.baseline?.contentSha256 !== sha256(baselineContent)) {
+    // 产物与它自己声明的 state 不一致：诚实的重认证不会产生这种差异，这是篡改/轮转。
+    return { ok: false, code: 'baseline-artifact-tampered', reason: 'stored baseline artifact does not match the hash recorded in the certification state' };
+  }
+  if (sha256(baselineContent) !== sha256(normalizeEolText(expectedBaseline.content))) {
+    // state 自洽、但和 `git show <base>` 不是一份东西：证据是按另一个 base 出的。
+    return { ok: false, code: 'baseline-differs-from-git-base', reason: `stored baseline does not match the Git baseline for base ${base}` };
   }
   const [baseline, candidate] = await Promise.all([
     evaluateSkill({ rootDir, targetPath: artifactPaths.baselineSkill, evidenceRunId: `${skillId}-baseline` }),
     evaluateSkill({ rootDir, targetPath: path.resolve(rootDir, sourcePath), evidenceRunId: `${skillId}-candidate` }),
   ]);
   if (JSON.stringify(baseline.raw) !== JSON.stringify(baselineRaw)) {
-    return { ok: false, reason: 'recorded baseline raw output does not match a fresh deterministic scenario run' };
+    return { ok: false, code: 'baseline-run-not-reproducible', reason: 'recorded baseline raw output does not match a fresh deterministic scenario run' };
   }
   if (JSON.stringify(candidate.raw) !== JSON.stringify(candidateRaw)) {
-    return { ok: false, reason: 'recorded candidate raw output does not match a fresh deterministic scenario run' };
+    return { ok: false, code: 'candidate-run-not-reproducible', reason: 'recorded candidate raw output does not match a fresh deterministic scenario run' };
   }
   const baselineValidation = validateTrainingEvidence({ tasks, raw: baselineRaw, scored: baselineScored });
   const candidateValidation = validateTrainingEvidence({ tasks, raw: candidateRaw, scored: candidateScored });
@@ -329,7 +336,7 @@ export async function validateCertifiedTrainingEvidence({
     && candidateValidation.valid
     && candidateValidation.metrics.validationHard >= baselineValidation.metrics.validationHard;
   if (!nonRegression || !allHardPass(candidateValidation.metrics)) {
-    return { ok: false, reason: 'certification scenarios regress or do not all pass' };
+    return { ok: false, code: 'scenarios-regress-or-incomplete-pass', reason: 'certification scenarios regress or do not all pass' };
   }
   return { ok: true, score: candidateValidation.metrics.overallHard };
 }

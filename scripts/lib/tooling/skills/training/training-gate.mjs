@@ -38,6 +38,7 @@ async function findTrainingEvidence(rootDir, skillId, sourcePath, currentSkillHa
   let bestEvidence = null;
   let bestScore = -1;
   const staleRefs = [];
+  const staleDetails = [];
   const evidenceRoots = [
     path.join(rootDir, 'docs', 'evidence', 'skill-training'),
     // Legacy records remain inspectable, but V1 state files cannot satisfy the
@@ -67,8 +68,25 @@ async function findTrainingEvidence(rootDir, skillId, sourcePath, currentSkillHa
       const nonRegression = state.nonRegression === true || state.non_regression === true || state.regression === false;
       if (!accepted || !nonRegression) continue;
       const acceptedSkillHash = String(state.acceptedSkillHash || state.accepted_skill_hash || '').trim().toLowerCase();
-      if (!/^[a-f0-9]{64}$/u.test(acceptedSkillHash) || acceptedSkillHash !== currentSkillHash) {
-        staleRefs.push(path.relative(rootDir, statePath).replace(/\\/gu, '/'));
+      if (!/^[a-f0-9]{64}$/u.test(acceptedSkillHash)) {
+        // 没有可用 hash 的证据根本不可核（V1 legacy 状态到这里），不能当成“内容过期”。
+        const staleRef = path.relative(rootDir, statePath).replace(/\\/gu, '/');
+        staleRefs.push(staleRef);
+        staleDetails.push({
+          ref: staleRef,
+          code: 'accepted-hash-malformed',
+          reason: 'certification state carries no accepted Skill content hash to verify against',
+        });
+        continue;
+      }
+      if (acceptedSkillHash !== currentSkillHash) {
+        const staleRef = path.relative(rootDir, statePath).replace(/\\/gu, '/');
+        staleRefs.push(staleRef);
+        staleDetails.push({
+          ref: staleRef,
+          code: 'accepted-hash-differs-from-current-skill',
+          reason: 'certification is stale: it was recorded for different Skill content than the Skill being checked',
+        });
         continue;
       }
       const certified = await validateCertifiedTrainingEvidence({
@@ -81,7 +99,13 @@ async function findTrainingEvidence(rootDir, skillId, sourcePath, currentSkillHa
         base,
       });
       if (!certified.ok) {
-        staleRefs.push(path.relative(rootDir, statePath).replace(/\\/gu, '/'));
+        const staleRef = path.relative(rootDir, statePath).replace(/\\/gu, '/');
+        staleRefs.push(staleRef);
+        staleDetails.push({
+          ref: staleRef,
+          code: String(certified.code || 'unclassified-evidence-failure'),
+          reason: String(certified.reason || 'certification evidence rejected'),
+        });
         continue;
       }
       const score = certified.score;
@@ -97,7 +121,7 @@ async function findTrainingEvidence(rootDir, skillId, sourcePath, currentSkillHa
     }
   }
 
-  return { evidence: bestEvidence, staleRefs };
+  return { evidence: bestEvidence, staleRefs, staleDetails };
 }
 
 function runGit(rootDir, args) {
@@ -184,6 +208,97 @@ async function hashSkillFile(rootDir, filePath) {
   }
 }
 
+// 门把证据失效原因映射成稳定 kind：九种不同失败不再压成同一句话，发布门也就能
+// 直接指出该跑哪条 certify 命令。code 由 training-certification.mjs 声明，这里只查表，
+// 不解析文本。
+const EVIDENCE_FAILURE_KINDS = new Map([
+  ['baseline-differs-from-git-base', 'certification-base-mismatch'],
+  ['baseline-artifact-tampered', 'inconsistent-evidence'],
+  ['accepted-hash-differs-from-current-skill', 'stale-content'],
+  ['accepted-hash-malformed', 'incomplete-evidence'],
+  ['skill-identity-or-hash-mismatch', 'stale-content'],
+  ['evidence-schema-v2-missing', 'incomplete-evidence'],
+  ['artifact-path-unsafe-or-missing', 'incomplete-evidence'],
+  ['artifacts-incomplete-or-unreadable', 'incomplete-evidence'],
+  ['result-not-accepted-non-regression', 'unaccepted-result'],
+  ['baseline-run-not-reproducible', 'non-reproducible-run'],
+  ['candidate-run-not-reproducible', 'non-reproducible-run'],
+  ['scenarios-regress-or-incomplete-pass', 'non-reproducible-run'],
+  ['current-skill-unreadable', 'unreadable-input'],
+  ['git-baseline-unreadable', 'unreadable-input'],
+  ['skill-source-unavailable', 'unreadable-input'],
+]);
+// 可修性排序：靠前的先报（同一 Skill 多份证据时取最值得动手的那条）。
+const EVIDENCE_KIND_PRIORITY = [
+  'certification-base-mismatch',
+  'inconsistent-evidence',
+  'stale-content',
+  'missing-evidence',
+  'non-reproducible-run',
+  'unaccepted-result',
+  'incomplete-evidence',
+  'unreadable-input',
+  'unclassified-evidence-failure',
+];
+export function classifyEvidenceFailure(code) {
+  return EVIDENCE_FAILURE_KINDS.get(String(code || '')) || 'unclassified-evidence-failure';
+}
+
+function mostActionableDetail(details) {
+  return [...details].sort((a, b) => {
+    const rank = EVIDENCE_KIND_PRIORITY.indexOf(classifyEvidenceFailure(a.code))
+      - EVIDENCE_KIND_PRIORITY.indexOf(classifyEvidenceFailure(b.code));
+    if (rank !== 0) return rank;
+    // 证据目录名是 ISO 时间戳，字典序即时间序；同优先级取最新那份。
+    if (a.ref === b.ref) return 0;
+    return a.ref < b.ref ? 1 : -1;
+  })[0];
+}
+
+function describeBlockedSkill({ skillId, base, currentSkillHash, evidenceResult }) {
+  const staleRefs = evidenceResult.staleRefs || [];
+  const staleDetails = evidenceResult.staleDetails || [];
+  if (currentSkillHash === null) {
+    return {
+      skillId,
+      status: 'blocked',
+      code: 'skill-source-unavailable',
+      reasonKind: 'unreadable-input',
+      staleRefs,
+      remedy: '',
+      reason: 'changed skill source is unavailable for content-hash verification',
+    };
+  }
+  if (staleDetails.length === 0) {
+    return {
+      skillId,
+      status: 'blocked',
+      code: 'no-accepted-evidence',
+      reasonKind: 'missing-evidence',
+      staleRefs,
+      reason: 'changed skill requires accepted, reproducible training evidence with non-regression proof and a matching content hash',
+      remedy: certifyRemedy({ skillId, base }),
+    };
+  }
+  const chosen = mostActionableDetail(staleDetails);
+  const reasonKind = classifyEvidenceFailure(chosen.code);
+  // 读不到当前内容时 certify 自身也会 blocked，不能把它当成修得好的命令递给人。
+  const remedy = reasonKind === 'unreadable-input' ? '' : certifyRemedy({ skillId, base });
+  return {
+    skillId,
+    status: 'blocked',
+    code: chosen.code,
+    reasonKind,
+    staleRefs,
+    reason: chosen.reason,
+    remedy,
+  };
+}
+
+function certifyRemedy({ skillId, base }) {
+  return `node scripts/aios.mjs skill certify --skill ${skillId} --base ${base}`;
+}
+
 export async function verifySkillTrainingGate({ rootDir = process.cwd(), changedFiles = null, base = 'HEAD' } = {}) {
   const files = [...new Set(
     (Array.isArray(changedFiles) ? changedFiles : changedSkillFilesFromGit({ rootDir, base }))
@@ -197,23 +312,16 @@ export async function verifySkillTrainingGate({ rootDir = process.cwd(), changed
   const skillIds = [...skillFiles.keys()].sort();
   const skills = [];
   for (const skillId of skillIds) {
-    const currentSkillHash = await hashSkillFile(rootDir, skillFiles.get(skillId));
+    const sourcePath = skillFiles.get(skillId);
+    const currentSkillHash = await hashSkillFile(rootDir, sourcePath);
     const evidenceResult = currentSkillHash
-      ? await findTrainingEvidence(rootDir, skillId, skillFiles.get(skillId), currentSkillHash, base)
-      : { evidence: null, staleRefs: [] };
-    skills.push(evidenceResult.evidence ? {
-      skillId,
-      status: 'verified',
-      evidence: evidenceResult.evidence,
-    } : {
-      skillId,
-      status: 'blocked',
-      reason: currentSkillHash === null
-        ? 'changed skill source is unavailable for content-hash verification'
-        : evidenceResult.staleRefs.length > 0
-          ? 'accepted training evidence is stale, incomplete, or missing the hash of the current Skill content'
-          : 'changed skill requires accepted, reproducible training evidence with non-regression proof and a matching content hash',
-    });
+      ? await findTrainingEvidence(rootDir, skillId, sourcePath, currentSkillHash, base)
+      : { evidence: null, staleRefs: [], staleDetails: [] };
+    if (evidenceResult.evidence) {
+      skills.push({ skillId, status: 'verified', evidence: evidenceResult.evidence });
+      continue;
+    }
+    skills.push(describeBlockedSkill({ skillId, base, currentSkillHash, evidenceResult }));
   }
   const blocked = skills.filter((skill) => skill.status !== 'verified');
   return {
@@ -329,7 +437,10 @@ function writeReport(stdout, report, options, renderText) {
 function renderSkillTrainingGateText(report) {
   const lines = [`AIOS skill training gate: ${report.status}`];
   for (const skill of report.skills) {
-    lines.push(`- ${skill.skillId}: ${skill.status}${skill.reason ? ` (${skill.reason})` : ''}`);
+    const detail = skill.status === 'verified'
+      ? ''
+      : `${skill.reasonKind ? ` (${skill.reasonKind}: ${skill.reason})` : (skill.reason ? ` (${skill.reason})` : '')}${skill.remedy ? ` remedy: ${skill.remedy}` : ''}`;
+    lines.push(`- ${skill.skillId}: ${skill.status}${detail}`);
   }
   if (report.skills.length === 0) lines.push('- no changed skill sources detected');
   return `${lines.join('\n')}\n`;

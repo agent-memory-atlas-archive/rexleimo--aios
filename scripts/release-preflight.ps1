@@ -42,6 +42,13 @@ function Invoke-NodeCheck([string]$ScriptPath, [string]$FailureMessage, [string[
       $ErrorActionPreference = $previousErrorActionPreference
     }
     if ($nodeExitCode -ne 0) {
+      # 失败时门自己的 JSON 带着每个 blocked Skill 的 reason/remedy；丢弃它就等于把
+      # 操作者面对一句没有指向的报错（.sh 分支是直接透传 stdout 的）。
+      foreach ($captured in @($stdoutFile, $stderrFile)) {
+        if (Test-Path -LiteralPath $captured) {
+          Get-Content -LiteralPath $captured | ForEach-Object { Write-Host $_ }
+        }
+      }
       throw $FailureMessage
     }
   } finally {
@@ -190,7 +197,7 @@ if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($trainingBase)) {
 Invoke-NodeCheck `
   -ScriptPath (Join-Path $RootDir "scripts/aios.mjs") `
   -Arguments @("skill", "verify-training", "--changed", "--base", $trainingBase, "--json") `
-  -FailureMessage "changed Skills lack reproducible training evidence for this release"
+  -FailureMessage "changed Skills lack reproducible training evidence validated against base: $trainingBase - re-certify each blocked Skill at that base (see its remedy field above): node scripts/aios.mjs skill certify --skill <id> --base $trainingBase"
 
 $AgentManifest = Join-Path $RootDir "agent-sources/manifest.json"
 $HasAgentManifest = Test-Path -LiteralPath $AgentManifest

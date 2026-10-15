@@ -149,6 +149,7 @@
       "scripts/tests/foundation/skills/governance/legacy-skill-prune-cli.test.mjs",
       "scripts/tests/foundation/skills/governance/verdict-schema.test.mjs",
       "scripts/tests/foundation/skills/training/training-evidence-validator.test.mjs",
+      "scripts/tests/foundation/skills/training/training-gate-reasons.test.mjs",
       "scripts/tests/learning/evolution/artifact-filename-windows-safety.test.mjs",
       "scripts/tests/learning/evolution/evolution-evaluator.test.mjs",
       "scripts/tests/learning/evolution/evolution-integration.test.mjs",

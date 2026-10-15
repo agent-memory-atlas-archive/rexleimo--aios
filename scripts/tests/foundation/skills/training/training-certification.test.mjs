@@ -111,7 +111,10 @@ test('training certification records reproducible evidence and rejects a forged 
     base: 'HEAD',
   });
   assert.equal(blocked.status, 'blocked');
-  assert.match(blocked.skills[0].reason, /evidence/i);
+  // 旧断言只要求原因里带 "evidence"——那是门把九种失效压成一句话时代的形状。
+  // 现在要求说清是哪一种：伪造的 raw 响应属于“重跑不可复现”。
+  assert.match(blocked.skills[0].reason, /does not match a fresh deterministic scenario run/u);
+  assert.equal(blocked.skills[0].reasonKind, 'non-reproducible-run');
 
   let output = '';
   const cliResult = await runSkillTrainingCertification(
@@ -175,5 +178,10 @@ test('accepted evidence still verifies after a CRLF checkout of the stored basel
     base: 'HEAD',
   });
   assert.equal(tampered.status, 'blocked', JSON.stringify(tampered));
-  assert.match(tampered.skills[0].reason, /stale|incomplete|missing the hash/iu, JSON.stringify(tampered.skills[0]));
+  // 篡改产物与“按另一个 base 出证”必须是两个 code：前者的 remedy 是重跑，
+  // 后者的 remedy 是换 base——合并成一句话就会指挥操作者去做错的那件事。
+  const tamperedEntry = tampered.skills[0];
+  assert.equal(tamperedEntry.code, 'baseline-artifact-tampered');
+  assert.equal(tamperedEntry.reasonKind, 'inconsistent-evidence');
+  assert.doesNotMatch(tamperedEntry.reason, /for base/u);
 });

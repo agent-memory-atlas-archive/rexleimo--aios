@@ -295,7 +295,9 @@ test('skill training gate rejects legacy state without auditable V2 artifacts', 
     changedFiles: ['skill-sources/search-first/SKILL.md'],
   });
   assert.equal(forged.status, 'blocked');
-  assert.match(forged.skills[0].reason, /evidence/i);
+  // hash 对得上但 schema 不是 V2：这不是“内容过期”，是不可审计。
+  assert.equal(forged.skills[0].code, 'evidence-schema-v2-missing');
+  assert.equal(forged.skills[0].reasonKind, 'incomplete-evidence');
 });
 
 test('skill training gate rejects legacy namespaced state by state skillId', async () => {
@@ -320,7 +322,10 @@ test('skill training gate rejects legacy namespaced state by state skillId', asy
   assert.equal(report.status, 'blocked');
   assert.equal(report.skills.length, 1);
   assert.equal(report.skills[0].skillId, '.system/skill-creator');
-  assert.match(report.skills[0].reason, /hash|evidence/i);
+  // legacy namespaced 状态里那个 placeholder hash 与现实内容不符：钉住诊断码，
+  // 不再钉描述它的句子。
+  assert.equal(report.skills[0].code, 'accepted-hash-differs-from-current-skill');
+  assert.equal(report.skills[0].reasonKind, 'stale-content');
 });
 
 test('skill training gate discovers changed rex-harness Skill sources', async () => {

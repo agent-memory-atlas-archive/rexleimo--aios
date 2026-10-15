@@ -55,10 +55,10 @@ a base that the release gate will not use is reported as a **base mismatch**, no
 
 ## Tasks
 
-- [ ] **t1-understand**: re-derive G1-G5 on the current tree; confirm which Skills a real release cut would gate
-- [ ] **t2-plan**: fix the decision (D-a / D-c / D-b) and the owned surfaces, then the dependency order
-- [ ] **t3-implement**: implement the chosen surface(s); one owner for base resolution stays with the preflight
-- [ ] **t4-verify**: `node --test scripts/tests/foundation/skills/training/*.test.mjs` + a mutation showing a
+- [x] **t1-understand**: re-derive G1-G5 on the current tree; confirm which Skills a real release cut would gate
+- [x] **t2-plan**: fix the decision (D-a / D-c / D-b) and the owned surfaces, then the dependency order
+- [x] **t3-implement**: implement the chosen surface(s); one owner for base resolution stays with the preflight
+- [x] **t4-verify**: `node --test scripts/tests/foundation/skills/training/*.test.mjs` + a mutation showing a
       base-mismatched cert is reported distinctly + `bash scripts/release-preflight.sh --dry-run` style probe
 
 ## Declared work-item fields
@@ -78,6 +78,17 @@ a base that the release gate will not use is reported as a **base mismatch**, no
 
 ## Decision Log
 
+- **Delivered**: each blocked gate entry now carries `code` + `reasonKind` + `remedy`; the preflight (both shells)
+  names the base it validated against and prints the `skill certify --skill <id> --base <base>` line. `remedy` is
+  withheld for `unreadable-input`, because `certify` reads the same unreadable file.
+- **D-b declined as reasoned**: a second base-resolution policy in `certify` would have to be proven equal to the
+  preflight's. Proving that equality is the work D-a does for free by echoing the preflight's own base.
+- **Three defects surfaced only after the reasons stopped being one umbrella sentence** (see register A20):
+  tamper vs wrong-base shared a branch; malformed/absent `acceptedSkillHash` was reported as "different content";
+  and `Invoke-NodeCheck` in `release-preflight.ps1` deleted captured stdout/stderr on failure, so all eleven
+  PowerShell-side checks failed silently. That last one is fixed for every check, not just training.
+- **Test debt repaid**: five assertions pinned the umbrella *prose* (`/stale|incomplete|hash|evidence/i`). They now pin
+  `code`/`reasonKind`. Pinning sentences is what let a diagnostic gap survive in a gate whose whole job is diagnosis.
 - 2026-10-15 registered via `plan start` then bound by `plan auto-gate --explicit-intent plan`
   (capability `software.planning.sequence`, activation `26e90d7c-5ad3-4758-8825-c4ccb3d01b16`).
   **Ledger note:** those two steps produced *two* plan documents; the active one is this `-2` file and the
@@ -87,4 +98,5 @@ a base that the release gate will not use is reported as a **base mismatch**, no
 
 ## Status
 
-- status: active — blocked on the D-a/D-c/D-b sign-off; facts are settled, no code written yet.
+- status: delivered 2026-10-15 (D-a + D-c executed; D-b declined). No tag cut — the remaining release blocker
+  is the untagged `rex-harness` gitlink, which is an operator publication action, not a code task.

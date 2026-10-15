@@ -173,12 +173,29 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Same-move residue also fixed**: the wiring guard's refresh instruction and the snapshot note it generates still said `scripts/tests/test-suite-wiring.test.mjs` after the test-tree move — the documented refresh command could not run. Corrected to `scripts/tests/tooling/suites/`; regenerating now reproduces the committed snapshot byte-for-byte (no drift).
 - **Open question this raises (not fixed, needs a decision)**: `runPlanCommand`'s catch-all on a parse failure returns help mode with `subcommand: 'status'`, which is the same substitution shape one level up. It at least prints usage instead of a green exit, so it is not the observed defect; recorded rather than changed.
 
-### A20 — OPEN (found 2026-10-15 during release-read): `skill certify --base HEAD` can never satisfy the release preflight for a Skill that changed since the last tag
+### A20 — RESOLVED 2026-10-15: the Skill certification base now agrees with the release preflight
 
-- **The trap, measured**: the release preflight verifies evidence with `--base <previous tag>` (`scripts/release-preflight.sh:171-177`, `TRAINING_BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD^)`) while the docs and the 2026-10-14 lesson teach certifying at `--base HEAD`. A change-cert stores `baseline = git show <base>:<skill>`, so the two bases resolve to **different blobs** whenever the Skill content moved since the tag, and the same evidence cannot satisfy both consumers.
-- **Repro on this repo state (v6.3.0 → HEAD)**: `verify-training --changed --base v6.3.0` reported **blocked** for 5 Skills (aios-project-system, memo, promo-video-pipeline, rexai-image-generation, verification-loop). Certifying them with `--base HEAD` left the gate **still blocked** (only the current-hash half healed); re-certifying the same five with `--base v6.3.0` turned the gate **verified** 5/5, with no test regressions (tracked-evidence suites 21/21).
-- **Two things follow**: ① the preflight's own incident guard is what makes this dangerous — untracked or uncommitted certification output *also* fails the release (`release-preflight.sh:184-192`), so half-done recovery looks like progress and isn't; ② nothing in the tooling tells the operator which base to certify against. Candidate fixes (undecided): make `certify` accept `--base release`/auto-derive the previous tag, or have the preflight print the exact `certify --base <tag> --skill <list>` command when it blocks. Not implemented — needs a decision on which surface owns the release base.
-- **Current state**: the five base-correct certs are committed; A19's ledger note stands.
+- **The trap, measured**: the release CI gate reads evidence from the TAGGED commit, not
+  from the working tree… and it validates with `--base <previous tag>`
+  (`scripts/release-preflight.sh:171-177`, `TRAINING_BASE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD^)`) while the docs and the 2026-10-14 lesson taught certifying at `--base HEAD`. A change-cert stores `baseline = git show <base>:<skill>`, so the two bases resolve to **different blobs** whenever the Skill content moved since the tag.
+- **Repro on this repo state (v6.3.0 → HEAD)**: `verify-training --changed --base v6.3.0` reported **blocked** for 5 Skills (aios-project-system, memo, promo-video-pipeline, rexai-image-generation, verification-loop). Certifying them with `--base HEAD` left the gate **still blocked**; re-certifying with `--base v6.3.0` turned it **verified** 5/5 — and the four base-correct bundles are now committed.
+- **Delivered contract** (work item `docs/plans/2026-10-15-a20-…-pre-2.md`, D-a + D-c, D-b declined):
+  - the gate stops collapsing nine different failures into one umbrella sentence. Each blocked entry now
+    carries `code` + `reasonKind` + `remedy`, and the remedy is withheld where it cannot work
+    (`unreadable-input` — `certify` reads the same file and would fail identically).
+  - `release-preflight.sh`/`.ps1` name the base they validated against and print the exact
+    `skill certify --skill <id> --base <that base>` line.
+- **Three defects found only because the reasons became specific** — the umbrella sentence had been hiding them:
+  1. a **tampered baseline artifact** and a **cert recorded at a different base** shared one branch. They need opposite
+     remedies (re-run vs re-certify at the other base), so they are now `baseline-artifact-tampered` vs
+     `baseline-differs-from-git-base`, distinguished by whether the artifact still matches the hash its own state records.
+  2. an evidence state carrying **no/malformed** `acceptedSkillHash` (V1 legacy) was reported as “different content”.
+     Now `accepted-hash-malformed` → `incomplete-evidence`, separate from `accepted-hash-differs-from-current-skill` → `stale-content`.
+  3. `Invoke-NodeCheck` in `release-preflight.ps1` captured child stdout/stderr into temp files and **deleted them on
+     failure**, so every PowerShell-side check failed with only its one-line message. It now re-flows the captured output
+     before throwing — this benefits all eleven checks in that script, not just the training gate.
+- **Lesson recorded**: five existing tests asserted that umbrella *prose* (`/stale|incomplete|hash|evidence/i`). Pin the
+  structure (`code`/`reasonKind`), never the sentence — the prose assertions were precisely what let a diagnostic gap survive.
 
 ### A21 — OPEN: `plan start` followed by `plan auto-gate --explicit-intent plan` creates a SECOND plan for one work item
 

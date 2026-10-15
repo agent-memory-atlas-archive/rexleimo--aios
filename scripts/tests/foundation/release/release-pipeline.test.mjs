@@ -349,6 +349,21 @@ test('release scripts and CI require a materialized rex-harness submodule', asyn
   }
 });
 
+test('release preflight names the Skill-training base and remedy in both shells', async () => {
+  const workspaceRoot = process.cwd();
+  const preflightShell = await readFile(path.join(workspaceRoot, 'scripts', 'release-preflight.sh'), 'utf8');
+  const preflightPowerShell = await readFile(path.join(workspaceRoot, 'scripts', 'release-preflight.ps1'), 'utf8');
+
+  // 门必须说清它是按哪个 base 校验的：按 --base HEAD 出的证对发布门永远过不去，
+  // 两串 shell 都要有同样的指向，否则 Windows 发布路径仍是个哑门。
+  assert.match(preflightShell, /validated against base: \$TRAINING_BASE/u);
+  assert.match(preflightShell, /skill certify --skill <id> --base \$TRAINING_BASE/u);
+  assert.match(preflightPowerShell, /validated against base: \$trainingBase/u);
+  assert.match(preflightPowerShell, /skill certify --skill <id> --base \$trainingBase/u);
+  // Invoke-NodeCheck 把 stdout 收进临时文件并在失败时删掉；不先回灌就看不到 remedy。
+  assert.match(preflightPowerShell, /Get-Content -LiteralPath \$captured/u);
+});
+
 test('release health watcher treats an absent local policy state as a neutral observable state', async () => {
   const workspaceRoot = process.cwd();
   const workflow = await readFile(

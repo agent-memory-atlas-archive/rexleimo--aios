@@ -36,7 +36,10 @@ test('被篡改的评分器工件不能通过训练门禁升级 rex 正式 Skill
       tampered.skills.map((skill) => [skill.skillId, skill.status]),
       [[SKILL_ID, 'blocked']],
     );
-    assert.match(tampered.skills[0].reason, /stale|incomplete|hash|evidence/u);
+    // 旧断言只要求原因里出现 stale/incomplete/hash/evidence 任一——那是门把几种失效
+    // 压成一句话时代的形状。现在钉结构：评分器工件被改 = 重跑不可复现。
+    assert.equal(tampered.skills[0].code, 'scenarios-regress-or-incomplete-pass');
+    assert.equal(tampered.skills[0].reasonKind, 'non-reproducible-run');
   } finally {
     await fixture.cleanup();
   }

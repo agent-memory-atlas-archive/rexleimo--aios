@@ -173,7 +173,11 @@ if [[ -z "$TRAINING_BASE" ]]; then
   TRAINING_BASE="HEAD^"
 fi
 if ! node "$ROOT_DIR/scripts/aios.mjs" skill verify-training --changed --base "$TRAINING_BASE" --json; then
-  echo "changed Skills lack reproducible training evidence for this release" >&2
+  # 过去这里只说"证据陈旧"，不说门是按哪个 base 校验的：操作者于是按习惯用
+  # --base HEAD 重出证，而那份证据对发布门永远过不去（change-cert 存的 baseline 是
+  # git show <base>:<skill>，base 不同则 blob 不同）。把 base 和 remedy 指到眼前。
+  echo "changed Skills lack reproducible training evidence validated against base: $TRAINING_BASE" >&2
+  echo "re-certify each blocked Skill at that base (see its \"remedy\" field above): node scripts/aios.mjs skill certify --skill <id> --base $TRAINING_BASE" >&2
   exit 1
 fi
 
