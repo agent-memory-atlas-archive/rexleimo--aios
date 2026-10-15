@@ -235,6 +235,7 @@ export function normalizeEvidence(raw = {}) {
 export function buildStructuredPlanState({
   title,
   objective,
+  workItemId = '',
   client = 'unknown',
   sessionId = '',
   source = 'aios-plan',
@@ -258,6 +259,8 @@ export function buildStructuredPlanState({
     schemaVersion: PLAN_SCHEMA_VERSION,
     title: String(title || 'Untitled plan').trim(),
     objective: String(objective || title || '').trim(),
+    // Canonical work-item identity: one ledger per id. Empty means the legacy unkeyed path.
+    workItemId: String(workItemId || '').trim(),
     status: PLAN_STATUSES.includes(status) ? status : 'active',
     relativePath,
     absolutePath,

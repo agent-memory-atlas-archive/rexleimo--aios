@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   addPlanEvidence,
   evaluateDoneGate,
+  openWorkItemPlan,
   readActivePlan,
   setPlanStatus,
   startPlan,
@@ -163,16 +164,40 @@ export async function runPlanCommand(options = {}, { rootDir = process.cwd(), st
       stderr.write('[err] plan start requires --title or --task\n');
       return { exitCode: 1 };
     }
-    const state = startPlan({
+    // A22: `--work-item <id>` declares the identity, so a repeat registration reuses the ledger
+    // instead of reserving a `-2` sibling. Presence is what counts: a declared-but-blank id is
+    // refused, never collapsed into "flag absent" and quietly routed to the unkeyed path.
+    const declaredId = typeof options.workItem === 'string' ? options.workItem : null;
+    const base = {
       rootDir,
       title,
       objective: options.objective || options.task || title,
       client: (options.client && options.client !== 'all') ? options.client : 'cli',
       sessionId: options.sessionId || '',
       source: options.source || 'aios plan start',
-    });
-    stdout.write(json ? `${JSON.stringify(state, null, 2)}\n` : `plan started: ${state.relativePath}\n`);
-    return { exitCode: 0, state };
+    };
+    let state;
+    let created = true;
+    let recovered = false;
+    try {
+      if (declaredId !== null) {
+        const opened = openWorkItemPlan({ ...base, workItemId: declaredId });
+        state = opened.plan;
+        created = opened.created;
+        recovered = opened.recovered;
+      } else {
+        state = startPlan(base);
+      }
+    } catch (error) {
+      // An unsafe id is refused, not sanitised into a different ledger.
+      stderr.write(`[err] ${error.message}\n`);
+      return { exitCode: 1 };
+    }
+    const label = created ? 'started' : recovered ? 'recovered' : 'reused';
+    stdout.write(json
+      ? `${JSON.stringify(declaredId !== null ? { ...state, ledger: { created, recovered } } : state, null, 2)}\n`
+      : `plan ${label}: ${state.relativePath}\n`);
+    return { exitCode: 0, state, created, recovered };
   }
 
   if (sub === 'status') {

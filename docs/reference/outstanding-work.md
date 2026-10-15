@@ -243,21 +243,30 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
   138/138, rex runtime+harness+team 127/127, full regression 2140 tests / 2131 pass / 0 fail / 9 skipped.
 - **Boundary of this fix**: the reported defect (start-then-gate) is closed; repeated `plan start` is **not** — see A22.
 
-### A22 — OPEN: `plan start` carries no work-item identity, so repeated calls still mint `-2`, `-3`, …
+### A22 — RESOLVED 2026-10-15: `plan start` now carries a canonical work-item id
 
-- **Repro (2026-10-15, isolated `--workspace`, repo untouched)**: two
-  `plan start --title "residual probe work item" --task "residual probe" --workspace <tmp>` calls wrote
-  `2026-10-15-residual-probe-work-item.md` **and** `…-2.md`, and the second call made the new document the active plan,
-  orphaning the first with no CLI path back to it (`plan task`/`add-evidence` only write the active plan).
-- **Why A21's fix does not cover it**: `plan start` is the explicit "open a ledger" command and `reservePlanArtifact`
-  uniquifies by trying `wx` opens — there is no identity to compare against, so nothing can say "same work item".
-  This is exactly the E-c half of A21's decision set: an explicit `--work-item <id>` whose document name is derived from
-  the id, updating in place instead of appending a suffix.
-- **Undecided surface** (registered, not guessed): whether `plan start` should refuse to open a second ledger while an
-  active non-terminal plan exists (forcing `--new-work-item` everywhere, which changes what `plan start` promises), or
-  keep the current permissive behaviour and add the id. The second option is additive; the first is a contract change.
-- **Interim discipline**: register through `plan auto-gate --explicit-intent plan` only — after A21 it reuses the active
-  ledger, so an accidental `plan start` first is now recoverable rather than duplicative.
+- **What shipped**: `plan start --work-item <id>`. `canonicalWorkItemId` normalises the id (case, spacing,
+  punctuation → slug) and refuses `..`, path separators, `:` and control characters, so an unsafe id writes
+  nothing rather than being sanitised into a different ledger. `openWorkItemPlan` is get-or-create: an existing
+  id store re-activates that ledger; a **lost store with a surviving document re-adopts the document**
+  (`recovered: true`) instead of reserving `-2`; only a genuinely new id creates one. The active plan is mirrored
+  to `.aios/planning/plans/<id>.json`, and `> work-item: <id>` is written into the durable markdown header.
+- **Why identity had to be declared, not inferred**: two phrasings of one sentence are two work items under the
+  prompt-authoring norms, and a fuzzy match is how one ledger gets swallowed by another. Matching is on the
+  canonical id (`<date>-<id>.md` suffix), never on objective text.
+- **Hole found by the guard, not by review**: `--work-item ""` initially collapsed into "flag absent" and fell
+  through to the unkeyed path — minting exactly the sibling this item exists to prevent. Identity is now keyed on
+  **presence** (`typeof === 'string'`), so a declared-but-blank id is refused.
+- **Boundary respected**: unkeyed `plan start` keeps its old behaviour (W4 pins it, incl. the `-2` sibling), so this
+  did not quietly redefine the command. Measured: unkeyed ×2 → `…-legacy-probe.md` + `…-2.md`; keyed ×3 with
+  casing/spacing variants → one `…-dup-item.md`, calls 2-3 report `created:false`.
+- **Evidence**: `scripts/tests/execution/planning/plan-work-item-identity.test.mjs` W1-W8 wired into `regression`;
+  planning 75/75, wiring+workflow+ctx 77/77, context/native/skills/dream/product-L3 35/35; five mutations each flip
+  an assertion (blank-fallback, no mirror, no re-adoption, no unsafe-id guard, name ignores identity); files
+  hash-verified IDENTICAL after the mutation batch.
+- **Residual (open, small)**: `plan auto-gate` does not accept `--work-item`, so capability bindings still key on
+  the plan path rather than the declared identity. A21's reuse rule covers the practical case; this is recorded
+  rather than guessed into scope.
 
 ## B. rex-harness / MCP adapter
 

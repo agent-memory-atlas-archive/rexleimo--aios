@@ -29,6 +29,35 @@ export function resolvePlanningStatePath(rootDir) {
   return path.join(rootDir, PLANNING_STATE_REL);
 }
 
+/**
+ * One ledger per work item: the active plan is also mirrored by its canonical id, so a
+ * plan that is not active can still be picked up again. Before this, a non-active plan
+ * existed only as markdown and `plan start` had no way to notice it was the same item.
+ */
+export function resolveWorkItemStorePath(rootDir, workItemId) {
+  return path.join(
+    path.dirname(resolvePlanningStatePath(rootDir)),
+    'plans',
+    `${canonicalWorkItemId(workItemId)}.json`,
+  );
+}
+
+// 中文注释：work-item 身份同时是文件名与状态键，所以先规范化成 slug。路径分隔符、`..`、
+// 控制字符一律拒绍（fail closed）——否则 `--work-item ../../elsewhere` 能把账本写到工作区外。
+export function canonicalWorkItemId(raw = '') {
+  const value = String(raw || '').trim();
+  if (!value) throw new Error('work item id must not be empty');
+  if (value.includes('..') || /[/\\:*?"<>|\x00-\x1f]/u.test(value)) {
+    throw new Error(`unsafe work item id: ${value}`);
+  }
+  const slug = slugify(value);
+  if (!slug) throw new Error(`work item id has no usable characters: ${value}`);
+  if (slug.length > 80) {
+    throw new Error(`work item id too long (max 80 characters after normalisation): ${value}`);
+  }
+  return slug;
+}
+
 function slugify(text = '') {
   const base = String(text)
     .trim()
@@ -54,6 +83,7 @@ export function buildPlanMarkdown({
   skills = [],
   tasks = [],
   schemaVersion = PLAN_SCHEMA_VERSION,
+  workItemId = '',
 } = {}) {
   const skillLines = (skills.length ? skills : ['Rex selects the current provider'])
     .map((s, i) => `${i + 1}. \`${s}\``);
@@ -80,6 +110,7 @@ export function buildPlanMarkdown({
     ...(sessionId ? [`> session: ${sessionId}`] : []),
     `> source: ${source}`,
     `> route: ${route}`,
+    ...(workItemId ? [`> work-item: ${workItemId}`] : []),
     '',
     '## Objective',
     '',
@@ -149,6 +180,11 @@ function writeActivePlan(rootDir, state) {
   fs.mkdirSync(path.dirname(statePath), { recursive: true });
   const normalized = normalizePlanForWrite(state);
   writeTextAtomically(statePath, `${JSON.stringify(normalized, null, 2)}\n`);
+  if (normalized.workItemId) {
+    const storePath = resolveWorkItemStorePath(rootDir, normalized.workItemId);
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    writeTextAtomically(storePath, `${JSON.stringify(normalized, null, 2)}\n`);
+  }
   return normalized;
 }
 
@@ -187,11 +223,13 @@ export function startPlan({
   route = null,
   skills = null,
   tasks = null,
+  workItemId = '',
 } = {}) {
   if (!rootDir) throw new Error('startPlan requires rootDir');
   const safeTitle = String(title || objective || 'Untitled plan').trim() || 'Untitled plan';
+  const workItem = workItemId ? canonicalWorkItemId(workItemId) : '';
   const createdAt = now.toISOString();
-  const fileName = `${todayStamp(now)}-${slugify(safeTitle)}.md`;
+  const fileName = `${todayStamp(now)}-${slugify(workItem || safeTitle)}.md`;
   const plansDir = resolvePlansDir(rootDir);
   fs.mkdirSync(plansDir, { recursive: true });
   const reservation = reservePlanArtifact(plansDir, fileName);
@@ -201,6 +239,7 @@ export function startPlan({
     const state = buildStructuredPlanState({
       title: safeTitle,
       objective: objective || safeTitle,
+      workItemId: workItem,
       client,
       sessionId,
       source,
@@ -224,6 +263,7 @@ export function startPlan({
       skills: state.skills,
       tasks: state.tasks,
       schemaVersion: state.schemaVersion,
+      workItemId: workItem,
     });
     fs.writeFileSync(reservation.descriptor, content, 'utf8');
     fs.closeSync(reservation.descriptor);
@@ -234,6 +274,72 @@ export function startPlan({
     fs.rmSync(reservation.absolutePath, { force: true });
     throw error;
   }
+}
+
+/**
+ * Get-or-create the ledger for a declared work-item id. Identity is compared as a canonical
+ * id, never as objective text: two phrasings of the same sentence stay two work items, and the
+ * same id always lands on the same ledger.
+ *
+ *   created  – no ledger existed for the id, one was written
+ *   recovered – the id store was gone but the document survived, so the existing document was
+ *               re-adopted instead of reserving a `-2` sibling (state is re-scaffolded)
+ *   neither  – the ledger already existed and is simply active again
+ */
+function readStoredPlan(filePath) {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function openWorkItemPlan(params = {}) {
+  const { rootDir, workItemId } = params;
+  const id = canonicalWorkItemId(workItemId);
+  const stored = readStoredPlan(resolveWorkItemStorePath(rootDir, id));
+  if (stored?.relativePath && fs.existsSync(path.resolve(rootDir, stored.relativePath))) {
+    return { plan: writeActivePlan(rootDir, { ...stored, updatedAt: new Date().toISOString() }), created: false, recovered: false };
+  }
+  const existingDocument = findWorkItemDocument(rootDir, id);
+  if (existingDocument) {
+    const state = buildStructuredPlanState({
+      title: params.title || id,
+      objective: params.objective || params.title || id,
+      client: params.client || 'unknown',
+      sessionId: params.sessionId || '',
+      source: params.source || 'aios plan start',
+      relativePath: existingDocument.relativePath,
+      absolutePath: existingDocument.absolutePath,
+      workItemId: id,
+    });
+    return { plan: writeActivePlan(rootDir, state), created: false, recovered: true };
+  }
+  return { plan: startPlan(params), created: true, recovered: false };
+}
+
+function findWorkItemDocument(rootDir, id) {
+  const plansDir = resolvePlansDir(rootDir);
+  let entries;
+  try {
+    entries = fs.readdirSync(plansDir, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  // Exact suffix match on the canonical slug (`<date>-<id>.md`); the newest date prefix wins.
+  // This is identity comparison, not similarity: nothing here reads the objective.
+  const matches = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(`-${id}.md`))
+    .map((entry) => entry.name)
+    .sort();
+  const fileName = matches.at(-1);
+  if (!fileName) return null;
+  const absolutePath = path.join(plansDir, fileName);
+  return {
+    absolutePath,
+    relativePath: path.join(PLANS_DIR_REL, fileName).split(path.sep).join('/'),
+  };
 }
 
 export function readActivePlan(rootDir) {

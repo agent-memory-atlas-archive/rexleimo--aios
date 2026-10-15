@@ -67,6 +67,7 @@
       "scripts/tests/execution/planning/plan-cli-explicit-intent.test.mjs",
       "scripts/tests/execution/planning/plan-cli-status-readonly.test.mjs",
       "scripts/tests/execution/planning/plan-single-ledger.test.mjs",
+      "scripts/tests/execution/planning/plan-work-item-identity.test.mjs",
       "scripts/tests/execution/planning/plan-dream-cli-contract.test.mjs",
       "scripts/tests/execution/planning/plan-runtime.test.mjs",
       "scripts/tests/execution/planning/planning-context-candidates.test.mjs",

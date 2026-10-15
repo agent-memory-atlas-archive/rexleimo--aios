@@ -22,6 +22,9 @@ const PLAN_CLI = new Command()
   .option('--dry-run', 'Evaluate without persisting a planned artifact')
   // 中文注释：双账声明。已有非终态活动计划时，planned 默认复用那本账；要开新工单必须显式声明。
   .option('--new-work-item', 'Declare a distinct new work item instead of reusing the active plan')
+  // 中文注释：`plan start --work-item <id>` 是“同一个工单只建一本账”的身份声明；
+  // 身份按规范化 id 比较，绝不比较 objective 文本。
+  .option('--work-item <id>', 'Canonical work-item id for plan start; an existing ledger is reused, not duplicated')
   .option('--source <text>', 'Source label')
   .option('--force', 'Force (e.g. force done / replace links)')
   .option('--message <text>', 'User message for auto-gate')
@@ -122,6 +125,7 @@ export function parsePlanArgs(argv) {
         policyMode: flags.policyMode,
         dryRun: Boolean(flags.dryRun),
         newWorkItem: Boolean(flags.newWorkItem),
+        workItem: typeof flags.workItem === 'string' ? flags.workItem : null,
         source: flags.source,
         explicitIntent: flags.explicitIntent ? String(flags.explicitIntent).trim() : '',
         workspaceRoot: flags.workspace ? String(flags.workspace).trim() : '',

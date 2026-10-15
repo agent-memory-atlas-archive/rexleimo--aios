@@ -176,7 +176,7 @@ Examples:
   aios plan status [--workspace <path>] [--json]
   aios plan set-status --status <active|approved|executing|done|blocked> [--note <text>] [--force] [--workspace <path>] [--json]
   aios plan show [--workspace <path>] [--html] [--json]
-  aios plan start --title <text> --task <text> [--workspace <path>] [--json]
+  aios plan start --title <text> --task <text> [--work-item <id>] [--workspace <path>] [--json]
   aios plan task <id> [--context <ref[:reason]>] [--target <path>] [--allow-write <glob>] [--workspace <path>] [--json]
   aios plan task <id> --propose-context [--target <path>] [--workspace <path>] [--json]
   aios plan task <id> --confirm-context-candidates [--candidate-ref <ref>] [--workspace <path>] [--json]
@@ -192,6 +192,9 @@ Options:
                                  unknown values are refused, never guessed from text
   --new-work-item                Open a second ledger: without it, a planned turn reuses the active
                                  not-done plan instead of writing a duplicate document
+  --work-item <id>               Canonical work-item identity for plan start: re-registering the same
+                                 id reuses its ledger instead of writing a slug-2 sibling; identity is
+                                 the id, never the objective text
   --status <status>              Plan or task status
   --context <ref[:reason]>       Required task context; repeat to add more
   --target <path>                Declared task target; repeat to add more
