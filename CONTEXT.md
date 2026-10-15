@@ -102,3 +102,11 @@
 **定义**：`outcome → 全部后果`（failureClass / backoffAction / checkpointStatus / runStatus / verificationResult / cadenceClass / stopByDefault / requiresOperator / countsAsNoopPoll / material）只登记在 `support/turn-consequences.mjs:TURN_CONSEQUENCES` 一处；其余模块调用 `derive*` / `turnConsequencesFor`，未登记名字直接抛错。`findTurnTableGaps()` 是这张表与 `SOLO_OUTCOMES` 的一致性检查，`scripts/tests/execution/harness/harness-turn-consequences.test.mjs` T7 额外扫描运行时源码，禁止第二处 outcome 字符串比较。
 
 **为什么**：D1 裁决保留 rex `TURN_OUTCOMES` 与 `SOLO_OUTCOMES` 两套词表（不跨表映射，直到有真实 call site——见 ADR 0002 的「可达性（枚举）」），前提是映射所有权唯一。没有这个约束，"两套词表"就会退化成"两套互相漂移的推理"。
+
+## 变更落点
+
+### 落点三问
+
+**定义**：动手前按顺序问三个问题，第一个命中的「是」即决定变更落在父仓库还是 `rex-harness/` 子模块——① 是否本仓库的贡献文书形状（PR/issue 模板、`AGENTS.md`、docs）；② 是否宿主「何时允许声称完成」的门禁（客户端指令注入、quality gate、verification-before-completion）；③ 是否需要被 Command 选中并返回一份 Evidence（新 Capability、新阶段、evidence schema、`skill-sources` 正文）。前两类留父仓库；第三类进子模块并走完整发布流（CHANGELOG + semver + tag + 独立指针 commit），判据本体是 ADR 0001 的「第三方可独立安装使用的公开产品面」。
+
+**为什么**：`workflow-ownership.md:37`（软件阶段只改 rex）与 ADR 0001（公开产品面归子模块）是同一条边界的两侧，但都是陈述句、不好执行；三问把它变成动手前的可判定顺序，同时把「改子模块要走发布流」的成本前置到决策时——外部 skill（如 mattpocock/skills 的 `pr`）的每一份内容都能拆成文书、门禁、阶段三块，混成一整份塞进任一侧都会造成第二套语义。裁决见 `docs/architecture/adr/0003-external-skill-adoption-landing.md`。
