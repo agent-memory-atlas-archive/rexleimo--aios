@@ -22,6 +22,8 @@ New to AIOS? These posts will get you oriented:
 
 ## Latest Posts
 
+- [v6.4.0: A Control Plane That Stops Guessing — Ledgers Cannot Fork, Refusals Are Features, Gates Run Where They Claim](2026-10-v640-control-plane-stops-guessing.md) — plan ledgers cannot fork (A21–A23), the plan CLI refuses instead of substituting a read-only view (A19), declared checks run in CI (A20 + directory budget + affected tests), and the mattpocock v1.3 trio lands on both faces
+
 - [v6.3.0: /grill Becomes a Real Command, the Interview Writes Itself Down, and Pi Picks Its Own MCP Carrier](2026-10-grill-with-docs.md) — the grilling command finally registers in seven clients, and the interview writes settled terms into CONTEXT.md and decisions into ADRs; pi 0.99+ picks its MCP carrier by version instead of stacking a warning
 
 - [v6.1.0: Browser MCP Off by Default — One Install-Time Choice, Three Modes](2026-09-browser-mcp-default-off.md) — browser automation is no longer installed on every machine; pick none/playwright/bsk at install and switch anytime
