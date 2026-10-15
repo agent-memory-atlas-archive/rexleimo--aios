@@ -323,6 +323,7 @@ export function evaluateWorkflowPolicy({
   explicitIntent = null,
   observations = [],
   completedCapabilities = [],
+  newWorkItem = false,
 } = {}) {
   const value = text(message);
   const mode = normalizeWorkflowPolicyMode(policyMode);
@@ -436,9 +437,13 @@ export function evaluateWorkflowPolicy({
     || needsPlan(value, intent, route, mode, capabilityPolicy);
   const disposition = planned ? 'planned' : 'guarded';
   const explicitPlan = intent === 'plan' || intent === 'planned';
+  // 一个工单只留一本账：planned 但已有非终态活动计划时默认**复用**那本（能力绑到它上面），
+  // 要开新工单必须显式声明 newWorkItem。判据是状态事实（存在且非终态），
+  // 不是对任务文本做相似度比较——后者会把另一个工单的账静默吞掉。
+  const reuseActivePlan = planned && !newWorkItem && hasUsableActivePlan(activePlan);
   return decision({
     disposition,
-    persistence: planned ? 'create' : 'none',
+    persistence: planned ? (reuseActivePlan ? 'reuse' : 'create') : 'none',
     requiredSkills: skillsForDecision(disposition, route, {
       explicitPlan,
       capabilityDecision,
@@ -456,6 +461,7 @@ export function evaluateWorkflowPolicy({
       : planned
         ? (mode === 'strict' ? 'strict-substantive-change' : 'planned-substantive-change')
         : 'adaptive-guarded-change',
+    plan: reuseActivePlan ? activePlan : null,
     capabilityDecision,
   });
 }

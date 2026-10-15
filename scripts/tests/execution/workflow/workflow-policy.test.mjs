@@ -127,7 +127,25 @@ test('read-only routing is driven by explicit intent, not by guessing from quest
     sessionId: 'session-a',
   });
   assert.equal(strict.disposition, 'planned');
-  assert.equal(strict.persistence, 'create');
+  // strict 的含义是“始终带账执行”，不是“每次另开一本账”：有非终态活动计划就复用那本，
+  // 要开新的必须显式声明 newWorkItem（A21：一个工单只留一本账）。
+  assert.equal(strict.persistence, 'reuse');
+  assert.equal(strict.plan.relativePath, 'docs/plans/2026-07-14-workflow.md');
+  assert.equal(evaluateWorkflowPolicy({
+    message: '为什么当前工作流会出现死循环？',
+    activePlan: null,
+    policyMode: 'strict',
+    client: 'codex',
+    sessionId: 'session-a',
+  }).persistence, 'create', 'strict with no ledger to reuse must still create one');
+  assert.equal(evaluateWorkflowPolicy({
+    message: '为什么当前工作流会出现死循环？',
+    activePlan: activePlan(),
+    policyMode: 'strict',
+    client: 'codex',
+    sessionId: 'session-a',
+    newWorkItem: true,
+  }).persistence, 'create', 'the declared escape hatch must survive strict mode');
 
   // 显式 read-only intent 才走 direct，且不创建计划。
   const direct = evaluateWorkflowPolicy({

@@ -20,6 +20,8 @@ const PLAN_CLI = new Command()
   .option('--session <id>', 'Client session id for continuation matching')
   .option('--policy-mode <adaptive|strict>', 'Workflow policy mode')
   .option('--dry-run', 'Evaluate without persisting a planned artifact')
+  // 中文注释：双账声明。已有非终态活动计划时，planned 默认复用那本账；要开新工单必须显式声明。
+  .option('--new-work-item', 'Declare a distinct new work item instead of reusing the active plan')
   .option('--source <text>', 'Source label')
   .option('--force', 'Force (e.g. force done / replace links)')
   .option('--message <text>', 'User message for auto-gate')
@@ -119,6 +121,7 @@ export function parsePlanArgs(argv) {
         sessionId: flags.session,
         policyMode: flags.policyMode,
         dryRun: Boolean(flags.dryRun),
+        newWorkItem: Boolean(flags.newWorkItem),
         source: flags.source,
         explicitIntent: flags.explicitIntent ? String(flags.explicitIntent).trim() : '',
         workspaceRoot: flags.workspace ? String(flags.workspace).trim() : '',

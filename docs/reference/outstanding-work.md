@@ -197,7 +197,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Lesson recorded**: five existing tests asserted that umbrella *prose* (`/stale|incomplete|hash|evidence/i`). Pin the
   structure (`code`/`reasonKind`), never the sentence — the prose assertions were precisely what let a diagnostic gap survive.
 
-### A21 — OPEN: `plan start` followed by `plan auto-gate --explicit-intent plan` creates a SECOND plan for one work item
+### A21 — RESOLVED 2026-10-15: a planned turn now reuses the active ledger (the unkeyed `plan start` path survives as A22)
 
 - **Observed 2026-10-15 while registering A20**: `plan start --title … --task …` persisted a plan
   (`status: active`, `route: unknown`, `skills: []` — no capability bound), then
@@ -224,6 +224,40 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
   work item — `docs/plans/2026-10-15-a21-one-work-item-must-not-produce-two-plan-ledgers-2.md` — with facts
   H1-H5, a declared target set, and one unsigned decision: reuse must be keyed on an explicit work-item id
   (E-c + E-a, the stated default) and never on objective-text similarity.
+
+- **Delivered**: `workflow-policy.mjs` resolved every planned turn to `persistence: 'create'`. It now reuses an
+  **active, non-terminal** plan (`reuseActivePlan = planned && !newWorkItem && hasUsableActivePlan(activePlan)`)
+  and hands that plan to the adapter via `decision.plan`. Reuse is keyed on a state fact, never on objective-text
+  similarity — a fuzzy match is how one work item silently swallows another's ledger.
+- **The reason reuse was useless before, and is now**: `applyWorkflowDecision`'s reuse branch only *looked up* a stored
+  activation, so reusing a ledger that had never been bound returned `capabilityCommand: null` and the caller had no
+  Provider Command — which is what made a fresh plan feel necessary. It now starts one bound to the reused plan.
+- **Declared escape hatch**: `plan auto-gate --new-work-item` (parsed, threaded, documented in help). `strict` mode
+  reuses too — strict means "always work from a ledger", not "mint a new ledger every turn"; that reading is now pinned
+  in both directions (reuse with a live plan, create with none, create when declared).
+- **Evidence**: `scripts/tests/execution/planning/plan-single-ledger.test.mjs` N1-N6 (start→gate leaves exactly one
+  document, repeated planned turn idempotent, reuse still yields a `provider.invoke` Command, `--new-work-item` opens
+  a second ledger, truncated flag not accepted as the declaration, terminal plan never reused, reuse does not rewrite
+  the document or its `createdAt`), wired into `regression`; five mutations each flip assertions (always-create 5,
+  ignore terminality 7, ignore the declaration 3, reuse-without-Command 1, plan not handed over 3); planning+workflow
+  138/138, rex runtime+harness+team 127/127, full regression 2140 tests / 2131 pass / 0 fail / 9 skipped.
+- **Boundary of this fix**: the reported defect (start-then-gate) is closed; repeated `plan start` is **not** — see A22.
+
+### A22 — OPEN: `plan start` carries no work-item identity, so repeated calls still mint `-2`, `-3`, …
+
+- **Repro (2026-10-15, isolated `--workspace`, repo untouched)**: two
+  `plan start --title "residual probe work item" --task "residual probe" --workspace <tmp>` calls wrote
+  `2026-10-15-residual-probe-work-item.md` **and** `…-2.md`, and the second call made the new document the active plan,
+  orphaning the first with no CLI path back to it (`plan task`/`add-evidence` only write the active plan).
+- **Why A21's fix does not cover it**: `plan start` is the explicit "open a ledger" command and `reservePlanArtifact`
+  uniquifies by trying `wx` opens — there is no identity to compare against, so nothing can say "same work item".
+  This is exactly the E-c half of A21's decision set: an explicit `--work-item <id>` whose document name is derived from
+  the id, updating in place instead of appending a suffix.
+- **Undecided surface** (registered, not guessed): whether `plan start` should refuse to open a second ledger while an
+  active non-terminal plan exists (forcing `--new-work-item` everywhere, which changes what `plan start` promises), or
+  keep the current permissive behaviour and add the id. The second option is additive; the first is a contract change.
+- **Interim discipline**: register through `plan auto-gate --explicit-intent plan` only — after A21 it reuses the active
+  ledger, so an accidental `plan start` first is now recoverable rather than duplicative.
 
 ## B. rex-harness / MCP adapter
 

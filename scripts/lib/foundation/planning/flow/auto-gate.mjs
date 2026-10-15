@@ -126,6 +126,7 @@ export function evaluateAutoGateDecision({
   explicitIntent = null,
   observations = null,
   completedCapabilities = null,
+  newWorkItem = false,
 } = {}) {
   if (!rootDir) throw new Error('evaluateAutoGateDecision requires rootDir');
   return evaluateWorkflowPolicy({
@@ -134,6 +135,7 @@ export function evaluateAutoGateDecision({
     policyMode: normalizeWorkflowPolicyMode(policyMode),
     client,
     sessionId,
+    newWorkItem: Boolean(newWorkItem),
     explicitIntent: resolveExplicitIntent(message, explicitIntent),
     // 北极星原则：observations 是调用方/模型的显式事实声明（如
     // change.behavior-requested / review.specialist-required），程序不自行
@@ -200,9 +202,12 @@ export function applyWorkflowDecision({
 
   if (decision.persistence === 'reuse') {
     const plan = decision.plan || null;
-    const capability = plan?.relativePath
+    const stored = plan?.relativePath
       ? findStoredAiosCapabilityActivation({ rootDir, workItemKey: plan.relativePath })
       : null;
+    // 复用一本已存在的账时能力必须绑到它上面；否则 reuse 路径交不出 Command，
+    // 调用方只能再建一本——双账就是这么来的。
+    const capability = stored || startCapability(plan);
     return {
       action: decision.action || 'reuse',
       created: false,
@@ -430,6 +435,7 @@ export function runAutoGate({
   explicitIntent = null,
   observations = null,
   completedCapabilities = null,
+  newWorkItem = false,
   dryRun = false,
   json = false,
 } = {}) {
@@ -443,6 +449,7 @@ export function runAutoGate({
     explicitIntent,
     observations,
     completedCapabilities,
+    newWorkItem: Boolean(newWorkItem),
   });
   const applied = applyWorkflowDecision({
     rootDir,
