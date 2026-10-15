@@ -317,12 +317,66 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
   健康 Windows 宿主下两用例全绿。若需要无 taskkill 的树杀，候选是 PowerShell CIM 枚举 + `Stop-Process`
   （新依赖、未批准、未实现）。
 
-### work-7 — interaction contract 决策编译器 [deferred]
+### work-7 — interaction contract 决策编译器【范围已于 2026-10-15 重推导，待 operator 签 D1-D3】
 
 - **dependsOn**: [work-6]
-- **operator 排序**：排在 work-6 之后
-- **deferred reason**：非阻塞，仅排序；范围与验收见本次会话的分析（typed 三通道 + scheduler hint 拆分）
-- 入图时需重新确认范围。
+- **范围为何需要重推导**：上一轮只留下一句“typed 三通道 + scheduler hint 拆分”，具体讨论未入库——
+  口头范围的存活周期等于会话长度。下面的范围全部从当前代码事实重建，每条带可复核命令。
+
+#### 事实（2026-10-15 实测）
+
+- **F1 类型化 turn 契约在生产路径零消费者**。work-4 裁决 D+C 删桥后：
+  `rg "normalizeTurnResult|TURN_OUTCOMES|turn-result" scripts --glob '*.mjs' | grep -v tests` → **空**。
+  契约只被子模块自己的 CLI（人工透传）校验；真正跑 turn 的 loop 不读它。
+- **F2 loop 跑在第二套未声明的词表上**。`SOLO_OUTCOMES`（7）/ `SOLO_FAILURE_CLASSES`（12）
+  定义在 `solo-runtime/support/constants.mjs:1-16`，与 rex `TURN_OUTCOMES`（5）/ `FAILURE_KINDS`（8）无映射所有权。
+- **F3 同一个语义映射被手写复制在≥6 处**，无一致性守卫：
+  `support/normalizers.mjs` 的 inferFailureClass / inferBackoffAction / inferCheckpointStatus（39-77）、
+  `loop/backoff.mjs:68`、`loop/cadence.mjs:58`、`gate/checkpoint.mjs:13`、`gate/should-run.mjs:51-66`。
+  按裸字面量匹配 `success|noop|human-gate|infra-retry|stopped` 的文件：**19 个 / ≈56 处**
+  （命令：`rg -n "=== 'success'|'human-gate'|'infra-retry'|'stopped'" scripts/lib --glob '*.mjs' | grep -v tests | awk -F: '{print $1}' | sort | uniq -c`）。
+- **F4 模型自报通道在父侧根本不存在**。`rg selfReport scripts --glob '*.mjs' | grep -v tests` → **空**；
+  而 norm#2 要求“自评是字段不是猜测”。provider 侧也只声明 stopped/blocked/infra-retry/human-gate，
+  **没有一家能声明材料性进展**（`execute-turn.mjs:98-187`、`execute-turn-pi-rpc.mjs:105-179`）。
+- **F5 操作者信号被压成一个 bool**。`should-run.mjs:51-66` 的 `operatorGateAcknowledged` 同时代表
+  显式 resume / 首次启动 / 本轮 ack，三种语义不可区分，只能一并放行 gate+budget+cadence。
+- **F6 证据可凭空造出来**。`normalizers.mjs:23-35` deriveEvidence 回退链 keyChanges→nextAction→summary→`outcome: unknown`
+  ——与“证据存在⇒已校验”相违。
+
+#### 范围（推导结果）
+
+把 loop 的 turn 决策从“六处手写推理”改成**一个编译函数对三个声明通道的查表**：
+
+| 通道 | 声明者 | 内容 | 现状 |
+| --- | --- | --- | --- |
+| **F 事实** | journal/账本 | 已记录轮次、结果、额度 spend | work-6 已单一写者，可直接做权威输入 |
+| **S 自报** | 模型/provider | outcome、progressMade、blockedReason | **不存在**（F4） |
+| **O 操作者** | 人 | intent、resume ack、gate 决定 | 被压成一个 bool（F5） |
+
+**scheduler hint 从输入降为输出**：cadenceClass / nextWakeMs / quiet 建议不得再从 outcome 字符串推，
+而是由编译器对 (F,S,O) 的查表结果派生——于是新 outcome/failureClass 只在一个 owner 里登记一次。
+
+#### 非目标
+
+- 不改 wire 契约 schema、不改子模块公开面（除非 D2 选了接线）。
+- 不动 attended 默认行为（`pacing=null` 仍全关）。
+- 不删 `resolveShouldRun`：它仍是额度/节奏的**策略层**，只是输入换成编译结果。
+
+#### 验收（入图后）
+
+- (a) outcome→failureClass/backoff/checkpoint/cadence 五张映射只剩一个 owner，其余四处改为调用；
+- (b) 新增词汇表漂移守卫（类 W3）：向 `SOLO_OUTCOMES` 加一个成员而不补映射→测试必须失败；
+- (c) 反例：provider 只给裸字符串（无 S 通道）时，不得产出 material 副作用（不能推进/不能声称进展）；
+- (d) `npm run test:affected` 绿；若走到 D2 的接线，必须先有调用点再建桥（ADR 0002）。
+
+#### 待签决策（阻塞入图）
+
+- **D1 词表**：统一到 rex `TURN_OUTCOMES`（破 wire 兼容风险）还是保留两套 + 单一 owned 映射表？
+  默认：**保留两套 + 一个 owner + 漂移守卫**。
+- **D2 是否让本项成为 turn 契约的第一个真调用点**（= ADR 0002 选项 A 的正当重开）？
+  默认：**先只做父侧编译层**；子模块接线单开 work item 并更新 ADR 0002。
+- **D3 自报强制程度**：现有 provider 从“返字符串”变成“必须声明 S 通道”是行为变动。
+  默认：**缺失即 `unknown`且不得产生 material 副作用**（删推理 switch，宁可保守也不猜）。
 
 ---
 
@@ -336,7 +390,7 @@ CHANGELOG [Unreleased] 新增 fix(harness) 条目更正 v5.13/v5.14 表述（历
 | operator-gated | work-5（删除 93 个备份需 operator 在终端执行；命令已入档；第二半已由现有门禁满足） |
 | proposed | —（work-8/work-9 已于 2026-10-14 经 operator「继续」授权并交付，见 done 行） |
 | blocked | — |
-| deferred | work-7（已随 work-6 完成而解锁；入图时需重新确认范围） |
+| deferred | work-7（已随 work-6 完成而解锁；范围已于 2026-10-15 从代码事实重推导并入库，待 operator 签 D1-D3） |
 | in_progress | — |
 | done | work-1, work-2, work-3, work-4（D+C，2026-10-14）, work-6（S1 2026-10-14 交付，G1/G2/G3 全闭合；S3 按范围决定不做）, work-8（2026-10-14，子模块 0.10.0）, work-9（2026-10-14，A18 封顶；环境残留另记） |
 
@@ -490,6 +544,10 @@ facts:
     于是 2026-09-18 已完成的 triage 计划卡 executing 三周、每次「继续」都被它带跑。修法：子命令名原样透传，词汇表归 ops 层
     （导出 PLAN_SUBCOMMANDS 并拒绝未知名）、status 拒绝写 flag 并指向 set-status、help 首次公布 set-status。C1-C5 5/5，
     两个变异各自独立被抓（恢复静默改只挂 C2、删 status 守卫只挂 C3），C4 钉住“拒得不宽”；该计划已置 done
+  - （2026-10-15）work-7 范围已从代码事实重推导并写入本文 §work-7（F1-F6 每条带可复核命令）：类型化 turn 契约在生产路径
+    零消费者、loop 跑在第二套词表上、1 个语义映射被手写复制在 ≥6 处、模型自报通道父侧根本不存在、操作者信号被压成 1 个 bool。
+    **教训（入库规则）：deferred 项的范围不得只存活在会话里**——“见本次会话的分析”等于把范围交给压缩机制去销毁，
+    下次 resume 只能猜测；范围必须写进工单本体，带可复核命令。入图阻塞在 D1-D3 三个决策，已给出默认值。
 assignment:
   work-5: operator      # 删 93 个备份，命令已入档，仅 operator 终端执行
   work-6: done          # S1/S2/S4 交付，S3 按范围决定不做
