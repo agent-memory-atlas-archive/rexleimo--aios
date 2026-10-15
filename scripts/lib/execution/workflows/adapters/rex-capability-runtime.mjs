@@ -238,7 +238,12 @@ function syncEvidenceToMatchingPlan({ rootDir, workItemKey, activationId, eviden
   const recorded = [];
   try {
     const plan = readActivePlan(rootDir);
-    if (!plan || plan.relativePath !== workItemKey) {
+    // A23: an activation may be addressed by its declared work-item id or, before that existed, by the
+    // ledger path. Both are exact identity equality; nothing here compares objective text.
+    const identityMatches = plan
+      && (plan.relativePath === workItemKey
+        || (plan.workItemId && plan.workItemId === workItemKey));
+    if (!identityMatches) {
       return Object.freeze({
         matched: false,
         status: 'not-matched',

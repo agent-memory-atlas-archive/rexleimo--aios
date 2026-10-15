@@ -264,9 +264,35 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
   planning 75/75, wiring+workflow+ctx 77/77, context/native/skills/dream/product-L3 35/35; five mutations each flip
   an assertion (blank-fallback, no mirror, no re-adoption, no unsafe-id guard, name ignores identity); files
   hash-verified IDENTICAL after the mutation batch.
-- **Residual (open, small)**: `plan auto-gate` does not accept `--work-item`, so capability bindings still key on
-  the plan path rather than the declared identity. A21's reuse rule covers the practical case; this is recorded
-  rather than guessed into scope.
+- **Residual (open, small)**: closed by A23 below — `plan auto-gate` now accepts `--work-item` and the
+  capability binding is keyed on the declared identity.
+
+### A23 — RESOLVED 2026-10-15: the gate carries the declared identity into its Capability binding
+
+- **What shipped**: `plan auto-gate --work-item <id>` threads the declaration into `startPlan`, so a
+  gate-created ledger carries `workItemId` instead of `''`. `startCapability` picks its
+  `workItemKey` by an ordered preference — declared id, then ledger path, then the
+  `turn:<client>:<session>:<sha256>` fallback — and the reuse branch reads a stored activation through
+  the same key list, so pre-A23 path-keyed activations stay reachable. `syncEvidenceToMatchingPlan`
+  matches either the path or the id, otherwise evidence bound under an id could never return to the
+  ledger.
+- **Two rules forced by measurement, not by design**:
+  1. *A declared id outranks A21's reuse rule when it names a different item.* `--work-item item-two`
+     was being swallowed by the active `item-one` ledger (guard P6 caught it). Comparison is canonical
+     id equality only — never objective-text similarity, for the same reason as A21/A22.
+  2. *`canonicalizeWorkItemId('')` must stay empty.* The shared `slugify` helper returns the literal
+     `'plan'` for empty input, so an undeclared turn read as “a different work item” and silently
+     switched A21's reuse off — five tests failed at once before the cause was found (pinned by P8).
+- **Contradictory declarations are refused, not resolved by precedence**: `--work-item X --new-work-item`
+  would write a second ledger whose activation key collides with the first, so it exits 1 and writes
+  nothing. Blank and unsafe ids are refused before any file is written, matching A22.
+- **Known redundancy (deliberate)**: removing the reuse branch's id read-through flips **no** test,
+  because `startCapability` re-derives the same keys and is idempotent on an existing activation. It is
+  recorded as a second belt, not as a guarded branch — an unflippable assertion would be a false guard.
+- **Evidence**: `scripts/tests/execution/planning/plan-auto-gate-identity.test.mjs` P1-P8 wired into
+  `regression`; planning + wiring 89/89, workflow + rex runtime/harness + ctx-agent-core 129/129, full
+  `npm run test:regression` exit 0 (2156 tests / 2147 pass / 0 fail / 9 skipped); four mutations flip
+  1 / 6 / 2 / 1 assertions; `plan check-done` 4/4 before the ledger was closed without `--force`.
 
 ## B. rex-harness / MCP adapter
 

@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import {
   addPlanEvidence,
+  canonicalWorkItemId,
   evaluateDoneGate,
   openWorkItemPlan,
   readActivePlan,
@@ -394,6 +395,25 @@ export async function runPlanCommand(options = {}, { rootDir = process.cwd(), st
 
   if (sub === 'auto-gate' || sub === 'always-on') {
     const message = options.task || options.objective || options.title || options.message || '';
+    // A23: an auto-gate ledger may be declared with the same identity as `plan start`. Presence is
+    // what counts (a blank declaration is refused, not treated as absent), and an unsafe id is
+    // rejected before anything is written.
+    const declaredGateId = typeof options.workItem === 'string' ? options.workItem : null;
+    // Two declarations that contradict each other are refused, not resolved by precedence: the id
+    // names one ledger while --new-work-item asks for a different one. Silently picking a side would
+    // leave two ledgers answering to a single activation key.
+    if (declaredGateId !== null && options.newWorkItem) {
+      stderr.write('[err] plan auto-gate cannot combine --new-work-item with --work-item: the id names one ledger, --new-work-item declares another\n');
+      return { exitCode: 1 };
+    }
+    if (declaredGateId !== null) {
+      try {
+        canonicalWorkItemId(declaredGateId);
+      } catch (error) {
+        stderr.write(`[err] ${error.message}\n`);
+        return { exitCode: 1 };
+      }
+    }
     const result = runAutoGate({
       rootDir,
       message,
@@ -403,6 +423,7 @@ export async function runPlanCommand(options = {}, { rootDir = process.cwd(), st
       policyMode: options.policyMode,
       explicitIntent: options.intent || options.explicitIntent || null,
       newWorkItem: Boolean(options.newWorkItem),
+      workItem: declaredGateId || '',
       dryRun: Boolean(options.dryRun),
       json,
     });

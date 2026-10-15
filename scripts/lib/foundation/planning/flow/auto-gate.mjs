@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 import {
+  canonicalizeWorkItemId,
   readActivePlan,
   startPlan,
   summarizePlanProgress,
@@ -127,6 +128,7 @@ export function evaluateAutoGateDecision({
   observations = null,
   completedCapabilities = null,
   newWorkItem = false,
+  workItem = '',
 } = {}) {
   if (!rootDir) throw new Error('evaluateAutoGateDecision requires rootDir');
   return evaluateWorkflowPolicy({
@@ -136,6 +138,9 @@ export function evaluateAutoGateDecision({
     client,
     sessionId,
     newWorkItem: Boolean(newWorkItem),
+    // The policy compares canonical ids, and it must not learn a second normalisation rule: the
+    // contract layer owns it.
+    workItemId: canonicalizeWorkItemId(workItem),
     explicitIntent: resolveExplicitIntent(message, explicitIntent),
     // 北极星原则：observations 是调用方/模型的显式事实声明（如
     // change.behavior-requested / review.specialist-required），程序不自行
@@ -162,6 +167,7 @@ export function applyWorkflowDecision({
   explicitIntent = null,
   observations = null,
   dryRun = false,
+  workItem = '',
 } = {}) {
   if (!rootDir) throw new Error('applyWorkflowDecision requires rootDir');
   if (!decision || typeof decision !== 'object') {
@@ -170,10 +176,16 @@ export function applyWorkflowDecision({
     };
   }
 
+  const capabilityKeys = (plan) => [...new Set([
+    String(plan?.workItemId || '').trim(),
+    String(plan?.relativePath || '').trim(),
+  ].filter(Boolean))];
+
   const startCapability = (plan = null) => {
     if (dryRun || !decision.capabilityDecision) return null;
-    const workItemKey = plan?.relativePath
-      || guardedWorkItemKey({ message, explicitIntent, client, sessionId });
+    // A23 precedence: the declared canonical work-item id wins over the ledger path, which wins over
+    // the turn hash. Identity, never text: nothing here compares objectives.
+    const workItemKey = capabilityKeys(plan)[0] || guardedWorkItemKey({ message, explicitIntent, client, sessionId });
     return startStoredAiosCapabilityActivation({
       rootDir,
       decision: decision.capabilityDecision,
@@ -202,9 +214,13 @@ export function applyWorkflowDecision({
 
   if (decision.persistence === 'reuse') {
     const plan = decision.plan || null;
-    const stored = plan?.relativePath
-      ? findStoredAiosCapabilityActivation({ rootDir, workItemKey: plan.relativePath })
-      : null;
+    // Read-through: an activation may be keyed by the declared id (A23) or by the ledger path
+    // (everything before it). Both are exact identity matches, tried in that order, so a
+    // pre-A23 activation never becomes unreachable.
+    const keys = capabilityKeys(plan);
+    const stored = keys
+      .map((key) => findStoredAiosCapabilityActivation({ rootDir, workItemKey: key }))
+      .find(Boolean) || null;
     // 复用一本已存在的账时能力必须绑到它上面；否则 reuse 路径交不出 Command，
     // 调用方只能再建一本——双账就是这么来的。
     const capability = stored || startCapability(plan);
@@ -223,6 +239,9 @@ export function applyWorkflowDecision({
       rootDir,
       title: titleFromMessage(message),
       objective: parseWorkflowCommand(message).message || titleFromMessage(message),
+      // A23: a declared identity must survive into the ledger itself, otherwise the capability
+      // binding and the ledger answer to different keys.
+      workItemId: String(workItem || '').trim(),
       client,
       sessionId,
       source,
@@ -436,6 +455,7 @@ export function runAutoGate({
   observations = null,
   completedCapabilities = null,
   newWorkItem = false,
+  workItem = '',
   dryRun = false,
   json = false,
 } = {}) {
@@ -450,6 +470,7 @@ export function runAutoGate({
     observations,
     completedCapabilities,
     newWorkItem: Boolean(newWorkItem),
+    workItem,
   });
   const applied = applyWorkflowDecision({
     rootDir,
@@ -460,6 +481,7 @@ export function runAutoGate({
     source,
     explicitIntent,
     observations,
+    workItem,
     dryRun: Boolean(dryRun),
   });
   const directive = buildAlwaysOnPlanningDirective({

@@ -324,6 +324,7 @@ export function evaluateWorkflowPolicy({
   observations = [],
   completedCapabilities = [],
   newWorkItem = false,
+  workItemId = '',
 } = {}) {
   const value = text(message);
   const mode = normalizeWorkflowPolicyMode(policyMode);
@@ -440,7 +441,13 @@ export function evaluateWorkflowPolicy({
   // 一个工单只留一本账：planned 但已有非终态活动计划时默认**复用**那本（能力绑到它上面），
   // 要开新工单必须显式声明 newWorkItem。判据是状态事实（存在且非终态），
   // 不是对任务文本做相似度比较——后者会把另一个工单的账静默吞掉。
-  const reuseActivePlan = planned && !newWorkItem && hasUsableActivePlan(activePlan);
+  // A23: a declared identity outranks reuse when it names a *different* work item — binding this
+  // turn's Command to another item's book would be the same swallowing failure from the other side.
+  // The comparison is canonical-id equality, never text similarity.
+  const declaredId = String(workItemId || '').trim();
+  const differentWorkItem = declaredId !== ''
+    && declaredId !== String(activePlan?.workItemId || '').trim();
+  const reuseActivePlan = planned && !newWorkItem && !differentWorkItem && hasUsableActivePlan(activePlan);
   return decision({
     disposition,
     persistence: planned ? (reuseActivePlan ? 'reuse' : 'create') : 'none',

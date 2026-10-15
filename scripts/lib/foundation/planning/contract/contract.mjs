@@ -42,6 +42,16 @@ export function resolveWorkItemStorePath(rootDir, workItemId) {
   );
 }
 
+// Non-throwing canonical form, for comparisons only (startPlan/openWorkItemPlan keep using the
+// validating `canonicalWorkItemId`). One owner for the normalisation, so the policy and the ledger
+// cannot drift into two different notions of the same id.
+// Blank must stay blank: `slugify` falls back to the literal 'plan' for an empty input, and that
+// would read as "a different declared work item" and silently disable A21's reuse rule.
+export function canonicalizeWorkItemId(raw = '') {
+  const value = String(raw || '').trim();
+  return value ? slugify(value) : '';
+}
+
 // 中文注释：work-item 身份同时是文件名与状态键，所以先规范化成 slug。路径分隔符、`..`、
 // 控制字符一律拒绍（fail closed）——否则 `--work-item ../../elsewhere` 能把账本写到工作区外。
 export function canonicalWorkItemId(raw = '') {

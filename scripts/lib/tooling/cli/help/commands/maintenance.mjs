@@ -180,7 +180,7 @@ Examples:
   aios plan task <id> [--context <ref[:reason]>] [--target <path>] [--allow-write <glob>] [--workspace <path>] [--json]
   aios plan task <id> --propose-context [--target <path>] [--workspace <path>] [--json]
   aios plan task <id> --confirm-context-candidates [--candidate-ref <ref>] [--workspace <path>] [--json]
-  aios plan auto-gate --task <text> [--message <text>] [--explicit-intent <value>] [--new-work-item] [--workspace <path>] [--json]
+  aios plan auto-gate --task <text> [--message <text>] [--explicit-intent <value>] [--new-work-item] [--work-item <id>] [--workspace <path>] [--json]
   aios plan capability-evidence --activation <id> --command-token <token> --evidence-kind <kind> --evidence-ref <ref> [--testability-file <path>] [--workspace <path>] [--json]
 
 Options:
@@ -192,9 +192,10 @@ Options:
                                  unknown values are refused, never guessed from text
   --new-work-item                Open a second ledger: without it, a planned turn reuses the active
                                  not-done plan instead of writing a duplicate document
-  --work-item <id>               Canonical work-item identity for plan start: re-registering the same
-                                 id reuses its ledger instead of writing a slug-2 sibling; identity is
-                                 the id, never the objective text
+  --work-item <id>               Canonical work-item identity for plan start and auto-gate: re-registering
+                                 the same id reuses its ledger instead of writing a slug-2 sibling, and the
+                                 Capability activation is bound under that same id; identity is the id,
+                                 never the objective text
   --status <status>              Plan or task status
   --context <ref[:reason]>       Required task context; repeat to add more
   --target <path>                Declared task target; repeat to add more
