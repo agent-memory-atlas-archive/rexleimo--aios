@@ -1,8 +1,8 @@
 # Outstanding work
 
 > Living register. Updated whenever an item opens or closes — update it in the same commit as the change.
-> Last updated: 2026-10-15 (resume): A19 opened and closed on the same turn — the `aios plan` CLI silently substituted a read-only view for write requests, which is how the finished 2026-09-18 triage plan stayed `executing` for three weeks and kept hijacking every 「继续」 resume. Ledger closed, register pointer re-pointed at the live work item. Previous: 2026-10-14 (third round): A18 mitigated by work-9 (taskkill wait capped at 1500 ms; the environment-side degradation stays open) and work-8 shipped in rex-harness 0.10.0 (recovery backups are now pruned on successful installs); C5 added for the still-pending operator deletion of the 93 historical backups. Before that: A17 opened (the turn settlement gate has no production importer); 2026-09-22, after the zcode verification — A14 closed, A15/A16 remain open.
-> Source of truth for the current work item: `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` (the 2026-09-18 triage plan it used to name is **closed** — A1-A4 all RESOLVED 2026-09-21).
+> Last updated: 2026-10-15 (later rounds): A20 closed the Skill certification base mismatch, A21 made a planned turn reuse the active ledger, A22 gave `plan start` a canonical work-item id, A23 propagated that id into the gate's ledger and its Capability binding, and A15 brought the five `shell: pwsh` workflow steps inside the shell-syntax guard. **A16 is the only open item left in section A** (dead barrel module; deleting it is an owner action, not an agent one). Release state: work-7 is classified minor (v6.3.0 -> v6.4.0) and blocked on two operator gates — tagging rex-harness gitlink `7336ee69` (its GitHub Release) and authoring the en/zh/ja/ko blog posts a minor release requires. Previous: 2026-10-15 (resume) A19 opened and closed on the same turn — the `aios plan` CLI silently substituted a read-only view for write requests, which is how the finished 2026-09-18 triage plan stayed `executing` for three weeks and kept hijacking every 「继续」 resume. Previous: 2026-10-14 (third round): A18 mitigated by work-9 (taskkill wait capped at 1500 ms; the environment-side degradation stays open) and work-8 shipped in rex-harness 0.10.0 (recovery backups are now pruned on successful installs); C5 added for the still-pending operator deletion of the 93 historical backups. Before that: A17 opened (the turn settlement gate has no production importer); 2026-09-22, after the zcode verification — A14 closed, A15/A16 remained open.
+> Source of truth for the last delivered work item: `docs/plans/2026-10-15-a23-make-plan-auto-gate-accept-the-declared-work-item-identity.md` (closed). `docs/plans/2026-10-14-submodule-boundary-and-loop-closure.md` still carries the operator-only remainders (work-5 backup deletion, work-7 release cut, work-10 blocked by ADR 0002).
 
 Items are split by **who owns the fix**, because that is what decides where the change lands:
 
@@ -131,11 +131,31 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Live confirmation (ZCode's own logs, `~/.zcode/cli/log/zcode-2026-09-2*.jsonl`)**: `config.mcp_server.skipped` / `config_mcp_server_invalid` / `"<server>: Unrecognized key: \"transport\""` / `diagnosticPath: mcp.servers.pencil`, `configPath: C:\\Users\\...\\.zcode\\cli\\config.json`, `configScope: user` — the app reads exactly the file and namespace AIOS targets, and it drops an entry whose discriminator is spelled `transport`. In the same startup, the AIOS-written `aios-shell` entry (`type: "stdio"` + `timeoutMs`) reached `mcp.server.connected` with `toolCount: 1`, and a plugin-declared HTTP server connected with `transport: "http"` — so the strict schema accepts AIOS's stdio shape today and the HTTP plane is live in the same runtime.
 - **Verification**: `node --test scripts/tests/integration.test.mjs scripts/tests/zcode-mcp-nested-migration.test.mjs` 28/28; `node scripts/aios.mjs integration doctor typesafe --clients zcode` now reports `not registered` (was `manual-step-required`) and `integration add typesafe --clients zcode --dry-run --skip-skills` plans a write to the live `C:\\Users\\Administrator\\.zcode\\cli\\config.json`; full gate `npm run test:scripts` → **2013 tests / 2004 pass / 0 fail / 9 skipped, files=200**.
 
-### A15 — OPEN: the five `shell: pwsh` workflow steps are outside S1/S2
+### A15 — RESOLVED 2026-10-15: the five `shell: pwsh` workflow steps are now covered
 
-- **Status**: open. S1/S2 (`scripts/tests/workflow-shell-syntax.test.mjs`) cover bash `run:` blocks only, because `windows-shell-smoke.yml` deliberately uses `shell: pwsh` for five steps.
-- **Why it matters (low-medium)**: PowerShell has its own here-string rules (the terminator must be at column 0), so the A6 class is not bash-specific. Those steps are currently unguarded.
-- **Next**: add a PowerShell syntax check to the guard where `pwsh` is available, or record the decision not to.
+- **What shipped**: `scripts/tests/execution/workflow/workflow-shell-syntax.test.mjs` grew S3-S5 next to
+  the existing S1/S2, and the header sentence that said non-bash steps were out of scope is gone — that
+  sentence *was* the gap.
+  - **S3** (interpreter-free, every platform): every `@'` / `@"` here-string in a PowerShell `run:` block
+    closes. Unclosed is an error in every PowerShell version, so this half never depends on what the
+    machine happens to have.
+  - **S4**: each PowerShell block is parsed by the real PowerShell AST parser (`Parser::ParseFile`,
+    discovery order `pwsh` → `powershell.exe` → `powershell`). **Nothing is executed** — the workflow
+    scripts are only tokenized. On this box there is no `pwsh`, so the proxy is Windows PowerShell 5.1,
+    which is *stricter* than the runner's pwsh 7 (an indented here-string terminator is legal only in
+    6.0+); the header records that a 5.1 indentation complaint is a portability warning, and S3
+    deliberately does not enforce column 0.
+  - **S5**: coverage is proven non-vacuous twice — the selector must find exactly as many PowerShell
+    steps as the raw YAML text declares (5 today), and a synthetic unterminated here-string plus
+    unbalanced parentheses must both be reported while a valid script must not be.
+- **Guard proven against the real file, not just synthetics**: an unbalanced `@(` injected into
+  `windows-shell-smoke.yml` made S4 fail; the file is now byte-identical to HEAD (`git diff --quiet` exit 0).
+- **Process note (self-inflicted, recorded)**: during that mutation `git checkout` re-materialized the file
+  with CRLF while the pre-mutation worktree was CRLF too, so a hash comparison against a value I had never
+  actually printed reported a false DRIFT — and the hash I then “compared” was one I had written down from
+  memory rather than read. Restoration was redone against the only objective reference available (the HEAD
+  blob), and the stray mutation backup was moved to `.aios/tmp/a15-mutation-residue-20261015/` instead of
+  deleted. Lesson: never assert an expected hash that was not captured in visible output.
 
 ### A16 — OPEN: `src/core/index.mjs` has no importers
 
