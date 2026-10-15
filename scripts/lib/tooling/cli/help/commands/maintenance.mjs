@@ -174,6 +174,7 @@ Examples:
     case 'plan':
       return `Usage:
   aios plan status [--workspace <path>] [--json]
+  aios plan set-status --status <active|approved|executing|done|blocked> [--note <text>] [--force] [--workspace <path>] [--json]
   aios plan show [--workspace <path>] [--html] [--json]
   aios plan start --title <text> --task <text> [--workspace <path>] [--json]
   aios plan task <id> [--context <ref[:reason]>] [--target <path>] [--allow-write <glob>] [--workspace <path>] [--json]
@@ -210,6 +211,7 @@ Options:
 
 Examples:
   aios plan show --html
+  aios plan set-status --status done --note "all work items delivered" --json
   aios plan show --workspace /tmp/demo --json
   aios plan task t3-implement --propose-context --target src/feature.mjs
   aios plan task t3-implement --confirm-context-candidates --candidate-ref src/feature.mjs

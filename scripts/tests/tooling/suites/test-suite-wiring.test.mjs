@@ -47,7 +47,7 @@
  *
  * Completion criteria: W1/W2/W3 each fail independently under mutation, and the
  *   regression suite stays green. Refresh the snapshot with
- *   AIOS_UPDATE_TEST_WIRING=1 node --test scripts/tests/test-suite-wiring.test.mjs
+ *   AIOS_UPDATE_TEST_WIRING=1 node --test scripts/tests/tooling/suites/test-suite-wiring.test.mjs
  *
  * Forbidden fake passes: no "the suite is not empty" style assertion, no self-comparison
  *   of the snapshot with itself, no skipped case.
@@ -156,7 +156,7 @@ function writeSnapshot(unwired) {
         schemaVersion: 1,
         note:
           'Test files reachable from no suite and no package.json test entry. This list is a '
-          + 'baseline for scripts/tests/test-suite-wiring.test.mjs, not an approval: wiring a file '
+          + 'baseline for scripts/tests/tooling/suites/test-suite-wiring.test.mjs, not an approval: wiring a file '
           + 'shrinks it, and a new unwired file fails the guard instead of being appended silently.',
         knownUnwired: unwired,
         knownNotInCi: previous.knownNotInCi || [],

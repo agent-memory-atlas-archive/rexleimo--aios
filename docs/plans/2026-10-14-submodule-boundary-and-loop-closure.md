@@ -485,6 +485,11 @@ facts:
   - **work-8 已交付**：新模块 `rex-harness/src/clients/recovery-prune.mjs`（每 skill 保留最近 2 份，归属不明不动，
     冲突/错误轮不修剪）；`installClientProjection` 成功后修剪并回报 `prunedRecoveryBackups`；
     子模块 0.9.1→0.10.0 + CHANGELOG + provider-contract 同步；证据 client-install 契约 22/22、子模块全量 218/218、doctor errors []
+  - （2026-10-15 resume）行尾次生隐患已验收入仓：affected subset 40/214 文件 646 pass / 0 fail / 1 skip（exit 0），commit 15e1716d
+  - （2026-10-15 resume）帐目类新缺陷 A19：`plan status --status done` 退出 0 却什么都没改（解析层把未识别子命令**静默改成 status** + status 分支忽略写 flag），
+    于是 2026-09-18 已完成的 triage 计划卡 executing 三周、每次「继续」都被它带跑。修法：子命令名原样透传，词汇表归 ops 层
+    （导出 PLAN_SUBCOMMANDS 并拒绝未知名）、status 拒绝写 flag 并指向 set-status、help 首次公布 set-status。C1-C5 5/5，
+    两个变异各自独立被抓（恢复静默改只挂 C2、删 status 守卫只挂 C3），C4 钉住“拒得不宽”；该计划已置 done
 assignment:
   work-5: operator      # 删 93 个备份，命令已入档，仅 operator 终端执行
   work-6: done          # S1/S2/S4 交付，S3 按范围决定不做
@@ -495,3 +500,5 @@ assignment:
 2026-10-14 第三轮：operator「继续没有完成的事情」授权 work-8（子模块 0.10.0，recovery 修剪）与
 work-9（A18 taskkill 封顶）并已交付。待 operator：① work-5 终端执行删除（命令已入档）；
 ② work-7 已解锁，入图需重确认范围。代码侧 work-1/2/3/4/6 均已交付；若重提结算接线（选项 A），必须先有调用点再建桥（ADR 0002 更新段）。
+2026-10-15 resume：CRLF 证据修复已验证并 commit（15e1716d，affected 646/0）；新发现并修复 A19（plan CLI 静默替代），
+旧 triage 计划帐目已置 done。待 operator：① work-5 终端执行删除（C5 在册）；② work-7 范围确认；③ push（未 cap）。

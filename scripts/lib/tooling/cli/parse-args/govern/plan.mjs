@@ -53,24 +53,17 @@ const PLAN_CLI = new Command()
 export function parsePlanArgs(argv) {
   const rest = argv.slice(1);
   const help = rest.includes('-h') || rest.includes('--help');
-  const subcommand = String(rest[0] || 'status').replace(/^-/, '') || 'status';
-  const known = new Set([
-    'start',
-    'status',
-    'show',
-    'review',
-    'set-status',
-    'task',
-    'add-evidence',
-    'capability-evidence',
-    'gate',
-    'check-done',
-    'inject',
-    'auto-gate',
-    'always-on',
-    'hook-user-prompt',
-  ]);
-  const sub = known.has(subcommand) ? subcommand : 'status';
+  // 中文注释：第一个非 flag 参数就是子命令名，未识别的名字保留原样，由 ops 层的
+  // `unknown plan subcommand` 拒绝。旧代码把它悄悄换成 status，于是
+  // `plan status --status done`（写入口其实是 set-status）与拼错的子命令都会
+  // 读到只读视图并 exit 0：写请求被静默丢弃，账目状态停在 executing 无人发现。
+  // 声明通道不猜语义——未知输入 fail closed。
+  const firstPositional = rest[0];
+  const declaresSubcommand = Boolean(firstPositional) && !String(firstPositional).startsWith('-');
+  const subcommand = declaresSubcommand ? String(firstPositional) : 'status';
+  // 中文注释：不再在本层维护子命令白名单副本——词汇表归 owner（ops 层的分支集），
+  // 本层只负责把声明的子命令名原样传下去。
+  const sub = subcommand;
   if (help) {
     return {
       mode: 'help',
@@ -79,7 +72,7 @@ export function parsePlanArgs(argv) {
       options: { subcommand: sub },
     };
   }
-  let parseArgv = known.has(subcommand) ? rest.slice(1) : rest;
+  let parseArgv = declaresSubcommand ? rest.slice(1) : rest;
   // plan task <id> --status done
   let positionalTaskId = '';
   if (sub === 'task' && parseArgv[0] && !String(parseArgv[0]).startsWith('-')) {

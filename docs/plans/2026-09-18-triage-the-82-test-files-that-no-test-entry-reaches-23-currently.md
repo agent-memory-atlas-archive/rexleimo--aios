@@ -79,7 +79,8 @@ Work items (stable ids, observable outcome, verification, real deps):
   - `ecc-agent-workflow`: no client carries `deprecated: true` any more (the flag was retired with the opencode deprecation), so the compatibility-tier reason can never fire; gemini's fail-closed state is reported through the evidence-gate reasons. Assertion updated.
 - `work-wire` (DONE for ALL families, 2026-09-21 fourth pass): the remaining 68 never-failing files were bulk-verified green (`node --test <68 files>`: 589 tests / 588 pass / 0 fail / 1 skipped), appended to the `regression` suite (129 → 197 files), snapshot refreshed to `knownUnwired: []` (W1/W2/W3 3/3). Verification: `npm run test:affected` ran the full pool itself — 1998 tests / 1989 pass / 0 fail / 9 skipped.
 - `work-snapshot-refresh` (DONE for the wired count): baseline shrank by exactly 9, enforced by guard W3.
-- still open: nothing. All 82 triage files are wired and green (`knownUnwired: []`); the only remaining opens live in `docs/outstanding-work.md` sections B (rex-harness/MCP adapter, not local) and C (owner actions).
+- still open: nothing. All 82 triage files are wired and green (`knownUnwired: []`); the only remaining opens live in `docs/reference/outstanding-work.md` sections B (rex-harness/MCP adapter, not local) and C (owner actions).
+- closed 2026-10-15: the ledger was still `executing` because `aios plan status --status done` silently no-opped (defect A19 in `docs/reference/outstanding-work.md`); set to `done` with `plan set-status`.
 - blocked: nothing. work-fixture-refresh unblocked by the owner-approved A+C decision and completed.
 - parallelGroups: [work-env-py], [work-residue], [work-win-colon], [work-stale-code], [work-fixture-refresh], [work-adjudicate] — independent domains, no shared state.
 - convergenceGate: full regression green, every wired family reachable from a suite, baseline shrunk by exactly the wired count.

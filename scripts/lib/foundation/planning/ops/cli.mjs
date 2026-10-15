@@ -26,6 +26,25 @@ function isContainedPath(rootPath, candidatePath) {
   return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
 }
 
+// 中文注释：本函数是 plan CLI 子命令词汇表的唯一 owner（下面的分支就是实现）。
+// 解析层不再维护副本，而是把声明的名字原样递到这里，未识别的就在这里拒绝。
+export const PLAN_SUBCOMMANDS = Object.freeze([
+  'start',
+  'status',
+  'show',
+  'review',
+  'set-status',
+  'task',
+  'add-evidence',
+  'capability-evidence',
+  'gate',
+  'check-done',
+  'inject',
+  'auto-gate',
+  'always-on',
+  'hook-user-prompt',
+]);
+
 function invalidTestabilityPath() {
   const error = new Error('testability file must resolve inside the selected workspace');
   error.code = 'AIOS_INVALID_TESTABILITY_PATH';
@@ -157,6 +176,13 @@ export async function runPlanCommand(options = {}, { rootDir = process.cwd(), st
   }
 
   if (sub === 'status') {
+    // 中文注释：status 是只读视图，写入口是 set-status。以前这里收到 --status/--note/--force
+    // 会静默忽略并 exit 0，调用方以为计划已关闭而帐目根本没动（已完成的计划长期停在 executing）。
+    // 写声明必须命中写入口，不能跌到只读视图。
+    if (options.status || options.note || options.force) {
+      stderr.write('[err] plan status is read-only; use: aios plan set-status --status <active|approved|executing|done|blocked> [--note <text>] [--force]\n');
+      return { exitCode: 1 };
+    }
     const state = readActivePlan(rootDir);
     if (!state) {
       stdout.write(json ? `${JSON.stringify({ active: null }, null, 2)}\n` : 'no active plan\n');
@@ -376,5 +402,6 @@ export async function runPlanCommand(options = {}, { rootDir = process.cwd(), st
   }
 
   stderr.write(`[err] unknown plan subcommand: ${sub}\n`);
+  stderr.write(`[err] valid subcommands: ${PLAN_SUBCOMMANDS.join(' | ')}\n`);
   return { exitCode: 1 };
 }
