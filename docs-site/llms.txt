@@ -69,6 +69,7 @@ AIOS is a local-first agent workflow layer that gives coding CLIs (Claude Code, 
 
 - https://cli.rexai.top/blog/2026-10-v640-control-plane-stops-guessing/ — v6.4.0: A Control Plane That Stops Guessing — Ledgers Cannot Fork, Refusals Are Features, Gates Run Where They Claim
 - https://cli.rexai.top/blog/2026-10-grill-with-docs/ — v6.3.0: /grill Becomes a Real Command, the Interview Writes Itself Down, and Pi Picks Its Own MCP Carrier
+- https://cli.rexai.top/blog/2026-10-qwen-flash-aios-pi/ — One Sentence In, One Product Out: A Small Model Burned 3.6 Billion Tokens a Month — AIOS Makes Software Development Something Anyone Can Do
 - https://cli.rexai.top/blog/2026-09-engineering-standards-trigger-chain/ — v6.2.0: Engineering Standards That Actually Trigger
 - https://cli.rexai.top/blog/2026-09-browser-mcp-default-off/ — v6.1.0: Browser MCP Off by Default — One Install-Time Choice, Three Modes
 - https://cli.rexai.top/blog/2026-09-v601-engineering-standards-rex/ — v6.0.1: Engineering Standards Move to rex-harness — The Baseline Lives With Its Consumers
