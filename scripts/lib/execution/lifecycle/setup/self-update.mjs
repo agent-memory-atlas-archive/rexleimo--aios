@@ -170,8 +170,8 @@ async function updateFromReleaseInstaller(rootDir, {
       ? `& '${quotePowerShellSingleString(localInstaller)}'`
       : `irm "${installerAssetBase}/aios-install.ps1" | iex`;
     const script = [
-      '$ErrorActionPreference = "Stop"',
       '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12',
+      '$ErrorActionPreference = "Stop"',
       `$env:AIOS_REPO='${psRepo}'`,
       `$env:AIOS_INSTALL_DIR='${psRootDir}'`,
       installerCmd,
