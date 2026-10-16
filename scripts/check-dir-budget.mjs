@@ -41,13 +41,11 @@ export const EXEMPT_DIRS = Object.freeze({
 
 // 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
 // 2026-10-13 已清零：所有超标目录要么已语义拆分，要么落入上面的豁免面。
-export const BASELINE_COUNTS = Object.freeze({
-  // 2026-10-15 恢复：8b7321c1 过早清空基线——对应的 harness/planning 测试树语义拆分尚未
-  // 落到 committed 树上，清空让每次 CI 的 pretest 秒挂（22-34s）。按 committed 实测数冻结，
-  // 拆分落地、两个目录降到预算内后按 RECOVERED 提示删除条目。
-  'scripts/tests/execution/harness': 9,
-  'scripts/tests/execution/planning': 12,
-});
+// 2026-10-15：harness 9 / planning 12 曾短暂重登记（被新增测试推回超标），当天补齐
+// 执行面（pretest:scripts）后即完成语义拆分并再次清零：
+//   - scripts/tests/execution/harness → solo/ + team/（镜像 lib/execution/harness 分层）
+//   - scripts/tests/execution/planning → cli/ + flow/ + contract/
+export const BASELINE_COUNTS = Object.freeze({});
 
 export function countDirEntries(trackedFiles) {
   const dirs = new Map();

@@ -6,7 +6,7 @@
 
 ## 背景
 
-本次迭代的触发点：参考 mattpocock/skills 仓库（已克隆至 agent-sources/skills/）后，发现我们现有 rex-harness skill 体系存在可量化的质量差距，具体表现为：
+本次迭代的触发点：参考 mattpocock/skills 仓库（曾克隆至 agent-sources/skills/，该副本已移除；仓库现状见 `docs/reports/competitor-watchlist.json` 的 `pendingDeepDive`）后，发现我们现有 rex-harness skill 体系存在可量化的质量差距，具体表现为：
 
 - Agent 经常汇报"已完成"但实际产出未达验收标准
 - Code Review 每次结果不可预期，没有统一的 smell 基线

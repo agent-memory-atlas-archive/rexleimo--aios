@@ -1,10 +1,24 @@
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-10-13",
+  "lastUpdated": "2026-10-15",
   "lastMetadataCheck": "2026-10-12 (trigger screening + new-player scan; all 5 active refs core contracts unchanged since 2026-09-28; no deep dive triggered; see docs/reports/2026-10-12-competitor-refresh.md)",
   "lastDeepDive": "2026-08-14 (TencentDB v2.0.0/v2.0.1-beta.1 full source; OMO v5 hashline-core + memory-core + fork-cost; Graphiti/Letta/mem0/OpenHarness current trees; see docs/reports/2026-08-14-competitor-source-refresh.md). 2026-10-12 was trigger screening + new-player scan only, no source deep dive",
   "refreshMethod": "api.github.com metadata + codeload.github.com tarballs + local source review of ACL/loadout/hashline/citation/temporal contracts",
-  "pendingDeepDive": [],
+  "pendingDeepDive": [
+    {
+      "id": "mattpocock-skills",
+      "name": "Matt Pocock Skills (aihero)",
+      "repo": "mattpocock/skills",
+      "pillar": "intelligent-planning",
+      "candidateQuestion": "一份变更的交付正文（最小可视摘要 + before/after 证据 + 可逆性 door/blast radius）是否值得作为控制面产物结构化产出，而不是停在仓库的 PR 模板文书层？",
+      "localClosestModule": "公文形状层：.github/PULL_REQUEST_TEMPLATE.md（37 行勾选框版）；门禁层：scripts/lib/clients/opencode/config.mjs:56 注入 verification-before-completion；控制面层：rex-code-review 的 rex.standards-spec-review.v1 verdict artifact（rex-harness/skill-sources/rex-code-review/SKILL.md:98）。自查结论：缺口只在文书形状层，证据契约与门禁已有 owner，未发现无覆盖的控制面问法——故登记为 pending 而非准入。",
+      "decision": "pending",
+      "decisionDate": "2026-10-15",
+      "alreadyAbsorbed": "pr 三节形状按「落点三问」第①问已落父仓库模板（docs/architecture/adr/0003）；本条目不是为它入册，而是留一条明确的重评判据，防止同一候选被反复当新发现。",
+      "overlapWarning": "retro 的「会话 → 环境改动建议」闭环与 Hermes 的 skill governance（proposal → review → apply/rollback）在 pillar 上重叠；将来若主张 team-workflow 参照，必须先做与 Hermes 的问法去重。",
+      "reevaluateIf": "出现可源码验证的「证据信封直接产出交付正文」（如 rex evidence schema 渲染出 Summary/Evidence/Door 三节）时作为新候选重评；仅发布新 skill 或新版本不构成重评理由。"
+    }
+  ],
   "rejectedCandidates": [
     {
       "id": "codewhale",

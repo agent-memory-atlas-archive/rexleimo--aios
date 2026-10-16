@@ -5,11 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { startPlan, readActivePlan } from '../../../lib/foundation/planning/contract/contract.mjs';
-import { showActivePlan, formatPlanShowText } from '../../../lib/foundation/planning/ops/show.mjs';
-import { evaluateSkillComplianceLive } from '../../../lib/tooling/skills/compliance/compliance-live.mjs';
-import { runSkillComply } from '../../../lib/tooling/skills/compliance/compliance.mjs';
-import { syncDreamLinesToActivePlan } from '../../../lib/execution/lifecycle/evolve/dream/export-to.mjs';
+import { startPlan, readActivePlan } from '../../../../lib/foundation/planning/contract/contract.mjs';
+import { showActivePlan, formatPlanShowText } from '../../../../lib/foundation/planning/ops/show.mjs';
+import { evaluateSkillComplianceLive } from '../../../../lib/tooling/skills/compliance/compliance-live.mjs';
+import { runSkillComply } from '../../../../lib/tooling/skills/compliance/compliance.mjs';
+import { syncDreamLinesToActivePlan } from '../../../../lib/execution/lifecycle/evolve/dream/export-to.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));

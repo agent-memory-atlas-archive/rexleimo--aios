@@ -52,8 +52,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
 
 const MESSAGE = 'add a vendor integration to the control plane';
 

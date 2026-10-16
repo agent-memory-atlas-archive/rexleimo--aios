@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
-import { evaluateWorkflowPolicy } from '../../../lib/foundation/planning/contract/workflow-policy.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
+import { evaluateWorkflowPolicy } from '../../../../lib/foundation/planning/contract/workflow-policy.mjs';
 
 // A21: one work item must not produce two plan ledgers. Before the fix, a planned turn always
 // resolved to `persistence: 'create'`, so registering twice (start, then auto-gate) wrote a second

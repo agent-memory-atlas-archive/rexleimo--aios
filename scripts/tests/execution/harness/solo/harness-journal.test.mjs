@@ -15,8 +15,8 @@ import {
   readSoloRunStatus,
   readSoloRunSummary,
   requestSoloHarnessStop,
-} from '../../../lib/execution/harness/solo/solo-journal.mjs';
-import { persistIterationState } from '../../../lib/execution/harness/solo/solo-runtime/support/state.mjs';
+} from '../../../../lib/execution/harness/solo/solo-journal.mjs';
+import { persistIterationState } from '../../../../lib/execution/harness/solo/solo-runtime/support/state.mjs';
 
 test('initSoloRunJournal writes objective summary and control artifacts', async () => {
   const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-solo-journal-'));

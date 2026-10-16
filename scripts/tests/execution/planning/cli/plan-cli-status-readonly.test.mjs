@@ -42,10 +42,10 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { getCommandHelpText } from '../../../lib/tooling/cli/help/help.mjs';
-import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
-import { PLAN_SUBCOMMANDS, runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
-import { readActivePlan } from '../../../lib/foundation/planning/contract/contract.mjs';
+import { getCommandHelpText } from '../../../../lib/tooling/cli/help/help.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { PLAN_SUBCOMMANDS, runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
+import { readActivePlan } from '../../../../lib/foundation/planning/contract/contract.mjs';
 
 function makeIo() {
   let stdoutText = '';

@@ -75,7 +75,7 @@ npm run typecheck && npm run build
 - File names: kebab-case for action modules (for example `auth-check.ts`), `index.ts` for module entry points.
 - For `mcp-server` internals, tool names follow `browser_*`; browser sessions may launch locally or attach to a configured CDP endpoint.
 - Keep configuration JSON keys stable; prefer additive changes over renaming.
-- Directory budget: max 8 entries (files + subdirs) per directory; split semantically when over. Enforced by `node scripts/check-dir-budget.mjs` (exemptions + ratcheted baselines live in that script).
+- Directory budget: max 8 entries (files + subdirs) per directory; split semantically when over. Enforced by `node scripts/check-dir-budget.mjs` as the second step of `pretest:scripts`, so CI's `npm run test:scripts` fails on a new over-budget directory (exemptions + ratcheted baselines live in that script).
 - Repo-local discoverable skills must live under `.codex/skills/` or `.claude/skills/` (optionally `.agents/skills/` only when the target client actually supports it). Do not invent parallel skill roots such as `.baoyu-skills/*/SKILL.md`; those are non-discoverable and should be plain docs or extension config only.
 
 ## Testing Guidelines
@@ -111,9 +111,11 @@ Git history follows Conventional Commit style:
 - Optional scope is common (for example `feat(skills): ...`).
 
 PRs should include:
-- concise problem/solution summary,
+- a smallest-visual summary (call tree / file tree / diff sketch / pseudocode / Mermaid)
+  ahead of the one-line problem/solution,
 - affected paths,
-- verification evidence (command output or checklist),
+- before/after verification evidence: paste the real command output, a checked box is not evidence,
+- merge danger: door (one-way or two-way) and blast radius,
 - screenshots/log snippets for browser-flow changes,
 - linked task/issue when applicable.
 
@@ -182,46 +184,6 @@ Classify substantive work before selecting process controls. Do not create a pla
   5. If no clear message is available, use fallback `chore: cap snapshot <YYYY-MM-DD>`.
   6. `git push` (or set upstream once when required).
 - If there are no changes, report a no-op instead of creating an empty commit.
-
-
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
-
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
-
-### When to use graph tools FIRST
-
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
-
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
-
-### Key Tools
-
-| Tool | Use when |
-| ------ | ---------- |
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
-
-### Workflow
-
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
 
 <!-- AIOS CODEMAP BEGIN -->
 ## MCP Tools: code-review-graph

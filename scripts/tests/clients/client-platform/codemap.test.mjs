@@ -246,6 +246,13 @@ test('tracked codemap instruction sections match the generator template exactly'
       expected,
       `${fileName} drifted from codemap template`,
     );
+    // 单一 owner：CRG 指令块只能有 AIOS 管理的那一个。外部工具注入的旧块曾与 AIOS 块
+    // 并存且互相矛盾（"ALWAYS use … BEFORE Grep/Glob/Read" vs 每工作项 ≤3 次图调用），
+    // 这里把它钉死，防止再次悄悄出现两份互相打架的指令。
+    assert.equal(raw.split('## MCP Tools: code-review-graph').length - 1, 1,
+      `${fileName}: CRG 指令区块必须只有一个（AIOS CODEMAP 块）`);
+    assert.equal(raw.includes('<!-- code-review-graph MCP tools -->'), false,
+      `${fileName}: 不得出现旧的外部注入标记 <!-- code-review-graph MCP tools -->`);
   }
 });
 

@@ -4,8 +4,8 @@ import path from 'node:path';
 import os from 'node:os';
 import test from 'node:test';
 
-import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
-import { runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
 
 // A22: `plan start` used to carry no identity, so registering the same work item twice wrote a
 // second document (`<slug>-2.md`) and silently made it active — the first ledger then had no CLI

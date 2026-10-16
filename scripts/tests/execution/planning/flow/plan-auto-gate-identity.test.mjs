@@ -4,9 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { parsePlanArgs } from '../../../lib/tooling/cli/parse-args/govern/plan.mjs';
-import { canonicalizeWorkItemId } from '../../../lib/foundation/planning/contract/contract.mjs';
-import { runPlanCommand } from '../../../lib/foundation/planning/ops/cli.mjs';
+import { parsePlanArgs } from '../../../../lib/tooling/cli/parse-args/govern/plan.mjs';
+import { canonicalizeWorkItemId } from '../../../../lib/foundation/planning/contract/contract.mjs';
+import { runPlanCommand } from '../../../../lib/foundation/planning/ops/cli.mjs';
 
 // A23: the declared work-item identity has to reach the Capability activation as well, otherwise the
 // ledger answers to an id (A22) while its Provider Command answers to a path or a turn hash.

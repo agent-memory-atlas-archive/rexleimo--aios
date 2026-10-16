@@ -948,7 +948,7 @@ async function cl10() {
     const planningTests = commandObservation(process.execPath, [
       '--test',
       'scripts/tests/execution/workflow/workflow-policy.test.mjs',
-      'scripts/tests/execution/planning/planning-contract.test.mjs',
+      'scripts/tests/execution/planning/contract/planning-contract.test.mjs',
       'scripts/tests/tooling/contracts/preflight-contracts.test.mjs',
     ]);
     const contextDbTests = commandObservation(process.execPath, [

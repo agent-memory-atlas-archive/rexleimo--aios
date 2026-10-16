@@ -11,13 +11,13 @@ import {
   readActivePlan,
   setPlanStatus,
   startPlan,
-} from '../../../lib/foundation/planning/contract/contract.mjs';
+} from '../../../../lib/foundation/planning/contract/contract.mjs';
 import {
   buildAlwaysOnPlanningDirective,
   ensurePlanForMessage,
   runAutoGate,
   runClaudeUserPromptSubmitHook,
-} from '../../../lib/foundation/planning/flow/auto-gate.mjs';
+} from '../../../../lib/foundation/planning/flow/auto-gate.mjs';
 
 async function makeTemp(prefix) {
   return mkdtemp(path.join(os.tmpdir(), prefix));
@@ -162,7 +162,7 @@ test('setPlanStatus updates active pointer', async () => {
 test('plan done requires tasks complete + evidence', async () => {
   const root = await makeTemp('aios-plan-done-gate-');
   try {
-    const { updatePlanTask, addPlanEvidence } = await import('../../../lib/foundation/planning/contract/contract.mjs');
+    const { updatePlanTask, addPlanEvidence } = await import('../../../../lib/foundation/planning/contract/contract.mjs');
     startPlan({ rootDir: root, title: 'Done gate', objective: 'fix bug in auth', client: 'cli' });
     assert.throws(() => setPlanStatus(root, 'done'), /cannot mark plan done/);
     const plan = readActivePlan(root);

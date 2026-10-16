@@ -24,6 +24,11 @@ export const SUITE_TOOLING_FILES = Object.freeze([
 
 // regression 图里没有这两个目录的边，它们有各自独立的 CI job，改动直接退回全量更诚实。
 const OUT_OF_GRAPH_PREFIXES = Object.freeze(['rex-harness/', 'mcp-server/']);
+
+// skill-sources/ 是技能注册面（一个目录一个 skill）：守卫测试按目录 readdir 遍历内容，
+// 不 import 具体文件，静态引用图扫不到边；不特殊处理，改 SKILL.md 会静默选中 0 个测试。
+const SKILL_SOURCES_PREFIX = 'skill-sources/';
+const SKILL_GUARD_TEST_PREFIX = 'scripts/tests/foundation/skills/';
 const SOURCE_SUFFIXES = Object.freeze(['.mjs', '.cjs', '.js']);
 const GRAPH_ROOT_PREFIXES = Object.freeze(['scripts/', 'config/']);
 
@@ -155,6 +160,12 @@ export function selectAffectedTests({ changedFiles, index, thresholdRatio = 0.6 
     const outsidePrefix = OUT_OF_GRAPH_PREFIXES.find((prefix) => file.startsWith(prefix));
     if (outsidePrefix) {
       return bail([`${outsidePrefix} 不在 regression 影响图内（有独立 CI job）`]);
+    }
+    if (file.startsWith(SKILL_SOURCES_PREFIX)) {
+      const guards = pool.filter((testFile) => testFile.startsWith(SKILL_GUARD_TEST_PREFIX));
+      for (const guard of guards) selected.add(guard);
+      reasons.push(`skill-sources 注册面改动，按技能守卫集选中 ${guards.length} 个测试：${file}`);
+      continue;
     }
     if (imprecise.has(file)) {
       return bail([`${file} 含无法静态枚举的动态 import`]);

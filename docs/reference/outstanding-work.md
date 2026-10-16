@@ -192,7 +192,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
   1. `scripts/lib/tooling/cli/parse-args/govern/plan.mjs` mapped *any* unrecognized subcommand to `status` (`known.has(subcommand) ? subcommand : 'status'`), so `plan list` printed the plan and exited 0, and the ops layer's own `unknown plan subcommand` refusal was **unreachable through the CLI**.
   2. The `status` branch in `scripts/lib/foundation/planning/ops/cli.mjs` ignored `--status/--note/--force` — the write entry point is `set-status`, which **no help surface advertised** (`scripts/lib/tooling/cli/help/commands/maintenance.mjs` listed status/show/start/task/auto-gate/capability-evidence only).
 - **Fix (fail closed, no guessing)**: the parser passes the declared name through verbatim and stops owning a vocabulary copy; the ops layer — which owns the branches, so it owns the list — exports `PLAN_SUBCOMMANDS` and refuses unknown names while printing them; `status` refuses write flags and prints the `set-status` form; help advertises `aios plan set-status --status <active|approved|executing|done|blocked> [--note] [--force]` plus an example.
-- **Evidence**: `scripts/tests/execution/planning/plan-cli-status-readonly.test.mjs` C1-C5 5/5, wired into `regression` (W1/W2/W3/W5/W6 6/6). Mutation-proved non-vacuous: reintroducing the parser fallback fails **C2** only; deleting the `status` guard fails **C3** only (C3 also asserts the persisted status and `updatedAt` are unchanged, so it cannot pass on stderr text alone); **C4** keeps the refusals from being over-wide (unforced `set-status done` is still blocked by the done gate, `--force` lands, `note` persists). Live checks on this host: `plan status` 0, `plan status --status done` 1, `plan list` 1, `plan set-status --status done --json` 0.
+- **Evidence**: `scripts/tests/execution/planning/cli/plan-cli-status-readonly.test.mjs` C1-C5 5/5, wired into `regression` (W1/W2/W3/W5/W6 6/6). Mutation-proved non-vacuous: reintroducing the parser fallback fails **C2** only; deleting the `status` guard fails **C3** only (C3 also asserts the persisted status and `updatedAt` are unchanged, so it cannot pass on stderr text alone); **C4** keeps the refusals from being over-wide (unforced `set-status done` is still blocked by the done gate, `--force` lands, `note` persists). Live checks on this host: `plan status` 0, `plan status --status done` 1, `plan list` 1, `plan set-status --status done --json` 0.
 - **Ledger repaired**: the 2026-09-18 plan is now `done` (t3-implement/t4-verify marked done with the 2026-09-21 evidence in their notes), and this register points at the live work item instead of the closed one.
 - **Same-move residue also fixed**: the wiring guard's refresh instruction and the snapshot note it generates still said `scripts/tests/test-suite-wiring.test.mjs` after the test-tree move — the documented refresh command could not run. Corrected to `scripts/tests/tooling/suites/`; regenerating now reproduces the committed snapshot byte-for-byte (no drift).
 - **Open question this raises (not fixed, needs a decision)**: `runPlanCommand`'s catch-all on a parse failure returns help mode with `subcommand: 'status'`, which is the same substitution shape one level up. It at least prints usage instead of a green exit, so it is not the observed defect; recorded rather than changed.
@@ -259,7 +259,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Declared escape hatch**: `plan auto-gate --new-work-item` (parsed, threaded, documented in help). `strict` mode
   reuses too — strict means "always work from a ledger", not "mint a new ledger every turn"; that reading is now pinned
   in both directions (reuse with a live plan, create with none, create when declared).
-- **Evidence**: `scripts/tests/execution/planning/plan-single-ledger.test.mjs` N1-N6 (start→gate leaves exactly one
+- **Evidence**: `scripts/tests/execution/planning/flow/plan-single-ledger.test.mjs` N1-N6 (start→gate leaves exactly one
   document, repeated planned turn idempotent, reuse still yields a `provider.invoke` Command, `--new-work-item` opens
   a second ledger, truncated flag not accepted as the declaration, terminal plan never reused, reuse does not rewrite
   the document or its `createdAt`), wired into `regression`; five mutations each flip assertions (always-create 5,
@@ -284,7 +284,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Boundary respected**: unkeyed `plan start` keeps its old behaviour (W4 pins it, incl. the `-2` sibling), so this
   did not quietly redefine the command. Measured: unkeyed ×2 → `…-legacy-probe.md` + `…-2.md`; keyed ×3 with
   casing/spacing variants → one `…-dup-item.md`, calls 2-3 report `created:false`.
-- **Evidence**: `scripts/tests/execution/planning/plan-work-item-identity.test.mjs` W1-W8 wired into `regression`;
+- **Evidence**: `scripts/tests/execution/planning/cli/plan-work-item-identity.test.mjs` W1-W8 wired into `regression`;
   planning 75/75, wiring+workflow+ctx 77/77, context/native/skills/dream/product-L3 35/35; five mutations each flip
   an assertion (blank-fallback, no mirror, no re-adoption, no unsafe-id guard, name ignores identity); files
   hash-verified IDENTICAL after the mutation batch.
@@ -313,7 +313,7 @@ Counted as 23 minus the 5 fixed in v5.19.2 (derived from the triage data, not re
 - **Known redundancy (deliberate)**: removing the reuse branch's id read-through flips **no** test,
   because `startCapability` re-derives the same keys and is idempotent on an existing activation. It is
   recorded as a second belt, not as a guarded branch — an unflippable assertion would be a false guard.
-- **Evidence**: `scripts/tests/execution/planning/plan-auto-gate-identity.test.mjs` P1-P8 wired into
+- **Evidence**: `scripts/tests/execution/planning/flow/plan-auto-gate-identity.test.mjs` P1-P8 wired into
   `regression`; planning + wiring 89/89, workflow + rex runtime/harness + ctx-agent-core 129/129, full
   `npm run test:regression` exit 0 (2156 tests / 2147 pass / 0 fail / 9 skipped); four mutations flip
   1 / 6 / 2 / 1 assertions; `plan check-done` 4/4 before the ledger was closed without `--force`.

@@ -37,8 +37,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { SOLO_CADENCE_CLASSES, SOLO_OUTCOMES } from '../../../lib/execution/harness/solo/solo-runtime/support/constants.mjs';
-import { normalizeSoloIterationOutcome } from '../../../lib/execution/harness/solo/solo-runtime/support/normalizers.mjs';
+import { SOLO_CADENCE_CLASSES, SOLO_OUTCOMES } from '../../../../lib/execution/harness/solo/solo-runtime/support/constants.mjs';
+import { normalizeSoloIterationOutcome } from '../../../../lib/execution/harness/solo/solo-runtime/support/normalizers.mjs';
 import {
   TURN_CONSEQUENCES,
   deriveCadenceClass,
@@ -47,7 +47,7 @@ import {
   findTurnTableGaps,
   isMaterialTurn,
   turnConsequencesFor,
-} from '../../../lib/execution/harness/solo/solo-runtime/support/turn-consequences.mjs';
+} from '../../../../lib/execution/harness/solo/solo-runtime/support/turn-consequences.mjs';
 
 const SOLO_RUNTIME_ROOT = path.join(
   process.cwd(),

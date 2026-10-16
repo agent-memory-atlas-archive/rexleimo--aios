@@ -19,6 +19,8 @@
  *   I8 真仓库自检：图必须仍然能从磁盘把已知枢纽模块反查出大量 dependents，
  *      否则说明扫描正则被重构改坏了 —— 那会让选择器静默漏测。
  *   I9 JSON 是叶子：清单类 .json 里的路径字符串是数据，不能变成 import 边。
+ *   I10 注册面改动：skill-sources/ 按「技能守卫目录」前缀选中（守卫按目录遍历，静态图无此边），
+ *       不再静默选中 0 个；文档改动的 0 选中（I6）不受影响。
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -176,4 +178,22 @@ test('I8 the on-disk scanner still resolves hub modules and the real test univer
   // 客户端注册表是全仓枢纽：扫描器一旦改坏，这里会立刻掉到 0，而不是静默漏测。
   assert.equal(index.dependents.get('scripts/lib/foundation/clients/selection/core/definitions.mjs').length > 80, true);
   assert.equal(index.dependents.get('scripts/lib/foundation/platform/paths.mjs').length > 30, true);
+});
+
+test('I10 a skill-sources change selects the registry guard tests instead of nothing', () => {
+  const index = fixtureIndex({
+    files: {
+      'scripts/tests/foundation/skills/core/skills-sync.test.mjs': '\n',
+      'scripts/tests/tooling/other.test.mjs': '\n',
+    },
+    testFiles: ['scripts/tests/foundation/skills/core/skills-sync.test.mjs', 'scripts/tests/tooling/other.test.mjs'],
+  });
+  const decision = selectAffectedTests({ changedFiles: ['skill-sources/retro/SKILL.md'], index });
+  assert.equal(decision.mode, 'subset');
+  assert.deepEqual(decision.files, ['scripts/tests/foundation/skills/core/skills-sync.test.mjs']);
+  assert.match(decision.reasons.join('\n'), /守卫/);
+  // 真仓库：regression 清单里必须真的存在这批守卫，否则上面的选择会退化成空集。
+  const suite = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'test-suites.json'), 'utf8')).regression.files;
+  const guardsInPool = suite.filter((file) => file.startsWith('scripts/tests/foundation/skills/'));
+  assert.equal(guardsInPool.length >= 5, true, `regression 清单里的技能守卫测试不足：${guardsInPool.length}`);
 });
