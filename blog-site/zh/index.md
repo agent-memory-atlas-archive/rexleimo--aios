@@ -77,6 +77,7 @@ description: "AIOS 工程与增长博客中文版：覆盖记忆系统、单 Age
 
 ## 深度文章
 
+- [一句话需求，一件软件：小模型月烧 36 亿 token——AIOS 让「人人能做开发」成真](qwen-flash-aios-pi.md)
 - [AIOS RL 训练系统：从合成 BUG 修复到多环境联合学习](rl-training-system.md)
 - [ContextDB 检索升级：FTS5/BM25 + 增量索引同步（P1.5）](contextdb-fts-bm25-search.md)
 - [Orchestrate Live：Subagent Runtime 正式可用](orchestrate-live.md)
