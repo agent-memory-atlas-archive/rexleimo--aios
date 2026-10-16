@@ -111,7 +111,7 @@ AIOS now supports ten coding clients — Codex CLI, Claude Code, Gemini CLI, Ope
 
 **3. Daily operations automation**
 
-Three Xiaohongshu (RED) accounts on an automated content queue plus browser automation — from 2 hours a day down to 15 minutes ([full write-up](zh/xiaohongshu-automation.md)). Small models execute, humans hold the review gates, and the environment guarantees nothing crosses the line.
+Three Xiaohongshu (RED) accounts on an automated content queue plus browser automation — from 2 hours a day down to 15 minutes ([full write-up](xiaohongshu-automation.md)). Small models execute, humans hold the review gates, and the environment guarantees nothing crosses the line.
 
 ## How to run it in Pi
 
