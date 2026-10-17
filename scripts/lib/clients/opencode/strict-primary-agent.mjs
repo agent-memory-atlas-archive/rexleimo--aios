@@ -2,6 +2,10 @@ import {
   AIOS_NATIVE_BEGIN_MARK,
   AIOS_NATIVE_END_MARK,
 } from '../native/distribution/emitters/shared.mjs';
+import {
+  OPENCODE_CLI_GENERATION_ENV,
+  normalizeOpenCodeCliGeneration,
+} from './cli-generation.mjs';
 
 export const OPENCODE_STRICT_PRIMARY_AGENT_NAME = 'aios-build';
 export const OPENCODE_STRICT_PRIMARY_AGENT_PATH = `.opencode/agent/${OPENCODE_STRICT_PRIMARY_AGENT_NAME}.md`;
@@ -28,8 +32,21 @@ export function withoutOpenCodeAgentArgs(extraArgs = []) {
   });
 }
 
-export function buildOpenCodeStrictAgentArgs(extraArgs = [], env = process.env) {
+// 代际分流：v1 顶层/run 都接受 --agent 与 --pure；v2 顶层 TUI 两者都不接受
+// （primary agent 由 opencode.json 的 default_agent 锁定），v2 `run` 仍接受
+// --agent 但没有 --pure。generation 未判定时保持 v1 旧行为（调用方应先用
+// detectOpenCodeCliGeneration 解析后传入）。
+export function buildOpenCodeStrictAgentArgs(extraArgs = [], env = process.env, options = {}) {
+  const generation = normalizeOpenCodeCliGeneration(env[OPENCODE_CLI_GENERATION_ENV])
+    ?? normalizeOpenCodeCliGeneration(options.generation)
+    ?? 1;
   const cleaned = withoutOpenCodeAgentArgs(extraArgs);
+
+  if (generation >= 2) {
+    if (options.mode === 'interactive') return [...cleaned];
+    return ['--agent', OPENCODE_STRICT_PRIMARY_AGENT_NAME, ...cleaned];
+  }
+
   const pureArgs = shouldUseOpenCodePureMode(env) && !cleaned.includes('--pure')
     ? ['--pure']
     : [];

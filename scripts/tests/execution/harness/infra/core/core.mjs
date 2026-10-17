@@ -144,6 +144,8 @@ test('one-shot subagent invocation strategies cover every harness client', () =>
   const common = {
     systemText: 'system',
     promptText: 'prompt',
+    // 显式声明代际，避免单测受开发机上真实安装的 opencode 版本影响。
+    env: { AIOS_OPENCODE_CLI_GENERATION: '2' },
     routedExtraArgs: ['-m', 'model-a'],
     codexOutput: {
       schemaPath: 'schema.json',
@@ -163,6 +165,12 @@ test('one-shot subagent invocation strategies cover every harness client', () =>
   });
   assert.deepEqual(buildOneShotInvocation({ clientId: 'opencode-cli', ...common }), {
     runner: 'spawn',
+    // v2 CLI：保留 --agent，不再注入 v1 专属的 --pure。
+    args: ['run', '--agent', 'aios-build', '-m', 'model-a', 'system\n\n## New User Request\nprompt'],
+  });
+  assert.deepEqual(buildOneShotInvocation({ clientId: 'opencode-cli', ...common, env: { AIOS_OPENCODE_CLI_GENERATION: '1' } }), {
+    runner: 'spawn',
+    // v1 显式声明：旧行为（--agent + --pure）保持不变。
     args: ['run', '--agent', 'aios-build', '--pure', '-m', 'model-a', 'system\n\n## New User Request\nprompt'],
   });
   assert.deepEqual(buildOneShotInvocation({ clientId: 'codex-cli', ...common }), {

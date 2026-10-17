@@ -15,6 +15,13 @@ import {
   buildOpenCodeStrictAgentArgs,
   shouldUseOpenCodePureMode,
 } from '../../../lib/clients/opencode/strict-primary-agent.mjs';
+import {
+  OPENCODE_CLI_GENERATION_ENV,
+  detectOpenCodeCliGeneration,
+  normalizeOpenCodeCliGeneration,
+  parseOpenCodeVersionMajor,
+  resetOpenCodeCliGenerationCache,
+} from '../../../lib/clients/opencode/cli-generation.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const BRIDGE = path.join(ROOT, 'scripts', 'contextdb-shell-bridge.mjs');
@@ -50,6 +57,62 @@ test('AIOS OpenCode invocations default to pure mode and allow an explicit plugi
   const env = { AIOS_OPENCODE_ENABLE_EXTERNAL_PLUGINS: '1' };
   assert.equal(shouldUseOpenCodePureMode(env), false);
   assert.deepEqual(buildOpenCodeStrictAgentArgs([], env), ['--agent', 'aios-build']);
+});
+
+test('OpenCode v2 CLI invocations drop flags the v2 binary does not accept', () => {
+  // v2 顶层 TUI：--agent/--pure 都不存在，必须完全不注入。
+  assert.deepEqual(
+    buildOpenCodeStrictAgentArgs([], {}, { generation: 2, mode: 'interactive' }),
+    []
+  );
+  assert.deepEqual(
+    buildOpenCodeStrictAgentArgs(['--session', 's1'], {}, { generation: 2, mode: 'interactive' }),
+    ['--session', 's1']
+  );
+
+  // v2 run：保留 --agent，永不注入 --pure。
+  assert.deepEqual(
+    buildOpenCodeStrictAgentArgs([], {}, { generation: 2, mode: 'run' }),
+    ['--agent', 'aios-build']
+  );
+  assert.deepEqual(
+    buildOpenCodeStrictAgentArgs([], { AIOS_OPENCODE_ENABLE_EXTERNAL_PLUGINS: '0' }, { generation: 2, mode: 'run' }),
+    ['--agent', 'aios-build']
+  );
+
+  // 环境变量覆盖优先于探测值。
+  assert.deepEqual(
+    buildOpenCodeStrictAgentArgs([], { [OPENCODE_CLI_GENERATION_ENV]: '2' }, { generation: 1, mode: 'interactive' }),
+    []
+  );
+});
+
+test('OpenCode CLI generation detection parses versions and honors overrides', () => {
+  assert.equal(normalizeOpenCodeCliGeneration('2'), 2);
+  assert.equal(normalizeOpenCodeCliGeneration('v1'), 1);
+  assert.equal(normalizeOpenCodeCliGeneration(undefined), null);
+  assert.equal(parseOpenCodeVersionMajor('opencode v2.0.32'), 2);
+  assert.equal(parseOpenCodeVersionMajor('1.4.7\n'), 1);
+  assert.equal(parseOpenCodeVersionMajor('not a version'), null);
+
+  resetOpenCodeCliGenerationCache();
+  let captures = 0;
+  const fakeCapture = () => {
+    captures += 1;
+    return { status: 0, stdout: 'v2.0.32\n', stderr: '' };
+  };
+  assert.equal(detectOpenCodeCliGeneration('opencode', {}, { capture: fakeCapture }), 2);
+  // 同进程内第二次调用走缓存，不再 spawn。
+  assert.equal(detectOpenCodeCliGeneration('opencode', {}, { capture: fakeCapture }), 2);
+  assert.equal(captures, 1);
+
+  // 显式覆盖不触发探测。
+  assert.equal(detectOpenCodeCliGeneration('opencode', { [OPENCODE_CLI_GENERATION_ENV]: '1' }, { capture: () => { throw new Error('must not spawn'); } }), 1);
+
+  resetOpenCodeCliGenerationCache();
+  const brokenCapture = () => ({ status: 1, stdout: '', stderr: 'boom' });
+  assert.equal(detectOpenCodeCliGeneration('opencode-missing', {}, { capture: brokenCapture }), null);
+  resetOpenCodeCliGenerationCache();
 });
 
 async function createFakeCodexCommand() {

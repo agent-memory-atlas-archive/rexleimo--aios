@@ -7,6 +7,7 @@ import { getClientCommandName, resolveClientFromRuntimeId } from '../../clients/
 import { ROOT_DIR, runCommand } from '../context/common.mjs';
 import { buildCodexMcpDisableArgs } from '../routing/routes.mjs';
 import { buildOpenCodeStrictAgentArgs } from '../../../clients/opencode/strict-primary-agent.mjs';
+import { detectOpenCodeCliGeneration } from '../../../clients/opencode/cli-generation.mjs';
 import { finalizeSession } from '../../../execution/lifecycle/run/session-hooks/finalize.mjs';
 
 function commandForRuntime(agent) {
@@ -31,7 +32,12 @@ function buildCodexInvocation({ extraArgs = [] }) {
 
 function buildOpenCodeInvocation({ extraArgs = [] }) {
   const cmd = commandForRuntime('opencode-cli');
-  return { cmd, args: buildOpenCodeStrictAgentArgs(extraArgs) };
+  // v2 顶层 TUI 不接受 --agent/--pure；代际探测失败时回退 v1 旧行为。
+  const generation = detectOpenCodeCliGeneration(cmd, process.env);
+  return {
+    cmd,
+    args: buildOpenCodeStrictAgentArgs(extraArgs, process.env, { generation, mode: 'interactive' }),
+  };
 }
 
 function buildHermesInvocation({ extraArgs = [] }) {

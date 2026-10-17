@@ -1,5 +1,6 @@
-import { getClientRuntimeId, getClientUnattendedArgs } from '../../../../foundation/clients/registry.mjs';
+import { getClientCommandName, getClientRuntimeId, getClientUnattendedArgs } from '../../../../foundation/clients/registry.mjs';
 import { buildOpenCodeStrictAgentArgs } from '../../../../clients/opencode/strict-primary-agent.mjs';
+import { detectOpenCodeCliGeneration } from '../../../../clients/opencode/cli-generation.mjs';
 
 function combineSystemAndPrompt(systemText, promptText) {
   return systemText
@@ -52,10 +53,14 @@ const CLIENT_STRATEGIES = Object.freeze({
       combineSystemAndPrompt(systemText, promptText),
     ],
   }),
-  [getClientRuntimeId('opencode')]: ({ systemText, promptText, routedExtraArgs }) => ({
-    runner: 'spawn',
-    args: ['run', ...buildOpenCodeStrictAgentArgs(routedExtraArgs), combineSystemAndPrompt(systemText, promptText)],
-  }),
+  [getClientRuntimeId('opencode')]: ({ systemText, promptText, routedExtraArgs, env = process.env }) => {
+    const commandName = getClientCommandName('opencode');
+    const generation = detectOpenCodeCliGeneration(commandName, env);
+    return {
+      runner: 'spawn',
+      args: ['run', ...buildOpenCodeStrictAgentArgs(routedExtraArgs, env, { generation, mode: 'run' }), combineSystemAndPrompt(systemText, promptText)],
+    };
+  },
   [getClientRuntimeId('codex')]: ({
     systemText,
     promptText,

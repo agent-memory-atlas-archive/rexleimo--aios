@@ -4,6 +4,7 @@ import { ROOT_DIR, parsePositiveInteger, runCommand, runCommandWithInput } from 
 import { buildCodexMcpDisableArgs, buildRouteRuntimeEnv, buildCtxAgentRoutePreview, buildHarnessRoutePreview, normalizeOrchestrateBlueprint, normalizeRouteExecutionMode, normalizeRouteMode, resolveHarnessRouteProviderForAgent, resolveRoutedSubagentClient } from '../routing/routes.mjs';
 import { buildOpenCodePrompt } from '../context/opencode-context.mjs';
 import { buildOpenCodeStrictAgentArgs } from '../../../clients/opencode/strict-primary-agent.mjs';
+import { detectOpenCodeCliGeneration } from '../../../clients/opencode/cli-generation.mjs';
 
 const PENDING_SMOKE_ONE_SHOT_AGENTS = new Set([]);
 
@@ -72,10 +73,14 @@ const ONE_SHOT_HANDLERS = {
     ['-p', prompt, ...extraArgs]
   ),
   'codex-cli': ({ prompt, extraArgs }) => runCodexOneShot(prompt, extraArgs),
-  'opencode-cli': ({ prompt, extraArgs }) => runBufferedCommand(
-    commandForRuntime('opencode-cli'),
-    ['run', ...buildOpenCodeStrictAgentArgs(extraArgs), buildOpenCodePrompt({ prompt })]
-  ),
+  'opencode-cli': ({ prompt, extraArgs }) => {
+    const cmd = commandForRuntime('opencode-cli');
+    const generation = detectOpenCodeCliGeneration(cmd, process.env);
+    return runBufferedCommand(
+      cmd,
+      ['run', ...buildOpenCodeStrictAgentArgs(extraArgs, process.env, { generation, mode: 'run' }), buildOpenCodePrompt({ prompt })]
+    );
+  },
   'grok-build': ({ prompt, extraArgs }) => runBufferedCommand(
     commandForRuntime('grok-build'),
     ['--always-approve', '-p', prompt, ...extraArgs]
