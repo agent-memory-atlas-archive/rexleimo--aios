@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Fixed
+
+- fix(interception): `config/host-capabilities.json` 之前按**调用方 rootDir（= 用户工作区）**拼路径，于是 `aios interception doctor` 只在「当前目录恰好是 AIOS 根」时能跑：在仓库外执行时读 `<cwd>/config/host-capabilities.json` 直接 ENOENT 崩栈（经 `doctor → proof → turn-gateway → buildCapabilityMatrix(rootDir)` 传入的 rootDir 默认是 `process.cwd()`）。开发机与 CI 都看不出来，因为两者的工作区就是仓库根。这份能力矩阵是随运行时分发的**静态内容**，不是用户工程产物，因此改为模块锚定：工作区里有就用工作区的（保留可覆盖性），没有就回落到本模块所在的安装根。写入目标仍以 rootDir 为准，只有内容根源改成模块锚定。Evidence: 同一个外部 cwd（`/tmp/foreign-cwd-doctor-*`）A/B——发布版 6.5.0 安装副本 `ENOENT ... /private/tmp/.../config/host-capabilities.json`，修复后 `ok: true`、`existing 16/16, direct_browser 15, missing_required_browser 0`、`hygiene.stale_count: 0`、`crg-plugin.ts verdict ok`、`rtk.ts` 仍按非自有只报不改；`interception-capabilities.test.mjs` 8/8（新增 3 例：工作区优先、缺失回落运行时根、无 rootDir 也可解析）。
+- 同形状问题只查了 interception 链路（`doctor.mjs` / `proof.mjs` / `tail.mjs` 都以 `process.cwd()` 为 rootDir 默认值）；仓内其他「按 rootDir 读静态内容」的位置未普查。
+
 ## [6.5.0] - 2026-10-17
 
 - feat(clients/opencode): AIOS 生成的 OpenCode 插件改为 **1.x / 2.x 双导出**，并对已存在的旧插件文件安装期自愈。OpenCode 2.x 加载器只读 `default` 导出且要求 `{ id, effect | setup }`，1.x 只遍历具名导出——两者互不兼容，现场是 `~/.config/opencode/plugins/crg-plugin.ts` 报 `PluginModule.LoadError: SchemaError(Expected object at ["default"])`、`rtk.ts` 报 `Missing key at ["default"]`，失败只降级成 WARN，插件（CRG 图更新、RTK 命令重写）**静默停摆**。模板尾部改为 `export default { id: 'code-review-graph', setup: CodeReviewGraphPlugin }` 并保留 1.x 具名导出（`setup` 是 2.x 内部的旧形状适配入口），一份文件两边可加载；`ensureOpencodePlugin` 写盘前先用 `classifyOpenCodePluginSource` 判定旧文件形状，不合格则留 `.bak-*` 后重写并 `[warn]/[hint]` 说出口。新增 `scripts/lib/clients/opencode/plugin-contract.mjs` 作为「插件模块契约」单一事实来源（分类 verdict：`ok / missing-default / default-not-object / default-missing-id / default-missing-handler`，与 2.x 四种失败一一对应），版本探测失败返回 `null` 并保守产出双导出。v2 原生 `effect` API（Effect runtime + capability ctx）**不在本批范围**，属独立迁移决策。Evidence: `plugin-contract.test.mjs` 12/12（含分类器对现场三种真实失败形状、自愈+备份、非 AIOS 文件逐字节不变）；真机 v2.0.32 `opencode run` 日志中 `crg-plugin.ts` 不再有 `failed to load plugin`，`mcp connected` 五服务齐（`code-review-graph` tools=30、`mcp-browser-use` tools=12、`aios-shell`/`aios-auth-tools`/pencil）；`rtk.ts` 经 `auditOpenCodePlugins` 判为 `missing-default / owned=false`，按「不改别人插件」只报告。
