@@ -22,6 +22,8 @@ New to AIOS? These posts will get you oriented:
 
 ## Latest Posts
 
+- [v6.6.0: The Agent's Scratch Space Leaked Into Your Project List](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — 41 sandbox directories (9.9 GB) grew inside the project parent because `mktemp -d` without `-p` writes to `cwd`; `AGENTS.md` now states the rule and `scripts/aios-tmp-gc.mjs` collects only on objective facts, failing closed on anything it cannot read
+
 - [v6.5.0: OpenCode 2.x Plugin Contract, and the Config That Stopped Lying About Where AIOS Lives](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x reads only the `default` export, so AIOS plugins went silently dead; plugins now ship a 1.x/2.x dual export and self-heal on install, and `aios interception mcp-repair` re-points stale MCP paths at the stable runtime root
 
 - [One Sentence In, One Product Out: A Small Model Burned 3.6 Billion Tokens a Month — AIOS Makes Software Development Something Anyone Can Do](2026-10-qwen-flash-aios-pi.md) — the only skill you need is describing what you want; a month of heavy daily use at 96% cache hits, the bare-model vs. wrapped-in-AIOS comparison, and the whole E-drive project list one-sentence requirements shipped

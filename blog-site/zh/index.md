@@ -20,6 +20,8 @@ description: "AIOS 工程与增长博客中文版：覆盖记忆系统、单 Age
 
 ## 最新文章
 
+- [v6.6.0：agent 的草稿空间漏进了你的项目列表](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — 41 个沙箱目录（9.9 GB）长在工程父目录里，因为不带 `-p` 的 `mktemp -d` 会写进 `cwd`；`AGENTS.md` 把规则说出口，`scripts/aios-tmp-gc.mjs` 只按客观事实回收，读不出的一律保留
+
 - [v6.5.0：OpenCode 2.x 插件契约，以及那份不再谎报 AIOS 位置的配置](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x 只读 `default` 导出，AIOS 插件因此静默停摆；现在改为 1.x/2.x 双导出并在安装期自愈，`aios interception mcp-repair` 把漂移的 MCP 路径重指到稳定运行时根
 
 - [v6.4.0：一个不再靠猜的控制平面——账本不许分叉、拒绝即功能、门禁跑在它声称的地方](2026-10-v640-control-plane-stops-guessing.md) — 计划账本不再分叉（A21–A23）、plan CLI 拒绝而不是替换成只读视图（A19）、声明了的检查真的在 CI 里跑（A20 + 目录预算 + 受影响测试），mattpocock v1.3 三件套双面落地

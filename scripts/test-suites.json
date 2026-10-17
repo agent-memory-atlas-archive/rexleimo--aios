@@ -218,6 +218,7 @@
       "scripts/tests/tooling/search/search.test.mjs",
       "scripts/tests/tooling/suites/test-impact.test.mjs",
       "scripts/tests/tooling/suites/test-suite-wiring.test.mjs",
+      "scripts/tests/tooling/tools/aios-tmp-gc.test.mjs",
       "scripts/tests/tooling/tools/check-site-sync.test.mjs",
       "scripts/tests/tooling/tools/dir-budget.test.mjs",
       "scripts/tests/tooling/tools/doc-citations.test.mjs",

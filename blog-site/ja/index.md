@@ -22,6 +22,8 @@ AIOS を初めて使う方へ。これらの投稿で概要を把握できます
 
 ## 最新の記事
 
+- [v6.6.0: エージェントの作業スペースがプロジェクト一覧に漏れた](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — `-p` なしの `mktemp -d` が `cwd` に書くため プロジェクト親にサンドボックス 41 個（9.9 GB）が生えた。`AGENTS.md` で規則を明文化し、`scripts/aios-tmp-gc.mjs` は客観的事実だけで回収、読めないものは残す
+
 - [v6.5.0: OpenCode 2.x プラグイン契約と、AIOS の居場所を嘘つかなくなった設定](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x は `default` エクスポートしか読まないため AIOS プラグインは静黙停止していた。1.x/2.x デュアルエクスポート化とインストール時自己修復、`aios interception mcp-repair` で失効 MCP パスを安定ランタイムルートへ戻す
 
 - [一文の要件で、一つのソフトウェアを：小規模モデルが月36億トークン——AIOS が「誰でも開発できる」を現実のものにする](2026-10-qwen-flash-aios-pi.md) — 必要なスキルはただ一つ、要件を明確に語り切ること。キャッシュヒット96%で1か月高強度使用、むき出しモデル vs AIOS 包む前後比較、要件から納品までの流れが生んだ E:/coding のプロジェクト一覧

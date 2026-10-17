@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.6.0] - 2026-10-17
+
+### Added
+
+- feat(tooling): 新增 `scripts/aios-tmp-gc.mjs` —— 回收散落在**工程父目录**里的 `mktemp` 沙箱残留，每个判定都是客观事实，读不出来一律保留。背景是一次真实事故：`~/codes`（仓库的父目录）里长出 41 个无人命名的目录（`abhome-1zbU` / `ci-repro-home-R2MG` / `asset-check-EYJZ` / `v650-patch-check-38213` / `rex0111-qLxI`），合计 4.06 GB 沙箱 + 5.8 GB 过期发布包 = 9.9 GB，全部躺在真实项目旁边。根因是一个被省略的参数：`mktemp -d <前缀>-XXXXXX` 不带 `-p` 时落在 shell 的 cwd，而那些 shell 当时正站在仓库父目录；它们不在任何仓库里，所以全世界的 `.gitignore` 都挡不住。判定阶梯（第一个不通过即短路）：名字形状 `-[A-Za-z0-9]{4,6}$` **且**后缀含大写或数字 → 年龄（`--older-than`，默认 60 分钟）→ git 状态（`dirty`/`unpushed`/`stashed`/**`unknown`** 全部保留）→ 根层凭据（`.env` / `.env.*.local` 保留，需 `--allow-secrets`）→ 易失根（系统 `TMPDIR` 整根默认剔除，需 `--allow-volatile-root`）→ 不可逆（`--mode purge` 必须再带 `--yes`，否则 exit 1；默认 `dry-run`，`to-trash` 只是 `mv` 到带日期的暂存目录）。Evidence: `scripts/tests/tooling/tools/aios-tmp-gc.test.mjs` 12/12（含 23 个**真实工程名**防误删回归：`rex-work`/`hermes-setup`/`wordpress-shens`/`rex-videos`/`rex-ppt-codex`/`aios-pro`/`inkloom.im` 必须全部判 false——原本只有一条形状正则时 `rex-work` 当场被判定可回收，是这条断言拦下的）；`node --test scripts/tests/tooling/tools/*.test.mjs` 62/62 无回归；`node scripts/check-dir-budget.mjs` → `0 blocking`；真实首跑 `node scripts/aios-tmp-gc.mjs --root ~/codes --older-than 30` → `collect=0 keep=34`（清理后对 34 个存活项目零误报）；清理前指向暂存目录时认出 44 项中的 37 项，把名字不规则的 7 项留给人。删除前另做内容核：`inkloom-release-pack` 的 4 个 `.env*` 与在用项目副本逐字节哈希一致、无独有顶层文件，三个 git 树 0 dirty / 0 stash，故无凭据与独有文件被销毁。
+- docs(agents): `AGENTS.md` 新增 `## Temp Sandbox Hygiene`，把规则写成约束而非偏好——沙箱必须 `mktemp -d -p "${TMPDIR:-/tmp}" <前缀>-XXXXXX`（`-p` 不可省略），禁止在工程父目录创建任何目录，并给出 `aios-tmp-gc` 的预览/可逆暂存/真删三档用法。这类问题的形状决定了 Definition of Done 抓不到：验证本身是通过的（假 HOME 确实证明了 `aios init` 写对了文件），损害纯粹是位置性的，只在文件管理器里看得见。
+
+### Known limits
+
+- 门禁未接：pre-tool gate 可以在源头拒绍「`mktemp -d` 的目标父目录是工程根」，但那要改安全门禁本身（blast radius 更大），本批未做，已记录为独立决策。
+- 制造者仍在运行：诊断过程中 21:21 / 21:29 又冒出新探针（来自并行的发布验证会话）。规则在被门禁强制执行之前只是建议。
+- 本次清理的 9.9 GB 是**暂存不是释放**（全部 `mv` 入 `~/.Trash/aios-sandbox-cleanup-2026-10-17`，一次 `rm` 未用）；macOS TCC 禁止枚举 `~/.Trash`，无法确认里面还有什么，清空废纸篓保留为人工动作。
+- 仓内其他会话/脚本是否还有「不带 `-p` 的 `mktemp`」未普查（本仓库 222 个测试文件已确认全部走 `os.tmpdir()`）。
+
 ## [6.5.1] - 2026-10-17
 
 ### Fixed

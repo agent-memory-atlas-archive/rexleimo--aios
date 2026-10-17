@@ -22,6 +22,8 @@ AIOS를 처음 사용하시나요? 이 게시물들이 방향을 잡아줄 것�
 
 ## 최신 글
 
+- [v6.6.0: 에이전트 작업 공간이 프로젝트 목록에 새었다](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — `-p` 없는 `mktemp -d` 가 `cwd` 에 써서 프로젝트 상위에 샌드박스 41 개 (9.9 GB) 가 자랐다. `AGENTS.md` 로 규칙을 명시하고 `scripts/aios-tmp-gc.mjs` 는 객관적 사실만으로 회수하며 읽을 수 없는 건 남긴다
+
 - [v6.5.0: OpenCode 2.x 플러그인 계약, 그리고 AIOS의 위치를 거짓으로 적지 않게 된 설정](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x는 `default` export만 읽어 AIOS 플러그인이 조용히 죽어 있었다. 1.x/2.x dual export화와 설치 시 자기 복구, `aios interception mcp-repair`로 무효 MCP 경로를 안정 runtime root로 되돌린다
 
 - [한 문장의 요구, 하나의 소프트웨어: 소형 모델이 한 달에 36억 토큰 — AIOS가 '누구나 개발할 수 있다'를 현실로](2026-10-qwen-flash-aios-pi.md) — 필요한 새 기술은 하나뿐이다, 요구를 명확히 말로 정리하는 것. 캐시 히트 96%의 한 달 고강도 사용, 맨 모델 vs AIOS 비교, 요구부터 납품까지의 흐름이 만든 E:/coding 프로젝트 목록
