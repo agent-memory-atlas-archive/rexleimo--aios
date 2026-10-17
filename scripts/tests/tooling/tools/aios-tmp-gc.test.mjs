@@ -96,6 +96,7 @@ test('parseArgs refuses irreversible purge without the second explicit opt-in', 
   assert.match(parseArgs(['--older-than', '-3']).error, /invalid --older-than/);
   assert.match(parseArgs(['--nope']).error, /unknown argument/);
   assert.equal(parseArgs([]).options.mode, 'dry-run', 'default must be non-destructive');
+  assert.equal(parseArgs([]).options.olderThanMinutes, DEFAULT_OLDER_THAN_MINUTES);
 });
 
 test('volatile system temp root is opt-in only', () => {
