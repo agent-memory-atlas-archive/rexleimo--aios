@@ -93,6 +93,22 @@ test('interception doctor and mcp migration make browser MCP direct', async () =
     'utf8'
   );
   const env = { AIOS_HOME: path.join(workspaceRoot, 'home') };
+  /* 中文注释：本测试的前提是「目标里已经有 browser 条目」，迁移才会走「保留并升级」分支。
+   * 以前这个前提靠机器上残留的真实配置供给了——一个干净检出的树里没有它们，
+   * mode 就解成 none、不写 browser 条目，测试只在环变量污染过的机器上“能跑过”。
+   * 现在把前提声在地自己沙箱里：向会被扫描到的目标（home 类 client home）写一条代理形态的 browser 条目。*/
+  const seedHome = path.join(env.AIOS_HOME, 'clients');
+  const proxiedArgs = [
+    path.join(process.cwd(), 'scripts', 'aios-mcp-proxy.mjs'),
+    '--host', 'mcp-browser-use',
+    '--', process.execPath, 'browser-use.mjs',
+  ];
+  await mkdir(path.join(seedHome, 'opencode'), { recursive: true });
+  await writeFile(
+    path.join(seedHome, 'opencode', 'opencode.json'),
+    `${JSON.stringify({ mcp: { 'mcp-browser-use': { type: 'local', command: process.execPath, args: proxiedArgs, enabled: true } } }, null, 2)}\n`,
+    'utf8',
+  );
   const result = runAios(['interception', 'doctor', '--fix', '--workspace', workspaceRoot, '--json'], env);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const parsed = JSON.parse(result.stdout);
