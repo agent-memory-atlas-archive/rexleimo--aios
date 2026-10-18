@@ -2,7 +2,7 @@
 import { Command } from 'commander';
 
 const WORKSHOP_SUBCOMMANDS = new Set(['propose', 'review', 'apply', 'rollback', 'index']);
-const ALL_SUBCOMMANDS = ['comply', 'health', 'certify', 'verify-training', 'propose', 'review', 'apply', 'rollback', 'index'];
+const ALL_SUBCOMMANDS = ['comply', 'health', 'certify', 'verify-training', 'add', 'propose', 'review', 'apply', 'rollback', 'index'];
 
 const SHARED_OPTIONS = [
   ['--json', 'Output as JSON'],
@@ -19,7 +19,9 @@ const SHARED_OPTIONS = [
   ['--scan', 'Scan for proposals'],
   ['--policy', 'Policy check'],
   ['--description <text>', 'Proposal description'],
-  ['--skill <ids>', 'Named Skill ids (repeatable or comma-separated) for certify/verify-training'],
+  ['--skill <ids>', 'Named Skill ids (repeatable or comma-separated) for certify/verify-training/add'],
+  ['--yes', 'Non-interactive: install every skill found in the source'],
+  ['--force', 'Replace existing unmanaged skill directories'],
 ];
 
 const program = new Command()
@@ -54,13 +56,13 @@ export function parseSkillArgs(argv = []) {
     subcommand, json: false, format: 'text', dryRun: false,
     dashboard: false, changed: false, base: 'HEAD', client: 'codex',
     description: '', id: '', action: '', name: '', path: '', scan: false, policy: false, live: false,
-    skill: [],
+    skill: [], source: '', yes: false, force: false,
   };
 
   try {
     if (!subcommand) {
       if (rawSubcommand && !rawSubcommand.startsWith('-') && !help) {
-        throw new Error('skill requires subcommand: comply, health, certify, verify-training, propose, review, apply, rollback, or index');
+        throw new Error('skill requires subcommand: comply, health, certify, verify-training, add, propose, review, apply, rollback, or index');
       }
       return { mode: 'help', help: true, command: 'skill', options };
     }
@@ -86,6 +88,8 @@ export function parseSkillArgs(argv = []) {
       options.name = posArgs[0] || '';
     } else if (subcommand === 'comply') {
       options.path = posArgs[0] || '';
+    } else if (subcommand === 'add') {
+      options.source = posArgs[0] || '';
     }
 
     // 映射 flags
@@ -103,6 +107,8 @@ export function parseSkillArgs(argv = []) {
     if (effectiveFlags.scan === true) options.scan = true;
     if (effectiveFlags.policy === true) options.policy = true;
     if (effectiveFlags.description) options.description = String(effectiveFlags.description);
+    if (effectiveFlags.yes === true) options.yes = true;
+    if (effectiveFlags.force === true) options.force = true;
     if (effectiveFlags.skill !== undefined) {
       const listed = Array.isArray(effectiveFlags.skill) ? effectiveFlags.skill : [effectiveFlags.skill];
       options.skill = listed
@@ -112,6 +118,11 @@ export function parseSkillArgs(argv = []) {
     }
 
     // 校验
+    if (subcommand === 'add') {
+      // add 的分发默认是"所有客户端"，与 comply 等审查类子命令默认单客户端不同。
+      if (!effectiveFlags.client) options.client = 'all';
+      if (!options.source) throw new Error('skill add requires a source path or git URL');
+    }
     if (subcommand === 'review' && !options.id) throw new Error('skill review requires a proposal id');
     if (subcommand === 'apply' && !options.id) throw new Error('skill apply requires a proposal id');
     if (subcommand === 'rollback' && !options.name) throw new Error('skill rollback requires a skill name');

@@ -488,3 +488,25 @@ test('parseSkillArgs defaults index scan to true', async () => {
   const parsed = parseSkillArgs(['skill', 'index']);
   assert.equal(parsed.options.scan, true);
 });
+
+test('parseSkillArgs parses add with source, client list, and add-specific flags', async () => {
+  const { parseSkillArgs } = await import('../../../../lib/tooling/cli/parse-args/govern/skill.mjs');
+
+  const parsed = parseSkillArgs(['skill', 'add', '~/some/skill-dir', '--client', 'codex,pi', '--skill', 'a,b', '--yes', '--force', '--json']);
+  assert.equal(parsed.options.subcommand, 'add');
+  assert.equal(parsed.options.source, '~/some/skill-dir');
+  assert.equal(parsed.options.client, 'codex,pi');
+  assert.deepEqual(parsed.options.skill, ['a', 'b']);
+  assert.equal(parsed.options.yes, true);
+  assert.equal(parsed.options.force, true);
+  assert.equal(parsed.options.json, true);
+});
+
+test('parseSkillArgs defaults add client to all and requires a source', async () => {
+  const { parseSkillArgs } = await import('../../../../lib/tooling/cli/parse-args/govern/skill.mjs');
+
+  const parsed = parseSkillArgs(['skill', 'add', '/tmp/skill-dir']);
+  assert.equal(parsed.options.client, 'all');
+
+  assert.throws(() => parseSkillArgs(['skill', 'add']), /skill add requires a source/);
+});

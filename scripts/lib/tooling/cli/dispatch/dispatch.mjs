@@ -146,6 +146,20 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
         applyResultExitCode(await runSkillTrainingGate(parsed.options, { rootDir: workspaceFor(parsed), stdout }));
         return;
       }
+      /* 外部技能安装：本地目录 / git URL → 注册处 → 全客户端用户级技能根 */
+      if (parsed.options.subcommand === 'add') {
+        const { installExternalSkills } = await import('../../components/skills/external/index.mjs');
+        applyResultExitCode(await installExternalSkills({
+          source: parsed.options.source,
+          client: parsed.options.client,
+          selectedSkills: parsed.options.skill,
+          force: Boolean(parsed.options.force),
+          yes: Boolean(parsed.options.yes),
+          json: Boolean(parsed.options.json),
+          stdout,
+        }));
+        return;
+      }
       /* Skill Workshop — 受控技能自生成闭环 */
       if (parsed.options.subcommand === 'propose') {
         const { propose } = await import('../../skills/skill-workshop.mjs');

@@ -118,6 +118,7 @@ Options:
 `;
     case 'skill':
       return `Usage:
+  aios skill add <source> [--client <list|all>] [--skill <names>] [--yes] [--force] [--json]
   aios skill comply <path> --dry-run [--client <client>] [--json]
   aios skill comply <path> --live [--client <client>] [--json]
   aios skill health [--dashboard] [--json]
@@ -127,12 +128,17 @@ Options:
   aios skill verify-training --skill <id>[,<id>...] [--base <ref>] [--json]
 
 Subcommands:
+  add          Install an external skill (local dir or git URL) into every client's global skills root
   comply       Generate expected skill behavior and trigger-smoke scenarios
   health       Report skill observation success rates and failure clusters
   certify      Record reproducible V2 training evidence for changed Skills
   verify-training Recompute and validate recorded training evidence
 
 Options:
+  --client <list|all>            Clients to install into for add (default: all)
+  --skill <names>                Pick skills from a multi-skill source (repeatable or comma-separated)
+  --yes                          Non-interactive: install every skill found in the source
+  --force                        Replace existing unmanaged skill directories
   --client <client>              Target client for compliance scenarios
   --skill <ids>                    Certify/verify named Skills (repeatable or comma-separated)
   --dry-run                      Generate spec/scenarios without live model execution

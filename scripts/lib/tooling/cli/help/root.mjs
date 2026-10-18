@@ -36,7 +36,7 @@ Commands:
   harness       Solo overnight harness with run journal + resume controls
   hud           Show ContextDB + dispatch HUD (CLI/TUI)
   learn-eval    Turn checkpoint telemetry into operator recommendations
-  skill         Skill compliance dry-runs and health dashboard
+  skill         Skill compliance dry-runs, health dashboard, and external skill install
   integration   Install and verify third-party vendor integrations (skill + docs MCP)
   judgment      Opt-in System One judgment gate (off until you enable it)
   session       Inspect session-local changed file state

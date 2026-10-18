@@ -39,6 +39,22 @@
 
 ---
 
+## 技能系统
+
+### 外部技能安装（`aios skill add`）
+
+**定义**：从外部来源（本地技能目录 / GitHub 仓库 / 技能包）安装技能的新命令入口，来源含多个技能时交互式勾选。已确认的决策见 `docs/adr/0001-external-skill-install.md`。
+
+**为什么**：`clone-website` 这类社区技能只存在于单个客户端的全局目录（如 `~/.pi/agent/skills/`），现有 canonical sync 只覆盖随 AIOS 发布的 `skill-sources/`，缺一条"收编外部技能"的通路。
+
+### 全局技能根（global skill root）
+
+**定义**：各客户端在用户主目录下的技能目录（`~/.pi/agent/skills/`、`~/.claude/skills/`、`~/.config/opencode/skills/` 等），对该客户端的所有项目生效；与仓库内项目级技能根（`.agents/skills/`、`.codex/skills/`）相对。
+
+**为什么**：外部技能安装的分发目标就是所有客户端的全局技能根（用户确认），术语上必须与项目级投影区分开，避免两条同步通路混淆。
+
+---
+
 ## 竞品组合
 
 ### consumed dependency
