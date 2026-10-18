@@ -145,7 +145,7 @@
       "scripts/tests/foundation/skills/core/skill-comply-live.test.mjs",
       "scripts/tests/foundation/skills/core/skill-index.test.mjs",
       "scripts/tests/foundation/skills/core/skills-component.test.mjs",
-      "scripts/tests/foundation/skills/core/skills-external-install.test.mjs",
+      "scripts/tests/foundation/skills/external/skills-external-install.test.mjs",
       "scripts/tests/foundation/skills/core/skills-frontmatter.test.mjs",
       "scripts/tests/foundation/skills/core/skills-no-injection-policy.test.mjs",
       "scripts/tests/foundation/skills/core/skills-resolution.test.mjs",

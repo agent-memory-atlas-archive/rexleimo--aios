@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.7.0] - 2026-10-18
+
+### Added
+
+- feat(skills): 新增 `aios skill add <source>` —— 把**外部技能**（canonical `skill-sources/` 之外的社区技能）装进 AIOS 的分发体系。动机是一次真实使用缺口：`clone-website` 技能很好用，但它只装在 pi 客户端的全局技能目录（`~/.pi/agent/skills/`），其他 9 个客户端都没有；而现有 canonical sync（`scripts/lib/tooling/skills/install/sync.mjs` + `skill-sources/`）只负责随 AIOS 发布的技能，没有「收编外部技能」的入口。管线三段：来源解析（本地目录根带 `SKILL.md` = 单技能；子目录各带 = 多技能；`https://` URL / `*.git` / `owner/repo` 简写 = git 浅克隆进一次性临时目录）→ canonical 外部注册处 `~/.aios/skills/external/<name>/`（`client=registry / scope=external` 归属元数据，与仓库内 `skill-sources/` 并行不干扰）→ 分发到各客户端用户级技能根 `homes[client]/skills`（复用 catalog 全局 scope 的同一落点约定与 `.aios-skill-install.json` 元数据格式）。幂等靠归属元数据 + `snapshotDirectory` 内容比较：managed 且内容相同 → reuse，不同 → 刷新；同名字技能换来源重装会刷新注册处（比较时忽略 `catalogSource`）。选择语义：多技能来源在 TTY 上交互勾选（`a`=全选 / 编号 / 名字）；非交互环境 fail-closed 拒绝猜测，要求 `--skill <names>` 或 `--yes`（全选）；`--client` 接受逗号列表（默认 `all`）。安全语义：`--force` 只强制接管 unmanaged 目标目录——managed 且内容相同的副本仍然 reuse（force 不是无脑覆盖）；目标目录就是来源目录本身时**防自毁跳过**（`copyDirRecursive` 会先 `rmSync` 目标，首次收编时目标常等于原始来源，pi 实测命中此守卫）；frontmatter 技能名做单段名校验（拒绝 `../` 遍历与路径分隔符）；预检错误全部走 refusal 约定（单行可操作结论，不刷堆栈）。Evidence: `scripts/tests/foundation/skills/core/skills-external-install.test.mjs` 7/7（单技能全端安装+幂等、多技能选择/非TTY拒绝、unmanaged 跳过与 force 接管、内容更新联动刷新、json 输出、来源分类、遍历名拒绝）+ `skills-component.test.mjs` 新增 parseSkillArgs 2 例（add 旗标解析 / client 默认 all + 缺 source 校验）共 35 个；真机端到端 `node scripts/aios.mjs skill add ~/.pi/agent/skills/clone-website` → 10 客户端 `[copy] skill installed (global)`，复跑 → `installed=0 reused=10`（pi 命中防自毁守卫保留原目录），`~/.codex/skills/clone-website/` 等实文件与 `.aios-skill-install.json` 归属链核验；定向回归 skills 全目录 129/129、CLI+wiring 96/96、setup components 40/40；全量 `npm run test:regression` → `files=224, tests=2212, pass=2200, fail=0, skipped=12`。
+
+### Known limits
+
+- 交互勾选的 TTY 提示路径只有逻辑覆盖（编号/名字解析与取消语义），没有真 TTY 会话级实测——agent 与 CI 走的都是 `--skill`/`--yes` 非交互路径。
+- `--mode link` 未实现：传了会得到 actionable 报错（copy-only slice）；注册处→客户端的 symlink 分发属后续独立决策。
+- 卸载命令未做（本批非目标）：外部技能目前只能手动删副本；注册处元数据已为未来的 `skill remove` 备好归属链。
+- GitHub 来源按 `git clone --depth 1` 实现，未做 tarball/registry 协议；`owner/repo` 简写固定指向 github.com。
+- 开发过程中测试曾因默认 `client: 'all'` 把 mock 未覆盖的客户端写进真实家目录（21 个目录），已按 `catalogSource` 含 `/aios-home/skills/external/` 精确清理并复核；测试现在全部限定到 mock 过的 homeMap。
+
 ## [6.6.0] - 2026-10-17
 
 ### Added

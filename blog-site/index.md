@@ -22,6 +22,8 @@ New to AIOS? These posts will get you oriented:
 
 ## Latest Posts
 
+- [v6.7.0: One Command, Every Client — 'aios skill add' Gives Community Skills a Front Door](2026-10-v670-external-skills-get-a-front-door.md) — the best community skill lived in exactly one client's global skills directory while nine other clients couldn't see it; `aios skill add <source>` stages a local dir or git URL into a canonical external registry and distributes to every client's user-level skills root — idempotent, fail-closed selection, and a self-copy guard that kept the original `clone-website` untouched
+
 - [v6.6.0: The Agent's Scratch Space Leaked Into Your Project List](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — 41 sandbox directories (9.9 GB) grew inside the project parent because `mktemp -d` without `-p` writes to `cwd`; `AGENTS.md` now states the rule and `scripts/aios-tmp-gc.mjs` collects only on objective facts, failing closed on anything it cannot read
 
 - [v6.5.0: OpenCode 2.x Plugin Contract, and the Config That Stopped Lying About Where AIOS Lives](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x reads only the `default` export, so AIOS plugins went silently dead; plugins now ship a 1.x/2.x dual export and self-heal on install, and `aios interception mcp-repair` re-points stale MCP paths at the stable runtime root

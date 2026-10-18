@@ -22,6 +22,8 @@ AIOS를 처음 사용하시나요? 이 게시물들이 방향을 잡아줄 것�
 
 ## 최신 글
 
+- [v6.7.0: 한 명령, 모든 클라이언트 — 'aios skill add'가 커뮤니티 스킬에 정문을 열어주다](2026-10-v670-external-skills-get-a-front-door.md) — 가장 쓸모 있는 커뮤니티 스킬이 한 클라이언트의 전역 스킬 디렉터리에만 머물고 나머지 아홉은 볼 수 없었다. `aios skill add <source>`가 로컬 디렉터리나 git URL을 canonical 외부 레지스트리에 스테이징하고 모든 클라이언트의 사용자 레벨 스킬 루트로 배포한다 — 멱등, fail-closed 선택, 자가복사 가드가 `clone-website` 원본을 지켰다
+
 - [v6.6.0: 에이전트 작업 공간이 프로젝트 목록에 새었다](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — `-p` 없는 `mktemp -d` 가 `cwd` 에 써서 프로젝트 상위에 샌드박스 41 개 (9.9 GB) 가 자랐다. `AGENTS.md` 로 규칙을 명시하고 `scripts/aios-tmp-gc.mjs` 는 객관적 사실만으로 회수하며 읽을 수 없는 건 남긴다
 
 - [v6.5.0: OpenCode 2.x 플러그인 계약, 그리고 AIOS의 위치를 거짓으로 적지 않게 된 설정](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x는 `default` export만 읽어 AIOS 플러그인이 조용히 죽어 있었다. 1.x/2.x dual export화와 설치 시 자기 복구, `aios interception mcp-repair`로 무효 MCP 경로를 안정 runtime root로 되돌린다

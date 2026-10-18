@@ -22,6 +22,8 @@ AIOS を初めて使う方へ。これらの投稿で概要を把握できます
 
 ## 最新の記事
 
+- [v6.7.0：一つのコマンドで全クライアントへ——「aios skill add」がコミュニティスキルの正門を開ける](2026-10-v670-external-skills-get-a-front-door.md) — 最良のコミュニティスキルが一つのクライアントのグローバルスキルディレクトリにしか存在せず、他の九つからは見えなかった。`aios skill add <source>` がローカルディレクトリや git URL を canonical 外部レジストリにステージし、全クライアントのユーザーレベルスキルルートへ配布——冪等、fail-closed な選択、自己コピー・ガードが `clone-website` の原本を守った
+
 - [v6.6.0: エージェントの作業スペースがプロジェクト一覧に漏れた](2026-10-v660-scratch-space-leaked-into-your-project-list.md) — `-p` なしの `mktemp -d` が `cwd` に書くため プロジェクト親にサンドボックス 41 個（9.9 GB）が生えた。`AGENTS.md` で規則を明文化し、`scripts/aios-tmp-gc.mjs` は客観的事実だけで回収、読めないものは残す
 
 - [v6.5.0: OpenCode 2.x プラグイン契約と、AIOS の居場所を嘘つかなくなった設定](2026-10-v650-opencode2-contract-config-stops-lying.md) — OpenCode 2.x は `default` エクスポートしか読まないため AIOS プラグインは静黙停止していた。1.x/2.x デュアルエクスポート化とインストール時自己修復、`aios interception mcp-repair` で失効 MCP パスを安定ランタイムルートへ戻す
