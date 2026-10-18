@@ -177,7 +177,10 @@ OPENCODE_HOME=/tmp/leakcheck node --test scripts/tests/clients/browser-core/bsk-
 
 ### 尚未闭环（诚实标注）
 
-1. **hook 真触发未验证**：`opencode run` 三次尝试全部在模型侧失败（`Invalid rexai-openai/openai-responses stream event`、`OpenAI Chat stream ended without finish_reason`、`service_unavailable`），没有产生任何 tool 调用，因此 `tool.execute.before/after` 是否经 `setup` 兼容层触发仍无证据。**当前只能声称"加载兼容"，不能声称"行为兼容"。** 项目级探针 `/tmp/oct7/.opencode/plugins/hook_probe.ts`（双导出形状）已被 v2.0.32 无 WARN 加载，等可用模型端点即可闭环。
-2. **付费用户拿到修复需要发版**：`~/.aios/bin/aios` 跑的是 `~/.rexcil/aios` 安装副本，`mcp-repair` 只在源码工作树里；需 commit + release + `aios update` 才对其他人生效。
+1. ~~hook 真触发未验证~~ → **已闭环（2026-10-18，opencode v2.0.32 真机）**。验证过程还揪出一个真实缺陷：
+   - 原双导出模板 `export default { id, setup: CodeReviewGraphPlugin }` 只是"加载兼容"——v2 调用 setup，但**不把 v1 扁平 hooks 记录翻译成 v2 hooks**（官方文档原文 "sharing an export does not translate V1 hooks into V2 hooks"），行为在 v2 是死的。
+   - 真机实验链：探针 A（setup 返回 cleanup）→ watcher 重载报 `TypeError: t is not a function`；探针 B（setup 内 `ctx.tool.hook("execute.before"/"execute.after")`、不返回值）→ hook 真实触发（`v2-before tool=shell input={"command":...}`）；另证 v2 把 bash 工具改名为 `shell`。
+   - 修复：模板改为「1.x 具名导出不变 + default 指向真正的 2.x setup（内部 `ctx.tool.hook` 注册，不返回 cleanup）」；`buildDualExportTail` 增 `setupExport`。单测 30 pass；真机 E2E：重生成 `~/.config/opencode/plugins/crg-plugin.ts` 后无 WARN 加载，**after-hook 实证**（模型 edit 后 graph.db mtime 1792282216→1792282362，与 3s debounce 吻合），**before-hook 实证**（0.3s 高频 poller 抓到存活进程 `uvx code-review-graph detect-changes --brief`）。
+2. **付费用户拿到修复需要发版**：本 hook 行为修复在 v6.6.0 之后，需 commit + release + `aios update` 才对其他人生效（待用户裁定发版时机）。
 3. **`aios interception mcp-repair` 需发版才对他机生效**：`~/.aios/bin/aios` 跑的是 `~/.rexcil/aios` 安装副本，本批代码只在源码工作树。本机修复已用工作树模块直接执行。
 4. **冷启动竞态**（`Location plugins did not finish activating`）按 D2 非目标处理，未改。

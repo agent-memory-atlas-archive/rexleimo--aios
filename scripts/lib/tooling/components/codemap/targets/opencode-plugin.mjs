@@ -4,11 +4,12 @@ import path from 'node:path';
 import { backupFilePath, resolveUserPath } from '../paths.mjs';
 import { buildDualExportTail, classifyOpenCodePluginSource, isAiosOwnedPluginSource } from '../../../../clients/opencode/plugin-contract.mjs';
 
-/* 中文注释：CRG 插件的 OpenCode plugin id 与 1.x 具名导出名——导出形状由
- * clients/opencode/plugin-contract.mjs 统一生成，这里不手写 `export default`，
+/* 中文注释：CRG 插件的 OpenCode plugin id、1.x 具名导出名、2.x setup 函数名——导出
+ * 形状由 clients/opencode/plugin-contract.mjs 统一生成，这里不手写 `export default`，
  * 否则契约知识会退回到分撒的字符串模板里（opencode 2.0 升级就是这么把插件弄坏的）。 */
 const CRG_PLUGIN_ID = 'code-review-graph';
 const CRG_LEGACY_EXPORT = 'CodeReviewGraphPlugin';
+const CRG_V2_SETUP = 'CodeReviewGraphV2Setup';
 
 const OPENCODE_CRG_PLUGIN_BODY = `import type { Plugin } from "@opencode-ai/plugin"
 
@@ -97,6 +98,60 @@ export const ${CRG_LEGACY_EXPORT}: Plugin = async ({ directory }) => {
     },
   }
 }
+
+/* 中文注释：2.x 的行为实现（2026-10-18 于 opencode v2.0.32 真机验证）。v2 只调用
+ * setup(ctx)，不会把 1.x 的 hooks 记录翻译过去，所以 hook 必须用 ctx.tool.hook
+ * 显式注册；两个注意点：(1) v2 里 shell 工具的 id 是 "shell"（1.x 是 "bash"），
+ * (2) plain-object setup 返回任何值都会让 watcher 重载报
+ * "TypeError: t is not a function"，因此这个 setup 故意不返回 cleanup。 */
+const ${CRG_V2_SETUP} = async (ctx: any) => {
+  const directory: string = ctx?.location?.directory ?? ctx?.location?.project?.directory ?? "."
+
+  let updateTimer: ReturnType<typeof setTimeout> | undefined
+  let updateRunning = false
+  let updatePending = false
+  let disposed = false
+
+  const runUpdate = async () => {
+    if (disposed) return
+    if (updateRunning) {
+      updatePending = true
+      return
+    }
+
+    updateRunning = true
+    try {
+      await runCrg(directory, ["update", "--skip-flows"])
+    } finally {
+      updateRunning = false
+      if (updatePending && !disposed) {
+        updatePending = false
+        scheduleUpdate()
+      }
+    }
+  }
+
+  const scheduleUpdate = () => {
+    if (disposed) return
+    if (updateTimer) clearTimeout(updateTimer)
+    updateTimer = setTimeout(() => {
+      updateTimer = undefined
+      void runUpdate()
+    }, UPDATE_DELAY_MS)
+  }
+
+  await ctx.tool.hook("execute.after", (event: any) => {
+    if (/edit|write|patch/i.test(String(event?.tool ?? ""))) scheduleUpdate()
+  })
+  await ctx.tool.hook("execute.before", async (event: any) => {
+    if (!/shell|bash/i.test(String(event?.tool ?? ""))) return
+    const command = event?.input?.command
+    if (typeof command !== "string" || !/(^|[;&|]\\s*)git\\s+commit\\b/i.test(command)) return
+
+    const result = await runCrg(directory, ["detect-changes", "--brief"])
+    if (result) console.log("[code-review-graph] Pre-commit analysis:\\n" + result)
+  })
+}
 `;
 
 /* 中文注释：1.x 只遍历具名导出，2.x 只读 default。两者共存在同一文件里，
@@ -104,6 +159,7 @@ export const ${CRG_LEGACY_EXPORT}: Plugin = async ({ directory }) => {
 const OPENCODE_CRG_PLUGIN = `${OPENCODE_CRG_PLUGIN_BODY}${buildDualExportTail({
   id: CRG_PLUGIN_ID,
   legacyExport: CRG_LEGACY_EXPORT,
+  setupExport: CRG_V2_SETUP,
 })}`;
 
 export function ensureOpencodePlugin(opencodeHome, { dryRun = false, io = console } = {}) {

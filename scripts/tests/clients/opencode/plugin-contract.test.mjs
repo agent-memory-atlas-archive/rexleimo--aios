@@ -58,8 +58,13 @@ test('classify: 双导出形状判为 ok 且保留 1.x 具名导出', () => {
 });
 
 test('buildDualExportTail: 只补 2.x 的 default，参数不全时拒绝', () => {
-  const tail = buildDualExportTail({ id: 'code-review-graph', legacyExport: 'CodeReviewGraphPlugin' });
-  assert.match(tail, /export default \{ id: 'code-review-graph', setup: CodeReviewGraphPlugin \}/u);
+  const tail = buildDualExportTail({ id: 'code-review-graph', legacyExport: 'CodeReviewGraphPlugin', setupExport: 'CodeReviewGraphV2Setup' });
+  assert.match(tail, /export default \{ id: 'code-review-graph', setup: CodeReviewGraphV2Setup \}/u);
+  // 缺省回落到 legacyExport（仅满足加载 schema，hook 不会被 2.x 翻译执行）。
+  assert.match(
+    buildDualExportTail({ id: 'code-review-graph', legacyExport: 'CodeReviewGraphPlugin' }),
+    /setup: CodeReviewGraphPlugin \}/u,
+  );
   assert.throws(() => buildDualExportTail({ id: '' }), /requires \{ id, legacyExport \}/u);
 });
 

@@ -366,6 +366,25 @@ test('OpenCode codemap plugin uses current hooks and bounds background graph com
   assert.doesNotMatch(source, /app\.on\(/u);
 });
 
+test('OpenCode codemap plugin registers real 2.x hooks inside setup (not the untranslated 1.x record)', async () => {
+  const home = await makeTemp('aios-opencode-crg-plugin-v2-');
+  const result = ensureOpencodePlugin(home, { io: silentIo() });
+  const source = await readFile(result.path, 'utf8');
+
+  // default 导出必须指向真正的 2.x setup（内部自行注册 ctx.tool.hook）。
+  assert.match(source, /export default \{ id: 'code-review-graph', setup: CodeReviewGraphV2Setup \}/u);
+  assert.match(source, /const CodeReviewGraphV2Setup = async \(ctx: any\) =>/u);
+  assert.match(source, /ctx\.tool\.hook\("execute\.before"/u);
+  assert.match(source, /ctx\.tool\.hook\("execute\.after"/u);
+  // v2 把 1.x 的 bash 工具改名为 shell；两代工具名都必须被 git-commit 前置 hook 命中。
+  assert.match(source, /\/shell\|bash\/i/u);
+  assert.match(source, /event\?\.input\?\.command/u);
+  // 真机实证：plain-object setup 返回值会让 2.0.32 的 watcher 重载整个插件集时抛
+  // `TypeError: t is not a function`，所以 v2 setup 的顶层不得有 return。
+  const setupBody = source.slice(source.indexOf('const CodeReviewGraphV2Setup'), source.indexOf('export default'));
+  assert.doesNotMatch(setupBody, /^  return /mu);
+});
+
 test('codemap writes zcode through the dot-path namespace and normalizes to the strict schema', async () => {
   const dir = await makeTemp('aios-codemap-zcode-');
   const filePath = path.join(dir, 'config.json');

@@ -7,9 +7,15 @@
  *        with an id and an effect or setup function.`（现场：`Missing key at ["default"]`
  *        与 `Expected object at ["default"]`），失败只降级成 WARN，插件静默停摆。
  *
- * 兼容形状 = 同时提供两者：保留 1.x 的具名导出，并把 default 写成 `{ id, setup }`
- * （`setup` 是 2.0 内部的旧形状适配入口）。2.0 原生 `effect` API（Effect runtime +
- * capability ctx）不在本模块范围，属独立迁移决策。
+ * 兼容形状 = 同时提供两者：保留 1.x 的具名导出，并把 default 写成 `{ id, setup }`。
+ * 注意（2026-10-18 v2.0.32 真机验证）：2.x 会调用 setup(ctx)，但**不会**把 setup 返回的
+ * 1.x 形状 hooks 记录翻译成 v2 hooks（官方文档原文 "sharing an export does not
+ * translate V1 hooks into V2 hooks"）——行为必须在 setup 内部通过
+ * `ctx.tool.hook("execute.before"/"execute.after", ...)` 自行注册；且 plain-object
+ * setup 返回任何值都会让 watcher 重载整个插件集时抛
+ * `TypeError: t is not a function`，因此 setup 不返回 cleanup。
+ * 2.0 原生 `effect` API（Effect runtime + capability ctx）不在本模块范围，
+ * 属独立迁移决策；Promise 版 `setup(ctx)` 是官方文档背书的 v1/v2 双支持路径。
  *
  * 分类器是**源码结构检查**（不是 JS parser），用于安装期与 doctor 的告警判定；
  * 它只能断言"导出形状是否符合加载器 schema"，不能证明 hook 真被触发。
@@ -129,15 +135,21 @@ export function classifyOpenCodePluginSource(source) {
   };
 }
 
-/** 生成 1.x/2.x 通吃的尾部导出（2.x 走 setup 兼容层，1.x 忽略 default）。 */
-export function buildDualExportTail({ id, legacyExport }) {
+/**
+ * 生成 1.x/2.x 通吃的尾部导出。`setupExport` 指向模板里真正给 2.x 用的 setup 函数
+ * （内部自行注册 v2 hooks，不返回 cleanup）；缺省回落到 `legacyExport`——但那只满足
+ * 加载 schema，hook 不会被 2.x 翻译执行，AIOS 模板必须传 setupExport。
+ */
+export function buildDualExportTail({ id, legacyExport, setupExport }) {
   const pluginId = String(id || '').trim();
   const exportName = String(legacyExport || '').trim();
-  if (!pluginId || !exportName) throw new Error('buildDualExportTail requires { id, legacyExport }');
+  const setupName = String(setupExport || exportName).trim();
+  if (!pluginId || !exportName || !setupName) throw new Error('buildDualExportTail requires { id, legacyExport }');
   return [
     '// OpenCode 2.x reads only the default export ({ id, setup }); 1.x collects named exports.',
-    '// Export both so one file loads on either major version.',
-    `export default { id: '${pluginId}', setup: ${exportName} };`,
+    '// 2.x does NOT translate the 1.x hooks record: the setup below must register hooks itself',
+    '// via ctx.tool.hook(...), and must not return a cleanup (breaks 2.0.32 plugin reload).',
+    `export default { id: '${pluginId}', setup: ${setupName} };`,
     '',
   ].join('\n');
 }
