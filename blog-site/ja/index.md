@@ -13,7 +13,7 @@ AIOS はローカル agent ワークフローレイヤーです。新しい codi
 
 AIOS を初めて使う方へ。これらの投稿で概要を把握できます:
 
-- [AIOS で Google Harness² を再現した——harness エンジニアリングの価値は何点か](2026-10-harness2-jobbench-aios-measurement.md) — AIOS の harness 工程能力で論文級再現を驾驭：JobBench 実測 +14.8pp vs 論文 +4.5pp、同方向
+- [AIOS で Google Harness² を再現した——harness エンジニアリングの価値は何点か](2026-10-harness2-jobbench-aios-measurement.md) — AIOS 席を同一得点台で実測：裸 51.1 → AIOS 85.8（+34.7pp）、論文値も自trackの再帰法も上回る
 - [AIOS のストーリー](launch-post.md) — なぜ作られたか、どんな問題を解決するか
 - [CLI 比較：生 vs. AIOS](cli-comparison-post.md) — レイヤーを追加すると何が変わるか
 - [自動化プレイブック](automation-playbook-post.md) — 日次使用的パタン
