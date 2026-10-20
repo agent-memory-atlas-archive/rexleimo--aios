@@ -13,6 +13,7 @@ AIOS はローカル agent ワークフローレイヤーです。新しい codi
 
 AIOS を初めて使う方へ。これらの投稿で概要を把握できます:
 
+- [Google の Harness² を再現し AIOS harness を実測した](2026-10-harness2-jobbench-aios-measurement.md) — 非 GCP で 4 脚ラダー完全再現、単一チャネル agnes-3.0-flash：base 68.2% → improve 83.0%（+14.8pp）、論文と同方向、穴と限界を全公開
 - [AIOS のストーリー](launch-post.md) — なぜ作られたか、どんな問題を解決するか
 - [CLI 比較：生 vs. AIOS](cli-comparison-post.md) — レイヤーを追加すると何が変わるか
 - [自動化プレイブック](automation-playbook-post.md) — 日次使用的パタン
