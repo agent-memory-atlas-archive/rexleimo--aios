@@ -1,6 +1,6 @@
 ---
 title: "AIOS で Google Harness² を再現した——harness エンジニアリングの価値は何点か"
-description: "Harness² は脳（モデル）でなく席（harness）を上げるほど実務成績が上がる論文：JobBench +4.5pp。我々は AIOS の harness エンジニアリング能力で評価パイプラインを自前マシンで完全再現し、同一モデルで 68.2% → 83.0%（+14.8pp）を実測、方向は論文と一致。"
+description: "Harness² は脳（モデル）でなく席（harness）を上げるほど実務成績が上がる論文：JobBench +4.5pp。我々は AIOS の harness エンジニアリング能力で評価系を自前マシンに載せ、さらに AIOS 自身の席を同一得点台で実測：同一モデルで裸 51.1% → AIOS 席 85.8%（**+34.7pp**）、論文値も自trackの再帰法も上回る。"
 date: 2026-10-20
 tags: ["AIOS", "harness2", "JobBench", "harness-engineering", "ベンチマーク", "再現"]
 ---

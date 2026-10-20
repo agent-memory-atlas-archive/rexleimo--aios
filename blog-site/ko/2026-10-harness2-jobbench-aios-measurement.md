@@ -1,6 +1,6 @@
 ---
 title: "AIOS로 Google Harness²를 재현했다 — harness 엔지니어링의 값어치는 몇 점인가"
-description: "Harness²는 두뇌(모델)가 아니라 책상(harness)을 바꿔야 실무 성적이 오른다고 주장한다: JobBench +4.5pp. 우리는 AIOS의 harness 엔지니어링 역량으로 평가 파이프라인을 자체 머신에 완전 재현하고 같은 모델로 68.2% → 83.0%(+14.8pp)를 실측 — 방향은 논문과 일치."
+description: "Harness²는 두뇌(모델)가 아니라 책상(harness)을 바꿔야 실무 성적이 오른다고 주장한다: JobBench +4.5pp. 우리는 AIOS의 harness 엔지니어링 역량으로 평가계를 자체 머신에 올린 뒤 AIOS 자체 책상을 같은 채점대에서 실측: 같은 모델로 맨 51.1% → AIOS 책상 85.8%(**+34.7pp**) — 논문값과 우리 트랙의 재귀법 모두 초과."
 date: 2026-10-20
 tags: ["AIOS", "harness2", "JobBench", "harness-engineering", "벤치마크", "재현"]
 ---
