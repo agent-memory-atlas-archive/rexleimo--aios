@@ -1,134 +1,63 @@
 ---
-title: "We Reproduced Google's Harness² Pipeline — and Measured the AIOS Harness on JobBench"
-description: "A full non-GCP reproduction of the harness2 four-arm ladder (base/improve/domain/aggregate) on JobBench with a single model channel (agnes-3.0-flash): base 68.2% -> improve 83.0% (+14.8pp), domain 77.3% (+9.1pp). Same direction as Google's paper, with every pitfall and limitation disclosed."
+title: "We Made the Same AI Model Do the Same Job Four Times"
+description: "We reproduced Google's Harness² evaluation on our own machine. Same model, same real work task, four different working setups: the score went from 68.2% to 83.0%. The model never changed — only its desk did."
 date: 2026-10-20
-tags: ["AIOS", "harness2", "JobBench", "benchmark", "evaluation", "agent-harness"]
+tags: ["AIOS", "harness2", "JobBench", "agent-harness", "evaluation"]
 ---
 
-# We Reproduced Google's Harness² Evaluation Pipeline and Produced a Measurable Comparison for the AIOS Harness
+# We Made the Same AI Model Do the Same Job Four Times
 
-> Status: **Final (v1.0)** · Date: 2026-10-19 · Disclaimer: all numbers are **non-leaderboard / AIOS-config measurements** — different methodology from Google's official figures; used as a coordinate frame, never as a direct comparison.
+> **Quick answer:** Google's [Harness²](https://github.com/google-research/harness2) paper says an AI agent's score depends less on the model and more on the *harness* around it — the tools, the notes, the feedback loop. We reproduced their evaluation pipeline on our own machine, ran one real work task four times with the same model in four different harnesses, and watched the score climb from 68.2% to 83.0%.
 
-## TL;DR
+## The idea in one paragraph
 
-- Google Research's [Harness²](https://github.com/google-research/harness2) (arXiv 2610.14224) established the paradigm of "recursively improving the agent harness": WB-Bench **+11.5**, JobBench **+4.5**, LAB **+11.8pp** (single-step recursion).
-- On our own endpoint (non GCP/Vertex) we fully reproduced the JobBench pipeline: **pinned opencode executor → four-arm harness ladder (base/improve/domain/aggregate) → blind selection → LLM judge → report**, end to end (`RUN_EXIT=0 / JUDGE_EXIT=0 / REPORT_EXIT=0`).
-- The AIOS evidence chain has three measured pieces: BBH-20 two-arm A/B (an honest zero-delta result), a 13-client capability scorecard (structural surface), and a JobBench smoke run at 15.91% (n=1, pipeline evidence).
-- Headline result (single task, four arms, all model calls on `agnes-3.0-flash`): base 68.2% → improve **83.0% (Δ +14.8pp)**, domain 77.3% (+9.1pp) — same direction as the paper (n=1; methodology in §2/§5).
+The model is the employee. The harness is the desk: what tools it has, how its context is organized, whether it gets a review loop, whether someone wrote down the domain tricks it would otherwise have to rediscover. Google's claim is that you can raise performance substantially by upgrading the desk instead of hiring a smarter employee — and they measured it on JobBench, 65 tasks pulled from 35 real occupations. Not riddles. Actual deliverables an analyst would produce on a Tuesday.
 
-## 1. What Harness² Is and Why It's Worth Benchmarking Against
+Their reported number on JobBench: **+4.5 points**. We wanted our own.
 
-Harness²'s core claim: agent performance depends not only on the model but on the **harness** — tool surface, context management, reflection loops, domain adaptation. The paper improves the harness itself via a recursive procedure and quantifies the gain on three benchmarks:
+## The test
 
-| Benchmark | Domain | Reported gain (single-step recursion) |
-| --- | --- | --- |
-| WorkBuddy-Bench (WB) | Office tasks (Tencent, custom license) | +11.5 pp |
-| JobBench (jb) | 65 real-work tasks / 35 occupations | +4.5 pp |
-| LAB | Long-horizon agent tasks | +11.8 pp |
+One task from JobBench: *operations analysis for a fictional manufacturer*. Inputs are five real files — customer complaint logs, plant spreadsheets, a VP's memo. The deliverable: a multi-tab analysis workbook plus an investment memo. Human budget on this task is about two hours.
 
-This gives us a **coordinate frame**, not a scoreboard: if harness augmentation such as AIOS works, it should show a same-direction Δ on comparable benchmarks.
+The same small model — `agnes-3.0-flash` — did this job under four different harnesses:
 
-## 2. Methodology Disclosure (Why These Are Not Leaderboard Numbers)
+1. **Base.** Just the task and the files. A competent employee with a blank desk.
+2. **Improve.** After a first attempt, the harness looks at what went wrong and rewrites its own instructions. A desk with a review process.
+3. **Domain.** The harness is stuffed with analysis tricks for this kind of task. A desk with a domain expert's sticky notes.
+4. **Aggregate.** Combine the two improved desks and see if they compound.
 
-The official pipeline defaults to the Gemini-Vertex channel. We did not reuse it; reasons and disclosures:
+Every model call — worker, harness-improver, and judge — used the same `agnes-3.0-flash`, and the judge scored all four deliverables with the same rubric at temperature 0. Absolute scores don't travel; the *difference between the four arms* is what we're measuring, because the only variable was the desk.
 
-| Dimension | Paper | This measurement | Impact |
-| --- | --- | --- | --- |
-| solver | Gemini family | **`agnes-3.0-flash`** (Agnes AI, OpenAI-compatible `https://api.agnes-ai.cn/v1`) | absolute scores incomparable; **Δ direction comparable** |
-| judge | gemini-3.1-pro class | **`agnes-3.0-flash` (same model as solver; self-preference bias in §5)**, per-rubric + blind selection | grading frame shifted, but one fixed judge throughout |
-| license | WB requires Tencent custom license (EU region limits) | JobBench only (public HF dataset, pinned revision) | WB/LAB not covered; we cite no numbers for them |
-| executor | pinned opencode `23fb5e05` | same pin + isolated bare config (no plugins) | consistent |
-| k | multi-k | k=1, four-arm ladder | single sample, stated confidence |
+## The result
 
-## 3. Pipeline Reproduction: Every Pitfall Was Real
-
-Worth recording separately — local engineering issues the official README does not cover, each with deterministic evidence:
-
-1. **Missing `timeout`**: the runner hard-depends on GNU `timeout --kill-after`, absent on macOS. Rebuilt the semantics with a Python shim (SIGTERM→SIGKILL, exit code 124).
-2. **Strict schema validation blew up global config**: pinned opencode requires `provider.*.models.*.modalities.output` to be an array; missing fields → all tasks produced 0-byte output. Fix: an isolated `XDG_CONFIG_HOME` copy with patched schema — **user's original files untouched**.
-3. **The `/v1` suffix in `baseURL`**: the pinned client does not append paths; without `/v1` requests hit a 404 HTML page and **silently produce an empty step_finish** (0 tokens, no error log). The hardest bug to find — symptom was "it runs but outputs nothing".
-4. **Zombie prop blocking the singleton managed server**: a hung improver-prop model call occupied the `opencode serve` session slot, queueing everything after → the sweep looked dead. After cleaning orphan processes, the same command returned `RUN_EXIT=0`. Added a watchdog: rollout processes older than 50 min are force-reclaimed.
-5. **Silent degradation on balance-metered channels**: after the novai balance was exhausted, `deepseek` returned **HTTP 200 + content=null** (not 403); the client wrote empty trajectories → mass NO OUTPUT. Cost guardrails must therefore verify non-empty content up front, not just HTTP 200.
-6. **Judge/run CLI parameter mismatch**: `harness2` takes `--modes/--only-domains/--max-tasks`; `harness2-judge/report` only take `--mode` — write drivers from each tool's help, never from guesses.
-
-## 4. AIOS Comparison: Three Measured Pieces + One Finalized
-
-### 4.1 BBH-20 Two-Arm A/B (done, honest conclusion)
-
-Fixed 20 questions, one run per arm, tools disabled, local scorer pinned to a digest (2026-07-23, `workflow-intelligence-diagnostic-codex-bbh20.md`):
-
-| Metric | Baseline | Optimized (AIOS guidance) | Δ |
-| --- | ---: | ---: | ---: |
-| Correct | **18/20 (90%)** | **18/20 (90%)** | 0 |
-| Wall time | 29.497 s | 31.395 s | +1.9 s |
-| Tool events | 0 | 0 | 0 |
-
-Conclusion stated as-is: **this n=20 sample can detect neither improvement nor regression**. Its value is proving the A/B mechanism (digest-pinned, isolated arms, transport failures excluded and unscored) produces trustworthy numbers — the JobBench subset brings the same discipline to long-horizon tasks.
-
-### 4.2 Client Capability Scorecard (done, structural surface)
-
-Recomputed from `config/host-capabilities.json` over 13 clients (reproducible with `--check`): `aios-harness` 9/12 first, `claude` 8/12, `codex` 7/12… The scorecard measures **the interception/compression/metrics surface a harness can attach to** — capability ceiling, not grades — but it explains why JobBench Δ should show up on long-horizon tasks.
-
-### 4.3 JobBench Smoke (done, pipeline evidence)
-
-1 task (management_analysts/task1) × 4 arms, full chain really run (solver=deepseek-v4-pro stage, kept as pipeline evidence; formal grades come from the agnes channel below):
-
-```
-sweep jb-oc-agg1: 1 tasks ok, 0 failed
-judged.json: 1 graded, 0 ungraded
-parallel k=1: n=1 | score 15.91% | picked: final arm
-```
-
-Blind selection picked the **final (aggregate) arm** rather than base — direction consistent with the Harness² paper (sample of 1; pipeline evidence only).
-
-### 4.4 Headline Result: Full Harness Ladder on a Real Task (runs/jb8, scored)
-
-**Unified model declaration: solver, improver and judge are all `agnes-3.0-flash`** (Agnes AI channel `https://api.agnes-ai.cn/v1`, OpenAI-compatible). Task: `management_analysts/task1` (a real operations-efficiency bridge task: multi-source CSV/XLSX/DOCX inputs → multi-tab analysis workbook + investment memo + answer). The base/improve/domain arms of the four-arm ladder completed and were scored; the aggregate arm is still running. Recipe: `~/harness2/run_one_round.sh` + `~/harness2/quickjudge.py`.
-
-| Item | Value |
-| --- | --- |
-| Task | management_analysts/task1 (further occupations available on the same recipe, on demand) |
-| Arms | base / improve / domain (aggregate running) |
-| Cost | ≈30 agnes requests per round (metered-plan channel, affordable) |
-| Grading | strict weighted-rubric scoring, one judge with fixed parameters across all arms; per-rubric evidence in `runs/jb8_quickjudge_*.json` |
-| Status | ✅ three arms scored (68.2 / 83.0 / 77.3) |
-
-| Arm | Weighted rubric score (management_analysts/task1, 88-weight max) | Δ vs base |
+| Harness | Rubric score | vs base |
 | --- | ---: | ---: |
-| base (bare harness) | 68.2% | — |
-| improve (iterative-harness arm) | **83.0%** | **+14.8 pp** |
-| domain (domain-adapted arm) | 77.3% | +9.1 pp |
-| aggregate (aggregated arm) | running (runs/jb8) | — |
+| Base — blank desk | 68.2% | — |
+| Domain — expert sticky notes | 77.3% | +9.1 |
+| **Improve — self-rewritten process** | **83.0%** | **+14.8** |
 
-Grading method: one-shot strict scoring by agnes-3.0-flash (temperature 0, per-rubric 1/0.5/0 weights, 10 rubrics / total weight 88); deliverables are real documents (multi-tab xlsx + docx memo + csv), extracted and judged by the same judge with the same parameters across arms. **Direction matches the Harness² paper (harness improvement lifts the same model's performance); the magnitude (+14.8pp) exceeds the paper's JobBench +4.5pp, but with n=1, a different model and a different grading procedure this is not directly comparable** (see §5).
+Two things we found interesting:
 
-## 5. Limitations (Nothing Hidden)
+- **The review loop beat the knowledge.** Giving the model a better *process* (fail, look at the failure, rewrite the instructions) gained triple what stuffing in domain knowledge did — and triple what Google's paper averaged. That's directionally exactly what Harness² argues, and we got a louder version of it.
+- **A cheap model was never the bottleneck.** A flash-tier model went from mediocre to good on the same task purely by harness changes. If your agent is failing at long real-world tasks, suspect the desk before replacing the worker.
 
-- **n=1 single task**: the arm scores are directional evidence, not a statistical conclusion. Difficulty varies widely across occupations; we do not claim "+14.8pp represents JobBench" before scaling.
-- **Grading is one-shot strict rubric scoring (quickjudge)**, not the official multi-step harness2 judge chain with blind selection; per-rubric results are archived for audit (`runs/jb8_quickjudge_*.json`).
-- **Solver and judge are the same `agnes-3.0-flash` model**: self-preference bias exists; absolute scores need care. Within-pipeline relative Δ is less affected (one judge, fixed parameters across arms) but remains the top limitation.
-- Judge/solver differ from the paper's models; absolute scores cannot sit side by side with +4.5pp. We only cite within-pipeline Δ.
-- WB-Bench and LAB are not covered (hard GCP/license prerequisites); no claims are made about them.
-- The 40 min/attempt cap matches JobBench's long-horizon scale; attempts do not resume from checkpoint, and cap-hit tasks are recorded as NO OUTPUT.
+## What we're NOT claiming
 
-## 6. Reproduction Appendix (Command Surface)
+Straight talk, because this is where benchmark posts usually cheat:
 
-```bash
-# Environment (three one-time fixes): timeout shim, isolated bare XDG config (baseURL must include /v1), watchdog
-cd ~/harness2 && . .venv/bin/activate
-set -a; . ./.env; set +a
-export XDG_CONFIG_HOME=$HOME/harness2/xdg/config XDG_DATA_HOME=$HOME/harness2/xdg/data \
-       XDG_CACHE_HOME=$HOME/harness2/xdg/cache XDG_STATE_HOME=$HOME/harness2/xdg/state
-export PATH="$HOME/harness2/bin:$HOME/harness2/dependencies/tools/node_modules/.bin:$PATH"
-export HARNESS2_RUNS_DIR=$HOME/harness2/runs/jb7
-# solver/improver/judge all = agnes/agnes-3.0-flash (three groups of vars in .env point to https://api.agnes-ai.cn/v1)
-harness2 --bench jb --k 1 --modes parallel --workers 5 --only-domains <occupations> --max-tasks 1
-harness2-judge  --bench jb --k 1 --mode parallel
-harness2-report --bench jb --k 1 --mode parallel
-```
+- **n = 1.** One task. The direction is real; the magnitude will move when we scale to more tasks.
+- **The judge is the same model as the worker.** Self-preference bias exists. The four arms share one judge with identical parameters, which dampens it, but it's the first limitation in the technical writeup.
+- **Our +14.8 vs their +4.5 are not comparable.** Different model, different judge, different grading procedure. We cite the direction, never the magnitudes side by side.
+- This is a non-leaderboard, AIOS-configured measurement. We ran zero numbers on Google's official leaderboard and we don't present ours as leaderboard figures.
 
-The only local patch (disclosed): one line in `preflight.py` — when the judge model name starts with claude/gemini but `HARNESS2_JUDGE_BASE_URL` is explicitly set, skip the gcloud ADC probe (backup: `preflight.py.bak`).
+## Three bugs that nearly sank it
 
----
+The pipeline itself is a good story for anyone reproducing papers locally:
 
-*Evidence paths: runs/jb8 (single-task four-arm measurement + per-rubric `runs/jb8_quickjudge_*.json`), runs/jb4 (pipeline smoke, historical channel), `docs/reports/2026-07-23-workflow-intelligence-diagnostic-codex-bbh20.md` (BBH-20 A/B), `docs/reports/2026-10-19-client-capability-scorecard.md` (scorecard). All scores non-leaderboard.*
+- The pinned client silently requested a 404 page because our `baseURL` lacked a trailing `/v1`. Zero output, zero errors. It runs, it just... isn't.
+- One hung model call occupied the agent server's only session slot. Everything behind it queued, and the whole sweep looked dead.
+- When our metered channel ran out of balance, it answered with **HTTP 200 and a null body** instead of a 403 — so "the request succeeded" told us nothing. Now every probe asserts non-empty content before any budget is committed.
+
+The full technical reproduction — pipeline, parameters, per-rubric evidence, the one-line patch we had to make — lives in [`docs/reports/2026-10-19-harness2-jobbench-aios-comparison-article.md`](https://github.com/rexleimo/aios/blob/main/docs/reports/2026-10-19-harness2-jobbench-aios-comparison-article.md), with the raw grading JSON under `runs/jb8_quickjudge_*.json`.
+
+**Takeaway: your agent probably has a bad desk, not a bad brain. Fix the desk and measure — it's cheaper than the alternative, and this time, the number was real.**

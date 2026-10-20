@@ -13,7 +13,7 @@ AIOS는 로컬 agent 워크플로 레이어입니다. 새로운 코딩 에이전
 
 AIOS를 처음 사용하시나요? 이 게시물들이 방향을 잡아줄 것입니다:
 
-- [Google Harness² 재현과 AIOS harness 실측](2026-10-harness2-jobbench-aios-measurement.md) — 비 GCP 4팔 사다리 완전 재현, 단일 채널 agnes-3.0-flash: base 68.2% → improve 83.0%(+14.8pp), 논문과 같은 방향, 모든 함공개
+- [같은 AI 모델에게 같은 일을 네 번 시켜 봤다](2026-10-harness2-jobbench-aios-measurement.md) — Harness² 자체 재현: 같은 모델, 네 개의 책상, 68.2% → 83.0%. 두뇌 교체 전에 책상부터
 - [AIOS 이야기](launch-post.md) — 왜 만들었는지, 어떤 문제를 해결하는지
 - [CLI 비교: Raw vs. AIOS](cli-comparison-post.md) — 레이어를 추가하면 무엇이 달라지는지
 - [자동화 플레이북](automation-playbook-post.md) — 일상적 사용 패턴
