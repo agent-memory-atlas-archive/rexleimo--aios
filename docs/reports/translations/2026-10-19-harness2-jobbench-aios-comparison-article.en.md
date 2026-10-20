@@ -1,4 +1,6 @@
 # We Reproduced Google's Harness² Evaluation Pipeline and Produced a Measurable Comparison for the AIOS Harness
+> [!IMPORTANT] Superseded by v1.2: the +14.8pp single-round figure below was retired as judge noise. Headline now: AIOS native arm **+34.7pp** (bare 51.1 -> AIOS 85.8). Current text: ../2026-10-19-harness2-jobbench-aios-comparison-article.md | Blog (EN): ../../../blog-site/2026-10-harness2-jobbench-aios-measurement.md
+
 
 > Status: **Final (v1.0)** · Date: 2026-10-19 · Disclaimer: all numbers are **non-leaderboard / AIOS-config measurements** — different methodology from Google's official figures; used as a coordinate frame, never as a direct comparison.
 

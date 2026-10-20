@@ -1,4 +1,6 @@
 # Google Harness² 평가 파이프라인을 재현하고, AIOS harness의 측정 가능한 비교를 내놓았다
+> [!IMPORTANT] v1.2 갱신: 아래 단발 +14.8pp는 판정 노이즈로 철회. 주 결론은 AIOS 네이티브 암 **+34.7pp**(맨 51.1 → AIOS 85.8). 현행판: ../2026-10-19-harness2-jobbench-aios-comparison-article.md
+
 
 > 상태: **최종본 (v1.0)** · 날짜: 2026-10-19 · 선언: 모든 수치는 **non-leaderboard / AIOS 환경 측정** — Google 공식과 측정 조건이 다르므로 좌표계 대조만 하며 직접 비교는 하지 않는다.
 

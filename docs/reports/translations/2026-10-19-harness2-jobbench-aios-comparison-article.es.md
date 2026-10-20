@@ -1,4 +1,6 @@
 # Reprodujimos el pipeline de evaluación Harness² de Google y obtuvimos una comparación medible para el harness de AIOS
+> [!IMPORTANT] Actualizado a v1.2: el +14.8pp de una sola ronda fue retirado como ruido del juez. Cifra principal actual: brazo nativo AIOS **+34.7pp** (51.1 → 85.8). Versión vigente: ../2026-10-19-harness2-jobbench-aios-comparison-article.md
+
 
 > Estado: **versión final (v1.0)** · Fecha: 2026-10-19 · Declaración: todas las cifras son **mediciones non-leaderboard / entorno AIOS** — distintas condiciones que las cifras oficiales de Google; solo se usar como marco de referencia, nunca como comparación directa.
 

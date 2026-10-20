@@ -1,4 +1,6 @@
 # Google の Harness² 評価パイプラインを再現し、AIOS harness の測定可能な比較を出した
+> [!IMPORTANT] v1.2 で更新：下記の単発 +14.8pp は判定ノイズとして撤回。主結論は AIOS ネイティブ腕 **+34.7pp**（裸 51.1 → AIOS 85.8）。現行版: ../2026-10-19-harness2-jobbench-aios-comparison-article.md
+
 
 > 状態：**最終版 (v1.0)** · 日付：2026-10-19 · 宣言：すべての数値は **non-leaderboard / AIOS 環境計測** — Google 公式とは計測条件が異なるため、座標系としての対照のみを行い、直接比較は行わない。
 
