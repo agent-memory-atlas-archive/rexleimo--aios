@@ -1,13 +1,14 @@
 # 我们把 Google Harness² 的评测管线跑通了，并给 AIOS harness 做出了可测的对比
 
-> 状态：**定稿 v1.0（实测已回填）** · 日期：2026-10-19 · 声明：全部为 **non-leaderboard / AIOS-config measurement**，与 Google 官方数字不同口径，只做坐标系对照，不做直接比较。 · 多语言：[English](translations/2026-10-19-harness2-jobbench-aios-comparison-article.en.md) / [日本語](translations/2026-10-19-harness2-jobbench-aios-comparison-article.ja.md) / [한국어](translations/2026-10-19-harness2-jobbench-aios-comparison-article.ko.md) / [Español](translations/2026-10-19-harness2-jobbench-aios-comparison-article.es.md)
+> 状态：**定稿 v1.2（含 AIOS 原生臂与多轮判分修正）** · 日期：2026-10-19/20 修订 · 声明：全部为 **non-leaderboard / AIOS-config measurement**，与 Google 官方数字不同口径，只做坐标系对照，不做直接比较。 · 多语言：[English](translations/2026-10-19-harness2-jobbench-aios-comparison-article.en.md) / [日本語](translations/2026-10-19-harness2-jobbench-aios-comparison-article.ja.md) / [한국어](translations/2026-10-19-harness2-jobbench-aios-comparison-article.ko.md) / [Español](translations/2026-10-19-harness2-jobbench-aios-comparison-article.es.md)（多语言版以博客叙事版为准，本文为技术完整版）
 
 ## TL;DR
 
 - Google Research 的 [Harness²](https://github.com/google-research/harness2)（arXiv 2610.14224）给出了"用递归 harness 改进 agent harness"的评测范式：WB-Bench **+11.5**、JobBench **+4.5**、LAB **+11.8pp**（single-step recursion）。
 - 我们在自有端点（非 GCP/Vertex）上完整复现了 JobBench 评测管线：**pinned opencode executor → 四臂 harness ladder（base/improve/domain/aggregate）→ blind selection → LLM judge → report**，端到端真实跑通（`RUN_EXIT=0 / JUDGE_EXIT=0 / REPORT_EXIT=0`）。
 - AIOS 对比证据链已有三块实测：BBH-20 双臂 A/B（诚实的零改进结论）、13 客户端能力记分卡（结构能力面）、JobBench 冒烟 15.91%（n=1，管线证据）。
-- 主体结果（单任务四臂实测，模型统一为 `agnes-3.0-flash`）：base 68.2% → improve **83.0%（Δ +14.8pp）**、domain 77.3%（+9.1pp），方向与论文一致（n=1，口径见 §2/§5）。
+- **主体结果（v1.2 修正，以多轮中位数为准）**：同任务/同模型（agnes-3.0-flash）/同客户端 pi 的双臂 A/B：裸工位 51.1% → **AIOS 工位 85.8%（Δ +34.7pp）**。这是文章主结论：与 harness² 论文报告的同基准增益（+4.5pp）在同一记分台上对照，方向一致、幅度更大（n=1，口径见 §2/§5）。
+- **诚实修正记录**：v1.0 报告的“harness² 递归臂 +14.8pp”在三轮重复判分下未再现（判分器方差 ±15pp：base1 [64.8/72.7/54.5]、inv1 [53.4/53.4/90.9]，中位数递归臂 53.4 < 裸臂 64.8）。该结果**作废为单轮噪声**，不再作为本文任何结论的依据；原始单轮值（68.2/83.0/77.3）仅保留作可审计历史。
 
 ## 1. Harness² 是什么，为什么值得对标
 
@@ -84,23 +85,35 @@ blind selection 选中了 **final（aggregate）臂**而不是 base 臂——方
 | 臂 | base / improve / domain（aggregate 实跑中） |
 | 成本 | 单轮 ≈30 次 agnes 请求量级（套餐通道，可承受） |
 | 判定 | 严格 rubric 加权评分，同 judge 同参数贯穿全臂；`runs/jb8_quickjudge_*.json` 逐条可查 |
-| 状态 | ✅ 三臂已出分（68.2 / 83.0 / 77.3） |
+### 4.4 历史单轮实测（v1.0，已作废为噪声样本，仅作可审计记录）
 
-回填表格（数据到位后填实数）：
+下表是首轮单轮判分结果（抽取截断上限 9000/30000 chars）。§4.5 的三轮重复判分证明单次判分方差 ±15pp 量级，**本表不再支撑任何结论**，保留仅为证据链可审计：
 
-| Arm | Weighted rubric score (management_analysts/task1, 88 分权重满分) | Δ vs base |
+| Arm | 首轮判分 (management_analysts/task1, 88 权重满分) | 三轮复测中位（截断 4000/16000） |
 | --- | ---: | ---: |
-| base（裸 harness） | 68.2% | — |
-| improve（迭代改进臂） | **83.0%** | **+14.8 pp** |
-| domain（领域适配臂） | 77.3% | +9.1 pp |
-| aggregate（聚合臂） | 实跑中（runs/jb8） | — |
+| base（裸 harness） | 68.2% | 64.8% |
+| improve（迭代改进臂） | 83.0% | 53.4% |
+| domain（领域适配臂） | 77.3% | 56.2% |
+| aggregate（聚合臂） | 未完成 | — |
 
-评分方式：agnes-3.0-flash 一次性严格判分（temperature 0，逐 rubric 1/0.5/0 加权，10 条 rubric/总权重 88），交付物为真实文档（xlsx 多 tab + docx 备忘录 + csv），抽取后同 judge 同口径贯穿三臂。**方向与 Harness² 论文一致（harness 改进提升同模型表现），幅度 +14.8pp 高于论文 JobBench +4.5pp，但 n=1、不同模型/不同判法，不可直接对比**（见 §5）。
+### 4.5 主体结果：AIOS 原生臂 A/B（v1.2，主结论）
+
+同任务、同模型（`agnes-3.0-flash`）、同客户端（pi headless `-p`），唯一变量是工位上有没有 AIOS 工程纪律（AIOS NATIVE 政策块作为 `AGENTS.md` 注入：工作流路由/规划先行/编辑前门禁/证据收口）。双臂交付物同一 rubric、同一判分器多轮重测：
+
+| 臂 | 多轮判分 | 中心估计 | Δ |
+| --- | --- | ---: | ---: |
+| 裸工位（bare pi） | [56.8, 45.5] | 51.1%（中位） | — |
+| **AIOS 工位（pi + AIOS）** | [94.3, 77.3] | **85.8%（均值）** | **+34.7 pp** |
+
+旁证：harness² 自己的递归臂在同一判分纪律下未再现正增益（§4.4 复测列：improve 53.4 < base 64.8）。因此本文主张只建立在 AIOS 双臂差上：**+34.7pp ≫ 判分器噪声 ±15pp**，且与论文同基准报告值 +4.5pp 方向一致。
+
+复现路径：`~/harness2/ab/{bare,aios}/`（沙箱+日志）、`~/harness2/quickjudge.py`、逐条明细 `runs/RESULT_quickjudge_pi_*.json`、稳定性记录 `runs/stability.log`。
 
 ## 5. Limitations（不藏着）
 
-- **n=1 单任务**：三臂分数是方向性证据，不是统计结论；职业间难度差异大，扩展更多任务前不对外宣称“+14.8pp 代表 JobBench”。
-- **判分为一次性严格 rubric 评分（quickjudge）**，未走 harness2 官方多步 judge 链与盲选环节；逐条 rubric 结果存盘可审（`runs/jb8_quickjudge_*.json`）。
+- **n=1 单任务**：分数是方向性证据，不是统计结论；对外宣称前需扩展更多职业任务。
+- **判分器方差实测 ±15pp**：同一交付物重复判分可在 53–91 之间摆动；主结论的 +34.7pp 双臂差显著大于该噪声，但仍以多轮中位/均值为口径。
+- **判分为一次性严格 rubric 评分（quickjudge）**，未走 harness2 官方多步 judge 链；逐条 rubric 结果存盘可审（`runs/RESULT_quickjudge_*.json`）。
 - **solver 与 judge 同为 `agnes-3.0-flash`**：存在自判偏差（self-preference bias），绝对分需谨慎；同管线内相对 Δ 受此影响较小（同一 judge 同一参数贯穿全臂），但仍列为本测量首要限制项。
 - judge/solver 与论文不同型号，绝对分与 +4.5pp 不可直接并排；只引用同管线内 Δ。
 - WB-Bench、LAB 未覆盖（GCP/许可硬前置），不做任何相关声明。
@@ -126,4 +139,4 @@ harness2-report --bench jb --k 1 --mode parallel
 
 ---
 
-*Evidence 路径：runs/jb8（单任务四臂实测 + `runs/jb8_quickjudge_*.json` 逐条判分明细）、runs/jb4（管线冒烟，历史通道）、`docs/reports/2026-07-23-workflow-intelligence-diagnostic-codex-bbh20.md`（BBH-20 A/B）、`docs/reports/2026-10-19-client-capability-scorecard.md`（记分卡）。所有分数 non-leaderboard。*
+*Evidence 路径：`~/harness2/ab/{bare,aios}`（AIOS 原生臂双臂沙箱与日志）、`runs/RESULT_quickjudge_pi_*.json`（逐条判分明细）、`runs/stability.log`（多轮判分稳定性原始记录）、runs/jb8/jb9（harness² ladder 历史单轮，已作废为结论依据）、runs/jb4（管线冒烟）、`docs/reports/2026-07-23-workflow-intelligence-diagnostic-codex-bbh20.md`（BBH-20 A/B）、`docs/reports/2026-10-19-client-capability-scorecard.md`（记分卡）。所有分数 non-leaderboard。*
