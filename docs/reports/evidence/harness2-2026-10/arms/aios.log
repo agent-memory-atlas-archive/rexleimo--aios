@@ -1,0 +1,19 @@
+Warning: Extension package "builtin:mcp": Extension /Users/rex/.pi/agent/npm/node_modules/pi-mcp-adapter/index.ts registers command `/mcp`, so built-in extension `mcp` was not loaded. To use `mcp`, run `pi config` and make sure it is enabled under Built-in extensions, then disable or remove the existing extension. We recommend only having one or the other loaded at a time.
+All three deliverables plus the summary are in place and verified openable:
+
+## Done — `output/`
+
+1. **`Meridian_Efficiency_Workbook.xlsx`** — 6 tabs (the 5 required + a Source Assumptions tab):
+   - **Plant Scorecard** — OEE (approx), defect rate /1,000, avg OTD, unplanned-downtime share, cost/unit, composite health rank; plus a VP-memo verification section flagging where the memo's claims hold up (Columbus/Portland defect direction ✓, Portland OTD 87.3% overstated vs computed 90.0% avg, +18% YoY unverifiable, Phoenix 58% utilization irreconcilable with 91.2% schedule attainment).
+   - **Trend Diagnostics** — all 12 plant×line combos flagged as watch items (3 flagged most severe: Columbus & Portland lines), 6-month OLS slopes (Portland: defects +3.10/1,000 & OTD −1.32 pts/mo, fastest deterioration).
+   - **Industry Benchmark** — FRED MCUMFN Jan–Jun 2024 (77.7/77.8/77.6/77.5/77.4/77.3, avg 77.5% — **stated in-workbook as the separately-obtained source assumption**, since the FRED file wasn't in the package) with a definition-mismatch caveat; P25/P50/P75 of the 3,240-record defect dataset for DefectRate and DowntimePercentage; per-plant positioning (all plants above P75 on defects).
+   - **Complaint-Production Crossref** — complaint rates /1,000 units, monthly complaint×downtime table with Pearson r (Phoenix +0.59 the only strong positive; Portland −0.19 inverse), category mix.
+   - **Equipment Risk Matrix** — 5 Columbus assets meet age > 8 yrs AND condition ≤ 5; est. capital **$2,664,924**; watch items; workforce context (Phoenix turnover 25–26%/yr).
+
+2. **`Meridian_COPQ_Analysis.csv`** — per-plant + ALL-PLANTS summary row, exactly per the specified formulas: Columbus $120,613 (3.6%), Nashville $40,936 (1.4%), Phoenix $136,106 (4.6%), Portland $131,279 (4.3%), **total $428,935 (3.5% of production cost)**.
+
+3. **`Meridian_Strategic_Investment_Memo.docx`** — ~3 pages to David Chen, grounded in the computed figures above: prioritized interventions P1–P4 (Columbus equipment replacement ~$2.66M; Portland 90-day OTD/quality kaizen; Phoenix workforce/process maturity; company defect-quartile closure target), and a direct, four-point evidence-based answer to the Board's consolidation question: **the data does not support consolidation** (no plant is below the national utilization index; cost gap is variable-cost-driven so it travels with the problem; Columbus capex need is bounded/sequencable; workforce transition risk unpriced).
+
+4. **`output/answer.md`** — full summary of what was produced, key figures, and verification notes.
+
+Analysis scripts are kept in `scripts/` (analyze.py, copq.py, build_workbook.py, build_memo.py) if you want to re-run or extend.

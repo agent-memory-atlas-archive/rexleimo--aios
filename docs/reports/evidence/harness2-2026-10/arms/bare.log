@@ -1,0 +1,19 @@
+Warning: Extension package "builtin:mcp": Extension /Users/rex/.pi/agent/npm/node_modules/pi-mcp-adapter/index.ts registers command `/mcp`, so built-in extension `mcp` was not loaded. To use `mcp`, run `pi config` and make sure it is enabled under Built-in extensions, then disable or remove the existing extension. We recommend only having one or the other loaded at a time.
+All three deliverables are complete and verified. Summary:
+
+**Deliverables in `./output/`:**
+
+1. **`Meridian_Diagnostic_Workbook_Q1Q2_2024.xlsx`** — 5 tabs as specified:
+   - *Plant Scorecard*: OEE, defect/1000, weighted OTD, unplanned-downtime share, cost/unit, composite health rank (Nashville #1 → Phoenix #4)
+   - *Trend Diagnostics*: plant×line monthly detail, 1 watch item flagged (Phoenix–Assembly Modules), 6-month LSQ slopes for defect rate and OTD per plant
+   - *Industry Benchmark*: FRED MCUMFN assumption recorded in-tab (H1 avg 78.9%), per-plant capacity vs national, DefectRate/Downtime percentile positioning from the 3,240-row benchmark dataset
+   - *Complaint-Production Crossref*: complaint rates/1000 by plant×month, severity-weighted index, downtime–severity correlation (Phoenix r=+0.64 strongest)
+   - *Equipment Risk Matrix*: 28 assets cross-referenced; 5 replacement priorities (all Columbus, $2.66M capex)
+
+2. **`Meridian_COPQ_Analysis.csv`** — per-plant COPQ (scap/rework/returns/complaints/downtime components) with totals: H1 COPQ **$428,935 = 3.49%** of production cost, plus ALL-plants summary row.
+
+3. **`Meridian_Strategic_Investment_Memo.docx`** — 3-page memo to David Chen: key-figure table, consolidation analysis (**no closure recommended** — Phoenix utilization program + phased Columbus capex + workload shift to Nashville instead), 4 prioritized interventions with estimated impact, correlation findings, and documented assumptions.
+
+4. **`answer.md`** — deliverable summary with computed figures and source assumptions.
+
+The VP memo's claims were verified against data: Columbus downtime/equipment concern confirmed; Phoenix 58% utilization claim **not confirmed** (computed 91.2%); Portland 87.3% OTD claim **not confirmed** (computed 90.2%) — both flagged for reconciliation in the memo.

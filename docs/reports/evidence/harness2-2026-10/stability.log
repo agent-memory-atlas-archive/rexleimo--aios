@@ -1,0 +1,20 @@
+ARM base1: 64.8%  (weighted 57.0/88)  items=10
+ARM inv1: 53.4%  (weighted 47.0/88)  items=10
+ARM dom1: 52.3%  (weighted 46.0/88)  items=10
+ARM pi_bare1: FAIL AttributeError 'NoneType' object has no attribute 'group'
+ARM pi_aios1: FAIL AttributeError 'NoneType' object has no attribute 'group'
+--round1--
+ARM base1: 72.7%  (weighted 64.0/88)  items=10
+ARM inv1: 53.4%  (weighted 47.0/88)  items=10
+ARM dom1: FAIL AttributeError 'NoneType' object has no attribute 'group'
+ARM pi_bare1: 56.8%  (weighted 50.0/88)  items=10
+ARM pi_aios1: 94.3%  (weighted 83.0/88)  items=10
+--round2--
+ARM base1: 54.5%  (weighted 48.0/88)  items=10
+ARM inv1: 90.9%  (weighted 80.0/88)  items=10
+ARM dom1: 60.2%  (weighted 53.0/88)  items=10
+ARM pi_bare1: FAIL AttributeError 'NoneType' object has no attribute 'group'
+ARM pi_aios1: FAIL JSONDecodeError Expecting value: line 1 column 2 (char 1)
+--round3--
+ARM pi_bare1: 45.5%  (weighted 40.0/88)  items=10
+ARM pi_aios1: FAIL AttributeError 'NoneType' object has no attribute 'group'
