@@ -1,6 +1,6 @@
 ---
 title: "We Reproduced Google's Harness² With AIOS — Here's What Harness Engineering Is Worth"
-description: "Harness² argues that upgrading the desk (harness), not the employee (model), moves real-work scores: +4.5pp on JobBench. We used AIOS's harness-engineering capabilities to reproduce the full evaluation on our own machine and measured +14.8pp (68.2% to 83.0%) for the same model on the same task — same direction as the paper."
+description: "Harness² argues that upgrading the desk (harness), not the employee (model), moves real-work scores: +4.5pp on JobBench. We used AIOS's harness-engineering capabilities to bring the full evaluation onto our own machine, then measured AIOS's own desk on the same scoreboard: +34.7pp for the same model on the same task (bare 51.1 -> AIOS 85.8)."
 date: 2026-10-20
 tags: ["AIOS", "harness2", "JobBench", "harness-engineering", "benchmark", "reproduction"]
 ---

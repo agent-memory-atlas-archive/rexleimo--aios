@@ -7,7 +7,7 @@ tags: ["AIOS", "harness2", "JobBench", "harness-engineering", "benchmark", "复�
 
 # 我们用 AIOS 复现了 Google 的 Harness²：harness 工程到底值多少分
 
-> **一句话：** Google 的 [Harness²](https://github.com/google-research/harness2) 论文主张——提升 agent 成绩靠的是换"工位"（harness：工具、流程、反馈环），而不是换"脑子"（模型），并在真实工作基准 JobBench 上报告了 +4.5pp。我们用 **AIOS 的 harness 工程能力**在自己机器上把这套评测完整复现并真实跑分：同一个模型，从 68.2% 提到 83.0%（**+14.8pp**），方向与论文一致。
+> **一句话：** Google 的 [Harness²](https://github.com/google-research/harness2) 论文主张——提升 agent 成绩靠的是换"工位"（harness：工具、流程、反馈环），而不是换"脑子"（模型），并在真实工作基准 JobBench 上报告了 +4.5pp。我们用 **AIOS 的 harness 工程能力**把整套评测搬上自己机器，再把 AIOS 自己的工位放上同一记分台：同一个模型、同一个任务，裸机 51.1% → **AIOS 工位 85.8%（+34.7pp）**。
 
 ## 为什么是我们来复现：AIOS 本身就是 harness 工程
 
