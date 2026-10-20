@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.delivery-ticket.v1",
+  "status": "ready",
+  "objective": "对标 Google 开源 Harness²（recursive agent harnessing），在官方基准（WorkBuddy-Bench / JobBench）上产出 AIOS 侧权威实测分数与可发布内容。",
+  "decisionTicketRef": "artifact:decision-ticket:workbuddy-harness-scorecard-20261019",
+  "workItems": [
+    {
+      "id": "work-capability-scorecard",
+      "title": "B 路线：从 host-capabilities 复算生成客户端能力记分卡（含 WorkBuddy）",
+      "outcome": "一份由脚本从 config/host-capabilities.json 计算得出、可重复复算的客户端能力记分卡报告，WorkBuddy 有逐轴分与总分，每个格子带来源引用。",
+      "completionCriteria": [
+        "记分卡数字由 `scripts/client-capability-scorecard.mjs` 从 config/host-capabilities.json 生成，报告正文无手写数字。",
+        "计分规则（轴、权重、L1/L2/L3 映射）在报告与脚本中同名声明，且对全部 10 个客户端一致适用。",
+        "WorkBuddy 行存在且其 limits / requiredEntrypoint / turnCompression 字段被引用为证据。"
+      ],
+      "verification": [
+        "node scripts/client-capability-scorecard.mjs --check",
+        "node --test scripts/tests/client-capability-scorecard.test.mjs",
+        "npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "artifact:plan:workbuddy-harness-scorecard-20261019",
+        "file:config/host-capabilities.json#clients"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-harness2-article-brief",
+      "title": "查证 Google harness 2 文章的评分轴与文章结构",
+      "outcome": "docs/reports/2026-10-19-harness2-article-brief.md：文章 URL / 发布主体 / 日期 / 评分轴清单 / 结构骨架，逐条标注 verified 或 unverified。",
+      "completionCriteria": [
+        "至少一条真实 URL 与 ≥3 个评分轴带原文引用落档。",
+        "无法查证的部分显式写成 unverified，不推断。"
+      ],
+      "verification": [
+        "rg -c 'https://' docs/reports/2026-10-19-harness2-article-brief.md",
+        "browser_navigate 到该 URL 成功（网络允许时），失败则记录为 unverified 并保留原因"
+      ],
+      "evidenceRefs": [
+        "artifact:plan:workbuddy-harness-scorecard-20261019"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-workbuddy-runner-adapter",
+      "title": "A 路线前置：WorkBuddy 评测执行通道（managed-runner）设计决策",
+      "outcome": "要么给出可实现的 workbuddy 评测通道设计（隔离目录、digest 钉定、scorer 位置、由会话内 runner 承接证据），要么正式记录为不可测并给出拒绝理由。",
+      "completionCriteria": [
+        "设计文档明确该通道是否需要在 WorkBuddy 会话内由被测方自执行，以及由此带来的自证有效性边界。",
+        "不引入未经批准的外部模型调用。"
+      ],
+      "verification": [
+        "docs/plans/2026-10-19-workbuddy-runner-adapter-design.md 存在并引用 F1/F2 证据",
+        "npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "file:scripts/lib/learning/gaia-ab-eval/client-adapters.mjs#L42-L100",
+        "file:config/host-capabilities.json#clients.workbuddy"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-workbuddy-live-ab",
+      "title": "A 路线：对 WorkBuddy 跑 BBH-20 / GAIA 真实 A/B 实测",
+      "outcome": "与既有 codex BBH-20 报告同格式的 WorkBuddy 实测报告：双组正确率、wall time、tool events、digest 钉定的 policy/prompt。",
+      "completionCriteria": [
+        "两组仅 AGENTS.md 文本不同，prompt 内不含 baseline/optimized 字样。",
+        "实际命令输出与答案数组落档，非人工誊写。"
+      ],
+      "verification": [
+        "node scripts/gaia-ab-eval.mjs --client workbuddy --json（adapter 落地后真实运行并保存输出）",
+        "npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "file:docs/reports/2026-07-23-workflow-intelligence-diagnostic-codex-bbh20.md"
+      ],
+      "dependsOn": [
+        "work-workbuddy-runner-adapter"
+      ]
+    },
+    {
+      "id": "work-comparison-article",
+      "title": "汇合：产出对标文章（博客 + 报告）并登记导航",
+      "outcome": "blog-site/2026-10-workbuddy-harness-scorecard.md（及 zh/ 版）+ mkdocs.blog.yml nav 登记，内容对齐已查证的文章轴并写明 AIOS 侧差异优势。",
+      "completionCriteria": [
+        "文中每个数字都能指向记分卡行或 config 字段；未实测的 A 路线结果不得被宣称。",
+        "对标轴来自 work-harness2-article-brief，未查证轴显式标注假设。"
+      ],
+      "verification": [
+        "rg -n '2026-10-workbuddy-harness-scorecard' mkdocs.blog.yml",
+        "node scripts/check-dir-budget.mjs",
+        "npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "artifact:plan:workbuddy-harness-scorecard-20261019"
+      ],
+      "dependsOn": [
+        "work-capability-scorecard",
+        "work-harness2-article-brief"
+      ]
+    },
+    {
+      "id": "work-harness2-jb-pilot",
+      "title": "Harness² 环境落地 + JobBench check（公开数据、无 Docker、无 Vertex 硬依赖）",
+      "outcome": "本地 clone google-research/harness2 并用 uv 完成安装；harness2-setup jb + harness2-check --bench jb 通过。",
+      "completionCriteria": [
+        "harness2-check --bench jb 退出码 0",
+        "数据集 revision 与任务数被记录"
+      ],
+      "verification": [
+        "harness2-check --bench jb"
+      ],
+      "evidenceRefs": [
+        "ref:google-research/harness2@main docs/BENCHMARKS.md (fetched 2026-10-19)"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-jb-scored-run",
+      "title": "JobBench 首轮权威分数（executor=opencode/codex，judge=用户指定的 OpenAI 兼容端点）",
+      "outcome": "baseline arm 在 JobBench 上跑完并有 judge 分数与 report 输出（runs/jb/）。",
+      "completionCriteria": [
+        "run/judge/report 三个命令的真实输出落档",
+        "judge 模型与端点被显式声明",
+        "评分期间按 EXPERIMENTS.md 封锁 dataset host"
+      ],
+      "verification": [
+        "harness2 --bench jb --k 1 --mode parallel && harness2-judge --bench jb --k 1 --mode parallel && harness2-report --bench jb --k 1 --mode parallel"
+      ],
+      "evidenceRefs": [
+        "ref:google-research/harness2@main docs/BENCHMARKS.md (fetched 2026-10-19)"
+      ],
+      "dependsOn": [
+        "work-harness2-jb-pilot"
+      ]
+    },
+    {
+      "id": "work-aios-harness-arm",
+      "title": "AIOS harness 对比臂：把 AIOS 组件接入 Harness² 8 组件框架跑同一基准",
+      "outcome": "同一任务集上 baseline vs AIOS-augmented 双组分数与差值。",
+      "completionCriteria": [
+        "两组仅 harness 组件不同，其余控制一致",
+        "差值用上游 rubric 权重计算"
+      ],
+      "verification": [
+        "harness2-report 对比输出"
+      ],
+      "evidenceRefs": [
+        "ref:google-research/harness2@main docs/BENCHMARKS.md (fetched 2026-10-19)"
+      ],
+      "dependsOn": [
+        "work-jb-scored-run"
+      ]
+    },
+    {
+      "id": "work-wb-bench-run",
+      "title": "WorkBuddy-Bench 正式打分（office/web/code 子集）",
+      "outcome": "WB-Bench 官方 runtime（Harbor 容器）跑通并产出 verifier score.json 汇总。",
+      "completionCriteria": [
+        "license 已知悉（Tencent 自定义许可含非欧盟地域限制）",
+        "HARNESS2_SOLVER_MODEL=google-vertex/gemini + GOOGLE_CLOUD_PROJECT 就绪"
+      ],
+      "verification": [
+        "harness2 --bench wb --subset office --k 1 --mode parallel 及 judge/report"
+      ],
+      "evidenceRefs": [
+        "ref:google-research/harness2@main docs/BENCHMARKS.md (fetched 2026-10-19)"
+      ],
+      "dependsOn": [
+        "work-harness2-jb-pilot"
+      ]
+    },
+    {
+      "id": "work-h2-article",
+      "title": "内容产出：对标 marktechpost/harness2 的 AIOS 视角文章 + 实测分数",
+      "outcome": "blog-site/ 文章 + docs/reports/ 证据报告，引用自家 runs 输出。",
+      "completionCriteria": [
+        "每个数字指向 runs/ 或 report 输出",
+        "明确标注未实测项"
+      ],
+      "verification": [
+        "rg 数字回链检查 + npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "ref:google-research/harness2@main docs/BENCHMARKS.md (fetched 2026-10-19)"
+      ],
+      "dependsOn": [
+        "work-jb-scored-run",
+        "work-aios-harness-arm"
+      ]
+    }
+  ],
+  "frontier": {
+    "ready": [],
+    "blocked": [
+      {
+        "workItemId": "work-harness2-article-brief",
+        "reason": "需要人类输入：文章 URL/标题未提供；且本环境查证通道失效（curl 无网络返回 000、DDG 对 headless 返回空页面、browser_screenshot 报 `__name is not defined`）。",
+        "evidenceRefs": [
+          "artifact:decision-ticket:workbuddy-harness-scorecard-20261019#blockingUnknowns"
+        ]
+      },
+      {
+        "workItemId": "work-workbuddy-live-ab",
+        "reason": "adapter 已实现且测试通过；实测被外部前置卡住：本机未安装 WorkBuddy/CodeBuddy CLI（/Applications/WorkBuddy.app 缺失、codebuddy/cbc 不在 PATH）。需用户安装或提供二进制路径，并先过 docs/plans/2026-10-19-workbuddy-runner-adapter-design.md 的 5 项安装验证清单。",
+        "evidenceRefs": [
+          "file:docs/plans/2026-10-19-workbuddy-runner-adapter-design.md#F4"
+        ]
+      },
+      {
+        "workItemId": "work-comparison-article",
+        "reason": "汇合项，依赖 work-capability-scorecard 与 work-harness2-article-brief 同时达完成条件。",
+        "evidenceRefs": [
+          "artifact:plan:workbuddy-harness-scorecard-20261019"
+        ]
+      },
+      {
+        "workItemId": "work-harness2-jb-pilot",
+        "reason": "需要批准：clone+安装外部仓库（本地可逆）并下载 HF 公开数据集；默认建议先行。",
+        "evidenceRefs": [
+          "ref:BENCHMARKS.md#JobBench"
+        ]
+      },
+      {
+        "workItemId": "work-wb-bench-run",
+        "reason": "需要用户提供 google-vertex/gemini 执行器凭据（GOOGLE_CLOUD_PROJECT + ADC）与成本上限，并确认接受 Tencent 自定义许可的地域条款。",
+        "evidenceRefs": [
+          "ref:BENCHMARKS.md#WorkBuddy-Bench",
+          "ref:Tencent/workbuddy-bench LICENSE"
+        ]
+      }
+    ]
+  },
+  "parallelGroups": [
+    [
+      "work-capability-scorecard",
+      "work-harness2-article-brief"
+    ]
+  ],
+  "convergenceGate": {
+    "requiredEvidenceRefs": [
+      "artifact:plan:workbuddy-harness-scorecard-20261019",
+      "file:config/host-capabilities.json#clients",
+      "file:scripts/lib/learning/gaia-ab-eval/client-adapters.mjs#L42-L100"
+    ],
+    "verification": "node scripts/client-capability-scorecard.mjs --check 退出码 0；node --test scripts/tests/client-capability-scorecard.test.mjs 通过；npm run test:affected 通过；node scripts/check-dir-budget.mjs 通过；文章 URL 与评分轴证据落档或显式标注 unverified。",
+    "joinCondition": "B 路线记分卡可复算 + 对标轴来源明确（或显式 unverified）+ A 路线要么有真实运行证据、要么正式记录为不可测；三者齐备才可宣称完成。"
+  },
+  "completionClaim": "soft",
+  "completed": [
+    {
+      "workItemId": "work-capability-scorecard",
+      "date": "2026-10-19",
+      "evidenceRefs": [
+        "file:docs/reports/2026-10-19-client-capability-scorecard.md",
+        "command:node scripts/client-capability-scorecard.mjs --check -> ok: ... matches config (13 clients)",
+        "command:npm run test:affected -> tests 2217 pass 2205 fail 0"
+      ]
+    },
+    {
+      "workItemId": "work-workbuddy-runner-adapter",
+      "date": "2026-10-19",
+      "evidenceRefs": [
+        "file:docs/plans/2026-10-19-workbuddy-runner-adapter-design.md",
+        "file:scripts/lib/learning/gaia-ab-eval/client-adapters.mjs#workbuddy",
+        "command:node --test scripts/tests/learning/gaia/gaia-ab-client-adapters.test.mjs -> fail 0"
+      ]
+    }
+  ],
+  "amendment": {
+    "date": "2026-10-19",
+    "reason": "用户澄清：WorkBuddy = Tencent/workbuddy-bench 基准（Harness² 官方三基准之一），不是 workbuddy 客户端。已查证 google-research/harness2 README + docs/BENCHMARKS.md + Tencent LICENSE。",
+    "evidenceRefs": [
+      "https://raw.githubusercontent.com/google-research/harness2/main/README.md",
+      "https://raw.githubusercontent.com/google-research/harness2/main/docs/BENCHMARKS.md",
+      "https://raw.githubusercontent.com/Tencent/workbuddy-bench/main/LICENSE"
+    ]
+  }
+}

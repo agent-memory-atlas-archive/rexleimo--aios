@@ -67,6 +67,41 @@ test('Claude invocation pins the model and keeps the common rules enabled', () =
   assert.doesNotMatch(invocation.input, /must-not-reach-client/u);
 });
 
+test('WorkBuddy invocation uses the bundled codebuddy CLI and withholds the expected answer', () => {
+  const invocation = buildGaiaClientInvocation({
+    client: 'workbuddy',
+    model: 'operator-pinned-model',
+    arm: 'baseline',
+    policy: 'Use the common tools and return only the final answer.',
+    task,
+    timeoutSeconds: 120,
+    remainingSpendUsd: 5,
+    usagePath: 'artifacts/workbuddy-usage.json',
+  });
+
+  assert.equal(invocation.executable, 'codebuddy');
+  assert.deepEqual(invocation.args, ['-p', invocation.input, '--model', 'operator-pinned-model']);
+  assert.match(invocation.input, /level-1-task/u);
+  assert.doesNotMatch(invocation.input, /must-not-reach-client/u);
+  assert.doesNotMatch(invocation.args.join(' '), /dangerously-skip-permissions|-y/u);
+});
+
+test('WorkBuddy invocation fails closed when the operator did not pin a model', () => {
+  assert.throws(
+    () => buildGaiaClientInvocation({
+      client: 'workbuddy',
+      model: '',
+      arm: 'baseline',
+      policy: 'Use the common tools and return only the final answer.',
+      task,
+      timeoutSeconds: 120,
+      remainingSpendUsd: 5,
+      usagePath: 'artifacts/workbuddy-usage.json',
+    }),
+    /workbuddy model[^"]*must be a non-empty string/u,
+  );
+});
+
 test('Hermes invocation pins the model and records usage locally', () => {
   const invocation = buildGaiaClientInvocation({
     client: 'hermes',

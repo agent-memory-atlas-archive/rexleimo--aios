@@ -70,6 +70,21 @@ export function buildGaiaClientInvocation({
     });
   }
 
+  if (client === 'workbuddy') {
+    // WorkBuddy ships a real CLI inside the app bundle, not on PATH by default:
+    //   /Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/cli/bin/codebuddy
+    // Flags mirror the registered one-shot handler for runtime client
+    // 'workbuddy-agent' in scripts/lib/foundation/ctx-agent-core/entry/one-shot.mjs.
+    // The model is account-bound: the operator pins it per run, so there is no
+    // hardcoded default here — an empty model must fail closed.
+    assertNonEmptyString(model, 'GAIA workbuddy model (pin it after CLI install verification)');
+    return Object.freeze({
+      executable: 'codebuddy',
+      args: Object.freeze(['-p', input, '--model', model]),
+      input,
+    });
+  }
+
   if (client === 'claude') {
     if (model !== CLAUDE_MODEL) {
       throw new Error(`claude model must equal ${CLAUDE_MODEL}`);
