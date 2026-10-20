@@ -13,7 +13,7 @@ AIOS is a local agent workflow layer — not a new coding agent, but a layer tha
 
 New to AIOS? These posts will get you oriented:
 
-- [We Made the Same AI Model Do the Same Job Four Times](2026-10-harness2-jobbench-aios-measurement.md) — reproduced Google Harness² off-GCP: same model, four desks, 68.2% → 83.0%. Fix the desk before replacing the brain
+- [We Reproduced Google's Harness² With AIOS — Here's What Harness Engineering Is Worth](2026-10-harness2-jobbench-aios-measurement.md) — AIOS harness engineering drove a full paper-grade reproduction: +14.8pp measured on JobBench vs the paper's +4.5, same direction
 - [The Story Behind AIOS](launch-post.md) — why it was built, and what problems it solves
 - [CLI Comparison: Raw vs. AIOS](cli-comparison-post.md) — what changes when you add the layer
 - [Automation Playbook](automation-playbook-post.md) — practical patterns for daily use

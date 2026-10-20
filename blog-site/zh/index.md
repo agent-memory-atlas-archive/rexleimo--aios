@@ -11,7 +11,7 @@ description: "AIOS 工程与增长博客中文版：覆盖记忆系统、单 Age
 
 刚接触 AIOS？从这里开始：
 
-- [我们让同一个 AI 模型，把同一份工作做了四遍](2026-10-harness2-jobbench-aios-measurement.md) — 复现 Google Harness²：同一个模型、四种工位，68.2% → 83.0%。先修工位，再换脑子
+- [我们用 AIOS 复现了 Google 的 Harness²：harness 工程到底值多少分](2026-10-harness2-jobbench-aios-measurement.md) — 用 AIOS 的 harness 工程能力驾驭论文级复现：JobBench 实测 +14.8pp vs 论文 +4.5pp，方向一致
 - [发布文章](launch-post.md) — 为什么做这个，它解决什么问题
 - [CLI 对比](cli-comparison-post.md) — 加了这层之后有什么变化
 - [自动化作战手册](automation-playbook-post.md) — 日常使用的实用模式
