@@ -1,6 +1,6 @@
 ---
 title: "我们用 AIOS 复现了 Google 的 Harness²：harness 工程到底值多少分"
-description: "Harness² 论文说，换工位（harness）比换脑子（模型）更能提分：JobBench +4.5pp。我们用 AIOS 的 harness 工程能力在自己的机器上把这套评测完整跑通，同管线测得同一个模型从 68.2% 到 83.0%（+14.8pp）——方向与论文一致。这篇文章讲两件事：工程能力如何让论文级复现成为可能，以及数字意味着什么。"
+description: "Harness² 论文说，换工位（harness）比换脑子（模型）更能提分：JobBench +4.5pp。我们用 AIOS 的 harness 工程能力在自己的机器上把这套评测完整跑通，再把 AIOS 自己的工位放上同一记分台：同一个模型、同一个任务，裸机 51.1% → **AIOS 工位 85.8%（+34.7pp）**。这篇文章讲两件事：工程能力如何让论文级复现成为可能，以及数字意味着什么。"
 date: 2026-10-20
 tags: ["AIOS", "harness2", "JobBench", "harness-engineering", "benchmark", "复现"]
 ---
