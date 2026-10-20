@@ -8,6 +8,7 @@
 | `arms/bare/output/` | 裸工位臂交付物（xlsx/csv/docx/answer.md） |
 | `arms/aios/output/` | AIOS 工位臂交付物 |
 | `arms/*.log` | 双臂 pi headless 会话输出 |
+| `arms/aios/AGENTS.md` | AIOS 工位注入件本体（AIOS NATIVE 政策块：工作流路由/规划先行/编辑前门禁/证据收口）——A/B 的处理变量原文 |
 | `RESULT_quickjudge_pi_{bare1,aios1}.json` | 主结论双臂逐条 rubric 判分明细 |
 | `RESULT_quickjudge_{base1,inv1,dom1,agg1}.json` | harness² ladder 历史单轮判分（已作废为结论依据，留作噪声样本审计） |
 | `stability.log` | 多轮重复判分原始记录（判分器方差 ±15pp 的出处） |
