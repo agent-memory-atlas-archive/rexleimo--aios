@@ -1,0 +1,56 @@
+{
+ "arm": "pi_aios1",
+ "pct": 77.27272727272727,
+ "detail": [
+  {
+   "i": 1,
+   "score": 1.0,
+   "why": "FRED MCUMFN average (77.5%) calculated and compared to plant utilizations (91-99%)."
+  },
+  {
+   "i": 2,
+   "score": 1.0,
+   "why": "Plants positioned against P75 of defect/downtime distributions in Industry Benchmark tab."
+  },
+  {
+   "i": 3,
+   "score": 1.0,
+   "why": "Portland correctly identified as having the highest complaint rate (0.51/1,000 units)."
+  },
+  {
+   "i": 4,
+   "score": 1.0,
+   "why": "Portland OTD deterioration identified with negative slope (-1.32 pts/month)."
+  },
+  {
+   "i": 5,
+   "score": 0.5,
+   "why": "Data-driven recommendation provided, but fails to weigh the specific qualitative factor of Phoenix's additive manufacturing capability."
+  },
+  {
+   "i": 6,
+   "score": 1.0,
+   "why": "VP memo discrepancies (utilization, OTD, downtime) explicitly flagged and corrected in Plant Scorecard tab."
+  },
+  {
+   "i": 7,
+   "score": 0.5,
+   "why": "Identified workforce instability as cause, but cited incorrect specific tenure/turnover figures (2.8 yrs/18-26% vs expected ~2.4 yrs/23%)."
+  },
+  {
+   "i": 8,
+   "score": 1.0,
+   "why": "All 12 plant-product combinations flagged as deteriorating on 2+ metrics."
+  },
+  {
+   "i": 9,
+   "score": 0.0,
+   "why": "Did not explicitly identify Dimensional Tolerance and Late Delivery as the top two categories or distinguish systemic vs plant-specific issues in the provided text."
+  },
+  {
+   "i": 10,
+   "score": 1.0,
+   "why": "COPQ CSV includes an 'ALL PLANTS (SUMMARY)' row with aggregated totals."
+  }
+ ]
+}

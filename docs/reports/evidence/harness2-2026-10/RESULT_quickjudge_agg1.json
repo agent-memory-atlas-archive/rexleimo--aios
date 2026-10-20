@@ -1,0 +1,56 @@
+{
+ "arm": "agg1",
+ "pct": 68.18181818181817,
+ "detail": [
+  {
+   "i": 1,
+   "score": 1.0,
+   "why": "Migration Guide explicitly states API keys are deprecated in v2.1 but not removed until v3 and that both methods work in parallel."
+  },
+  {
+   "i": 2,
+   "score": 1.0,
+   "why": "Troubleshooting and Release Notes clearly state dataset.deleted does not exist and DELETE triggers dataset.updated via soft delete."
+  },
+  {
+   "i": 3,
+   "score": 0.5,
+   "why": "Mentions standard and bulk categories and cites the 20 req/min Free tier limit, but the sync category and complete tier mapping table are cut off or missing in the provided text."
+  },
+  {
+   "i": 4,
+   "score": 0.0,
+   "why": "The provided Troubleshooting Guide only covers 401s and does not include a section explaining 403 Forbidden (authenticated but not authorized)."
+  },
+  {
+   "i": 5,
+   "score": 0.5,
+   "why": "Release Notes mention incremental sync and GET /jobs/{job_id} for tracking, but the provided text is cut off before describing the 'full' mode and the specific response payload of POST /sync."
+  },
+  {
+   "i": 6,
+   "score": 1.0,
+   "why": "Release Notes follow the required structure with Upgrade Steps, Breaking Changes, New Features, Bug Fixes, and Improvements."
+  },
+  {
+   "i": 7,
+   "score": 1.0,
+   "why": "API Reference correctly lists production/sandbox base URLs and specifies application/json content type for POST/PUT/PATCH."
+  },
+  {
+   "i": 8,
+   "score": 0.5,
+   "why": "The Troubleshooting Guide addresses the specific ticket symptoms (root causes), but the provided text does not explicitly include a section titled 'Common Migration Pitfalls' or a consolidated summary of patterns."
+  },
+  {
+   "i": 9,
+   "score": 1.0,
+   "why": "Migration Guide and Release Notes consistently align v2.0, v2.1, and v2.2 features and dates with the changelog history."
+  },
+  {
+   "i": 10,
+   "score": 0.5,
+   "why": "Bulk limit (1000) and pagination limit (100) are specified, but the dataset name length constraint (3-100 characters) is missing from the provided text."
+  }
+ ]
+}

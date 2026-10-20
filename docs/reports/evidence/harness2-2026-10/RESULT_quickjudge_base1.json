@@ -1,0 +1,56 @@
+{
+ "arm": "base1",
+ "pct": 54.54545454545454,
+ "detail": [
+  {
+   "i": 1,
+   "score": 1.0,
+   "why": "The Industry Benchmark tab in the xlsx correctly lists the FRED MCUMFN values for Jan-Jun 2024, calculates the average (75.83%), and compares each plant's volume-basis utilization against this federal average."
+  },
+  {
+   "i": 2,
+   "score": 0.0,
+   "why": "The tab provides percentile positions (all >75th) and lists P25/P50/P75 thresholds, but it fails to explicitly cross-reference the specific plant metric values against the 25th/50th/75th distributions for both DefectRate and DowntimePercentage in a clear comparative analysis, nor does it distinguish between the two metrics in the positioning statement (it just says 'exceed P75 on both')."
+  },
+  {
+   "i": 3,
+   "score": 1.0,
+   "why": "The Complaint-Production Crossref tab correctly calculates 'Complaints per 1,000 Units' for each plant. Portland OR has 0.51, which is the highest value among the four plants (Nashville 0.18, Columbus 0.36, Phoenix 0.49)."
+  },
+  {
+   "i": 4,
+   "score": 1.0,
+   "why": "The Trend Diagnostics tab explicitly identifies Portland OR with an OTD Slope of -1.318 %/month and labels the OTD Trend as 'Deteriorating'. The memo also highlights this as a watch item."
+  },
+  {
+   "i": 5,
+   "score": 0.0,
+   "why": "The strategic memo is truncated in the provided text. While it makes a recommendation for Nashville as a consolidation destination, it does not address the qualitative factors regarding Phoenix's additive manufacturing capability, nor does it weigh these against the quantitative cost structure in a comprehensive argument for the board's specific question."
+  },
+  {
+   "i": 6,
+   "score": 0.5,
+   "why": "The memo/analysis partially addresses discrepancies. For example, it notes Phoenix is not at target and provides specific COPQ figures. However, it does not explicitly flag the VP's incorrect utilization claim (~58% vs actual ~91.5%) or the Portland OTD discrepancy (~87.3% vs actual ~90.0%) as corrections to the VP's memo, but rather presents the new data. It implicitly corrects by providing accurate data but lacks the explicit 'flag discrepancy' step."
+  },
+  {
+   "i": 7,
+   "score": 0.0,
+   "why": "The provided deliverables (COPQ CSV, Memo, XLSX tabs) do not mention workforce instability, turnover rates (~23%), or tenure (~2.4 years). This critical root-cause analysis is missing from the text provided."
+  },
+  {
+   "i": 8,
+   "score": 1.0,
+   "why": "The Trend Diagnostics tab includes a section 'Plant_ID | Plant | Product Line | Deteriorating Month Transitions | Deteriation Count'. It lists combinations where deterioration count is >= 2 (e.g., Columbus Custom Fabrication has 3 transitions, Portland Custom Fabrication has 4). This satisfies the requirement to identify specific plant-product line combinations deteriorating on multiple metrics."
+  },
+  {
+   "i": 9,
+   "score": 0.0,
+   "why": "The provided text does not mention 'Dimensional Tolerance' or 'Late Delivery' as complaint categories, nor does it distinguish between plant-specific and systemic issues regarding these categories. The Complaint-Production Crossref tab only aggregates totals and severity."
+  },
+  {
+   "i": 10,
+   "score": 1.0,
+   "why": "The Meridian_COPQ_Analysis.csv includes a row 'PLT-005' labeled 'ALL,All Plants' which aggregates the totals for Units, Costs, Complaints, and COPQ across all four plants."
+  }
+ ]
+}

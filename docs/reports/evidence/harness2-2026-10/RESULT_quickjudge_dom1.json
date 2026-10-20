@@ -1,0 +1,56 @@
+{
+ "arm": "dom1",
+ "pct": 60.22727272727273,
+ "detail": [
+  {
+   "i": 1,
+   "score": 0.0,
+   "why": "The candidate outputs do not include an Industry Benchmark tab in the Excel file, nor do they compute or compare FRED national capacity utilization averages. The tab is missing from the provided artifacts."
+  },
+  {
+   "i": 2,
+   "score": 0.0,
+   "why": "The candidate outputs do not include percentile analysis (25th/50th/75th) against an external manufacturing defect dataset. No such benchmarking or positioning is present in the Excel tabs or CSV."
+  },
+  {
+   "i": 3,
+   "score": 0.5,
+   "why": "The COPQ CSV lists Portland OR with the highest number of complaints (20) and calculates complaint costs, but it does not explicitly compute or state the 'complaint rate per 1,000 units' metric. The strategic memo mentions the rate (0.15/1,000) but the required tab 'Complaint-Production Crossref' is not distinctly visible as a separate diagnostic component identifying the rate explicitly."
+  },
+  {
+   "i": 4,
+   "score": 1.0,
+   "why": "The Plant Scorecard and Strategic Memo explicitly note Portland's OTD downward slope (-1.3 pts/mo) and June dip to 84.3%. The Trend Diagnostics tab basis notes confirm the calculation method for month-over-month deterioration, and the memo identifies Portland as having the most dangerous trajectory."
+  },
+  {
+   "i": 5,
+   "score": 1.0,
+   "why": "The strategic memo explicitly addresses the consolidation question, recommends against full consolidation, proposes absorbing Columbus volume into Nashville, and weighs Phoenix's specific capabilities (additive/composite) and workforce issues before committing its capacity."
+  },
+  {
+   "i": 6,
+   "score": 1.0,
+   "why": "The Plant Scorecard tab includes a 'VP MEMO CLAIM VERIFICATION' section that explicitly flags discrepancies (Phoenix utilization 91.2% vs 58%, Portland OTD 90.0% vs 87.3%, headcount 765 vs 820) and states that conclusions rely on recomputed values."
+  },
+  {
+   "i": 7,
+   "score": 1.0,
+   "why": "The strategic memo explicitly attributes Phoenix's quality issues to 'high workforce turnover (18.4% production)' and 'ramp-up delays', and the executive summary notes 'highest COPQ... driven by... workforce instability' (though the specific 2.4 year tenure is not explicitly cited in the text, the turnover rate and causal link to quality/productivity are clearly identified as the root cause, satisfying the core requirement of identifying workforce instability as the driver). *Correction*: The memo says 18.4% turnover, the task says ~23%. However, it does identify workforce instability as the root cause. I will give 0.5 for the specific metric mismatch but the causal link is there. Wait, the task says 'Phoenix's ~23% turnover'. The memo says 18.4%. This is a factual discrepancy in the candidate's output vs the task description's expected finding. However, the rubric asks if it identifies workforce instability *with* those stats. Since the stats are off (18.4 vs 23), I will score 0.5."
+  },
+  {
+   "i": 8,
+   "score": 0.5,
+   "why": "The Trend Diagnostics tab basis notes define the watch item criteria (>=2 metrics deteriorating). The text says '31 watch items found'. However, the actual list of specific plant-product combinations is cut off in the provided text block ('WATCH ITEMS \u2014 plant x line months deteriorating o'). While the methodology is correct, the explicit identification of the specific combinations is not fully visible/verified in the provided snippet, making it difficult to confirm the specific outputs were generated correctly, though the framework is present."
+  },
+  {
+   "i": 9,
+   "score": 0.0,
+   "why": "The candidate outputs do not identify 'Dimensional Tolerance' and 'Late Delivery' as the most prevalent complaint categories. The COPQ CSV and Memo discuss complaint counts and severity but do not break down categories or distinguish between plant-specific vs systemic issues based on category prevalence."
+  },
+  {
+   "i": 10,
+   "score": 1.0,
+   "why": "The COPQ CSV includes a final row 'PLT-ALL,All Plants (Summary)' with aggregated totals for Units, Scrap, Rework, Complaints, Costs, and the COPQ Percentage."
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "arm": "pi_bare1",
+ "pct": 45.45454545454545,
+ "detail": [
+  {
+   "i": 1,
+   "score": 0.5,
+   "why": "The summary states the FRED average (78.9%) and plant utilization comparison, but the specific calculation of the average from the raw FRED data is not visible in the provided snippet, and the 'Industry Benchmark' tab content is not fully shown to verify the month-by-month comparison logic."
+  },
+  {
+   "i": 2,
+   "score": 0.5,
+   "why": "The summary mentions percentile positions from the dataset, but the actual Industry Benchmark tab content is missing from the provided deliverables to confirm if the 25th/50th/75th percentiles were correctly computed and displayed."
+  },
+  {
+   "i": 3,
+   "score": 0.0,
+   "why": "The Complaint-Production Crossref tab is not included in the deliverables. The summary mentions complaint counts but does not explicitly identify Portland OR as having the highest complaint rate per 1,000 units produced."
+  },
+  {
+   "i": 4,
+   "score": 0.5,
+   "why": "The Trend Diagnostics tab shows data for PLT-004 (Portland), but the 'Watch Item?' column is only fully populated for the first few rows. It is not explicitly shown that Portland's OTD deterioration was flagged as a watch item with a negative MoM trend in the provided snippet."
+  },
+  {
+   "i": 5,
+   "score": 0.5,
+   "why": "The memo recommends against consolidation and focuses on Phoenix and Columbus, but it does not explicitly weigh the qualitative factor of Phoenix's additive manufacturing capability mentioned in the rubric."
+  },
+  {
+   "i": 6,
+   "score": 1.0,
+   "why": "The summary explicitly states that the VP memo's Portland OTD estimate (~87.3%) differs from the computed weighted value (90.2%) and flags it for reconciliation, correctly verifying and correcting the inaccuracy."
+  },
+  {
+   "i": 7,
+   "score": 0.0,
+   "why": "The summary mentions Phoenix's turnover (20.5% in memo, ~23% in prompt context) and tenure, but does not explicitly link this workforce instability as a key contributing factor to its quality and productivity problems in the provided text; it attributes Phoenix's weakness to utilization and defects without the causal workforce link."
+  },
+  {
+   "i": 8,
+   "score": 1.0,
+   "why": "The Trend Diagnostics tab clearly identifies 'Worsening Metrics' and flags 'PLT-003 | Assembly Modules' as a watch item because it has 2 worsening metrics, satisfying the requirement for identifying specific plant-product line combinations deteriorating on at least two metrics."
+  },
+  {
+   "i": 9,
+   "score": 0.0,
+   "why": "The deliverables do not contain a specific analysis of complaint categories (Dimensional Tolerance vs. Late Delivery) or a distinction between plant-specific and systemic issues."
+  },
+  {
+   "i": 10,
+   "score": 1.0,
+   "why": "The Meridian_COPQ_Analysis.csv includes a row labeled 'ALL,Company Total' which aggregates the totals across all four plants, satisfying the requirement for a summary row."
+  }
+ ]
+}
