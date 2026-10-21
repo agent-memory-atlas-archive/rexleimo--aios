@@ -191,6 +191,9 @@ async function updateFromReleaseInstaller(rootDir, {
         assetSource = 'node-fetch';
         stagedBytes = staged.bytes;
       } catch (error) {
+        // 中文注释：暂存目录已经建出来了，回退时必须本身清掉——只把变量置空会把
+        // 一个空目录留在 %TEMP%（跑一次全量就漏一批，测试侧的 t.after 回收不了非己建的目录）。
+        if (stageDir) await rm(stageDir, { recursive: true, force: true }).catch(() => {});
         stageDir = '';
         env.AIOS_ASSET_URL = remoteAssetUrl;
         io.log(

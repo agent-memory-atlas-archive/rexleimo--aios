@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.7.3] - 2026-10-21
+
+### Fixed
+
+- fix(windows): `aios update` 的 Node 暂存回退路径不再漏留暂存目录，测试沙箱一律自行回收。现场：清理本机 `%TEMP%` 时扫出 **856 个**匹配项（共 21 MB），绝大多数是测试沙箱与回退路径留下的 `aios-dl-*` / `aios-selfupdate-*` 目录，少量是本会话的探针文件。两个原因：（1）`self-update.mjs` 的 win32 分支在资源下载失败时把 `stageDir` 变量置空后直接回退，但目录已经被 `mkdtemp` 建出来了——于是每次回退都在易失目录里留一个空目录（变量置空不等于删除，外层 `finally` 也被跳过）；现在回退前先 `rm(stageDir, {recursive:true, force:true})` 再置空。（2）`release-download.test.mjs` 与 `self-update-lifecycle.test.mjs` 的沙箱从不回收（后者 14 处 `mkdtemp` 裸用）；现在统一到 `tempRoot(prefix, t)`，由 `t.after` 删除，跟 `mcp-path-repair.test.mjs` 里已有的 `t.after` 约定保持一致。另注意一个平台差异：Windows 上 `t.after` 里用 `fs.rmSync` 会抛（该文件 `fs` 是 `node:fs/promises`），回收统一走异步 `rm`。
+
+Evidence: `self-update-lifecycle` + `release-download` 18/18（含新断言：暂存失败回退后 `tempDirBase`  readdir 为空，把这个泄露钉住）、`node --test` 跑完 `%TEMP%` 残留计数 **0**（修前同一次跑留下 1–2 个）、`npm run test:affected` → `tests=648, pass=647, fail=0, skipped=1`。
+
+### Known limits
+
+- 泄露只影响易失目录里的空子目录（不顶磁盘也不影响正确性）；不打算为此加一个 GC 钩子——目录预算/临时回收已有现成工具。
+
 ## [6.7.2] - 2026-10-21
 
 ### Fixed

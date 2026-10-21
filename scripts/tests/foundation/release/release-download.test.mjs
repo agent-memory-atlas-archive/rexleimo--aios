@@ -27,12 +27,16 @@ function zipBytes() {
   return Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.alloc(12), eocd]);
 }
 
-async function newDir(prefix) {
-  return mkdtemp(path.join(TMP_BASE, prefix));
+async function newDir(prefix, t) {
+  const dir = await mkdtemp(path.join(TMP_BASE, prefix));
+  // 中文注释：测试沙箱必须自报回收——否则每跑一次全量就在 %TEMP% 里留一批空目录
+  // （实测一次 Windows 本机清理扫出 856 个 aios-dl-* / 21MB，全部是本测试的残留）。
+  if (t && typeof t.after === 'function') t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  return dir;
 }
 
-test('downloadReleaseAsset writes the asset and reports one attempt on success', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset writes the asset and reports one attempt on success', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'aios.zip');
   const bytes = zipBytes();
   const calls = [];
@@ -54,8 +58,8 @@ test('downloadReleaseAsset writes the asset and reports one attempt on success',
   assert.deepEqual(await fs.readFile(dest), bytes);
 });
 
-test('downloadReleaseAsset retries a transport reset and cleans the partial file', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset retries a transport reset and cleans the partial file', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'aios.zip');
   let attempt = 0;
   const logs = [];
@@ -81,8 +85,8 @@ test('downloadReleaseAsset retries a transport reset and cleans the partial file
   assert.equal((await fs.readFile(dest)).includes(Buffer.from('half')), false);
 });
 
-test('downloadReleaseAsset rejects a truncated payload and never leaves it on disk', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset rejects a truncated payload and never leaves it on disk', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'aios.zip');
   const truncated = zipBytes().subarray(0, 8); // 有内容、无 EOCD
 
@@ -101,8 +105,8 @@ test('downloadReleaseAsset rejects a truncated payload and never leaves it on di
   await assert.rejects(fs.stat(dest), { code: 'ENOENT' });
 });
 
-test('downloadReleaseAsset retries retryable statuses (503) and reports the last one', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset retries retryable statuses (503) and reports the last one', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'missing.zip');
 
   await assert.rejects(
@@ -118,8 +122,8 @@ test('downloadReleaseAsset retries retryable statuses (503) and reports the last
   );
 });
 
-test('downloadReleaseAsset does not waste retries on a missing asset (404)', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset does not waste retries on a missing asset (404)', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'missing.zip');
   let calls = 0;
 
@@ -140,8 +144,8 @@ test('downloadReleaseAsset does not waste retries on a missing asset (404)', asy
   assert.equal(calls, 1);
 });
 
-test('downloadReleaseAsset refuses a zip without an end-of-central-directory record', async () => {
-  const dir = await newDir('aios-dl-');
+test('downloadReleaseAsset refuses a zip without an end-of-central-directory record', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const dest = path.join(dir, 'aios.zip');
   const noEocd = Buffer.from('PK\x03\x04garbage-without-eocd', 'latin1');
 
@@ -159,8 +163,8 @@ test('downloadReleaseAsset refuses a zip without an end-of-central-directory rec
   await assert.rejects(fs.stat(dest), { code: 'ENOENT' });
 });
 
-test('verifyDownloadedArchive accepts gzip payload and rejects a non-gzip body', async () => {
-  const dir = await newDir('aios-dl-');
+test('verifyDownloadedArchive accepts gzip payload and rejects a non-gzip body', async (t) => {
+  const dir = await newDir('aios-dl-', t);
   const gz = path.join(dir, 'aios.tar.gz');
   await fs.writeFile(gz, Buffer.concat([Buffer.from([0x1f, 0x8b]), Buffer.alloc(32)]));
   assert.equal((await verifyDownloadedArchive(gz)).ok, true);
