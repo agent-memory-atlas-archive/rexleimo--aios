@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.8.0] - 2026-10-21
+
+### Added
+
+- feat(testing): 测试运行的临时根改由 runner 拥有。`run-test-suite.mjs` 与 `run-affected-tests.mjs` 现在每轮开一个隔离目录（同时重写 `TMPDIR`/`TEMP`/`TMP` 三个键：POSIX 读 `TMPDIR`，Windows 读 `TEMP`/`TMP`，`os.tmpdir()` 两边取的不一样，漏一个就有测试继续往真 `%TEMP%` 里写），跑完直接删整根。起因是现场清理时量化了堆积：本机 `D:\\Temp` 共 68,052 条目，其中 **62,773 个**匹配自家测试沙箱形状（374 个 fixture 前缀族，最老 2026-10-13），占条目数 92%；靠 ~100 个测试文件各自自觉回收是挡不住的，所以把回收放到拥有运行生命周期的那一层。新建测试仍可用 `t.after`（`release-download` / `self-update-lifecycle` 已在 6.7.3 改成那样），但不再是个正确性前提。
+  - 逃生门：`AIOS_TEST_TEMP_SANDBOX_DISABLE=1` 退回真实临时目录（调试、或要复现一个固定路径时），套件尾行会打 `temp_sandbox=disabled`。
+  - 删不掉时不静默：子进程留了句柄在沙箱里（Windows 上常见，就是本版本上面那条 `aios update` 被拒的同一族问题）时，尾行打 `temp_sandbox=KEPT@<路径> (<错误码>) -> npm run tmp:gc`，把处置路径交给用户。
+  - 自我愈合：建沙箱前先把**自己命名家族**（`aios-test-run-` + 6 位随机后缀）超过 24h 的陈旧沙箱扫掉，只碰这一族、只碰够旧的。
+
+- feat(cli): `scripts/aios-tmp-gc.mjs --temp`（C 项兜底）。作用是把根换成 `os.tmpdir()`、隐式放行易失根（否则刚报的发现又被下一道守卫剔掉）、并把名字谓词从通用 `isSandboxName` 换成严格的 `isAiosFixtureName`（`^aios-<fixture>-<6 位随机>`）。窄化是必须的：系统临时目录里住着别的 app 的随机名目录（`.tmpHau8Eb`、GUID.tmp）和碰巧带 4-6 位后缀的真实工程名，通用形状判定在那儿太宽。新增 `npm run tmp:gc`（默认 dry-run，`--older-than 1440`）和 `npm run tmp:gc:trash`（移到废纸篓暂存，可逆）；`--mode purge` 仍需 `--yes` 才真删。
+
+### Fixed
+
+- fix(windows): 两个 CLI 在 Windows 上**静默空转**。`import.meta.url === \`file://${process.argv[1]}\`` 这种入口判定只在 POSIX 成立——Windows 那边是 `file:///C:/…`（三斜杠 + 盘符），把 `argv[1]` 的反斜杠换成正斜杠也补不上那个前导斜杠。后果不是报错，是根本不执行 `main()` 并且以 0 退出：`aios-tmp-gc --mode purge --yes` 看起来成功、实际一个目录没删（实测三轮 `--help` 全部空输出 exit 0：相对路径、Windows 绝对路径、正斜杠绝对路径）。`scripts/aios-tmp-gc.mjs` 与 `scripts/client-capability-scorecard.mjs` 改用已有的 realpath 版 `isDirectModuleInvocation`。现存带 `|| argv[1].endsWith('<本文件名>')` 兜底的入口（`aios-mcp-proxy` / `aios-mcp-server` / `shell-mcp-server`）本来就是靠这个兜底在 Windows 上活着的，不改；新增 `cli-entry-guard.test.mjs` 把「裸 `file://` 模板相等」这一形状钉住，并额外用子进程实测三种 argv 形态都能真的跑进 `main()`。
+
+Evidence: 全量 `npm run test:regression`（228 files，elapsed 438,894ms）**退出码 0、tests=2241 pass=2232 fail=0 skipped=9**，尾行 `temp_sandbox=removed`，同一轮 `%TEMP%` 里 fixture 家族计数 **1081 → 1081 不变**、`aios-test-run-*` 残留 0（修前同一轮会新增上千个：本机 24h 内实测堆到 5,857 个）；重点套件 `tests=42 pass=42 fail=0`（含 `--temp` 在假临时目录里的端到端：`collect=3 keep=3`，`.tmpHau8Eb` / `someproject-rex-work` / `node-compile-cache` 原地不动，`--mode purge` 缺 `--yes` 返回 1，补 `--yes` 后只删自家三族）；`node scripts/aios-tmp-gc.mjs --help` 现在输出 usage，`client-capability-scorecard.mjs --check` 不再空转，实在报 `ok: ... matches config (13 clients)`；dir-budget `0 blocking`。feature release 按仓库自己的发布契约必须带发布帖（`llms-txt.test.mjs` 用一条失败把这件事抦了出来）：新增 `blog-site/2026-10-v680-test-runner-owns-the-temp-directory.md` 并重生成 `docs-site/llms.txt`（76 → 77 篇，Blog 索引首位 v6.8.0）。
+
+### Known limits
+
+- 隔离只覆盖走 runner 的两个入口。直接 `node --test scripts/tests/<x>.test.mjs` 单文件调试仍写真实临时目录（这是刻意的：调试时要看得见的产物），由 `npm run tmp:gc` 兜底。
+- `--temp` 只认 `aios-*` 家族；别的客户端或更早版本留下的随机名沙箱仍在“不可判定”里，不会被动。
+- 本版本不回收安装目录内的 `.browser-profiles`（它是本轮 `aios update` 被拒的真原因）；那是 profile 根位置的决策，单独立项。
+
 ## [6.7.3] - 2026-10-21
 
 ### Fixed

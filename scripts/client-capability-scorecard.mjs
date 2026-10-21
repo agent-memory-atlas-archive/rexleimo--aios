@@ -11,6 +11,8 @@
 import { readFileSync } from 'node:fs';
 import { writeFileSync } from 'node:fs';
 
+import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
+
 const DEFAULT_CONFIG_PATH = 'config/host-capabilities.json';
 const DEFAULT_REPORT_PATH = 'docs/reports/2026-10-19-client-capability-scorecard.md';
 
@@ -161,7 +163,7 @@ function main(argv) {
   console.log(`ok: ${reportPath} matches config (${Object.keys(scorecard).length} clients)`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isDirectModuleInvocation(import.meta.url)) {
   try {
     main(process.argv.slice(2));
   } catch (error) {

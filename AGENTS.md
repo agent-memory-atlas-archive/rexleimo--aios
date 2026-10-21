@@ -83,6 +83,12 @@ Automated suites are available for both root AIOS workflows and `mcp-server`.
 
 Pick the tier by where you are in the loop — do not run the full suite per edit:
 
+Both `run-test-suite.mjs` and `run-affected-tests.mjs` create one isolated temp root per run
+(TMPDIR/TEMP/TMP all redirected) and delete it on exit; test files do not need to reclaim their
+own sandboxes. Set `AIOS_TEST_TEMP_SANDBOX_DISABLE=1` to run against the real temp dir while
+debugging (the summary line then reports `temp_sandbox=disabled`); if disposal fails because a
+child left a handle open, the run prints the kept directory and `npm run tmp:gc` sweeps it later.
+
 1. **Inner loop (every edit batch):** `npm run test:affected` (repo root). It maps the working-tree
    diff through the import/spawn graph and runs only the related test files; when it cannot prove the
    impact set (suite manifest/tooling changed, `rex-harness/`, `mcp-server/`, unattributable source,
@@ -131,6 +137,7 @@ PRs should include:
 - 建沙箱：`mktemp -d -p "${TMPDIR:-/tmp}" aios-probe-XXXXXX`（`-p` 不可省略；`mktemp -d foo-XXXXXX` 会落在当前 cwd，而 cwd 常常是仓库父目录）。
 - 假 `$HOME` / `npm pack` 探针 / 复现工作树一律落在上述路径之下，并配 `trap` 或 `--older-than` 回收。
 - 回收已散落的残留：`node scripts/aios-tmp-gc.mjs --root "$HOME/codes"` 先预览（默认 `dry-run`），确认后 `--mode to-trash` 移到废纸篓暂存目录（可逆）；`--mode purge --yes` 才真删。判定只用客观事实（名字形状 + 年龄 + git 脏/未推送/stash 状态 + 是否含 `.env*.local`），含未提交改动或凭据的目录一律保留，系统临时目录根需 `--allow-volatile-root` 显式放行。
+- 回收系统临时目录里的测试沙箱残留：`npm run tmp:gc`（= `--temp --older-than 1440`，默认 dry-run）/ `npm run tmp:gc:trash`。`--temp` 比通用形状判定更窄：只收自己家的 `aios-<fixture>-<6 位随机>` 家族，其他 app 的随机名目录一律原地不动。
 
 ## Browser MCP Selection
 - In this repo, use the `mcp-browser-use` alias backed by `scripts/run-local-browser-mcp.mjs`.

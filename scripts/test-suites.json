@@ -206,6 +206,7 @@
       "scripts/tests/memory/memo-store/memo-scope.test.mjs",
       "scripts/tests/memory/memo-store/memo-storage-locking.test.mjs",
       "scripts/tests/memory/memo-store/memo-storage.test.mjs",
+      "scripts/tests/tooling/contracts/cli-entry-guard.test.mjs",
       "scripts/tests/tooling/contracts/integration.test.mjs",
       "scripts/tests/tooling/contracts/judgment.test.mjs",
       "scripts/tests/tooling/contracts/public-content-contract.test.mjs",

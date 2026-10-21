@@ -12,12 +12,18 @@
  *     [--mode dry-run|to-trash|purge] [--trash-dir <dir>] [--allow-secrets]
  *     [--allow-volatile-root] [--yes] [--json]
  *
+ * `--temp`（系统临时目录专用）：把根换成 `os.tmpdir()`、隐式放行易失根，并把名字谓词
+ * 换成严格的 `aios-<fixture>-<6 位随机>` 家族——系统临时目录里住着其他 app 的随机名目录，
+ * 通用形状判定在那里太宽，所以这个模式只认自己留下的沙箱。搭配 `npm run tmp:gc` 使用。
+ *
  * 退出码：0 = 成功（含无可回收项）；1 = 参数或执行错误。
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
+import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 /* 中文注释：mktemp 的 X 替换结果是 4-6 位 [A-Za-z0-9]；光看形状会误伤 `rex-work`、
  * `hermes-setup`、`wordpress-shens` 这类真实工程名（它们恰好也是 4-6 位小写词）。
@@ -28,6 +34,15 @@ export const SANDBOX_RANDOM_RE = /-[A-Za-z0-9]*[A-Z0-9][A-Za-z0-9]*$/;
 
 export function isSandboxName(name) {
   return SANDBOX_SHAPE_RE.test(name) && SANDBOX_RANDOM_RE.test(name);
+}
+
+/* 中文注释：--temp 面向的是系统临时目录，那里住着别人的 app（.tmpHau8Eb / GUID.tmp …），
+ * 所以必须比通用形状更窄：只收我们自己测试留下的 `aios-<fixture>-<6 位随机>` 家族。
+ * 名字前缀是故意写死的——它是“这个目录归我管”的唯一凭据。 */
+export const AIOS_FIXTURE_RE = /^aios-[a-z0-9][a-z0-9-]*-[A-Za-z0-9]{6}$/;
+
+export function isAiosFixtureName(name) {
+  return AIOS_FIXTURE_RE.test(name);
 }
 
 /* 兼容旧引用：形状正则（不含随机性判别），仅供展示/外部复用。 */
@@ -42,6 +57,7 @@ export function parseArgs(argv) {
     trashDir: null,
     allowSecrets: false,
     allowVolatileRoot: false,
+    temp: false,
     yes: false,
     json: false,
   };
@@ -63,6 +79,7 @@ export function parseArgs(argv) {
     if (arg === '--trash-dir') { options.trashDir = argv[++i]; continue; }
     if (arg === '--allow-secrets') { options.allowSecrets = true; continue; }
     if (arg === '--allow-volatile-root') { options.allowVolatileRoot = true; continue; }
+    if (arg === '--temp') { options.temp = true; continue; }
     if (arg === '--yes') { options.yes = true; continue; }
     if (arg === '--json') { options.json = true; continue; }
     if (arg === '--help' || arg === '-h') return { help: true };
@@ -105,10 +122,11 @@ export function classify(facts, policy = {}) {
     nowMs = Date.now(),
     olderThanMinutes = DEFAULT_OLDER_THAN_MINUTES,
     allowSecrets = false,
+    namePredicate = isSandboxName,
   } = policy;
   const reasons = [];
   if (!facts.isDirectory || facts.isSymlink) return keep(facts, ['not-a-plain-directory']);
-  if (!isSandboxName(facts.name)) return keep(facts, ['name-not-sandbox-shaped']);
+  if (!namePredicate(facts.name)) return keep(facts, ['name-not-sandbox-shaped']);
   const ageMinutes = (nowMs - facts.mtimeMs) / 60000;
   if (ageMinutes < olderThanMinutes) return keep(facts, [`too-young:${Math.round(ageMinutes)}m`]);
   if (facts.gitState === 'dirty') return keep(facts, ['uncommitted-work']);
@@ -173,7 +191,7 @@ function runGit(dirPath) {
   }
 }
 
-export function scanRoots(roots, { olderThanMinutes, nowMs = Date.now() } = {}, { probe = probeFacts } = {}) {
+export function scanRoots(roots, { olderThanMinutes, nowMs = Date.now(), namePredicate = isSandboxName } = {}, { probe = probeFacts } = {}) {
   const collected = [];
   const kept = [];
   for (const root of roots) {
@@ -187,7 +205,7 @@ export function scanRoots(roots, { olderThanMinutes, nowMs = Date.now() } = {}, 
     for (const entry of entries) {
       const full = path.join(root, entry.name);
       const facts = probe(full);
-      const verdict = classify(facts, { nowMs, olderThanMinutes });
+      const verdict = classify(facts, { nowMs, olderThanMinutes, namePredicate });
       (verdict.action === 'collect' ? collected : kept).push({ ...verdict, root });
     }
   }
@@ -233,7 +251,7 @@ export function formatReport(report, { json = false } = {}) {
 export function main(argv = process.argv.slice(2)) {
   const parsed = parseArgs(argv);
   if (parsed.help) {
-    process.stdout.write('usage: node scripts/aios-tmp-gc.mjs [--root <dir>]... [--older-than <min>] [--mode dry-run|to-trash|purge] [--trash-dir <dir>] [--allow-secrets] [--allow-volatile-root] [--yes] [--json]\n');
+    process.stdout.write('usage: node scripts/aios-tmp-gc.mjs [--root <dir>]... [--temp] [--older-than <min>] [--mode dry-run|to-trash|purge] [--trash-dir <dir>] [--allow-secrets] [--allow-volatile-root] [--yes] [--json]\n');
     return 0;
   }
   if (parsed.error) {
@@ -241,11 +259,16 @@ export function main(argv = process.argv.slice(2)) {
     return 1;
   }
   const options = parsed.options;
-  const roots = options.roots.length ? options.roots : defaultRoots();
-  /* 中文注释：易失根（系统临时目录）默认整根剔除——里面随机名目录可能属于别的 app。 */
+  /* 中文注释：--temp = 收系统临时目录里我们自己的测试沙箱。它同时开了三件事：
+   * 根参加临时目录、隐式放行易失根（否则下面那遭把刚报的发现又剔掉）、名字谓词换成严格家族。
+   * 不默认可选根：必须用户显式声明，避免顺手扫了别人的 app 目录。 */
+  const namePredicate = options.temp ? isAiosFixtureName : isSandboxName;
+  const roots = options.roots.length ? [...options.roots] : [];
+  if (options.temp) roots.push(os.tmpdir());
+  if (roots.length === 0) roots.push(...defaultRoots());
   const usableRoots = roots.filter((root) => {
     if (!isVolatileRoot(root)) return true;
-    if (options.allowVolatileRoot) return true;
+    if (options.allowVolatileRoot || options.temp) return true;
     process.stderr.write(`aios-tmp-gc: skipped volatile root ${root} (pass --allow-volatile-root to include)\n`);
     return false;
   });
@@ -253,7 +276,7 @@ export function main(argv = process.argv.slice(2)) {
     process.stderr.write('aios-tmp-gc: no usable roots\n');
     return 1;
   }
-  const { collected, kept } = scanRoots(usableRoots, { olderThanMinutes: options.olderThanMinutes });
+  const { collected, kept } = scanRoots(usableRoots, { olderThanMinutes: options.olderThanMinutes, namePredicate });
   const report = {
     mode: options.mode,
     roots: usableRoots,
@@ -270,6 +293,8 @@ export function main(argv = process.argv.slice(2)) {
   return failed ? 1 : 0;
 }
 
-/* 中文注释：被直接执行时进入 CLI；被测试 import 时只导出纯函数。 */
-const invokedDirectly = process.argv[1] && import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}`;
-if (invokedDirectly) process.exitCode = main();
+/* 中文注释：被直接执行时进入 CLI；被测试 import 时只导出纯函数。
+ * 必须用 realpath 版 helper：`import.meta.url === \`file://${argv[1]}\`` 在 Windows 上**永不成立**
+ * （那边是 file:///C:/…，三斜杠 + 盘符），结果是脚本静默不执行并且以 0 退出——
+ * 比报错更险：`--mode purge` 看起来成功，实际一个没删。本机实测过。 */
+if (process.argv[1] && isDirectModuleInvocation(import.meta.url)) process.exitCode = main();

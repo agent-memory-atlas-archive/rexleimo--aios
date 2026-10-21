@@ -61,7 +61,9 @@
     "test:team": "node scripts/run-test-suite.mjs team",
     "test:workflow": "npm run test:harness && npm run test:orchestrator && npm run test:rex && npm run test:team",
     "test:regression": "node scripts/run-test-suite.mjs regression",
-    "test:affected": "node scripts/run-affected-tests.mjs"
+    "test:affected": "node scripts/run-affected-tests.mjs",
+    "tmp:gc": "node scripts/aios-tmp-gc.mjs --temp --older-than 1440",
+    "tmp:gc:trash": "node scripts/aios-tmp-gc.mjs --temp --older-than 1440 --mode to-trash"
   },
   "devDependencies": {
     "tsx": "^4.21.0"

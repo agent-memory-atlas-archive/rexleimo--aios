@@ -10,6 +10,7 @@ import {
   classify,
   defaultRoots,
   execute,
+  isAiosFixtureName,
   isSandboxName,
   isVolatileRoot,
   main,
@@ -183,6 +184,77 @@ test('execute moves to a staging trash dir and never touches kept items', () => 
 test('trashDirFor stages under the user Trash with a dated folder', () => {
   const dir = trashDirFor({ home: '/home/rex', now: new Date('2026-10-17T12:00:00Z') });
   assert.equal(dir, path.join('/home/rex', '.Trash', 'aios-tmp-gc-2026-10-17'));
+});
+
+test('--temp uses the strict aios fixture family, not the broad sandbox shape', () => {
+  /* 中文注释：这三个形状是本机 %TEMP% 里实测堆到 6 万多个的真实 fixture 命名。 */
+  for (const name of [
+    'aios-orchestrator-01XBgK',
+    'aios-native-doctor-claude-home-04coTH',
+    'aios-test-run-AbCdEf',
+  ]) {
+    assert.equal(isAiosFixtureName(name), true, name);
+  }
+  /* 中文注释：通用形状判定能而 --temp 家族判定必须不能——这些同居在系统临时目录里，
+   * 分属其他 app 或真实工程名，在易失根里把它们当垃圾就是数据丢失事故。 */
+  for (const name of [
+    '.tmpHau8Eb', 'hau8Eb', 'someproject-rex-work', 'abhome-1zbU',
+    'aios-orchestrator', 'aios-orchestrator-01XBgKX', 'aiosOrch-01XB',
+  ]) {
+    assert.equal(isAiosFixtureName(name), false, name);
+  }
+
+  const policy = { nowMs: DAY * 60000, olderThanMinutes: 60, namePredicate: isAiosFixtureName };
+  assert.equal(classify(facts({ name: 'aios-orchestrator-01XBgK' }), policy).action, 'collect');
+  assert.deepEqual(
+    classify(facts({ name: '.tmpHau8Eb' }), policy).reasons,
+    ['name-not-sandbox-shaped'],
+    '--temp 必须把其他 app 的随机名目录留在原地'
+  );
+});
+
+test('--temp takes the volatile root implicitly and collects only our fixture dirs', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'aios-gc-temp-mode-'));
+  const oldMs = Date.now() - 2 * DAY * 60000;
+  const stamp = (dir) => fs.utimesSync(dir, new Date(oldMs), new Date(oldMs));
+  const mine = ['aios-orchestrator-01XBgK', 'aios-native-doctor-claude-home-04coTH', 'aios-test-run-AbCdEf'];
+  const strangers = ['.tmpHau8Eb', 'someproject-rex-work', 'node-compile-cache'];
+  const writes = [];
+  const envKeys = ['TMPDIR', 'TEMP', 'TMP'];
+  const originalEnv = Object.fromEntries(envKeys.map((k) => [k, process.env[k]]));
+  const original = { out: process.stdout.write, err: process.stderr.write };
+  try {
+    for (const name of [...mine, ...strangers]) {
+      const dir = path.join(root, name);
+      fs.mkdirSync(dir);
+      stamp(dir);
+    }
+    /* 中文注释：os.tmpdir() 在 POSIX 读 TMPDIR、在 Windows 读 TEMP/TMP，
+     * 所以这三个必须一起暂改，否则同一测试在两边跑向不同的根。 */
+    for (const key of envKeys) process.env[key] = root;
+    process.stdout.write = (chunk) => { writes.push(String(chunk)); return true; };
+    process.stderr.write = (chunk) => { writes.push(String(chunk)); return true; };
+
+    assert.equal(main(['--temp', '--older-than', '60']), 0);
+    assert.match(writes.join(''), /collect=3/);
+    assert.doesNotMatch(writes.join(''), /skipped volatile root/, '--temp 自己就是要扫易失根，不应再要求 --allow-volatile-root');
+    for (const name of mine) assert.equal(fs.existsSync(path.join(root, name)), true, '默认 dry-run 不动任何目录');
+    for (const name of strangers) assert.equal(fs.existsSync(path.join(root, name)), true, '其他 app 的目录必须原地不动');
+
+    writes.length = 0;
+    assert.equal(main(['--temp', '--older-than', '60', '--mode', 'purge']), 1, '不可逆删除仍需第二个显式 opt-in');
+    assert.equal(main(['--temp', '--older-than', '60', '--mode', 'purge', '--yes']), 0);
+    for (const name of mine) assert.equal(fs.existsSync(path.join(root, name)), false, `${name} 应被回收`);
+    for (const name of strangers) assert.equal(fs.existsSync(path.join(root, name)), true, `${name} 不属于本工具的家族`);
+  } finally {
+    process.stdout.write = original.out;
+    process.stderr.write = original.err;
+    for (const [key, value] of Object.entries(originalEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('main defaults to dry-run and skips a volatile root without the flag', () => {

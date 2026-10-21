@@ -15,6 +15,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { buildImpactIndex, selectAffectedTests } from './lib/tooling/test-impact.mjs';
+// 中文注释：仍只 import 测试工具层（test-suite-runner 只读 node:fs/os/path + 套件清单），
+// 不碰 scripts/lib/foundation/platform，所以上面那条“产品代码坏掉时入口要能跑”的约束不变。
+import { createTempSandbox, disposeTempSandbox } from './lib/tooling/test-suite-runner.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST = path.join(ROOT, 'scripts', 'test-suites.json');
@@ -121,11 +124,18 @@ function main() {
     return 0;
   }
 
+  const sandbox = createTempSandbox();
   const result = spawnSync(
     process.execPath,
     ['--test', `--test-concurrency=${concurrency}`, ...targetFiles],
-    { cwd: ROOT, stdio: ['ignore', 'inherit', 'inherit'] }
+    { cwd: ROOT, stdio: ['ignore', 'inherit', 'inherit'], env: sandbox.env }
   );
+  const cleanup = disposeTempSandbox(sandbox.dir);
+  if (sandbox.disabled) {
+    process.stderr.write('[affected] temp sandbox disabled (AIOS_TEST_TEMP_SANDBOX_DISABLE=1)\n');
+  } else if (!cleanup.removed) {
+    process.stderr.write(`[affected] 临时沙箱未能删除：${cleanup.dir}${cleanup.error ? ` (${cleanup.error})` : ''} —— 用 npm run tmp:gc 收尾\n`);
+  }
   return result.status ?? 1;
 }
 
