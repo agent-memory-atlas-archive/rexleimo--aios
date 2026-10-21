@@ -10,6 +10,7 @@ import { PRIMARY_BROWSER_ALIAS } from '../constants.mjs';
 import { browserModeAppliesPlaywright, resolveBrowserMode } from '../modes/mcp-mode.mjs';
 import { formatErrorMessage, requireCommand } from '../shared.mjs';
 import {
+  describeProfileHold,
   legacyProfileRoot,
   migrateLegacyProfileRoot,
   resolveProfileRoot,
@@ -29,19 +30,20 @@ export function relocateBrowserProfileRoot({
   io = console,
   dryRun = false,
   fsImpl = fs,
+  probe,
 } = {}) {
   const targetRoot = resolveProfileRoot({ env });
   const legacyRoot = legacyProfileRoot({ rootDir });
   const result = dryRun
     ? { status: 'planned', legacyRoot, targetRoot }
-    : migrateLegacyProfileRoot({ legacyRoot, targetRoot, fsImpl });
+    : migrateLegacyProfileRoot({ legacyRoot, targetRoot, fsImpl, ...(probe === undefined ? {} : { probe }) });
 
   switch (result.status) {
     case 'migrated':
       io.log(`[ok] browser profiles moved out of the install tree: ${legacyRoot} -> ${targetRoot}`);
       break;
     case 'locked':
-      io.log(`[warn] browser profiles still inside the install tree: a live browser session holds ${legacyRoot}.`);
+      io.log(`[warn] browser profiles still inside the install tree: ${legacyRoot} is held (${describeProfileHold(result)}).`);
       io.log(`[warn] close that browser (or the client session owning it) and rerun; profile root is ${targetRoot}.`);
       break;
     case 'target-exists':

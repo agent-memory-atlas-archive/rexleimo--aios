@@ -9,8 +9,9 @@ import {
   resolveLocalBrowserMcpScript,
 } from '../runtime/runtime-paths.mjs';
 import {
+  describeProfileHold,
   legacyProfileRoot,
-  profileTreeBusy,
+  profileTreeState,
   resolveProfileRoot,
 } from '../profile-root.mjs';
 import { formatErrorMessage } from '../shared.mjs';
@@ -158,11 +159,14 @@ export async function doctorBrowserMcp({ rootDir, io = console, fix = false, dry
   const legacyRoot = legacyProfileRoot({ rootDir });
   if (!fs.existsSync(legacyRoot)) {
     ok(`profile root lives outside the install tree: ${profileRoot}`);
-  } else if (profileTreeBusy(legacyRoot)) {
-    warn(`profiles still inside the install tree and a live browser session holds them: ${legacyRoot}`);
-    warn('  an `aios update` swap will be refused while that holds; close the browser, then run: aios internal browser install');
   } else {
-    warn(`stale profile root inside the install tree: ${legacyRoot} (unlocked); move it out with: aios internal browser install`);
+    const state = profileTreeState(legacyRoot);
+    if (state.busy) {
+      warn(`profiles still inside the install tree and currently held (${describeProfileHold(state)}): ${legacyRoot}`);
+      warn('  an `aios update` swap will be refused while that holds; close the browser, then run: aios internal browser install');
+    } else {
+      warn(`stale profile root inside the install tree: ${legacyRoot} (free); move it out with: aios internal browser install`);
+    }
   }
 
   let defaultProfile = null;

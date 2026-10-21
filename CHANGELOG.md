@@ -12,20 +12,20 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ### Fixed
 
-- fix(browser): `aios update` 不再被一个活着的浏览器会话顶死。旧位置把 profile 放在安装根里面，而换入靠 `[System.IO.Directory]::Move` 给安装目录改名让位——Chrome 用 `--user-data-dir=<安装树内路径>` 持有目录句柄时，Windows 直接拒这个改名。本机实测两次：一次孤儿 browser MCP + 9 个 Chrome（自己退出后升级才成功），一次活会话止写 `grill`/`headless-check`（19 个 Chrome，当场拦住 v6.8.0 本机升级）。对照事实把锁源说得很清楚：十几个只持有安装树内**脚本文件**的 bridge 并不挡改名，挡的是**目录名占用**——所以这不是"进程太多"，是位放错了。
-- fix(browser): 迁移只在客观安全时动文件系统，拒绕就是拒绕不是降级。判凭是 Chrome 自己写的 `SingletonLock`（根目录或任一子 profile 带锁 = 活会话），新根已存在时**绝不合并**，软链接旧根不搬，`rename` 失败（如 EXDEV）时旧数据原地完好并带原因上报。状态一律打出来（`migrated`/`no-legacy`/`target-exists`/`locked`/`error`），不静默。
+- fix(browser): `aios update` 不再被一个活着的浏览器会话顶死。旧位置把 profile 放在安装根里面，而换入靠 `[System.IO.Directory]::Move` 给安装目录改名让位——Chrome 用 `--user-data-dir=<安装树内路径>` 持有目录句柄时，Windows 直接拒这个改名。本机实测两次：一次孤儿 browser MCP + 9 个 Chrome（自己退出后升级才成功），一次活会话正在写 `grill`/`headless-check`（19 个 Chrome，当场拦住 v6.8.0 本机升级）。对照事实把阻塞源说得很清楚：十几个只持有安装树内**脚本文件**的 bridge 并不挡改名，挡的是**目录名占用**——所以这不是"进程太多"，是位置放错了。
+- fix(browser): 迁移只在客观安全时动文件系统，拒绝就是拒绝，不是降级。判据是客观占用：Chrome 自己写的锁标记（POSIX `SingletonLock`、Windows 实测为 `Lockfile`），加上进程探针（任何浏览器进程的 `--user-data-dir` 落在树里即视为占用，孤儿 renderer 也算）；探针不可用时按 fail-closed 处理，不确定就不搬，新根已存在时**绝不合并**，软链接旧根不搬，`rename` 失败（如 EXDEV）时旧数据原地完好并带原因上报。状态一律打出来（`migrated`/`no-legacy`/`target-exists`/`locked`/`error`），不静默。
 - fix(browser): 卸除两处会把旧位置“焊回来”的字面量——`launcher.ts` 的兜底 `'.browser-profiles/local'` 改成走 `getProfileDir('local')`；`cdp-service.mjs` 的 `path.join(rootDir, '.browser-profiles', …)` 改用 profile 根。安装器的 `preservePaths` **不改**：过渡期仍需要它兜住尚未迁移的安装。
 
 ### Notes
 
-- 新增 `aios internal browser doctor` 一行现状：根已在安装树外（OK）/ 旧根存在但被活会话占着（WARN，并告知它会挡住下一次升级）/ 旧根没人用（WARN，告知迁移命令）。warn 不改 doctor 结枰（只有 err 会），所以不会把现有用户变成红。
+- 新增 `aios internal browser doctor` 一行现状：根已在安装树外（OK）/ 旧根存在且仍被占用（WARN，说明占用理由，并告知它会挡住下一次升级）/ 旧根没人用（WARN，告知迁移命令）。warn 不改 doctor 结论（只有 err 会），所以不会把现有用户变成红。
 - 浏览器 MCP 子进程如果跑的是旧 `mcp-server/dist`（发布归档不打包 dist，但用户自己 `npm run build` 过就会优先用 dist），需重新构建才拿到新逻辑；升级本身会整树改名重建，所以升级后的安装天然走 tsx+src。
 
-Evidence: `node --test scripts/tests/clients/browser-core/profile-root.test.mjs` → tests=9 pass=9 fail=0（覆盖：根不在安装树内、契约变量优先且只认绝对值、旧串/反斜杠同形映射、`SingletonLock` 判定、五种迁移状态 + 失败时旧树完好 + 幂等、软链接拒搬、dry-run 不碰盘、CDP 布局落在外部、builder 注入绝对契约值）；`npm --prefix mcp-server run typecheck` → 0 错，`npm --prefix mcp-server test` → tests=117 pass=105 fail=0（新增 3 条 TS 侧同名契约全部 pass）；`node --test scripts/tests/clients/browser-core/*.test.mjs` → tests=61 pass=61 fail=0；消费方套件（browser-local-mcp / aios-components / aios-doctor / aios-lifecycle-plan / platform-smoke）→ tests=102 pass=102 fail=0，新增 env key 没破任何配置快照断言；test-suite-wiring 6/6（新测试已登记进 regression 清单）；dir-budget 767 dirs 0 blocking；`git grep "'\.browser-profiles'"` 复核：除安装器 preservePaths 与配置里的 profile 名外无硬编码残留。
+Evidence: `node --test scripts/tests/clients/browser-core/profile-root.test.mjs` → tests=12 pass=12 fail=0（覆盖：根不在安装树内、契约变量优先且只认绝对值、旧串与反斜杠写法映射到同一目标、两种锁标记、`live-process` 计数与两种命令行写法、探针不可用 fail-closed、五种迁移状态 + 失败时旧树完好 + 幂等、软链接拒搬、dry-run 不碰盘、CDP 布局落在外部、builder 注入绝对契约值）；`npm --prefix mcp-server run typecheck` → 0 错，`npm --prefix mcp-server test` → tests=117 pass=105 fail=0（新增 3 条 TS 侧同名契约全部 pass）；`node --test scripts/tests/clients/browser-core/*.test.mjs` → tests=61 pass=61 fail=0；消费方套件（browser-local-mcp / aios-components / aios-doctor / aios-lifecycle-plan / platform-smoke）→ tests=102 pass=102 fail=0，新增 env key 没破任何配置快照断言；test-suite-wiring 6/6（新测试已登记进 regression 清单）；dir-budget 767 dirs 0 blocking；真机进程验证：起一个真 headless Chrome 指向沙箱 profile，有 `Lockfile` 时读作 busy/lockfile，删掉标记后默认探针仍命中 10 条真实命令行，杀掉进程后读作 free；`git grep "'\.browser-profiles'"` 复核：除安装器 preservePaths 与配置里的 profile 名外无硬编码残留。
 
 ### Known limits
 
-- 本版本只改新安装与已接线消费者的行为。现场旧安装里的 `.browser-profiles` 要等到浏览器会话结束（锁消失）才能搬走；那期间 `aios update` 仍会被同一个目录句柄拒绕——现在会告诉你原因和处置命令，不再只留一句错误。
+- 本版本只改新安装与已接线消费者的行为。现场旧安装里的 `.browser-profiles` 要等到浏览器会话结束（占用消失）才能搬走；那期间 `aios update` 仍会被同一个目录句柄拒绝——现在会告诉你原因和处置命令，不再只留一句错误。
 - 已有安装如果自己 `npm run mcp-server` 构建过，旧 dist 仍含旧逻辑；重新构建或升级（整树重建）即恢复。
 
 ## [6.8.0] - 2026-10-21

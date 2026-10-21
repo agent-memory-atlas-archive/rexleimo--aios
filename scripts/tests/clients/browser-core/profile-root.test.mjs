@@ -17,10 +17,12 @@ import {
   LEGACY_PROFILE_DIR_NAME,
   PROFILE_ROOT_ENV,
   chromeProfileLockPresent,
+  extractUserDataDir,
   isInsideDir,
   legacyProfileRoot,
   migrateLegacyProfileRoot,
   profileTreeBusy,
+  profileTreeState,
   resolveProfilePath,
   resolveProfileRoot,
 } from '../../../lib/tooling/components/browser/profile-root.mjs';
@@ -209,6 +211,65 @@ test('the browser MCP child process receives the profile root as an absolute con
   else process.env[PROFILE_ROOT_ENV] = previous;
 });
 
+test('a live Chrome lock is detected from Chrome\'s own marker, not from guesses', (t) => {
+  const base = sandbox(t);
+  const root = path.join(base, LEGACY_PROFILE_DIR_NAME);
+  fs.mkdirSync(path.join(root, 'grill'), { recursive: true });
+  const free = { probe: () => '' };
+
+  assert.equal(chromeProfileLockPresent(path.join(root, 'grill')), false);
+  assert.deepEqual(profileTreeState(root, { ...free }), { busy: false, reason: 'free', holders: 0 }, '没有锁也没有进程 = 空闲');
+
+  // POSIX 形状：SingletonLock（真实 Chrome 里是符号链接，判定只看存在性）。
+  fs.writeFileSync(path.join(root, 'grill', 'SingletonLock'), '');
+  assert.equal(chromeProfileLockPresent(path.join(root, 'grill')), true);
+  assert.equal(profileTreeState(root, { ...free }).reason, 'lockfile', '子 profile 带标记 = 整棵树被占用');
+
+  // Windows 形状：现场实测 Chrome 只留 `Lockfile`，根本不留 SingletonLock。
+  fs.rmSync(path.join(root, 'grill', 'SingletonLock'));
+  fs.writeFileSync(path.join(root, 'grill', 'Lockfile'), '');
+  assert.equal(chromeProfileLockPresent(path.join(root, 'grill')), true, 'Windows 上的标记是 Lockfile');
+  assert.equal(profileTreeState(root, { ...free }).busy, true);
+});
+
+test('an orphaned renderer with no lock file still counts as occupancy', (t) => {
+  /* 中文注释：本机现场就是这样——`grill` 里一个锁文件都没有，却仍有 10 个 chrome 进程持有树内目录，
+   * 于是第一版谓词把真机报成 "unlocked"。只查锁文件会假阴性，而假阴性的代价是把活 profile 搬走。 */
+  const base = sandbox(t);
+  const root = path.join(base, LEGACY_PROFILE_DIR_NAME);
+  fs.mkdirSync(path.join(root, 'grill'), { recursive: true });
+  const probe = () => [
+    `101\tchrome.exe --user-data-dir=${path.join(root, 'grill')} --type=renderer`,
+    `102\tchrome.exe "--user-data-dir=${path.join(root, 'grill')}" --type=gpu-process`,
+    '103\tchrome.exe --user-data-dir=C:\\Other\\place',
+    '104\tnode.exe scripts/run-local-browser-mcp.mjs',
+  ].join('\n');
+
+  assert.deepEqual(profileTreeState(root, { probe }), { busy: true, reason: 'live-process', holders: 2 });
+
+  // 探针不可用不等于空闲：fail-closed，不确定就不搬。
+  assert.deepEqual(profileTreeState(root, { probe: () => null }), { busy: true, reason: 'probe-failed', holders: -1 });
+  assert.deepEqual(profileTreeState(root, { probe: () => { throw new Error('no shell'); } }).reason, 'probe-failed');
+
+  const migrate = migrateLegacyProfileRoot({ legacyRoot: root, targetRoot: path.join(base, 'profiles'), probe });
+  assert.equal(migrate.status, 'locked', '有进程持有目录时绝不改名');
+  assert.equal(migrate.reason, 'live-process');
+  assert.equal(fs.existsSync(root), true, '旧树原地完好');
+
+  const probeFailed = migrateLegacyProfileRoot({ legacyRoot: root, targetRoot: path.join(base, 'profiles2'), probe: () => null });
+  assert.equal(probeFailed.status, 'locked');
+  assert.equal(probeFailed.reason, 'probe-failed');
+
+  assert.deepEqual(profileTreeState(root, { probe: () => '103\tchrome.exe --user-data-dir=C:\\Other\\place' }),
+    { busy: false, reason: 'free', holders: 0 }, '别人的 profile 不算在本树头上');
+});
+
+test('extractUserDataDir reads both quoted and bare spellings', () => {
+  assert.equal(extractUserDataDir('chrome --user-data-dir=D:\\Temp\\p --headless'), 'D:\\Temp\\p');
+  assert.equal(extractUserDataDir('chrome "--user-data-dir=D:\\Temp\\p" --headless'), 'D:\\Temp\\p');
+  assert.equal(extractUserDataDir('chrome --no-proxy-server'), '');
+});
+
 test('the installer reports the relocation status instead of swallowing it', (t) => {
   const base = sandbox(t);
   const legacyRoot = path.join(base, 'aios-install', LEGACY_PROFILE_DIR_NAME);
@@ -241,7 +302,7 @@ test('the installer reports the relocation status instead of swallowing it', (t)
     io: { log: (line) => lines2.push(String(line)) },
   });
   assert.equal(busy.status, 'locked');
-  assert.match(lines2.join('\n'), /\[warn\].*live browser session/u, '挡住升级的就是这个现场，必须说出来');
+  assert.match(lines2.join('\n'), /\[warn\].*still inside the install tree/u, '挡住升级的就是这个现场，必须说出来');
   assert.equal(fs.existsSync(path.join(legacy2, 'grill', 'SingletonLock')), true, '活 profile 原地不动');
 });
 

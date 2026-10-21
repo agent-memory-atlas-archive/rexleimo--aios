@@ -1,6 +1,6 @@
 ---
 title: "v6.9.0: A Browser Session Should Not Be Able to Block an Upgrade — So the Profile Root Moved Out of the Install Tree"
-description: "v6.9.0 moves browser profile data out of the AIOS install tree, to ~/.rexcil/browser-profiles, and closes a bug that blocked two upgrades on one Windows machine. The install swap works by renaming the install directory aside, which is safe even when other processes hold files inside it. A live Chrome whose user-data-dir sits inside that directory is a different thing: it holds the directory, and Windows refuses the rename. The fix is one environment contract (AIOS_BROWSER_PROFILE_ROOT, absolute only), a single resolver module, a migration that refuses whenever a Chrome SingletonLock is present, and two hardcoded path literals removed. config/browser-profiles.json is unchanged, because those relative strings name a profile, not a location."
+description: "v6.9.0 moves browser profile data out of the AIOS install tree, to ~/.rexcil/browser-profiles, and closes a bug that blocked two upgrades on one Windows machine. The install swap works by renaming the install directory aside, which is safe even when other processes hold files inside it. A live Chrome whose user-data-dir sits inside that directory is a different thing: it holds the directory, and Windows refuses the rename. The fix is one environment contract (AIOS_BROWSER_PROFILE_ROOT, absolute only), a single resolver module, a migration that refuses whenever Chrome leaves its own lock marker or a live browser process still holds the directory, and two hardcoded path literals removed. config/browser-profiles.json is unchanged, because those relative strings name a profile, not a location."
 date: 2026-10-22
 tags: ["AIOS", "v6.9.0", "browser", "windows", "self-update", "release"]
 ---
@@ -58,23 +58,32 @@ AIOS_BROWSER_PROFILE_ROOT   (absolute path only — a relative value is ignored)
 
 ## Migration refuses, and says why
 
-Moving a live Chrome profile corrupts login state. That is not a risk to take "usually", so the predicate is the marker Chrome itself writes:
+Moving a live Chrome profile corrupts login state. That is not a risk to take "usually", so the predicate starts from the marker Chrome itself writes — and here the real machine corrected my first version. I wrote it checking POSIX's `SingletonLock`, then ran the new doctor against this machine while 10 Chrome processes held `.browser-profiles\grill`, and it cheerfully reported **"unlocked"**. Windows Chrome does not write `SingletonLock`; it writes a zero-byte **`Lockfile`** (measured: present in `headless-check`, absent in `grill`, whose main process had already exited and left orphaned renderers holding the directory handles).
 
 ```js
-fs.lstatSync(path.join(dir, 'SingletonLock'))   // root or any child profile
+PROFILE_LOCK_MARKERS = ['SingletonLock', 'Lockfile']   // root or any child profile dir
 ```
+
+Markers alone are still not enough: a profile can be held by processes with no marker at all, which is exactly the `grill` case. So the check adds a process probe — enumerate browser images and match their `--user-data-dir` against the tree, in both the bare and the Windows `"--user-data-dir=path"` spelling:
+
+```js
+profileTreeState(root) // { busy, reason, holders }
+// reason: 'free' | 'lockfile' | 'live-process' | 'probe-failed'
+```
+
+`probe-failed` counts as **busy**. "I could not check" must not turn into permission to move somebody's login state.
 
 | status | condition | filesystem effect |
 |---|---|---|
-| `migrated` | legacy root present, target absent, no lock | one rename |
+| `migrated` | legacy root present, target absent, tree free | one rename |
 | `no-legacy` | nothing to do (fresh install, or already moved) | none — the normal end state |
 | `target-exists` | both roots present | **never merged**; new root stays authoritative |
-| `locked` | a live session holds it | nothing touched, warning printed |
+| `locked` | a `Lockfile`/`SingletonLock` marker, or N browser processes holding a `--user-data-dir` inside the tree, or an unavailable probe | nothing touched, reason printed |
 | `error` | rename failed (e.g. cross-device) | old tree left fully intact, code reported |
 
 Symlinked legacy roots are also refused: a symlink is not a directory AIOS owns, and renaming it could move something it points at. Every status is printed, never swallowed — `locked` in particular now says *"an `aios update` swap will be refused while that holds; close the browser, then run `aios internal browser install`"*, which is the sentence that would have saved an hour today.
 
-`aios internal browser doctor` gained a line reporting where the root is and whether a stale one still sits inside the install tree, as warnings (which do not flip the doctor result) rather than errors.
+`aios internal browser doctor` gained a line reporting where the root is and whether a stale one still sits inside the install tree, as warnings (which do not flip the doctor result) rather than errors — and the warning names what holds the tree: `Chrome keeps its own lock marker in the profile`, `N processes hold a --user-data-dir inside the tree`, or `the occupancy probe is unavailable, so we fail closed and do not move it`.
 
 ## Two literals that would have welded the old path back in
 
@@ -85,8 +94,9 @@ The installers' `preservePaths` deliberately still list `.browser-profiles`, `mc
 
 ## Verification
 
-- `node --test scripts/tests/clients/browser-core/profile-root.test.mjs` → **tests=9 pass=9 fail=0**: root outside the install tree; contract value wins and rejects relative; legacy and backslash spellings map onto the new root; absolute paths respected; unrelated relative paths keep workspace semantics; `SingletonLock` detection on root and child; all five migration statuses including "old tree intact on failure", idempotent rerun, symlink refusal, dry-run touching nothing; CDP `userDataDir` outside the install root; builder injects an absolute contract value without clobbering a user-set one.
+- `node --test scripts/tests/clients/browser-core/profile-root.test.mjs` → **tests=12 pass=12 fail=0**: root outside the install tree; contract value wins and rejects relative; legacy and backslash spellings map onto the new root; absolute paths respected; unrelated relative paths keep workspace semantics; both lock markers (POSIX `SingletonLock` and Windows `Lockfile`); `live-process` counted from injected command lines in both spellings; `probe-failed` fails closed; all five migration statuses including "old tree intact on EXDEV", idempotent rerun, symlink refusal, dry-run touching nothing; CDP `userDataDir` outside the install root; builder injects an absolute contract value without clobbering a user-set one.
 - `npm --prefix mcp-server run typecheck` → clean; `npm --prefix mcp-server test` → tests=117 pass=105 fail=0, including three new TS-side tests asserting the same mapping and precedence.
+- Real-process validation, not mocks: a real headless Chrome was launched against a sandbox profile. With its `Lockfile` present the tree read `busy / lockfile`; deleting the marker while the process kept running still matched **10** real command lines; after the kill the tree read `free`. That run is what exposed the `SingletonLock`-only false negative above.
 - Existing consumers re-run without edits: browser-core suite 61/61; `browser-local-mcp` + `aios-components` + `aios-doctor` + `aios-lifecycle-plan` + `platform-smoke` → 102/102 (the new env key breaks no config snapshot).
 - Repo grep audit: no hardcoded `.browser-profiles` root remains outside the resolver, the installer preserve list, and the profile *names* in config.
 

@@ -71,17 +71,23 @@ export function resolveProfilePath(targetPath, { profileRoot, workspaceRoot }) {
 }
 
 /**
- * Chrome 自己写的 `SingletonLock` 是"这个 profile 正被占用"的客观凭据。
- * 不看进程表、不看文件名猜测——搬活 profile 会直接损坏登录态。
+ * Chrome 自己的占用凭据。两个平台不同一个名字，而且都得查：
+ *   POSIX：`SingletonLock`（符号链接）
+ *   Windows：`Lockfile`（零字节文件，实测真机 headless-check 就是这个）
+ * 只查一个会假阴性：本机 `grill` 没有 SingletonLock，Windows 上根本不留它。
  */
+export const PROFILE_LOCK_MARKERS = Object.freeze(['SingletonLock', 'Lockfile']);
+
 export function chromeProfileLockPresent(dir, { fsImpl = fs } = {}) {
   if (!dir) return false;
-  try {
-    fsImpl.lstatSync(path.join(dir, 'SingletonLock'));
-    return true;
-  } catch {
-    return false;
-  }
+  return PROFILE_LOCK_MARKERS.some((marker) => {
+    try {
+      fsImpl.lstatSync(path.join(dir, marker));
+      return true;
+    } catch {
+      return false;
+    }
+  });
 }
 
 function childDirs(dir, { fsImpl = fs }) {
@@ -95,10 +101,110 @@ function childDirs(dir, { fsImpl = fs }) {
   }
 }
 
-/** 根目录本身或任何一个 profile 子目录带锁 = 有活会话。 */
-export function profileTreeBusy(dir, probes = { fsImpl: fs }) {
-  if (chromeProfileLockPresent(dir, probes)) return true;
-  return childDirs(dir, probes).some((child) => chromeProfileLockPresent(child, probes));
+function pathKey(value) {
+  const resolved = path.resolve(String(value || ''));
+  // 中文注释：Windows 文件系统大小写不敏感且符号链接会改形状，比较前归一化。
+  return process.platform === 'win32' ? resolved.toLowerCase().replace(/\\/g, '/') : resolved;
+}
+
+function isPathInside(candidate, root) {
+  if (!candidate || !root) return false;
+  const a = pathKey(candidate);
+  const b = pathKey(root);
+  return a === b || a.startsWith(b.endsWith('/') ? b : `${b}/`);
+}
+
+/** 从命令行里拿 `--user-data-dir` 的值。两种写法都要接：裸值，以及 Chrome 在 Windows 上
+ * 把整个开关包在双引号里（`"--user-data-dir=D:\path"`）时残留的首尾引号。 */
+export function extractUserDataDir(commandLine) {
+  const text = String(commandLine || '');
+  const match = text.match(/--user-data-dir=(?:"([^"]+)"|([^\s]+))/);
+  if (!match) return '';
+  const raw = match[1] || match[2] || '';
+  return raw.replace(/^"+|"+$/g, '');
+}
+
+/**
+ * 默认探针：列出带浏览器图像名的进程及其命令行。
+ * 返回 null = 探针不可用（调用方必须当作“不确定”，而不是“空闲”）。
+ */
+export function defaultBrowserProcessProbe() {
+  if (process.platform === 'win32') {
+    const script = [
+      '$ErrorActionPreference="SilentlyContinue"',
+      "$rows = @(Get-CimInstance Win32_Process -Filter \"Name='chrome.exe' OR Name='chromium.exe' OR Name='msedge.exe' OR Name='headless_shell.exe' OR Name='chrome-headless-shell.exe'\")",
+      "foreach ($r in $rows) { if ($r.CommandLine) { Write-Output (\"$($r.ProcessId)\t$($r.CommandLine)\") } }",
+    ].join('; ');
+    try {
+      const { execFileSync } = require_childProcess();
+      const out = execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', script], {
+        encoding: 'utf8',
+        maxBuffer: 8 * 1024 * 1024,
+        timeout: 15000,
+      });
+      return String(out || '');
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const { execFileSync } = require_childProcess();
+    return execFileSync('ps', ['-eo', 'pid=,args='], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 15000 });
+  } catch {
+    return null;
+  }
+}
+
+let childProcessModule = null;
+function require_childProcess() {
+  // 中文注释：延迟 require，跟现有工具脚本一致：单测注入 probe 时完全不碰子进程。
+  if (!childProcessModule) childProcessModule = process.getBuiltinModule('node:child_process');
+  return childProcessModule;
+}
+
+/**
+ * profile 树到底能不能搬。返回客观理由，交给调用方打印：
+ *   free           无锁文件且无持有者
+ *   lockfile       根或子 profile 里有 Chrome 自己的锁标记
+ *   live-process   有进程的 --user-data-dir 落在树里（孤儿 renderer 也算，它照样撑着目录句柄）
+ *   probe-failed   无法完成检查——按 fail-closed 处理，不确定就不搬
+ */
+export function profileTreeState(root, { fsImpl = fs, probe = defaultBrowserProcessProbe } = {}) {
+  const scan = (dir) => {
+    if (chromeProfileLockPresent(dir, { fsImpl })) return true;
+    return childDirs(dir, { fsImpl }).some((child) => chromeProfileLockPresent(child, { fsImpl }));
+  };
+  if (!root) return { busy: false, reason: 'free', holders: 0 };
+  if (scan(root)) return { busy: true, reason: 'lockfile', holders: 0 };
+
+  let listing;
+  try {
+    listing = probe();
+  } catch {
+    listing = null;
+  }
+  if (listing === null || listing === undefined) {
+    return { busy: true, reason: 'probe-failed', holders: -1 };
+  }
+  const holders = String(listing)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && isPathInside(extractUserDataDir(line), root)).length;
+  if (holders > 0) return { busy: true, reason: 'live-process', holders };
+  return { busy: false, reason: 'free', holders: 0 };
+}
+
+/** 兼容旧调用：忙碌 = 不是 free（probe-failed 也算忙碌，宁可不搬）。 */
+export function profileTreeBusy(root, probes = { fsImpl: fs }) {
+  return profileTreeState(root, probes).busy;
+}
+
+/** 把占用理由译成人话：现场真出现过“没有锁文件但 10 个进程持有目录”的形状。 */
+export function describeProfileHold(state) {
+  if (state.reason === 'live-process') return `${state.holders} processes hold a --user-data-dir inside the tree`;
+  if (state.reason === 'probe-failed') return 'the occupancy probe is unavailable, so we fail closed and do not move it';
+  if (state.reason === 'lockfile') return 'Chrome keeps its own lock marker in the profile';
+  return String(state.reason || 'held');
 }
 
 /**
@@ -107,7 +213,7 @@ export function profileTreeBusy(dir, probes = { fsImpl: fs }) {
  *   migrated      搬完了
  *   no-legacy     旧根不存在（新装或已迁移）——正常终态
  *   target-exists 新根已存在，绝不合并（宁可不搬，也不把两份 profile 搅在一起）
- *   locked        有活会话，本轮不搬（下轮再来）
+ *   locked        被占用（锁标记 / 活进程 / 探针不可用），本轮不搬（下轮再来）
  *   error         rename 失败（跨卷等），原因带在 error 里；旧数据原地完好
  */
 export function migrateLegacyProfileRoot({
@@ -115,7 +221,8 @@ export function migrateLegacyProfileRoot({
   targetRoot,
   fsImpl = fs,
   rename = (from, to) => fsImpl.renameSync(from, to),
-  busyProbe = profileTreeBusy,
+  probe,
+  busyProbe = profileTreeState,
 } = {}) {
   if (!legacyRoot || !targetRoot) return { status: 'no-legacy', legacyRoot, targetRoot };
   if (isInsideDir(legacyRoot, targetRoot)) {
@@ -136,8 +243,11 @@ export function migrateLegacyProfileRoot({
   } catch {
     /* 新根不存在才是我们要的情形；这里吞的只是 ENOENT。 */
   }
-  if (busyProbe(legacyRoot, { fsImpl })) {
-    return { status: 'locked', legacyRoot, targetRoot, reason: 'singleton-lock-present' };
+  const probes = { fsImpl };
+  if (probe !== undefined) probes.probe = probe;
+  const state = busyProbe(legacyRoot, probes);
+  if (state.busy) {
+    return { status: 'locked', legacyRoot, targetRoot, reason: state.reason, holders: state.holders };
   }
   try {
     fsImpl.mkdirSync(path.dirname(targetRoot), { recursive: true });
