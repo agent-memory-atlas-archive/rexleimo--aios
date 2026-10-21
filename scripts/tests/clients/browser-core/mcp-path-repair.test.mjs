@@ -8,9 +8,11 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 import {
+  decodeConfigPathToken,
   findVolatileAiosPaths,
   isVolatileAiosRoot,
   resolveStableAiosRoot,
+  absolutePathItems,
 } from '../../../lib/foundation/platform/aios-runtime-root.mjs';
 import {
   findDanglingOpenCodePluginEntries,
@@ -19,6 +21,7 @@ import {
   repairStaleAiosMcpPaths,
 } from '../../../lib/tooling/components/browser/mcp/mcp-path-repair.mjs';
 import { migrateBrowserMcpConfig } from '../../../lib/tooling/components/browser/mcp/mcp-migration.mjs';
+
 
 function makeFixture(prefix) {
   const base = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -104,6 +107,40 @@ test('findVolatileAiosPaths: 只命中易失或已消失的 AIOS 路径', (t) =>
   assert.match(hits[0], /auth-tools-server\.py$/u);
 });
 
+test('decodeConfigPathToken: 把 JSON 转义形态的 Windows 路径折回真实路径（与主机无关）', () => {
+  assert.equal(decodeConfigPathToken('D:\\\\Temp\\\\stable-aios\\\\scripts\\\\auth-tools-server.py'), 'D:\\Temp\\stable-aios\\scripts\\auth-tools-server.py');
+  assert.equal(decodeConfigPathToken('D:\\\\aios\\\\scripts\\\\x.py,'), 'D:\\aios\\scripts\\x.py');
+  // POSIX 与正斜杠 Windows 形态原样保留（只解码成对反斜杠）。
+  assert.equal(decodeConfigPathToken('/tmp/aios-x/scripts/auth-tools-server.py'), '/tmp/aios-x/scripts/auth-tools-server.py');
+  assert.equal(decodeConfigPathToken('D:/aios/scripts/x.py'), 'D:/aios/scripts/x.py');
+  assert.equal(decodeConfigPathToken('./plugins/aios-memory.ts'), './plugins/aios-memory.ts');
+});
+
+test('findVolatileAiosPaths: 转义形态的稳定根条目受信，不拿已修好的条目反复报 stale', (t) => {
+  const fx = makeFixture('aios-root-esc-');
+  t.after(() => fs.rmSync(fx.base, { recursive: true, force: true }));
+  // 这就是修复器写盘后配置里的真实形状：JSON.stringify 把反斜杠翻倍。
+  const repaired = JSON.stringify({
+    mcp: {
+      'aios-auth-tools': { command: 'python', args: [path.join(fx.stableRoot, 'scripts', 'auth-tools-server.py')] },
+      'user-owned': { command: 'node', args: ['/Users/someone/tools/server.js'] },
+    },
+  }, null, 2);
+  assert.equal(
+    findVolatileAiosPaths(repaired, { env: fx.env, tmpdir: fx.tmpdir, trustedRoots: [fx.stableRoot] }).length,
+    0,
+    `修好后不应残留易失命中：${JSON.stringify(findVolatileAiosPaths(repaired, { env: fx.env, tmpdir: fx.tmpdir, trustedRoots: [fx.stableRoot] }))}`,
+  );
+
+  const volatileEntry = JSON.stringify({
+    mcp: { 'aios-shell': { command: 'node', args: [path.join(fx.tmpdir, 'gone-run', 'scripts', 'shell-mcp-server.mjs')] } },
+  }, null, 2);
+  const hits = findVolatileAiosPaths(volatileEntry, { env: fx.env, tmpdir: fx.tmpdir, trustedRoots: [fx.stableRoot] });
+  assert.equal(hits.length, 1, `易失条目应被抦住：${JSON.stringify(hits)}`);
+  // 交回调用方的是解码后的真实路径，不再是带双反斜杠的碎 token。
+  assert.equal(hits[0].includes('\\\\'), false, hits[0]);
+});
+
 test('isAiosManagedPath: 认 AIOS 自有条目，不认用户自有路径', () => {
   assert.equal(isAiosManagedPath('/tmp/x/aios-bsk-1/scripts/auth-tools-server.py'), true);
   assert.equal(isAiosManagedPath('/tmp/x/aios-bsk-1/scripts/run-local-browser-mcp.mjs'), true);
@@ -184,7 +221,7 @@ test('修复器: dry-run 只报告，不改文件；只把 AIOS 托管条目重�
   });
   assert.equal(result.ok, true, JSON.stringify(result));
   const after = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const pathsOf = (entry) => [...(entry.command || []), ...(entry.args || [])].filter((item) => typeof item === 'string' && item.startsWith('/'));
+  const pathsOf = (entry) => absolutePathItems(entry?.command, entry?.args);
   for (const key of ['aios-auth-tools', 'aios-shell', 'mcp-browser-use']) {
     const paths = pathsOf(after.mcp[key] || {});
     assert.ok(paths.length, `${key} 应已重新 materialize: ${JSON.stringify(after.mcp[key])}`);

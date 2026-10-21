@@ -10,6 +10,8 @@ import test from 'node:test';
 import { compressPreSendTurn } from '../../../../lib/foundation/interception/index.mjs';
 import { buildClaudePreToolUseRewriteResponse, rewriteShellCommand } from '../../../../lib/foundation/interception/index.mjs';
 import { decodeEnvelope } from '../../../../lib/foundation/interception/runtime/core/envelope.mjs';
+import { absolutePathItems } from '../../../../lib/foundation/platform/aios-runtime-root.mjs';
+
 
 const cli = path.join(process.cwd(), 'scripts', 'aios.mjs');
 
@@ -400,8 +402,8 @@ test('interception mcp-repair previews by default and only writes with --fix', a
   assert.equal(appliedJson.backups.length, 1, '写盘前必须留一份备份');
 
   const repaired = JSON.parse(await readFile(configPath, 'utf8'));
-  const authArgs = [...(repaired.mcp['aios-auth-tools'].command || []), ...(repaired.mcp['aios-auth-tools'].args || [])]
-    .filter((item) => typeof item === 'string' && item.startsWith('/'));
+  const repairedEntry = repaired.mcp['aios-auth-tools'];
+  const authArgs = absolutePathItems(repairedEntry.command, repairedEntry.args);
   assert.ok(authArgs.some((item) => !item.startsWith(workspaceRoot)), `AIOS 条目应离开失效目录: ${JSON.stringify(authArgs)}`);
   assert.equal(repaired.mcp['user-owned'].args[0], '/Users/someone/tools/server.js', '用户自有条目原样保留');
 

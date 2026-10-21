@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.7.2] - 2026-10-21
+
+### Fixed
+
+- fix(windows): 路径卫生与既存红不再依赖 POSIX 形状，Windows 上 `scripts/release-preflight.sh` 可正常本地发版。三条既存失败其实是两类平台假设：
+  1. `scripts/lib/foundation/platform/aios-runtime-root.mjs` 的 `findVolatileAiosPaths` 从配置**文本**里抠绝对路径 token，而 Windows 条目在 JSON 里是转义形态（`"D:\\aios\\scripts\\x.py"`）。抠到的 token 以多余反斜杠开头，既匹配不上 `trustedRoots` 也匹配不上易失前缀，最后被「带 aios 字样且不存在」的兜底分支抓住 —— 于是**已经修好的稳定根条目被永久误报 stale**（修复器年年重修同一条目、`doctor` 说脏话）。修法是客观解码而不是放宽断言：新增并导出 `decodeConfigPathToken`，把成对反斜杠折回真实路径（POSIX 与 `D:/` 形态原样保留，顺带剥尾部标点）；抓取模式同时接受 `D:\` 与 `D:/`；比较键 `comparisonKey` 统一折叠分隔符，并在 win32 额外折叠大小写（Windows 路径大小写不敏感），UNC/POSIX 语义不变。
+  2. `mcp-path-repair.test.mjs` 与 `interception-cli.test.mjs` 用 `item.startsWith('/')` 挑「绝对路径参数」，把 POSIX 形状写进了断言：Windows 上修复器明明已经把条目重指到稳定根（`D:\Temp\…\stable-aios\…`），过滤器却整批丢掉，断言只拿到空数组并报「应已重新 materialize / 应离开失效目录」—— 红的是测试自己的平台假设。口径收到生产模块自己手里：`aios-runtime-root.mjs` 新增并导出 `isAbsolutePathLike` / `absolutePathItems`（认 POSIX 根、盘符、UNC 三种形状），两处断言改用它。理由是这个判断本来就是平台路径形状的事实判定，放在测试侧会再长出一份平行实现；先试过单独开 `scripts/tests/fixtures/absolute-path-items.mjs`，但那把 `scripts/tests/fixtures` 顶到 9 项、踩穿目录预算门，而预算门给出的结论正是“该归位而不是该豁免”。
+  3. `client-capability-scorecard.test.mjs` 的「已提交报告与重新渲染逐字节相同」在 Windows 必红：`core.autocrlf=true` 的检出把 LF 报告刷成 90 个 CRLF，而生成器只写 LF。按仓库既有同类约定（`agent-sources/**`、`scripts/lib/tooling/specs/*.json`、`docs/evidence/skill-training/**` 都钉 `text eol=lf`）给 `docs/reports/*client-capability-scorecard.md` 补同一属性并重新检出为 LF。**没有在测试里归一化换行**：归一化会把「内容真的变了」和「只是被检出转了行尾」两类信号合并掉，前者该响、后者不该响。
+
+Evidence: `mcp-path-repair` 11/11（含 2 条新回归：`decodeConfigPathToken` 在任意主机上验证转义形态解码与标点剥离；JSON 化的配置里受信稳定根零命中、易失条目恰好命中 1 条且交回的是解码后的真实路径）、`interception-cli` 通过、`client-capability-scorecard` 5/5 且工作树 CRLF 计数为 0（blob 本来就是 LF）、`npm run test:affected` → `tests=764, pass=762, fail=0, skipped=2`：改动前那 3 个既存 Windows 失败全部消失且零新增失败。
+
+### Known limits
+
+- 路径 token 仍靠正则扫描配置文本（不是先解析 JSON 再遍历字段），所以依赖「解码后形状与 `path.resolve` 一致」；文件名本身含反斜杠这类罕见转义仍可能漏判。
+- win32 的大小写折叠只作用于比较键；交回调用方与写盘的路径保持原样大小写。
+- 只改 Windows 侧判定，POSIX 行为未变（`comparisonKey` 在非 win32 不折叠大小写）。
+
 ## [6.7.1] - 2026-10-21
 
 ### Fixed

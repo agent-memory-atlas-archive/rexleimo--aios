@@ -11,6 +11,49 @@ import path from 'node:path';
 
 const AIOS_ROOT_MARKER = ['scripts', 'aios.mjs'];
 
+/* 中文注释：从配置文本里抠出来的 Windows 路径有三副面孔：JSON 转义形态
+ * （`"D:\\aios\\scripts\\x.py"`，抠到的 token 里反斜杠是成对的）、直接写正斜杠的形态
+ * （`D:/aios/scripts/x.py`）以及原生单反斜杠形态。拿未解码的 token 去做前缀比对，已修好的
+ * 稳定根条目会被当成“不存在的 AIOS 路径”一直误报 stale——修复器于是年年重修同一条目。
+ * 因此：解码回真实路径后再比对，比对键统一折分隔符，win32 额外折小写（路径大小写不敏感）。
+ */
+export function decodeConfigPathToken(raw) {
+  const token = String(raw || '').replace(/[.,;:]+$/u, '');
+  if (!/^[A-Za-z]:/u.test(token)) return token;
+  return token.replace(/\\\\/gu, '\\');
+}
+
+function comparisonKey(value) {
+  const text = String(value).replace(/[\\/]+/gu, '/').replace(/\/+$/u, '');
+  return process.platform === 'win32' ? text.toLowerCase() : text;
+}
+
+const POSIX_ROOTED = /^\//u;
+const DRIVE_ROOTED = /^[A-Za-z]:[\\/]/u;
+const UNC_ROOTED = /^[\\/]{2}/u;
+
+/** 该字符串在任何支持的路制下是否像绝对路径（POSIX 根 / 盘符 / UNC）。 */
+export function isAbsolutePathLike(value) {
+  return typeof value === 'string'
+    && (POSIX_ROOTED.test(value) || DRIVE_ROOTED.test(value) || UNC_ROOTED.test(value));
+}
+
+/**
+ * 从 command/args 这类数组里挑出绝对路径参数。存在理由：调用方（含测试）需要一个
+ * 不拿 `startsWith('/')` 当判据的口径——那样 Windows 上盘符路径会被整批丢掉。
+ *
+ * @param {...(Array<string>|string|null|undefined)} groups
+ * @returns {string[]}
+ */
+export function absolutePathItems(...groups) {
+  const flat = [];
+  for (const group of groups) {
+    if (Array.isArray(group)) flat.push(...group);
+    else if (typeof group === 'string') flat.push(group);
+  }
+  return flat.filter(isAbsolutePathLike);
+}
+
 function safeRealpath(value, fsImpl) {
   if (!value) return '';
   try {
@@ -51,10 +94,10 @@ function volatilePrefixes({ env = process.env, tmpdir = os.tmpdir(), fsImpl = fs
 
 function startsUnder(candidate, prefix) {
   if (!prefix) return false;
-  const normalized = String(candidate).replace(/[/\\]+$/u, '');
-  const base = String(prefix).replace(/[/\\]+$/u, '');
+  const normalized = comparisonKey(candidate);
+  const base = comparisonKey(prefix);
   if (!base || normalized === base) return false;
-  return normalized.startsWith(`${base}/`) || normalized.startsWith(`${base}\\`);
+  return normalized.startsWith(`${base}/`);
 }
 
 /** 该候选根是否位于系统临时目录之下（= 不可写入长期配置）。 */
@@ -107,10 +150,10 @@ export function findVolatileAiosPaths(text, { env = process.env, fsImpl = fs, tm
   const hits = new Set();
   /* 中文注释：只取真正的"绝对路径 token"——前面不能接 . / \ 或 word，否则会把
    * JSON 里的相对条目（"./plugins/aios-memory.ts"）误读成绝对路径。 */
-  const absolutePathPattern = /(?<![\w./\\-])(?:\/|\b[A-Za-z]:\\)[^\s"'`,)\]}]+/gu;
+  const absolutePathPattern = /(?<![\w./\\-])(?:\/|\b[A-Za-z]:[\\/])[^\s"'`,)\]}]+/gu;
   for (const match of String(text || '').matchAll(absolutePathPattern)) {
-    const candidate = match[0].replace(/[.,;:]+$/u, '');
-    if (trusted.some((root) => candidate === root || startsUnder(candidate, root))) continue;
+    const candidate = decodeConfigPathToken(match[0]);
+    if (trusted.some((root) => comparisonKey(candidate) === comparisonKey(root) || startsUnder(candidate, root))) continue;
     const isVolatile = prefixes.some((prefix) => startsUnder(candidate, prefix));
     if (isVolatile) {
       hits.add(candidate);

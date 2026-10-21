@@ -12,6 +12,12 @@ docs-site/llms.txt text eol=lf
 # 所以它和上面几条一样必须钉 LF：否则 Windows 检出把证据刷成 CRLF，
 # 已接受的认证会在下一次干净检出时被自己的基线守卫推翻。
 docs/evidence/skill-training/** text eol=lf
+# 客户端能力评分报告同理：`scripts/tests/client-capability-scorecard.test.mjs`
+# 拿已提交报告与重新渲染结果做逐字节比较，而生成器只写 LF。`core.autocrlf=true`
+# 的 Windows 检出会把工作树刷成 CRLF，于是同一份内容在 Linux 绿、在 Windows 红。
+# 钉住 LF 而不是在测试里归一化换行：归一化会把“提交内容真的变了”和
+# “只是被检出转了行尾”两类信号合并掉，前者该响、后者不该响。
+docs/reports/*client-capability-scorecard.md text eol=lf
 /AGENTS.md text eol=lf
 /CLAUDE.md text eol=lf
 /GEMINI.md text eol=lf
