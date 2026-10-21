@@ -1,9 +1,10 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 import { resolveNewestStableRelease } from '../release/release-lookup.mjs';
+import { downloadReleaseAsset } from '../release/release-download.mjs';
 
 const DEFAULT_REPO = 'rexleimo/aios';
 
@@ -108,6 +109,11 @@ async function updateFromReleaseInstaller(rootDir, {
   run = runCommand,
   currentVersion = '',
   resolveNewestRelease = null,
+  // 中文注释：platform / downloadImpl / tempDirBase 是测试接缝，不是运行期旋钮。
+  // 注入 platform 后 win32 分支可以在任何操作系统上被单测覆盖，不必等 Windows CI。
+  platform = process.platform,
+  downloadImpl = downloadReleaseAsset,
+  tempDirBase = os.tmpdir(),
 } = {}) {
   // 中文注释：防降级守卫 —— GitHub releases/latest 按创建时间排序，补发旧版本会
   // 抢占 latest。这里优先用调用方注入的 semver-max 查询拿到精确 tag；查询失败
@@ -150,7 +156,7 @@ async function updateFromReleaseInstaller(rootDir, {
     AIOS_REPO: repo,
     AIOS_INSTALL_DIR: rootDir,
   };
-  const assetName = process.platform === 'win32' ? 'aios.zip' : 'aios.tar.gz';
+  const assetName = platform === 'win32' ? 'aios.zip' : 'aios.tar.gz';
   if (newest?.tag) {
     env.AIOS_RELEASE_TAG = newest.tag;
     // AIOS_ASSET_URL 自旧版安装器起就被支持，即使本地安装器不识别新
@@ -158,7 +164,7 @@ async function updateFromReleaseInstaller(rootDir, {
     env.AIOS_ASSET_URL = `https://github.com/${repo}/releases/download/${newest.tag}/${assetName}`;
   }
 
-  if (process.platform === 'win32') {
+  if (platform === 'win32') {
     const psRepo = quotePowerShellSingleString(repo);
     const psRootDir = quotePowerShellSingleString(rootDir);
     // Prefer the local installer when present: it carries the same defensive
@@ -166,19 +172,60 @@ async function updateFromReleaseInstaller(rootDir, {
     // a remote fetch for the exact code being executed. Remote is the fallback
     // for minimal checkouts that shipped without scripts/aios-install.ps1.
     const localInstaller = path.join(rootDir, 'scripts', 'aios-install.ps1');
-    const installerCmd = await pathExists(localInstaller)
-      ? `& '${quotePowerShellSingleString(localInstaller)}'`
-      : `irm "${installerAssetBase}/aios-install.ps1" | iex`;
-    const script = [
-      '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12',
-      '$ErrorActionPreference = "Stop"',
-      `$env:AIOS_REPO='${psRepo}'`,
-      `$env:AIOS_INSTALL_DIR='${psRootDir}'`,
-      installerCmd,
-    ].join('; ');
-    io.log('+ runtime self-update: GitHub Releases installer (PowerShell)');
-    await run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script], { cwd: process.env.USERPROFILE || process.env.HOME || rootDir, env, io });
-    return { method: 'release-installer', updated: true, skipped: false };
+    const remoteAssetUrl = env.AIOS_ASSET_URL
+      || `https://github.com/${repo}/releases/latest/download/${assetName}`;
+    // 中文注释：Windows 的 Schannel 通道（Invoke-WebRequest / git-bash curl）对 GitHub
+    // CDN 会被中途重置，实测同 URL 走 Node 自带 TLS 栈稳定成功。所以先用 Node 把资产抓到
+    // 暂存目录（带 zip 尾部校验，截断即重试），再让安装器读本地文件；只有 Node 抓取失败才
+    // 退回安装器自身下载（那条路现在也带重试 + 截断校验）。
+    let stageDir = '';
+    let assetSource = 'installer-fetch';
+    let stagedBytes = 0;
+    try {
+      try {
+        stageDir = await mkdtemp(path.join(tempDirBase, 'aios-selfupdate-'));
+        const stagedAsset = path.join(stageDir, assetName);
+        io.log(`+ runtime self-update: staging release asset via Node fetch: ${remoteAssetUrl}`);
+        const staged = await downloadImpl({ url: remoteAssetUrl, destPath: stagedAsset, io });
+        env.AIOS_ASSET_URL = staged.destPath;
+        assetSource = 'node-fetch';
+        stagedBytes = staged.bytes;
+      } catch (error) {
+        stageDir = '';
+        env.AIOS_ASSET_URL = remoteAssetUrl;
+        io.log(
+          `[warn] Node asset staging failed: ${error instanceof Error ? error.message : error}; `
+          + 'falling back to the installer download (now retried and zip-verified)',
+        );
+      }
+
+      let installerCmd;
+      if (await pathExists(localInstaller)) {
+        installerCmd = `& '${quotePowerShellSingleString(localInstaller)}'`;
+      } else if (stageDir) {
+        const stagedInstaller = path.join(stageDir, 'aios-install.ps1');
+        await downloadImpl({ url: `${installerAssetBase}/aios-install.ps1`, destPath: stagedInstaller, io });
+        installerCmd = `& '${quotePowerShellSingleString(stagedInstaller)}'`;
+      } else {
+        installerCmd = `irm "${installerAssetBase}/aios-install.ps1" | iex`;
+      }
+
+      const script = [
+        '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12',
+        '$ErrorActionPreference = "Stop"',
+        `$env:AIOS_REPO='${psRepo}'`,
+        `$env:AIOS_INSTALL_DIR='${psRootDir}'`,
+        installerCmd,
+      ].join('; ');
+      io.log('+ runtime self-update: GitHub Releases installer (PowerShell)');
+      await run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script], { cwd: process.env.USERPROFILE || process.env.HOME || rootDir, env, io });
+      return { method: 'release-installer', updated: true, skipped: false, assetSource, stagedBytes, remoteAssetUrl };
+    } finally {
+      if (stageDir) {
+        // 暂存目录只服务本次安装：安装器已把文件拷进它自己的临时目录，留着只会堆垃圾。
+        await rm(stageDir, { recursive: true, force: true }).catch(() => {});
+      }
+    }
   }
 
   // 中文注释：`set -o pipefail` 是失败必须响亮报出的那半修 —— 没有它，
@@ -219,6 +266,9 @@ export async function updateHarnessRuntime({
   io = console,
   runCommandImpl = runCommand,
   resolveNewestRelease,
+  platform,
+  downloadImpl,
+  tempDirBase,
 } = {}) {
   const before = await readVersion(rootDir);
   if (before) {
@@ -236,6 +286,9 @@ export async function updateHarnessRuntime({
          run: runCommandImpl,
          currentVersion: before,
          resolveNewestRelease: releaseResolver,
+         platform,
+         downloadImpl,
+         tempDirBase,
        }));
 
   const after = await readVersion(rootDir);

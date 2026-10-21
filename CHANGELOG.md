@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.7.1] - 2026-10-21
+
+### Fixed
+
+- fix(windows): `aios update` 在 Windows 上因 GitHub CDN 中途重置 TLS 连接而报错，现在能自愈。现场事实（同一台 Windows 机、同一 URL、不同 TLS 栈）：PowerShell `Invoke-WebRequest` 抛 `System.IO.IOException`「从传输流中收到意外的 EOF 或 0 个字节」，git-bash `curl`（schannel）抛 `curl: (56) schannel: server closed abruptly (missing close_notify)` 并留下 9,646 字节残 zip，而 Node 自带 TLS 栈与 `C:\Windows\System32\curl.exe` 同 URL 稳定拿到 7,094,308 字节完整资产——即资产与网络都好，坏的是 Schannel 通道的不稳定性叠加“单发下载 + 不校验 + 不清残文件”。三处修：（1）新增 `scripts/lib/execution/lifecycle/release/release-download.mjs`，`downloadReleaseAsset` 带退避重试、`content-length` 比对、按客观字节判定完整性（zip 查 end-of-central-directory 记录、gzip 查魔数），任何失败当场删残文件，4xx「资产不存在」标为不可重试直接中断；（2）`self-update.mjs` 的 win32 分支改为先用 Node 把 `aios.zip`（以及缺失时的 `aios-install.ps1`）暂存到临时目录再做替换，安装器只读本地文件，Node 暂存失败才退回安装器下载并记录原因，`platform`/`downloadImpl`/`tempDirBase` 作为测试接缝使 win32 形状可在任意主机断言；（3）`aios-install.ps1::Download-File` 重写为下载器优先级 Node → `curl.exe` → `Invoke-WebRequest`、4 次退避重试（`AIOS_DOWNLOAD_RETRIES` 可调）、解压前用 `ZipFile::OpenRead` 证明 zip 完整、本地副本校验失败只删副本不动原件。Linux/macOS 分支未动（OpenSSL 通道无此问题，`aios-install.sh` 原本就带 `--retry 3`）。
+- 失败语义澄清：旧版把截断包一路带到 `Expand-Archive` 才以「找不到中央目录结尾记录」暴死，且残文件留在临时目录；现在下载阶段即拒绝并清理，报错保留真实原因（`download failed permanently: <url> :: HTTP 404 (not retryable)` / `download failed after 4 attempt(s): ...`）。`release-lookup` 本就走 Node fetch，Windows 侧只剩 `CRYPT_E_REVOCATION_OFFLINE` 影响手工 `curl` 探针，代码路径无需改动。
+
+Evidence: `scripts/tests/foundation/release/release-download.test.mjs` 7/7（一次成功、重置后第 2 次成功且残文件被清、content-length 不符拒绝且不落盘、503 重试、404 不重试且只发 1 次、无 EOCD 的 zip 被拒、gzip 魔数正反例）+ `self-update-lifecycle.test.mjs` 11/11（win32 注入 platform：Node 暂存→本地安装器→`AIOS_ASSET_URL` 指向暂存文件→暂存目录用完即清；暂存失败→回退远端 URL 并告警；bash 形状回归；防降级守卫不受影响）+ `release-pipeline.test.mjs` 42/42（安装器断言改为守护重试循环与 zip 完整性校验）；真机 Windows 验证：把旧的 9,646 字节残 zip 喂给新 `Download-File` → `downloaded zip is truncated or unreadable` 且无残文件；真下载 `v6.7.0/aios.zip` → 第 1、2 次被重置、`[ok] download succeeded on attempt 3/4`、7,094,308 字节；`https://.../nope.zip` → 单次 404 即 `download failed permanently`；`npm run test:affected` → `tests=648, pass=647, fail=0, skipped=1`；`powershell Parser::ParseFile` 对 `aios-install.ps1` 零语法错误。
+
+### Known limits
+
+- Windows 通道的重置是网络中间盒行为，重试把“必然失败”变成“大概率成功”，不是 100% 保证：4 次全失败时仍会报错，但此时报错是干净的（不半截替换、不残文件、旧安装完好）。
+- `AIOS_DOWNLOAD_RETRIES` 之外没有独立的退避时长旋钮；上限 8 秒。
+- 本机 `~/.rexcil/aios` 仍是 6.7.0 之前的 6.3.0，需发布后重跑 `aios update` 才吃到本修复（旧安装器自身不含重试逻辑）。
+
 ## [6.7.0] - 2026-10-18
 
 ### Added

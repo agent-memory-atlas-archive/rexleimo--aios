@@ -482,7 +482,12 @@ test('PowerShell installer can use a local asset URL for install smoke tests', a
   // 中文注释：releases/latest 会被补发旧版抢占，安装器必须支持按精确 tag 拉取。
   assert.match(installPs1, /AIOS_RELEASE_TAG|\$ReleaseTag/);
   assert.match(installPs1, /elseif \(\$ReleaseTag\)[\s\S]*releases\/download\/\$ReleaseTag\/aios\.zip/);
-  assert.match(installPs1, /Copy-Item -LiteralPath \$localPath -Destination \$OutFile -Force/);
+  assert.match(installPs1, /function Copy-VerifiedLocalFile[\s\S]*Copy-Item -LiteralPath \$Source -Destination \$OutFile -Force/);
+  // 中文注释：Windows 上 GitHub CDN 会中途重置 Schannel 连接（实测 IWR 报
+  // “意外的 EOF 或 0 个字节”），安装器必须重试，并且在解压前证明 zip 是完整的。
+  assert.match(installPs1, /for \(\$attempt = 1; \$attempt -le \$maxAttempts; \$attempt\+\+\)/);
+  assert.match(installPs1, /Assert-DownloadedArchive[\s\S]*System\.IO\.Compression\.ZipFile\]::OpenRead/);
+  assert.match(installPs1, /download failed after \{0\} attempt\(s\)/);
 });
 
 test('Bash installer can use a local asset URL for install smoke tests', async () => {

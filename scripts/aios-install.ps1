@@ -23,25 +23,134 @@ function Enable-Tls12() {
   }
 }
 
+function Copy-VerifiedLocalFile([string]$Source, [string]$OutFile) {
+  Write-Host "+ copy $Source"
+  Copy-Item -LiteralPath $Source -Destination $OutFile -Force
+  try {
+    Assert-DownloadedArchive -Path $OutFile
+  } catch {
+    # 只删拷过来的副本，原文件不动；否则残副本会跟着走到 Expand-Archive。
+    Remove-Item -LiteralPath $OutFile -Force -ErrorAction SilentlyContinue
+    throw
+  }
+}
+
+function Invoke-NodeDownload([string]$NodeCommand, [string]$Url, [string]$OutFile) {
+  # 中文注释：本机实测 Windows 的 Schannel 通道（Invoke-WebRequest 与 git-bash curl）对
+  # GitHub CDN 会被中途重置，而同 URL 走 Node 自带 TLS 栈稳定成功。Node 是 AIOS 的硬
+  # 依赖，所以把 Node 当作首选下载器：拉不全就报错退出，绝不静默留残文件。
+  $helper = Join-Path ([System.IO.Path]::GetTempPath()) ("aios-fetch-" + [guid]::NewGuid().ToString("n") + ".mjs")
+  $body = @'
+import { writeFile } from 'node:fs/promises';
+const [url, out] = process.argv.slice(2);
+try {
+  const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(180000) });
+  if (!res.ok) {
+    const permanent = res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 425 && res.status !== 429;
+    const failure = new Error('HTTP ' + res.status + (permanent ? ' (not retryable)' : ''));
+    failure.permanent = permanent;
+    throw failure;
+  }
+  const buf = Buffer.from(await res.arrayBuffer());
+  const declared = Number(res.headers.get('content-length') || 0);
+  if (declared > 0 && declared !== buf.length) {
+    throw new Error('content-length mismatch: declared ' + declared + ', received ' + buf.length);
+  }
+  await writeFile(out, buf);
+  process.stdout.write('bytes=' + buf.length + '\n');
+} catch (error) {
+  // 中文注释：把真正的死因压成一行，否则重试日志只有一句 exit code 1。
+  const cause = error && error.cause && error.cause.message ? error.cause.message : '';
+  process.stderr.write('download failed: ' + (error && error.message ? error.message : error) + (cause ? ' (' + cause + ')' : '') + '\n');
+  // 退出码 20 = “资产根本不在”（4xx），让外层重试循环知道不该再试。
+  process.exitCode = error && error.permanent ? 20 : 1;
+}
+'@
+  Set-Content -LiteralPath $helper -Value $body -Encoding ASCII
+  try {
+    Invoke-Checked -Command $NodeCommand -Arguments @($helper, $Url, $OutFile)
+  } finally {
+    Remove-Item -LiteralPath $helper -Force -ErrorAction SilentlyContinue
+  }
+}
+
+function Assert-DownloadedArchive([string]$Path) {
+  if ((Get-Item -LiteralPath $Path).Length -le 0) {
+    throw "downloaded file is empty: $Path"
+  }
+  if ($Path -notmatch '\.zip$') { return }
+  # 截断的 zip 缺 end-of-central-directory 记录，ZipFile::OpenRead 会当场报错——
+  # 这一步把“残包一路走到 Expand-Archive 才暴死”变成“下载阶段就重试”。
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = $null
+  try {
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    $archive.Dispose()
+    $archive = $null
+  } catch {
+    throw ("downloaded zip is truncated or unreadable: {0} :: {1}" -f $Path, $_.Exception.Message)
+  } finally {
+    if ($null -ne $archive) { $archive.Dispose() }
+  }
+}
+
 function Download-File([string]$Url, [string]$OutFile) {
   if ($Url -match '^file://') {
-    $localPath = ([System.Uri]$Url).LocalPath
-    Write-Host "+ copy $localPath"
-    Copy-Item -LiteralPath $localPath -Destination $OutFile -Force
+    Copy-VerifiedLocalFile -Source (([System.Uri]$Url).LocalPath) -OutFile $OutFile
     return
   }
   if (Test-Path -LiteralPath $Url) {
-    Write-Host "+ copy $Url"
-    Copy-Item -LiteralPath $Url -Destination $OutFile -Force
+    Copy-VerifiedLocalFile -Source $Url -OutFile $OutFile
     return
   }
-  Write-Host "+ download $Url"
+
+  $maxAttempts = 4
+  if ($env:AIOS_DOWNLOAD_RETRIES -and $env:AIOS_DOWNLOAD_RETRIES -match '^\d+$') {
+    $maxAttempts = [Math]::Max(1, [int]$env:AIOS_DOWNLOAD_RETRIES)
+  }
+  $node = Get-Command node -ErrorAction SilentlyContinue
+  $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
   $iwr = Get-Command Invoke-WebRequest -ErrorAction SilentlyContinue
-  if ($iwr -and $iwr.Parameters.ContainsKey('UseBasicParsing')) {
-    Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing
-    return
+  $lastError = "no downloader available"
+  Write-Host "+ download $Url"
+
+  for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    try {
+      Remove-Item -LiteralPath $OutFile -Force -ErrorAction SilentlyContinue
+      if ($node) {
+        Invoke-NodeDownload -NodeCommand $node.Source -Url $Url -OutFile $OutFile
+      } elseif ($curl) {
+        Invoke-Checked -Command $curl.Source -Arguments @("-fsSL", "--retry", "3", "--retry-all-errors", "-o", $OutFile, $Url)
+      } elseif ($iwr) {
+        Enable-Tls12
+        if ($iwr.Parameters.ContainsKey('UseBasicParsing')) {
+          Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing
+        } else {
+          Invoke-WebRequest -Uri $Url -OutFile $OutFile
+        }
+      } else {
+        throw "no downloader available (need node, curl.exe, or Invoke-WebRequest)"
+      }
+      Assert-DownloadedArchive -Path $OutFile
+      if ($attempt -gt 1) { Write-Host ("[ok] download succeeded on attempt {0}/{1}" -f $attempt, $maxAttempts) }
+      return
+    } catch {
+      $lastError = $_.Exception.Message
+      # 中文注释：退出码 20 来自 Node 下载助手，意思是 4xx“资产不存在”——
+      # 重试只会浪费时间，直接中断并保留真实原因。
+      $permanentHttp = (Test-Path Variable:LASTEXITCODE) -and ($LASTEXITCODE -eq 20)
+      # 关键：残文件必须当场清掉，否则下一次 attempt 或后续 Expand-Archive 会在半截包上工。
+      Remove-Item -LiteralPath $OutFile -Force -ErrorAction SilentlyContinue
+      if ($permanentHttp) {
+        throw ("download failed permanently: {0} :: {1}" -f $Url, $lastError)
+      }
+      Write-Host ("[warn] download attempt {0}/{1} failed: {2}" -f $attempt, $maxAttempts, $lastError)
+      if ($attempt -lt $maxAttempts) {
+        Start-Sleep -Seconds ([int][Math]::Min(8, [Math]::Pow(2, $attempt)))
+      }
+    }
   }
-  Invoke-WebRequest -Uri $Url -OutFile $OutFile
+  throw ("download failed after {0} attempt(s): {1} :: {2}" -f $maxAttempts, $Url, $lastError)
 }
 
 function Invoke-Checked([string]$Command, [string[]]$Arguments) {

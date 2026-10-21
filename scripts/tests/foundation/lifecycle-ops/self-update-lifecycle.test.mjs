@@ -115,6 +115,9 @@ test('install-tree self-update uses the release installer and never git commands
     io: { log: () => {}, error: () => {} },
     runCommandImpl: run,
     resolveNewestRelease: async () => null,
+    // win32 分支会先试 Node 暂存：给个报失败的桩，让它走安装器下载回退，
+    // 断言重点仍是“只跑安装器、不跑 git”。
+    downloadImpl: async () => { throw new Error('stub: no network in tests'); },
   });
 
   assert.equal(result.method, 'release-installer');
@@ -154,13 +157,20 @@ test('install-tree self-update refuses to downgrade when releases/latest is olde
 
 test('install-tree self-update pins the asset URL to the exact newest tag', async () => {
   const root = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-'));
+  const stageBase = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-stage-'));
   const { writeFile } = await import('node:fs/promises');
   await writeFile(path.join(root, 'VERSION'), '5.16.2\n', 'utf8');
   const run = fakeRunner();
   const envs = [];
+  const downloadCalls = [];
   const recordingRun = async (command, args, options = {}) => {
     envs.push(options.env || {});
     return run(command, args, options);
+  };
+  const stubDownload = async ({ url, destPath }) => {
+    downloadCalls.push(url);
+    await writeFile(destPath, 'staged-payload');
+    return { destPath, bytes: 14, attempts: 1 };
   };
 
   const result = await updateHarnessRuntime({
@@ -168,25 +178,125 @@ test('install-tree self-update pins the asset URL to the exact newest tag', asyn
     io: { log: () => {}, error: () => {} },
     runCommandImpl: recordingRun,
     resolveNewestRelease: async () => ({ tag: 'v5.17.0', version: '5.17.0', security: false }),
+    // 中文注释：注入 platform 后 Windows 形状在任何主机上都能断言，不必等 Windows CI。
+    platform: 'win32',
+    downloadImpl: stubDownload,
+    tempDirBase: stageBase,
   });
 
   assert.equal(result.updated, true);
   assert.equal(result.skipped, false);
-  const assetUrl = (envs[0] || {}).AIOS_ASSET_URL || '';
   assert.equal((envs[0] || {}).AIOS_RELEASE_TAG, 'v5.17.0');
-  if (process.platform === 'win32') {
-    assert.equal(run.calls[0].startsWith('powershell '), true);
-    assert.equal(run.calls[0].includes('$ErrorActionPreference = "Stop"'), true);
-    assert.equal(run.calls[0].includes('/releases/download/v5.17.0/aios-install.ps1'), true);
-    assert.equal(run.calls[0].includes('/download/download/'), false);
-    assert.equal(assetUrl.endsWith('/releases/download/v5.17.0/aios.zip'), true);
-  } else {
-    // 中文注释：钉住正确的 tag 资产 URL，并明确拒绝历史畸形形状
-    // `/releases/download/<tag>/download/...`（双 download 段 → 404，
-    // 正是这个 bug 让 6.1.0 → 6.4.0 升级静默变 no-op）。
-    assert.equal(run.calls[0].includes('releases/download/v5.17.0/aios-install.sh'), true);
-    assert.equal(run.calls[0].includes('/download/download/'), false);
-    assert.equal(run.calls[0].startsWith('bash -lc set -o pipefail; curl -fsSL '), true);
-    assert.equal(assetUrl.endsWith('/releases/download/v5.17.0/aios.tar.gz'), true);
-  }
+  assert.equal(run.calls.filter((key) => key.includes('/download/download/')).length, 0);
+  // 中文注释：钉住正确的 tag 资产 URL，并明确拒绝历史畸形形状
+  // `/releases/download/<tag>/download/...`（双 download 段 → 404，
+  // 正是这个 bug 让 6.1.0 → 6.4.0 升级静默变 no-op）。
+  assert.equal(result.remoteAssetUrl, 'https://github.com/rexleimo/aios/releases/download/v5.17.0/aios.zip');
+  assert.equal(downloadCalls[0], 'https://github.com/rexleimo/aios/releases/download/v5.17.0/aios.zip');
+  assert.equal(downloadCalls[1], 'https://github.com/rexleimo/aios/releases/download/v5.17.0/aios-install.ps1');
+  assert.equal(run.calls[0].startsWith('powershell '), true);
+  assert.equal(run.calls[0].includes('$ErrorActionPreference = "Stop"'), true);
+  // 资产已落到暂存目录，安装器只读本地文件（不再走 Schannel/irm）。
+  assert.equal((envs[0] || {}).AIOS_ASSET_URL.endsWith(path.join('aios.zip')), true);
+  assert.equal((envs[0] || {}).AIOS_ASSET_URL.startsWith(stageBase), true);
+  assert.equal(result.assetSource, 'node-fetch');
+  assert.equal(run.calls[0].includes('irm '), false);
+});
+
+test('install-tree self-update keeps the bash installer shape on non-Windows hosts', async () => {
+  const root = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-'));
+  const { writeFile } = await import('node:fs/promises');
+  await writeFile(path.join(root, 'VERSION'), '5.16.2\n', 'utf8');
+  const run = fakeRunner();
+  const envs = [];
+
+  const result = await updateHarnessRuntime({
+    rootDir: root,
+    io: { log: () => {}, error: () => {} },
+    runCommandImpl: async (command, args, options = {}) => {
+      envs.push(options.env || {});
+      return run(command, args, options);
+    },
+    resolveNewestRelease: async () => ({ tag: 'v5.17.0', version: '5.17.0', security: false }),
+    platform: 'linux',
+  });
+
+  assert.equal(result.updated, true);
+  // 中文注释：Linux/macOS 不注入 Node 暂存（OpenSSL 通道无此问题），保持
+  // `set -o pipefail` + 精确 tag 资产 URL 的既有形状。
+  assert.equal(run.calls[0].startsWith('bash -lc set -o pipefail; curl -fsSL '), true);
+  assert.equal(run.calls[0].includes('releases/download/v5.17.0/aios-install.sh'), true);
+  assert.equal(run.calls[0].includes('/download/download/'), false);
+  assert.equal((envs[0] || {}).AIOS_ASSET_URL, 'https://github.com/rexleimo/aios/releases/download/v5.17.0/aios.tar.gz');
+});
+
+test('win32 self-update runs the local installer against the Node-staged asset', async () => {
+  const root = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-'));
+  const stageBase = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-stage-'));
+  const { writeFile, access } = await import('node:fs/promises');
+  await writeFile(path.join(root, 'VERSION'), '6.3.0\n', 'utf8');
+  await mkdir(path.join(root, 'scripts'), { recursive: true });
+  const localInstaller = path.join(root, 'scripts', 'aios-install.ps1');
+  await writeFile(localInstaller, 'param()', 'utf8');
+  const run = fakeRunner();
+  const envs = [];
+  const logs = [];
+  let stagedPath = '';
+
+  const result = await updateHarnessRuntime({
+    rootDir: root,
+    io: { log: (line) => logs.push(line), error: () => {} },
+    runCommandImpl: async (command, args, options = {}) => {
+      envs.push(options.env || {});
+      return run(command, args, options);
+    },
+    resolveNewestRelease: async () => ({ tag: 'v6.7.0', version: '6.7.0', security: false }),
+    platform: 'win32',
+    tempDirBase: stageBase,
+    downloadImpl: async ({ destPath }) => {
+      stagedPath = destPath;
+      await writeFile(destPath, 'staged-zip');
+      return { destPath, bytes: 10, attempts: 2 };
+    },
+  });
+
+  assert.equal(result.assetSource, 'node-fetch');
+  assert.equal(result.stagedBytes, 10);
+  assert.equal(run.calls[0].includes(`& '${localInstaller}'`), true);
+  assert.equal(run.calls[0].includes('irm '), false);
+  assert.equal(envs[0].AIOS_ASSET_URL, stagedPath);
+  assert.equal(logs.some((line) => line.includes('staging release asset via Node fetch')), true);
+  // 暂存目录用完即清，不在易失目录里堆残骸。
+  await assert.rejects(access(stagedPath), /ENOENT/u);
+});
+
+test('win32 self-update falls back to the installer download when Node staging fails', async () => {
+  const root = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-'));
+  const stageBase = await mkdtemp(path.join(TMP_BASE, 'aios-selfupdate-stage-'));
+  const { writeFile } = await import('node:fs/promises');
+  await writeFile(path.join(root, 'VERSION'), '6.3.0\n', 'utf8');
+  await mkdir(path.join(root, 'scripts'), { recursive: true });
+  await writeFile(path.join(root, 'scripts', 'aios-install.ps1'), 'param()', 'utf8');
+  const run = fakeRunner();
+  const envs = [];
+  const logs = [];
+
+  const result = await updateHarnessRuntime({
+    rootDir: root,
+    io: { log: (line) => logs.push(line), error: () => {} },
+    runCommandImpl: async (command, args, options = {}) => {
+      envs.push(options.env || {});
+      return run(command, args, options);
+    },
+    resolveNewestRelease: async () => ({ tag: 'v6.7.0', version: '6.7.0', security: false }),
+    platform: 'win32',
+    tempDirBase: stageBase,
+    downloadImpl: async () => { throw new Error('unexpected EOF from transport stream'); },
+  });
+
+  assert.equal(result.updated, true);
+  assert.equal(result.assetSource, 'installer-fetch');
+  // 回退语义：把远端 URL 交回安装器（安装器自己现在也带重试 + 截断校验）。
+  assert.equal(envs[0].AIOS_ASSET_URL, 'https://github.com/rexleimo/aios/releases/download/v6.7.0/aios.zip');
+  assert.equal(logs.some((line) => line.includes('Node asset staging failed') && line.includes('unexpected EOF')), true);
 });

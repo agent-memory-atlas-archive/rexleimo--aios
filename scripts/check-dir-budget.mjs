@@ -17,6 +17,7 @@ export const EXEMPT_DIRS = Object.freeze({
   'skill-sources': 'skill registry surface (one dir per skill)',
   'docs/plans': 'plan-discovery flat contract (preflight/dry-run/MCP create flat there)',
   'docs/reports': 'report log; same flat-discovery convention as plans',
+  'docs/reports/evidence/harness2-2026-10': 'one harness2 ladder run kept as a single artifact: drivers, result blobs and the stability log are cross-referenced by its README; splitting them loses reproducibility',
   'docs/evidence/skill-training': 'training evidence log blobs',
   'blog-site': 'generated site output',
   'blog-site/ja': 'generated locale mirror',

@@ -133,6 +133,7 @@
       "scripts/tests/foundation/native/native-route-commands.test.mjs",
       "scripts/tests/foundation/native/native-source-tree.test.mjs",
       "scripts/tests/foundation/native/native-sync.test.mjs",
+      "scripts/tests/foundation/release/release-download.test.mjs",
       "scripts/tests/foundation/release/release-lookup.test.mjs",
       "scripts/tests/foundation/release/release-pipeline.test.mjs",
       "scripts/tests/foundation/release/release-submodule-gate.test.mjs",
