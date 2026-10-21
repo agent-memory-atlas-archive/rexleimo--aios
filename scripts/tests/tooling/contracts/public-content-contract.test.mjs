@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import YAML from 'yaml';
 
 // 中文注释：Windows 下 URL.pathname 会产生 /E:/ 前缀，path.resolve 会拼成 E:\E:\...；用 fileURLToPath 保持跨平台。
 const rootDir = path.resolve(fileURLToPath(new URL('../../../..', import.meta.url)));
@@ -122,4 +123,44 @@ test('localized docs changelogs expose the current 4.0 release records', () => {
     assert.match(changelog, /v4\.0\.1/);
     assert.match(changelog, /v4\.0\.0/);
   }
+});
+
+/* 中文注释：本文件的既有 front matter 检查都是正则匹配“键在不在”，而 mkdocs 吃的是真正的
+ * YAML 解析——v6.8.0 的发布帖就是被这个缝隙放过去的：description 里写了双引号标量 + `\``
+ * （YAML 双引号里的非法转义），正则看着完全正常，CI 的 `mkdocs build --strict` 直接红。
+ * 所以这里补上同一道严格解析，把本地绿灯和 Pages 构建对齐。 */
+test('every blog post front matter parses as strict YAML (the mkdocs --strict gate)', () => {
+  const failures = [];
+  const posts = fs.readdirSync(path.join(rootDir, 'blog-site'))
+    .filter((name) => name.endsWith('.md') && name !== 'index.md')
+    .sort();
+
+  /* 中文注释：先自证解析器是严的——若哪天换成宽松实现，这条守卫必须立刻失效可见。
+   * 反斜杠用 String.fromCharCode(92) 拼：Write-Through 工具会把字面里的 `\` 当转义序列吃掉，
+   * 拼出来的才是真正会弄坏 mkdocs 的那个字节。 */
+  const invalidEscape = 'description: "backslash-then-backtick: x' + String.fromCharCode(92) + '`y"';
+  assert.throws(
+    () => YAML.parse(invalidEscape),
+    undefined,
+    'strict YAML parser must reject an invalid double-quoted escape'
+  );
+
+  for (const name of posts) {
+    const markdown = read(path.posix.join('blog-site', name)).replace(/\r\n/g, '\n');
+    const match = markdown.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
+    if (!match) { failures.push(`${name}: no front matter block`); continue; }
+    let data;
+    try {
+      data = YAML.parse(match[1]);
+    } catch (error) {
+      failures.push(`${name}: ${String(error.message).split('\n')[0]}`);
+      continue;
+    }
+    if (!data || typeof data !== 'object') { failures.push(`${name}: front matter is not a mapping`); continue; }
+    if (!data.title) failures.push(`${name}: missing title`);
+    if (!data.description) failures.push(`${name}: missing description`);
+    if (!data.date && !data.publish_date) failures.push(`${name}: missing date/publish_date`);
+  }
+
+  assert.deepEqual(failures, [], `blog-site front matter must survive `+"`mkdocs build --strict`:\n" + failures.join('\n'));
 });
