@@ -65,7 +65,22 @@ if [[ "$ALLOW_DIRTY" != "true" && -n "$(git -C "$ROOT_DIR" status --short)" ]]; 
   exit 1
 fi
 
-bash "$ROOT_DIR/scripts/release-preflight.sh" --tag "$TAG" >/dev/null
+# 中文注释：preflight 的输出一律先落盘。旧写法 `>/dev/null` 把失败证据全丢掉了：
+# 实测本机一次 v6.8.0 发布在这里失败，只留下一行 "root release test suite failed"，
+# 重跑又是绿的，于是既无法定位也无法判断是不是偶发——一个发布门把它能拦住的原因
+# 自己吃掉，比不过门还糟。现在失败会把日志尾部直接喷到 stderr，完整路径也告诉你。
+LOG_DIR="${AIOS_RELEASE_PREFLIGHT_LOG_DIR:-$ROOT_DIR/.aios/artifacts}"
+mkdir -p "$LOG_DIR" 2>/dev/null || LOG_DIR="${TMPDIR:-/tmp}"
+PREFLIGHT_LOG="$LOG_DIR/release-preflight-${TAG}-$(date +%Y%m%d-%H%M%S).log"
+echo "[release] preflight log: $PREFLIGHT_LOG"
+
+if ! bash "$ROOT_DIR/scripts/release-preflight.sh" --tag "$TAG" >"$PREFLIGHT_LOG" 2>&1; then
+  echo "[release] preflight FAILED — last 40 lines of $PREFLIGHT_LOG:" >&2
+  tail -n 40 "$PREFLIGHT_LOG" >&2
+  echo "[release] full log kept at: $PREFLIGHT_LOG" >&2
+  exit 1
+fi
+echo "[release] preflight passed (full log: $PREFLIGHT_LOG)"
 
 echo "Version: $VERSION"
 echo "Tag:     $TAG"
