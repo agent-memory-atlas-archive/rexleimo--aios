@@ -8,6 +8,7 @@ import {
   resolveLocalBrowserMcpScript,
   resolvePythonCommand,
 } from '../runtime/runtime-paths.mjs';
+import { PROFILE_ROOT_ENV, resolveProfileRoot } from '../profile-root.mjs';
 
 /* 中文注释：当外部 browser-use checkout 不存在时，回退到仓库内的 Playwright MCP。 */
 export function buildLocalBrowserMcpServer(rootDir, existingAlias = {}, runtime = {}) {
@@ -17,6 +18,11 @@ export function buildLocalBrowserMcpServer(rootDir, existingAlias = {}, runtime 
   delete nextEnv.AIOS_INTERCEPTION_METRICS;
   delete nextEnv.AIOS_MCP_PROXY;
   delete nextEnv.AIOS_MCP_UPSTREAM_HOST;
+  /* 中文注释：把 profile 根当绝对路径交给子进程——这是两侧（AIOS .mjs / mcp-server .ts）
+   * 唯一的契约变量。不递这个值的话，TS 侧只能自己探安装布局，两边很容易漂到不同目录，
+   * 结果是登录态写进一个谁都不看的角落。已有值（用户自己设的）不覆盖：传 nextEnv 进解析。
+   */
+  nextEnv[PROFILE_ROOT_ENV] = resolveProfileRoot({ env: { ...process.env, ...nextEnv } });
   return {
     type: 'stdio',
     command: runtime.nodeCommand || 'node',

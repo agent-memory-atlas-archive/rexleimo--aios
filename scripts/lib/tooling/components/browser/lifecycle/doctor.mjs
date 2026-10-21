@@ -8,6 +8,11 @@ import {
 import {
   resolveLocalBrowserMcpScript,
 } from '../runtime/runtime-paths.mjs';
+import {
+  legacyProfileRoot,
+  profileTreeBusy,
+  resolveProfileRoot,
+} from '../profile-root.mjs';
 import { formatErrorMessage } from '../shared.mjs';
 
 // 纯函数：合并默认运行时和测试注入，让 doctor 逻辑不直接绑定真实系统命令。
@@ -144,6 +149,20 @@ export async function doctorBrowserMcp({ rootDir, io = console, fix = false, dry
     err('profile config missing: config/browser-profiles.json');
   } else {
     ok('profile config found: config/browser-profiles.json');
+  }
+
+  /* 中文注释：profile 根在哪——这一行就是“升级会不会被浏览器会话顶死”这个同因问题的现状。
+   * 旧根在安装树里时，Chrome 持有目录句柄会使 `aios update` 的改名让位被拒；现在只应当
+   * 作为过渡态出现，所以报 warn（不是 err：warn 不改 doctor 结枰）。 */
+  const profileRoot = resolveProfileRoot({ env: process.env });
+  const legacyRoot = legacyProfileRoot({ rootDir });
+  if (!fs.existsSync(legacyRoot)) {
+    ok(`profile root lives outside the install tree: ${profileRoot}`);
+  } else if (profileTreeBusy(legacyRoot)) {
+    warn(`profiles still inside the install tree and a live browser session holds them: ${legacyRoot}`);
+    warn('  an `aios update` swap will be refused while that holds; close the browser, then run: aios internal browser install');
+  } else {
+    warn(`stale profile root inside the install tree: ${legacyRoot} (unlocked); move it out with: aios internal browser install`);
   }
 
   let defaultProfile = null;

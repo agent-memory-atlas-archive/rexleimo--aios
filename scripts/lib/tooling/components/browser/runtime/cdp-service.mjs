@@ -11,6 +11,7 @@ import {
   normalizeCdpPort,
   resolveDefaultCdpPort,
 } from './runtime-paths.mjs';
+import { resolveProfileRoot } from '../profile-root.mjs';
 
 export function testPortOpen(port) {
   return new Promise((resolve) => {
@@ -39,6 +40,9 @@ export function resolveCdpServiceLayout(rootDir, port = DEFAULT_CDP_SERVICE_PORT
   }
 
   const resolvedPort = normalizeCdpPort(port);
+  // 中文注释：CDP 的 user-data-dir 必须落在安装树外——它在安装树里时，一个活着的 Chrome
+  // 就能把下一次 `aios update` 的换入（Directory::Move）顶死。
+  const profileRoot = resolveProfileRoot({ env: process.env, homeDir });
   const label = `${CDP_SERVICE_LABEL_PREFIX}${resolvedPort}`;
   const logsDir = path.join(homeDir, 'Library', 'Logs');
   const launchAgentsDir = path.join(homeDir, 'Library', 'LaunchAgents');
@@ -56,7 +60,8 @@ export function resolveCdpServiceLayout(rootDir, port = DEFAULT_CDP_SERVICE_PORT
     launcherPath: path.join(localBinDir, `aios-cdp-${resolvedPort}-start.sh`),
     stdoutPath: path.join(logsDir, `aios-cdp-${resolvedPort}.out.log`),
     stderrPath: path.join(logsDir, `aios-cdp-${resolvedPort}.err.log`),
-    userDataDir: path.join(rootDir, '.browser-profiles', resolvedPort === 9222 ? 'default-cdp' : `default-cdp-${resolvedPort}`),
+    userDataDir: path.join(profileRoot, resolvedPort === 9222 ? 'default-cdp' : `default-cdp-${resolvedPort}`),
+    profileRoot,
   };
 }
 

@@ -14,6 +14,7 @@
       "scripts/tests/clients/adapters/headroom-mcp-registration.test.mjs",
       "scripts/tests/clients/adapters/zcode-agents-plugin.test.mjs",
       "scripts/tests/clients/adapters/zcode-mcp-nested-migration.test.mjs",
+      "scripts/tests/clients/browser-core/profile-root.test.mjs",
       "scripts/tests/clients/browser-core/browser-local-mcp.test.mjs",
       "scripts/tests/clients/browser-core/browser-mode-switch.test.mjs",
       "scripts/tests/clients/browser-core/browser-mode.test.mjs",

@@ -141,6 +141,7 @@ PRs should include:
 
 ## Browser MCP Selection
 - In this repo, use the `mcp-browser-use` alias backed by `scripts/run-local-browser-mcp.mjs`.
+- Browser profile data lives **outside** the install tree at `~/.rexcil/browser-profiles` (override with `AIOS_BROWSER_PROFILE_ROOT`, absolute only). `config/browser-profiles.json` keeps `.browser-profiles/<name>` values — those are profile *names*; the location comes from the profile root. Never reintroduce a profile path inside `<install>`: a live Chrome holding a directory there makes the `Directory::Move` that `aios update` uses to swap installs fail, and the refusal is only clean, not survivable.
 - Use `browser_launch` for a local browser or configure the profile with `cdpPort`/`cdpUrl` for an externally started browser.
 - If multiple browser MCPs are available, do **not** use `chrome-devtools` for normal business flows; reserve it for low-level inspection/debugging only.
 - Default reasoning order for page understanding: `browser_snapshot` first, then targeted HTML or screenshots as fallbacks.

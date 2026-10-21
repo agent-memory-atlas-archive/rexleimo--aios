@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.9.0] - 2026-10-22
+
+### Added
+
+- feat(browser): 浏览器 profile 根搬到安装树外，默认 `~/.rexcil/browser-profiles`（与安装根 `~/.rexcil/aios` 同卷，所以迁移就是一次 rename）。新增单一契约变量 `AIOS_BROWSER_PROFILE_ROOT`（只接受绝对路径）：AIOS 侧在 `mcp-server-builders.mjs` 里把它算好注进浏览器 MCP 子进程，TS 侧只读这个值，读不到就退回 `REXCIL_HOME`/`~/.rexcil` 推导——两侧同一语义，不留第二份安装布局知识。位置定义集中在 `scripts/lib/tooling/components/browser/profile-root.mjs`（根解析、旧串映射、锁判定、迁移四件事）。`config/browser-profiles.json` **不改一个字段**：里面的 `.browser-profiles/<name>` 是 profile 的名字不是位置，resolver 把旧串直接折到新根（Windows 手写的反斜杠同形同样折）。CDP 服务布局（`cdp-service.mjs` 的 `userDataDir`）一并改到新根，否则 Mac 上同一个争用面原地保留。
+
+### Fixed
+
+- fix(browser): `aios update` 不再被一个活着的浏览器会话顶死。旧位置把 profile 放在安装根里面，而换入靠 `[System.IO.Directory]::Move` 给安装目录改名让位——Chrome 用 `--user-data-dir=<安装树内路径>` 持有目录句柄时，Windows 直接拒这个改名。本机实测两次：一次孤儿 browser MCP + 9 个 Chrome（自己退出后升级才成功），一次活会话止写 `grill`/`headless-check`（19 个 Chrome，当场拦住 v6.8.0 本机升级）。对照事实把锁源说得很清楚：十几个只持有安装树内**脚本文件**的 bridge 并不挡改名，挡的是**目录名占用**——所以这不是"进程太多"，是位放错了。
+- fix(browser): 迁移只在客观安全时动文件系统，拒绕就是拒绕不是降级。判凭是 Chrome 自己写的 `SingletonLock`（根目录或任一子 profile 带锁 = 活会话），新根已存在时**绝不合并**，软链接旧根不搬，`rename` 失败（如 EXDEV）时旧数据原地完好并带原因上报。状态一律打出来（`migrated`/`no-legacy`/`target-exists`/`locked`/`error`），不静默。
+- fix(browser): 卸除两处会把旧位置“焊回来”的字面量——`launcher.ts` 的兜底 `'.browser-profiles/local'` 改成走 `getProfileDir('local')`；`cdp-service.mjs` 的 `path.join(rootDir, '.browser-profiles', …)` 改用 profile 根。安装器的 `preservePaths` **不改**：过渡期仍需要它兜住尚未迁移的安装。
+
+### Notes
+
+- 新增 `aios internal browser doctor` 一行现状：根已在安装树外（OK）/ 旧根存在但被活会话占着（WARN，并告知它会挡住下一次升级）/ 旧根没人用（WARN，告知迁移命令）。warn 不改 doctor 结枰（只有 err 会），所以不会把现有用户变成红。
+- 浏览器 MCP 子进程如果跑的是旧 `mcp-server/dist`（发布归档不打包 dist，但用户自己 `npm run build` 过就会优先用 dist），需重新构建才拿到新逻辑；升级本身会整树改名重建，所以升级后的安装天然走 tsx+src。
+
+Evidence: `node --test scripts/tests/clients/browser-core/profile-root.test.mjs` → tests=9 pass=9 fail=0（覆盖：根不在安装树内、契约变量优先且只认绝对值、旧串/反斜杠同形映射、`SingletonLock` 判定、五种迁移状态 + 失败时旧树完好 + 幂等、软链接拒搬、dry-run 不碰盘、CDP 布局落在外部、builder 注入绝对契约值）；`npm --prefix mcp-server run typecheck` → 0 错，`npm --prefix mcp-server test` → tests=117 pass=105 fail=0（新增 3 条 TS 侧同名契约全部 pass）；`node --test scripts/tests/clients/browser-core/*.test.mjs` → tests=61 pass=61 fail=0；消费方套件（browser-local-mcp / aios-components / aios-doctor / aios-lifecycle-plan / platform-smoke）→ tests=102 pass=102 fail=0，新增 env key 没破任何配置快照断言；test-suite-wiring 6/6（新测试已登记进 regression 清单）；dir-budget 767 dirs 0 blocking；`git grep "'\.browser-profiles'"` 复核：除安装器 preservePaths 与配置里的 profile 名外无硬编码残留。
+
+### Known limits
+
+- 本版本只改新安装与已接线消费者的行为。现场旧安装里的 `.browser-profiles` 要等到浏览器会话结束（锁消失）才能搬走；那期间 `aios update` 仍会被同一个目录句柄拒绕——现在会告诉你原因和处置命令，不再只留一句错误。
+- 已有安装如果自己 `npm run mcp-server` 构建过，旧 dist 仍含旧逻辑；重新构建或升级（整树重建）即恢复。
+
 ## [6.8.0] - 2026-10-21
 
 ### Added

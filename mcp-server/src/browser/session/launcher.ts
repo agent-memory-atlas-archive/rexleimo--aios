@@ -332,7 +332,9 @@ export class BrowserLauncher {
           }
 
           // 仅在显式允许回退时，对 default profile 自动降级到 local。
-          const fallbackProfile = profileManager.getProfile('local') || { name: 'local', userDataDir: '.browser-profiles/local' };
+          // 中文注释：不再写死 `.browser-profiles/local` 这种路径字面量——位置由 profile 根决定，
+          // 留一个字面量在角落里就等于把旧位置重新焊回安装树。
+          const fallbackProfile = profileManager.getProfile('local') || { name: 'local' };
           const fallbackUserDataDir = fallbackProfile.userDataDir
             ? profileManager.resolveWorkspacePath(fallbackProfile.userDataDir)
             : profileManager.getProfileDir('local');
