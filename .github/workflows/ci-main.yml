@@ -161,7 +161,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          # 中文注释：本作业会 `playwright install chromium`，而 Playwright 1.58 只支持到
+          # ubuntu24.04-x64；`ubuntu-latest` 已是 26.04，会直接 “does not support chromium” 失败。
+          - ubuntu-24.04
           - macos-latest
           - windows-latest
     steps:

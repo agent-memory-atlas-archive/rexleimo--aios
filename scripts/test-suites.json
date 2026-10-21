@@ -209,6 +209,7 @@
       "scripts/tests/tooling/contracts/integration.test.mjs",
       "scripts/tests/tooling/contracts/judgment.test.mjs",
       "scripts/tests/tooling/contracts/public-content-contract.test.mjs",
+      "scripts/tests/tooling/contracts/workflow-runner-support.test.mjs",
       "scripts/tests/tooling/io-safety/atomic-write.test.mjs",
       "scripts/tests/tooling/io-safety/repo-lock.test.mjs",
       "scripts/tests/tooling/offload/canvas-context-scaling.test.mjs",

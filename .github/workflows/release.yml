@@ -10,7 +10,12 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 中文注释：必须钉住 Playwright 支持的 Ubuntu 版本。GitHub `ubuntu-latest` 已移到
+    # 26.04，而 Playwright 1.58 的 chromium 支持表只到 ubuntu24.04-x64，于是
+    # “Verify local browser MCP install path” 硬失败：
+    # ERROR: Playwright does not support chromium on ubuntu26.04-x64（重试永远绿不了）。
+    # 新版镜像可用时再抬，不要退回 latest。
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

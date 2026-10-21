@@ -14,7 +14,9 @@ on:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    # 中文注释：本作业会 `playwright install --with-deps chromium`；Playwright 1.58 只支持到
+    # ubuntu24.04-x64，`ubuntu-latest`（已是 26.04）会直接报 “does not support chromium”。
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
