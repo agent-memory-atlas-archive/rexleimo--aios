@@ -10,6 +10,9 @@ import { CLIENT_DEFINITIONS } from '../../foundation/clients/selection/core/defi
 export const PROJECTION_MARKER = '.rex-projection.json';
 
 /**
+ * 参数 `clientSkillRoots` 接受的是相对项目根的 skill 目录名（如 .codex），不是客户端 id：
+ * pi 与 zcode 共用 .agents，按目录去重才是真实的覆盖面。
+ *
  * 度量面的权威是客户端注册表，不是本模块里的一份清单：`projectSkillRoot` 己在
  * `definitions.mjs` 里逐客户端登记过，在这里再拄一份就会让"零漂移"只说表面的一部分
  * （实测：硬编码 5 个根 checked=85 vs 注册表全集 checked=153）。
@@ -63,12 +66,12 @@ function comparePayloads(sourceDir, projectedDir) {
 export function collectProjectionDrift({
   installRoot,
   repoRoot,
-  clients = registrySkillRoots(),
+  clientSkillRoots = registrySkillRoots(),
 } = {}) {
   if (!installRoot || !repoRoot) throw new TypeError('collectProjectionDrift requires installRoot and repoRoot');
   const sourceRoot = path.join(installRoot, 'rex-harness', 'skill-sources');
   const entries = [];
-  for (const client of clients) {
+  for (const client of clientSkillRoots) {
     const skillsDir = path.join(repoRoot, client, 'skills');
     if (!fs.existsSync(skillsDir)) continue;
     for (const skill of fs.readdirSync(skillsDir).sort()) {

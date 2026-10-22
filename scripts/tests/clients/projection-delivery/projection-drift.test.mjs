@@ -143,7 +143,7 @@ test('the default measurement surface is the whole client registry, not a local 
     const registryRoots = registrySkillRoots();
     const explicit = await collectProjectionDrift({
       installRoot: fx.install, repoRoot: fx.repo,
-      clients: registryRoots,
+      clientSkillRoots: registryRoots,
     });
     assert.equal(report.checked, explicit.checked,
       '默认覆盖面必须等于注册表 projectSkillRoot 全集（一条规则只有一个 owner）');
