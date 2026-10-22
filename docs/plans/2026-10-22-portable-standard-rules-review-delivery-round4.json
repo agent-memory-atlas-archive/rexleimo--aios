@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:0cab76cb",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round4.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-delivery-guarantee",
+  "standardsFindings": [
+    {
+      "id": "S4-R7-1",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (static import specifier vs path.resolve(import.meta.dirname,...))",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "同一个 rex-harness 位置用了两种写法，必须同时正确才绿；由一处派生后复用"
+    },
+    {
+      "id": "S4-R7-2",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (new RegExp(standards, u))",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "用正则承担字符串包含，安全性来自技能名恰好没有元字符；改用 includes 或显式转义"
+    },
+    {
+      "id": "S4-R7-3",
+      "position": "scripts/lib/clients/rex-harness/projection-drift.mjs (clientSkillRoots)",
+      "evidence": [
+        "file:scripts/tests/clients/projection-delivery/projection-drift.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "未知选项静默回落默认值会让调用点改名后交叉检查退化成同义反复（本轮实测发生）；与 resolveStandardConfig 的拒绝未知键原则统一，留给 work-budget-engine"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R7-1",
+      "position": "delivery-ticket work-delivery-guarantee C4/C6",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json",
+        "git:84471b8f"
+      ],
+      "severity": "hard",
+      "recommendation": "doctor 机读漂移与 unmanaged 数未实现；aios update 不重生投影（grep 零命中）。C0/C5/C8/V0/V1 达成不等于送达闭环，completionClaim 保持 soft"
+    },
+    {
+      "id": "SP-R7-2",
+      "position": "work-delivery-guarantee C0/C5",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
+        "receipt:48b613bb-35c3-4f87-95f6-f3135d942cb5"
+      ],
+      "severity": "judgement",
+      "recommendation": "达成且经反向验证：源侧删标准引用→父侧 12 条全红 + 子模块存在性 1 红；默认面缩回旧 5 根→交叉检查 1 红；还原后 16/16、子模块 231/231、接线门 6/6。并记录实测机制：目标与自记 sourceDigest 不一致即按人管保留，意外编辑会永久冻结该投影"
+    }
+  ],
+  "verdict": "pass",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round4.md",
+    "receipt:48b613bb-35c3-4f87-95f6-f3135d942cb5",
+    "git:b7ee3a43",
+    "git:e402bff"
+  ]
+}
