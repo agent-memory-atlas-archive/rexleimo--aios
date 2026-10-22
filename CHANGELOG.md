@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.10.0] - 2026-10-22
+
+### Added
+
+- **可移植工程标准（`aios standards check`）**：目录项数、单文件行数、重复行、依赖方向四条量化规则，任何 git 仓库都能跑，不再只是 AIOS 自己的私有门。项目侧只有一份 `config/standards.json`：`budgets`（可按整条规则或按实体覆盖）、`exemptions`（必须写理由）、`baselines`（存量，只许收缩）、`layers`（分层声明）。默认预算的唯一 owner 在 `rex-harness` 规则清单里，宿主不再各存一份数字。
+- **首次运行只报告，不拦你**：仓库没有 `config/standards.json` 时输出 `STOCK` 前缀、每规则最多 20 行、全量走 `--json`、退出码 0。`aios standards check --freeze` 把当前存量冻结成 `baselines` 并报告数量，从此这条门对该仓库生效——新增越界立刻红灯（实测 `kind=growth`），冻结是处置不是赦免。`--strict` 保留"未配置也拦"的旧行为。
+- **分层与依赖方向**：`layers.order`（外层→内层）+ `layers.prefixes`（路径前缀→层名）由项目自己声明；引擎只把**内层指向外层**的边判红，未声明分层或缺模块图一律 SKIP 并说明缺什么，不产出猜测式违规。模块图由 `standards check --write-edges` 从本仓库 tracked 源码自给生成（正则近似，非 AST）。
+- **重复行度量（近似等级）**：连续 6 行归一化文本相同的窗口，预算 0。局限写在规则清单与 `rex-engineering-standards` 技能里：改名就看不见、窗口以下的相似不算、单文件自重复不算。
+- `rex-harness` 子模块升级到 **v0.12.0**（引擎、命令、`--freeze/--strict/--write-edges`、分层声明、证据引用完整性修复都在这里）。
+
+### Fixed
+
+- 依赖方向门的输入检查把"输入齐备"误当成"本构建供不了这个输入"，导致这条规则此前在任何项目上都静默 SKIP。
+- `runStandards` 缺省读器时静默量到 0 个实体并报 `status=ok / exit 0`（假通过）；现在量不到任何实体是结构化 `measure-error` 且退出码 1。
+- `git:` 证据引用要求 7-40 位小写十六进制，`receipt:` 引用在所有 evidence 种类上都必须能在 receipt 存储里解析（此前审查阶段的伪造引用可以通过）。
+
 ## [6.9.0] - 2026-10-22
 
 ### Added
