@@ -1,0 +1,20 @@
+{
+  "kind": "behavior-preserving-hardening",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-wiring",
+  "baseline": {
+    "publicEntry": "rex-harness/src/index.mjs 公开面（installClientProjection / standardsReferenceConsumers / sharedReferenceSkillIds）与 skill-sources Provider 正文",
+    "setup": "独立可清理基线：临时项目根之外的既有测试面（父侧投影漂移套件 + 子模块 skill-sources 套件）一起跑，工作树为加担保前的 1cd5a942（子模块 cab9105 之前）",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "scripts/tests/clients/projection-delivery/projection-drift.test.mjs",
+        "rex-harness/tests/skills/skill-sources.test.mjs"
+      ],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "第 0 步先加载标准的 wiring 自 rex-harness 0.8.0 起就在四个 Provider 源文里，基线场景应全绿——缺的是担保，不是行为",
+    "observed": "tests 14 / pass 14 / fail 0，退出码 0",
+    "receiptRef": "receipt:83c6e2ee-e2e7-42e2-af9c-57575d41918e"
+  }
+}

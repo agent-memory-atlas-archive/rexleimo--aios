@@ -161,3 +161,13 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 两条反向验证（子代理式自证，不是嘴上说绿）：删掉 rex-code-review 的第 0 步 → 4 条里 1 红，报 "no longer references"；
 把第 0 步移到正文之后 → 1 红（位置担保）。两次都还原并复测 4/4；`git status` 确认源文件已回原状。
 过程中还纠掉一处自我实现断言：`firstHeadingAt` 原本从 reference 之后开始找，使 `referenceAt < firstHeadingAt` 恒真。
+
+### wiring 加固的不变式复核（verify-invariants）
+
+| 不变式 | 核对方式 | 实测 |
+|---|---|---|
+| 生产逻辑未改 | `git -C rex-harness diff 1a1cd75..cab9105 -- src/ \| grep '^+' \| grep -cE 'function \|if \|return \|=>\|for '` | `0`：src 侧只加了一个冻结常量与一条导出（install.mjs +10，index.mjs +6/-1，-1 是导出块重写） |
+| 未删未弱化既有用例 | `--numstat -- tests/` 去掉新文件后 | 空——只新增 `standards-provider-wiring.test.mjs`（+54/-0） |
+| 担保真的会咬 | 两次反向验证后还原 | 删第 0 步 → 1 红（no longer references）；把第 0 步移到正文之后 → 1 红（位置）；还原后 4/4 |
+| 未把假安心带进去 | 自查过程中发现并当场修掉 | `firstHeadingAt` 原先从 reference 之后开始找，使位置断言恒真；改为从文件开头找之后，位置反向验证才会红 |
+| 全量未退 | 子模块 `npm test` / 父侧四套合跑 / 接线门 / 目录预算 | 231/231；19/19（`receipt:736a40d7`）；wiring gate 6/6；`0 blocking` |
