@@ -36,11 +36,13 @@
         "升级时自动重生投影与 aios doctor 漂移报告落在父仓库（AIOS 集成路径，不是子模块公开面）",
         "子模块侧改动批量成一个子模块 release；父仓库的子模块指针移动作为独立 commit，不与功能改动混提",
         "SKILL.md 送达漂移从实测 30 条（6 技能 x 5 客户端）降到 0；仅附属物（evals/references）差异 15 条单独报数，不作为通过条件；检查总数 66 条，干净口径见 test-scope 文档",
-        "aios doctor 输出一条可机读的投影漂移计数（落后条目数 + 重生命令），当前该 grep 无任何 projection 检查",
+        "aios doctor 输出一条可机读的投影状态：skillDrift 数、unmanaged 数与可执行的重生命令；当前该 grep 无任何 projection 检查（本仓库实测 6 条人管旧副本，安装器只 warn 保留，绿灯会掩盖它们）",
         "存在测试：去掉任一 code-producing Provider 的『先加载 rex-engineering-standards』第 0 步即变红（当前 scripts/tests 与 rex-harness/tests 对该 wiring 零命中）",
         "aios update / init 路径会重生投影，升级后不再残留旧版本投影",
         "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义",
-        "不得把「安装运行时 ↔ 仓库子模块 checkout」之间的发布归档加工差异计入送达漂移（早期审计得到 45/66 即混入了这类无关项，见 test-scope 文档的度量口径节）"
+        "不得把「安装运行时 ↔ 仓库子模块 checkout」之间的发布归档加工差异计入送达漂移（早期审计得到 45/66 即混入了这类无关项，见 test-scope 文档的度量口径节）",
+        "漂移度量覆盖面取自客户端注册表的 projectSkillRoot 全集，不写死本地清单；担保测试断言“度量面 == 注册表客户端全集”（实测差值：registry-driven checked=153 vs 硬编码 checked=85）",
+        "unmanaged 判定以源侧目录名为权威（同名源目录存在且投影无 marker），不得用 rex- 命名前缀猜归属"
       ],
       "verification": [
         "node --test scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
