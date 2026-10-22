@@ -302,3 +302,6 @@ C7/C8 的担保方式：新测试一律在 fixture git 仓库上跑，不引用�
 `package.json` 没有 quality 脚本，`ci-main.yml` 不跑，`release-preflight.sh` 也不跑。
 于是那 3 条 facade 超标是**长期存在但无人可见**的红灯——本轮把它们接进引擎时没有登记 baselines，
 就是为了让它们继续是可见的违规而不是被静默赦免。是否要冻结存量（300/467/417）是存量处置决定，留给用户。
+（自曝：decide-testability 提交的那份 JSON 里我把 RED 写成 "pass 1 / fail 4"，与总共 4 条自相矛盾；
+ 真实观测是 pass 1 / fail 3，已在 receipt:49eed7ab 对应的测试输出上重读确认后改正该文件。
+ 数字写错和数字猜错是同一种病，只是后果轻一点。）

@@ -1,0 +1,20 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-line-owner-round10",
+  "redCandidate": {
+    "publicEntry": "scripts/lib/foundation/architecture/governance.mjs 的 evaluateArchitectureGovernance({rootDir, rules, config}) —— 行数度量与超标判定改走 rex-harness 公开面的 measureFileLines + applyBudgetRule",
+    "setup": "fixture 根目录写 scripts/lib/demo.mjs（三行）并喂一条 maxLines=2 的规则：断言 checks[0].disposition === 'violation'、count === 3、maxLines === 2、report.ok === false；再在 fixture 的 config/standards.json 里写 exemptions.fileLines 指向该路径，断言 disposition === 'exempt' 且 reason 回到报告里、report.ok === true；再写 baselines.fileLines count=3，断言 disposition === 'baseline'、detail 含 baseline，把文件加到四行后复跑断言变回 violation 且失败信息含 baseline 3；最后断言入口缺失与 requiredModules 缺失两类仍然是 FAIL（这两类不是预算，不许被塞进引擎）",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "scripts/tests/foundation/standards/architecture-line-owner.test.mjs"
+      ],
+      "cwd": "E:\\\\coding\\\\harness-cli"
+    },
+    "expected": "本仓库只剩一处行数定义与一处超标判定；处置(exempt/baseline/violation/pass)与理由来自项目配置和引擎，governance 只负责读文件、聚合、以及它自己那两类结构检查",
+    "observed": "tests 4 / pass 1 / fail 3，退出码 1：断言 超标这件事必须由预算引擎给出处置 失败——旧 checks[0] 只有 lineCount/maxLines/failures，没有 disposition；豁免那条同样失败（旧实现根本不读项目配置）。第三条（基线只许收缩）与第四条（入口缺失/模块缺失仍 FAIL）在旧实现下即应成立，属既有行为，RED 阶段它们本来就是绿的",
+    "failureReason": "不是工具故障而是所有权分裂：清单/引擎定义 physical lines 并给出处置，governance 另有一套——countSourceLines 先 trim 再切，然后自己比 lineCount > rule.maxLines 生成 failures。迁移前实测：50 条既有规则上两种定义计数一字不差（0 条差异），也就是说这第二条 owner 从未产出过不同数字，只带来两份可各自漂移的语义；这正是 ADR 0002 要消灭的形状，也是上一轮审查记下的 SP-R9-1",
+    "receiptRef": "receipt:49eed7ab-e8e7-4d60-8e30-0649b97cf695"
+  }
+}

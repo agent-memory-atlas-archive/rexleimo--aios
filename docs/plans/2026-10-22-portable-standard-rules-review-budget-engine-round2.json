@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:52244f7a",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round2.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-budget-engine",
+  "standardsFindings": [
+    {
+      "id": "S5-R10-1",
+      "position": "file:scripts/lib/foundation/architecture/governance.mjs failures[] also carries baseline notes while status stays OK",
+      "evidence": [
+        "file:scripts/lib/foundation/architecture/governance.mjs",
+        "file:scripts/tests/foundation/standards/architecture-line-owner.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "字段名会说谎：基线说明只该进 detail，failures 留给真失败"
+    },
+    {
+      "id": "S5-R10-2",
+      "position": "file:scripts/lib/foundation/architecture/governance.mjs countSourceLines compat alias with changed semantics",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round2.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "语义从 trim 变为 physical lines；仓库内除一处措辞断言外无其它消费者。别名必须在下一次触碰该文件时删除，否则兼容层自己长成第二条 owner"
+    },
+    {
+      "id": "S5-R10-3",
+      "position": "scripts/tests/tooling/runtime-probe/platform-smoke.test.mjs local countSourceLines + <=40 budget",
+      "evidence": [
+        "file:scripts/tests/tooling/runtime-probe/platform-smoke.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "同一条行数规则在本仓库的第三个 owner；不属本轮验收范围，登记给 work-dup-metric，不顺手改以免把有界修复扩成重排"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R10-1",
+      "position": "review-budget-engine-round1 SP-R9-1",
+      "evidence": [
+        "receipt:49eed7ab-e8e7-4d60-8e30-0649b97cf695",
+        "receipt:d43865bc-9282-4ded-96d5-44fd396907f2",
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round2.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "关闭：度量与判定唯一来自引擎，豁免/存量唯一来自 config/standards.json。裁决先量后选——50 条规则上两种定义 0 条差异；迁移后判定集合逐字不变（47 pass / 3 violation at 300,467,417）"
+    },
+    {
+      "id": "SP-R10-2",
+      "position": "work-budget-engine 9 条验收",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round2.md",
+        "receipt:a3444f90-c86a-420d-a3cf-41a52870f899",
+        "git:24cc9306"
+      ],
+      "severity": "judgement",
+      "recommendation": "全部达成，本项关闭；整体 work item portable-standard-rules 仍剩 work-cli-surface / work-self-consumer / work-layer-gate / work-external-proof / work-dup-metric 五项，completionClaim 保持 soft"
+    },
+    {
+      "id": "SP-R10-3",
+      "position": "quality:architecture gate has no automated runner",
+      "evidence": [
+        "file:package.json",
+        "file:.github/workflows/ci-main.yml",
+        "file:scripts/release-preflight.sh"
+      ],
+      "severity": "judgement",
+      "recommendation": "门没有任何自动化路径执行（无 npm 脚本、CI 不跑、release-preflight 不跑），所以 3 条 facade 超标长期不可见。本轮故意不登记 baselines 也不接线：接线即红灯，而修/冻结/只留可见性是存量处置决定，需 owner 选"
+    }
+  ],
+  "verdict": "pass",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round2.md",
+    "receipt:49eed7ab-e8e7-4d60-8e30-0649b97cf695",
+    "receipt:d43865bc-9282-4ded-96d5-44fd396907f2",
+    "receipt:a3444f90-c86a-420d-a3cf-41a52870f899",
+    "git:777a9621",
+    "git:24cc9306"
+  ]
+}
