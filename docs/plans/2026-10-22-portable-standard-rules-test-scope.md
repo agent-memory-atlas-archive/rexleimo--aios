@@ -107,3 +107,20 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 
 基线（加断言前必须真实通过）：`node --test rex-harness/tests/domain/standard-config.test.mjs`，5 条用例全绿。
 本轮不产生诚实 RED：若把已有行为写成"新行为"就是伪造差异；因此按 hardening 分流，Rex 应选加固验证而非 TDD。
+
+## work-delivery-guarantee 范围（投影送达可观察化）
+
+干净口径：**客户端投影目录 ↔ 安装运行时 `rex-harness/skill-sources`**（生成器是 `fs.cpSync` 原样拷贝，
+所以内容差异只能来自"没重生"，不能来自发布加工——C8 的根据）。安装态布局实测：
+`~/.rexcil/aios/rex-harness/src/index.mjs` 与 `scripts/` 同级，存在 ✓。
+
+| 标准 | 行为性质 | 缝 | 断言 |
+|---|---|---|---|
+| C3/C4 漂移可机读 | **新用户可观察行为**（当前无任何 projection 检查，审计脚本还躺在 `.aios/tmp`） | 新 CLI `node scripts/aios-projection-drift.mjs --json --install-root <dir> --repo-root <dir>` | 输出 `{ checked, skillDrift, attachmentDrift, entries[] }`；`--fail-on-drift` 时 skillDrift>0 → 退出 1；根目录由调用方给，不固定为脚本自身仓库（吸收 work-config-surface 的 C7 教训） |
+| C3 本机归零 | 证据（不可作 fixture 断言） | 同上，真实安装根 | 重生前后各跑一次：30 → 0，附属物差异单独报数 |
+| C5/C0 wiring 担保 | 担保测试（源码已有第 0 步，今天不产生红） | 子模块 `tests/skills/standards-provider-wiring.test.mjs` | 逐个 code-producing Provider 的 `skill-sources/**/SKILL.md` 含"第 0 步先加载 rex-engineering-standards"；删掉即红 |
+| C5 送达担保 | 担保测试 | 父侧 `scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs` | 客户端实际读的投影里也含第 0 步（源侧绿不等于送达绿——本轮立项的直接原因） |
+| C1/C6 升级重生 | 新行为 | `scripts/lib/execution/lifecycle/setup/self-update.mjs` 的既有依赖注入缝 | update 成功后调用投影重生；init 路径已有（`aios-init.mjs:97`），update 路径实测 grep 零命中 |
+| C4 doctor | 新行为 | `scripts/lib/environment/doctor/aggregate.mjs` 的 `doctor:rex-*` gate | 新增 check，note 内含 `skillDrift=<n>` 与重生命令 |
+
+诚实 RED 只登记机读漂移这一条。测试文件不得依赖本机安装：用 fixture 双根目录，真实安装只作为额外证据。

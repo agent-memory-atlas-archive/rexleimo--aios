@@ -1,0 +1,20 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-delivery-guarantee",
+  "redCandidate": {
+    "publicEntry": "scripts/aios-projection-drift.mjs --json --install-root <dir> --repo-root <dir>（新 CLI 公共入口；根目录一律由调用方给）",
+    "setup": "fixture 双根目录（假 install 运行时 + 假 repo 投影）3 个场景：干净投影报 0/0、SKILL.md 变陈旧计入 skillDrift、仅附属物差异计入 attachmentDrift 且不算 skillDrift，另加 --fail-on-drift 退出码 1",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "scripts/tests/clients/projection-delivery/projection-drift.test.mjs"
+      ],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "工具输出 { checked, skillDrift, attachmentDrift }，陈旧 SKILL.md 使 skillDrift=1，仅附属物差异不产生 skillDrift，--fail-on-drift 时退出码 1",
+    "observed": "tests 3 / fail 3，Error: Cannot find module 'E:\\coding\\harness-cli\\scripts\\aios-projection-drift.mjs'，退出码 1",
+    "failureReason": "新用户可观察行为缺失：漂移目前无法机读。仓库无任何 projection 检查（grep doctor 无命中），唯一审计是 .aios/tmp/projection-drift-audit-v2.mjs，gitignore 且口径写死，验收不可重复（工单 V1 正是为此）",
+    "receiptRef": "receipt:cb9328f6-983b-41a1-8545-c5c5a5370367"
+  }
+}
