@@ -630,6 +630,6 @@
       "rex-harness/skill-sources": "kernelInternals",
       "rex-harness/tests": "kernelInternals"
     },
-    "layersNote": "单一事实源：host 只能通过 kernelSurface（rex-harness/src/index.mjs）依赖内核。rex-import-boundaries.test.mjs 断言它的前缀集合与此一致，防止一份分层两个 owner。"
+    "layersNote": "分层事实的唯一写者：host 只能通过 kernelSurface（rex-harness/src/index.mjs）依赖内核；rex-import-boundaries 的 B5 断言钉住这里的前缀集合与其硬编码根一致。"
   }
 }
