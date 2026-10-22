@@ -97,7 +97,7 @@
         "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
       ],
       "verification": [
-        "node --test scripts/tests/tooling/standards/standards-cli.test.mjs",
+        "node --test scripts/tests/foundation/standards/standards-cli.test.mjs",
         "node scripts/lib/tooling/cli/dispatch/dispatch.mjs 路由断言测试"
       ],
       "evidenceRefs": [
@@ -147,7 +147,7 @@
         "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
       ],
       "verification": [
-        "node --test scripts/tests/tooling/standards/layer-dependency.test.mjs",
+        "node --test scripts/tests/foundation/standards/layer-dependency.test.mjs",
         "npm run test:regression"
       ],
       "evidenceRefs": [
@@ -193,7 +193,7 @@
         "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
       ],
       "verification": [
-        "node --test scripts/tests/tooling/standards/duplication.test.mjs"
+        "node --test scripts/tests/foundation/standards/duplication.test.mjs"
       ],
       "evidenceRefs": [
         "file:rex-harness/skill-sources/rex-engineering-standards/SKILL.md"
