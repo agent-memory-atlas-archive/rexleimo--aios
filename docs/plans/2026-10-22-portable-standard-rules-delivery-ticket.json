@@ -20,7 +20,7 @@
         "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
       ],
       "verification": [
-        "node --test scripts/tests/tooling/standards/rule-config.test.mjs"
+        "node --test scripts/tests/tooling/contracts/standard-rule-config.test.mjs"
       ],
       "evidenceRefs": [
         "artifact:decision-ticket:portable-standard-rules"
