@@ -33,13 +33,14 @@
       "outcome": "客户端读到的 rex 投影与安装源码一致，且投影漂移与 Provider wiring 都变成机器可检测状态。",
       "completionCriteria": [
         "Provider『第 0 步先加载标准』的担保测试落在子模块自己的 tests（测的是子模块 skill-sources，不能只在下游拦）",
-        "升级自动重生投影与 aios doctor 漂移报告落在父仓库（AIOS 集成路径）",
+        "升级时自动重生投影与 aios doctor 漂移报告落在父仓库（AIOS 集成路径，不是子模块公开面）",
         "子模块侧改动批量成一个子模块 release；父仓库的子模块指针移动作为独立 commit，不与功能改动混提",
-        "本机 rex 投影与安装源码内容不一致数从实测 45/66 降到 0",
+        "SKILL.md 送达漂移从实测 30 条（6 技能 x 5 客户端）降到 0；仅附属物（evals/references）差异 15 条单独报数，不作为通过条件；检查总数 66 条，干净口径见 test-scope 文档",
         "aios doctor 输出一条可机读的投影漂移计数（落后条目数 + 重生命令），当前该 grep 无任何 projection 检查",
         "存在测试：去掉任一 code-producing Provider 的『先加载 rex-engineering-standards』第 0 步即变红（当前 scripts/tests 与 rex-harness/tests 对该 wiring 零命中）",
         "aios update / init 路径会重生投影，升级后不再残留旧版本投影",
-        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义",
+        "不得把「安装运行时 ↔ 仓库子模块 checkout」之间的发布归档加工差异计入送达漂移（早期审计得到 45/66 即混入了这类无关项，见 test-scope 文档的度量口径节）"
       ],
       "verification": [
         "node --test scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",

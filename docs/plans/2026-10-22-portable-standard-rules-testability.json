@@ -1,0 +1,17 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-config",
+  "redCandidate": {
+    "publicEntry": "rex-harness/src/index.mjs（子模块公开面；父仓库唯一允许 import 的入口）",
+    "setup": "新建 scripts/tests/tooling/standards/rule-config.test.mjs，动态 import 公开面并断言其导出 QUANTITATIVE_STANDARD_RULES（目录 8 / 单文件 400 的单一权威），工作树 E:/coding/harness-cli 未改动子模块公开面",
+    "command": {
+      "executable": "node",
+      "args": ["--test", "scripts/tests/tooling/standards/rule-config.test.mjs"],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "公开面导出 QUANTITATIVE_STANDARD_RULES，且 directoryEntries.budget=8、fileLines.budget=400，父侧不再自写预算常量",
+    "observed": "AssertionError [ERR_ASSERTION]：公开面未导出 QUANTITATIVE_STANDARD_RULES；actual=undefined, expected=true；测试退出码 1（fail 1）",
+    "failureReason": "行为差异，非工具或解析故障：默认预算目前无单一权威——8 只写在父仓库 AGENTS.md 与 scripts/check-dir-budget.mjs 常量里，400 只写在子模块标准 §4 的散文里，公开面没有任何机器可读导出，所以 B1 无法被判定",
+    "receiptRef": "receipt:37d0161d-40ec-4719-bfec-d4c8bf2b5acd"
+  }
+}

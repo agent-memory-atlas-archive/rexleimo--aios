@@ -51,7 +51,7 @@ graph LR
 | work | 完成条件的判定方式 | 失败/超限时的回退点 |
 |---|---|---|
 | work-config-surface | `rule-config.test.mjs`：未知键、缺 reason 的 exempt、非法预算都必须结构化报错 | 契约不成立就退回 ADR 0002 重开，不实现"能读就行"的宽松解析 |
-| work-delivery-guarantee | 漂移审计数从 45/66 归零 + `rex-standards-wiring.test.mjs` 有"删掉第 0 步即变红"的真反例 | 若投影重生无法在 update 路径挂钩，本条降级为 doctor 只报警，**第一期不阻塞后续切片**，但必须在 ticket 里记 blocked 原因 |
+| work-delivery-guarantee | 干净口径报数（投影 ↔ 安装源码）：SKILL.md 漂移从实测 30 条归零（附属物 15 条单独报数不作通过条件）+ 子模块内 `rex-standards-wiring` 测试有"删掉第 0 步即变红"的真反例 | 若投影重生无法在 update 路径挂钩，本条降级为 doctor 只报警，**第一期不阻塞后续切片**，但必须在 ticket 里记 blocked 原因 |
 | work-budget-engine | 现有 `dir-budget.test.mjs` 全绿 + 任意 rootDir fixture 通过 | 引擎改动若使本仓库预算报告出现新红灯，先迁豁免/基线数据再继续，不得放宽默认值 |
 | work-cli-surface | CLI 契约测试（0 与非 0 两条路径）+ 临时仓库 fixture 红→改→绿 | 若子命令面与现有 `quality-gate` 职责重叠，合并进 `quality-gate` 而不是新增第二条命令（ADR 0002 决策 4：不得裂成两个工具） |
 | work-self-consumer | `npm run test:scripts` + `aios doctor --strict` 双绿，且脚本内不再有私有常量 | 24 条 facade 规则迁移若使 `evaluateArchitectureGovernance` 出现行为差，保留旧路径为**过渡**并在 ADR 记录重开裁决，不许静默双轨 |
@@ -91,7 +91,7 @@ ledger: {
   facts: [
     "planning ticket 通过 normalizePlanningArtifact 校验（8 work items / 无环 / frontier 全覆盖）",
     "反例自证：人为造环被拒（delivery dependency graph contains a cycle）",
-    "送达现状：66 条 rex 投影中 45 条与安装源码不一致；wiring 担保测试 0 命中",
+    "送达现状（已按干净口径重算）：66 条 rex 投影中 SKILL.md 漂移 30 条（6 技能 × 5 客户端），仅附属物 15 条，完全一致 21 条；wiring 担保测试 0 命中",
     "修正轮：落点按子模块边界 ADR 0001 重定——引擎/清单默认值/CLI 实现/schema/wiring 测试均归子模块",
     "修正轮：新增边 work-delivery-guarantee → work-budget-engine（送达是前提 + 共享投影通路），ticket 重校仍 PASS"
   ],
