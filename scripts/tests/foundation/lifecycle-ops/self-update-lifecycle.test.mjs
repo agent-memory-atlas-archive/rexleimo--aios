@@ -312,3 +312,30 @@ test('win32 self-update falls back to the installer download when Node staging f
   const { readdir } = await import('node:fs/promises');
   assert.deepEqual(await readdir(stageBase), [], `回退后暂存根应为空：${JSON.stringify(await readdir(stageBase))}`);
 });
+
+test('an unreachable release source stops the update instead of installing an unverified version', async (t) => {
+  // 中文注释：匿名配额被同出口烧光时（本机真实状态），解析会抛 release-source-unreachable。
+  // 旧行为是打一行 warn 然后退回按创建时间排的 releases/latest 指针——那等于"查不到版本就装一个
+  // 没验过、还可能更低的包"。解析失败必须停在这里：下载本来就依赖这次解析。
+  const root = await tempRoot('aios-selfupdate-', t);
+  const run = fakeRunner();
+  let downloaded = 0;
+
+  const result = await updateHarnessRuntime({
+    rootDir: root,
+    io: { log: () => {}, error: () => {} },
+    runCommandImpl: run,
+    resolveNewestRelease: async () => {
+      throw Object.assign(new Error('GitHub release lookup returned HTTP 403 (rate limited)'),
+        { code: 'release-lookup-rate-limited', attempts: ['release-lookup-rate-limited: HTTP 403', 'release-feed-http: HTTP 500'] });
+    },
+    downloadImpl: async () => { downloaded += 1; throw new Error('unreachable'); },
+  });
+
+  assert.equal(result.updated, false, JSON.stringify(result));
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, 'release-source-unreachable');
+  assert.deepEqual(result.detail, ['release-lookup-rate-limited: HTTP 403', 'release-feed-http: HTTP 500'],
+    '把两个源的失败原因交出去，用户才知道是配额问题而不是"没有新版本"');
+  assert.equal(downloaded, 0, '一次下载都不许发起');
+});

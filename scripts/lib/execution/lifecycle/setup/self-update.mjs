@@ -119,11 +119,21 @@ async function updateFromReleaseInstaller(rootDir, {
   // 抢占 latest。这里优先用调用方注入的 semver-max 查询拿到精确 tag；查询失败
   // 时退回 releases/latest 但保持旧行为。拿到 tag 后按 tag 精确拉取资产。
   let newest = null;
+  // 中文注释：能注入解析器时（真实运行路径就是这样），解析失败**不允许**退回 releases/latest：
+  // 那个指针按创建时间排序，补发旧版本会抢占它，于是"查询失败"会变成"装了一个没验过版本、
+  // 还可能更低的包"。解析不出来就停在这儿，把原因交出去；下载本来就依赖这次解析。
   if (typeof resolveNewestRelease === 'function') {
     try {
       newest = await resolveNewestRelease({ repo });
     } catch (error) {
-      io.log(`[warn] release lookup failed: ${error instanceof Error ? error.message : error}; falling back to releases/latest`);
+      io.log(`[warn] release lookup failed: ${error instanceof Error ? error.message : error}`);
+      return {
+        method: 'release-installer',
+        updated: false,
+        skipped: true,
+        reason: 'release-source-unreachable',
+        detail: (error && typeof error === 'object' ? error.attempts : null) ?? null,
+      };
     }
   }
   if (newest?.version && currentVersion) {
@@ -148,7 +158,10 @@ async function updateFromReleaseInstaller(rootDir, {
   // 生成 `releases/download/vX.Y.Z/download/aios-install.sh` → 404；而该分支
   // 恰恰是 release 查询成功（正常路径）时才会走到。资产基址在这里一次拼对，
   // 两个平台分支只追加文件名。
+  // 中文注释：只有"调用方压根没注入解析器"时才会用到 latest 指针（安装脚本等外部入口的旧行为）。
   const installerAssetBase = newest?.tag
+
+
     ? `https://github.com/${repo}/releases/download/${newest.tag}`
     : `https://github.com/${repo}/releases/latest/download`;
   const env = {
