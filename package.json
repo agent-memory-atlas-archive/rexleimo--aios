@@ -63,7 +63,8 @@
     "test:regression": "node scripts/run-test-suite.mjs regression",
     "test:affected": "node scripts/run-affected-tests.mjs",
     "tmp:gc": "node scripts/aios-tmp-gc.mjs --temp --older-than 1440",
-    "tmp:gc:trash": "node scripts/aios-tmp-gc.mjs --temp --older-than 1440 --mode to-trash"
+    "tmp:gc:trash": "node scripts/aios-tmp-gc.mjs --temp --older-than 1440 --mode to-trash",
+    "standards": "node scripts/aios-standards.mjs"
   },
   "devDependencies": {
     "tsx": "^4.21.0"

@@ -1,98 +1,35 @@
-// scripts/check-dir-budget.mjs — 目录条目预算门禁（每层 ≤8 的机器门禁）
-// 统计 git 跟踪文件下每个目录的直接条目数（文件+子目录都占一位）。
-// 三类处置：exempt（生成物/入口面/发现契约，跳过并注明理由）、
-// baseline（存量超标，冻结今日数，只许减少不许增加）、其余超标即红灯。
-// 用法：node scripts/check-dir-budget.mjs [--budget 8]
+// scripts/check-dir-budget.mjs — 目录条目预算门禁（本仓库的入口，判定不在此处）
+//
+// 中文注释：判定已搬到 rex-harness 公开面的 `applyBudgetRule`，豁免与存量搬到 `config/standards.json`。
+// 这个文件只剩两件事：把本仓库的 tracked 列表交给引擎，以及把引擎的处置表转成 CI 熟悉的
+// `failures/recovered` 形状。适配层只换形状，不再自己判定——否则同一条规则又有了第二个 owner。
+// 用法：node scripts/check-dir-budget.mjs [--budget N] [--root <dir>]
 // 退出码：新增超标或存量增长 → 1；否则 0。
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// 默认预算不在此处二次定义：只有一个权威，即 rex-harness 公开面的机器可读清单。
-// 项目侧只声明覆盖项与豁免理由（resolveStandardConfig 负责拒绝未知键与静默豁免）。
-import { QUANTITATIVE_STANDARD_RULES } from '../rex-harness/src/index.mjs';
+import { measureDirectoryEntries, QUANTITATIVE_STANDARD_RULES, applyBudgetRule } from '../rex-harness/src/index.mjs';
+import { loadProjectConfig, runStandardsRule } from './lib/foundation/architecture/standards-check.mjs';
+
+// 中文注释：既有调用方与测试用的名字保留为别名——引擎才是度量的实现者，这里不再写第二份算法。
+export { measureDirectoryEntries as countDirEntries } from '../rex-harness/src/index.mjs';
 
 export const DEFAULT_BUDGET = QUANTITATIVE_STANDARD_RULES.directoryEntries.budget;
+export const RULE_ID = 'directoryEntries';
 
-// 豁免：拆了反而错的地方（生成物/镜像、CLI 入口面、扁平发现契约）。
-export const EXEMPT_DIRS = Object.freeze({
-  '.': 'repo layout root (entry surface)',
-  'scripts': 'CLI entry surface; moves break package.json bin + hook/docs references',
-  'skill-sources': 'skill registry surface (one dir per skill)',
-  'docs/plans': 'plan-discovery flat contract (preflight/dry-run/MCP create flat there)',
-  'docs/reports': 'report log; same flat-discovery convention as plans',
-  'docs/reports/evidence/harness2-2026-10': 'one harness2 ladder run kept as a single artifact: drivers, result blobs and the stability log are cross-referenced by its README; splitting them loses reproducibility',
-  'docs/evidence/skill-training': 'training evidence log blobs',
-  'blog-site': 'generated site output',
-  'blog-site/ja': 'generated locale mirror',
-  'blog-site/ko': 'generated locale mirror',
-  'blog-site/zh': 'generated locale mirror',
-  'blog-site/assets': 'generated site assets',
-  'docs-site': 'generated site output',
-  'docs-site/ja': 'generated locale mirror',
-  'docs-site/ko': 'generated locale mirror',
-  'docs-site/zh': 'generated locale mirror',
-  'docs-site/assets': 'generated site assets',
-  'docs-site/overrides/partials/rex': 'generated site partials',
-  'docs/superpowers/plans': 'imported snapshot, not hand-maintained structure',
-  'docs/superpowers/specs': 'imported snapshot, not hand-maintained structure',
-  'pptx-ai-coding-share/pptxgenjs_helpers': 'vendored helpers',
-  'mcp-server': 'TS package entry surface (package.json/tsconfig + src/scripts/tests); 7 configs immovable, floor is 9',
-  'mcp-server/test-results': 'generated bench output',
-  'config': 'user-facing config surface (documented stable paths in messages/installers/docs; loaders join rootDir+config+name)',
-  'client-sources/native-base': 'client registry surface (one dir per client, mirrors skill-sources precedent)',
-  'agent-sources/roles': 'agent registry surface (one file per role; flat readdir contract in agents/source-tree.mjs)',
-});
-
-// 存量基线（2026-10-13 普查）：只许减不许增；清零后把条目删掉。
-// 2026-10-13 已清零：所有超标目录要么已语义拆分，要么落入上面的豁免面。
-// 2026-10-15：harness 9 / planning 12 曾短暂重登记（被新增测试推回超标），当天补齐
-// 执行面（pretest:scripts）后即完成语义拆分并再次清零：
-//   - scripts/tests/execution/harness → solo/ + team/（镜像 lib/execution/harness 分层）
-//   - scripts/tests/execution/planning → cli/ + flow/ + contract/
-export const BASELINE_COUNTS = Object.freeze({});
-
-export function countDirEntries(trackedFiles) {
-  const dirs = new Map();
-  for (const file of trackedFiles) {
-    const slash = file.lastIndexOf('/');
-    const dir = slash < 0 ? '.' : file.slice(0, slash);
-    if (!dirs.has(dir)) dirs.set(dir, new Set());
-    dirs.get(dir).add(file.slice(slash + 1));
-  }
-  // 子目录本身占父目录一位。
-  for (const dir of [...dirs.keys()]) {
-    if (dir === '.') continue;
-    const parent = dir.includes('/') ? dir.slice(0, dir.lastIndexOf('/')) : '.';
-    if (!dirs.has(parent)) dirs.set(parent, new Set());
-    dirs.get(parent).add(`${dir.slice(parent === '.' ? 0 : parent.length + 1)}/`);
-  }
-  return new Map([...dirs.entries()].map(([dir, entries]) => [dir, entries.size]));
-}
-
-export function evaluateBudgets(dirCounts, { budget = DEFAULT_BUDGET, exemptions = EXEMPT_DIRS, baseline = BASELINE_COUNTS } = {}) {
-  const failures = [];
-  const recovered = [];
-  for (const [dir, count] of dirCounts) {
-    if (count <= budget) {
-      if (Object.prototype.hasOwnProperty.call(baseline, dir)) recovered.push({ dir, count });
-      continue;
-    }
-    if (Object.prototype.hasOwnProperty.call(exemptions, dir)) continue;
-    if (Object.prototype.hasOwnProperty.call(baseline, dir)) {
-      if (count > baseline[dir]) {
-        failures.push({ dir, count, kind: 'growth', detail: `${dir}: ${count} > baseline ${baseline[dir]} (shrink only)` });
-      }
-      continue;
-    }
-    failures.push({ dir, count, kind: 'new', detail: `${dir}: ${count} > budget ${budget}` });
-  }
-  return { failures, recovered };
-}
-
-function listTrackedFiles(rootDir) {
-  const stdout = execFileSync('git', ['ls-files', '-z'], { cwd: rootDir, encoding: 'buffer' });
-  return stdout.toString('utf8').split('\0').map((line) => line.trim()).filter(Boolean);
+/** 中文注释：保持既有返回形状（failures[].dir/.kind/.detail、recovered[].dir/.count），判定来自引擎。 */
+export function evaluateBudgets(dirCounts, { budget = DEFAULT_BUDGET, exemptions = {}, baseline = {} } = {}) {
+  const report = applyBudgetRule({
+    rule: RULE_ID,
+    measurements: dirCounts,
+    budgets: { [RULE_ID]: budget },
+    exemptions: { [RULE_ID]: Object.entries(exemptions).map(([dir, reason]) => ({ path: dir, reason })) },
+    baselines: { [RULE_ID]: Object.entries(baseline).map(([dir, count]) => ({ path: dir, count })) },
+  });
+  return {
+    failures: report.violations.map((v) => ({ dir: v.path, count: v.count, kind: v.kind, detail: v.detail })),
+    recovered: report.recovered.map((r) => ({ dir: r.path, count: r.count })),
+  };
 }
 
 export function isDirectRun(argv = process.argv, metaUrl = import.meta.url) {
@@ -104,15 +41,42 @@ export function isDirectRun(argv = process.argv, metaUrl = import.meta.url) {
   }
 }
 
-if (isDirectRun()) {
+async function main() {
   const budgetFlag = process.argv.indexOf('--budget');
-  const budget = budgetFlag >= 0 ? Number.parseInt(process.argv[budgetFlag + 1], 10) || DEFAULT_BUDGET : DEFAULT_BUDGET;
-  const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-  const counts = countDirEntries(listTrackedFiles(rootDir));
-  const { failures, recovered } = evaluateBudgets(counts, { budget });
-  for (const failure of failures) console.log(`[dir-budget] FAIL ${failure.detail}`);
-  for (const item of recovered) console.log(`[dir-budget] RECOVERED ${item.dir} now ${item.count}; remove its baseline entry`);
-  const violators = [...counts.entries()].filter(([, n]) => n > budget).length;
-  console.log(`[dir-budget] ${counts.size} dirs, ${violators} over budget ${budget}: ${failures.length} blocking, ${recovered.length} recovered`);
-  process.exit(failures.length > 0 ? 1 : 0);
+  const budget = budgetFlag >= 0 ? Number.parseInt(process.argv[budgetFlag + 1], 10) || DEFAULT_BUDGET : undefined;
+  // 中文注释：目标根由调用方决定。默认仍是本仓库，因为 CI 就在仓库根跑，数字要与历史对齐；
+  // 可移植的那条命令是 scripts/aios-standards.mjs，它默认取 cwd。
+  const rootFlag = process.argv.indexOf('--root');
+  const rootDir = rootFlag >= 0
+    ? path.resolve(process.argv[rootFlag + 1])
+    : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+  const config = await loadProjectConfig({ rootDir });
+  if (config.ok !== true) {
+    for (const error of config.errors ?? []) {
+      console.log(`[dir-budget] config ${error.code} at ${error.path}: ${error.message}`);
+    }
+    process.exitCode = 1;
+    return;
+  }
+  const merged = budget === undefined ? config : { ...config, budgets: { ...config.budgets, [RULE_ID]: budget } };
+
+  const result = await runStandardsRule({ rootDir, rule: RULE_ID, config: merged });
+  if (result.status === 'skip') {
+    console.log(`[dir-budget] SKIP: ${result.reason}`);
+    process.exitCode = 0;
+    return;
+  }
+  const report = result.report;
+  for (const violation of report.violations) console.log(`[dir-budget] FAIL ${violation.detail}`);
+  for (const item of report.recovered) {
+    console.log(`[dir-budget] RECOVERED ${item.path} now ${item.count}; remove its baseline entry`);
+  }
+  console.log(`[dir-budget] ${report.measured} dirs, ${report.overBudget} over budget ${report.budget}: `
+    + `${report.blocking} blocking, ${report.recovered.length} recovered`);
+  process.exitCode = report.blocking > 0 ? 1 : 0;
+}
+
+if (isDirectRun()) {
+  await main();
 }

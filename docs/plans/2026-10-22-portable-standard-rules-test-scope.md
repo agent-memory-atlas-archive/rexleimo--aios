@@ -247,3 +247,26 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 "没测到 ≠ 零漂移"与"不用 rex 的项目不被报噪"两面。既有 `aios-doctor.test.mjs` 的 `effective_warn=2`
 一字未改仍绿，说明新门没有把噪声塞进别人的断言。复测 receipt:1865c148（退出 0），邻域 77/77，
 test:affected 2282/2273/0 fail。
+
+## 第九轮范围（work-budget-engine 第一轮：引擎出宿主）
+
+落点：引擎 `rex-harness/src/domain/budget-rule.mjs`（度量 + 三处置，纯键→数）；宿主适配
+`scripts/lib/foundation/architecture/standards-check.mjs`（定根、取 tracked 列表、源码扩展名策略）；
+命令 `scripts/aios-standards.mjs`（默认 cwd，`--root/--rule/--json`）；私有门
+`scripts/check-dir-budget.mjs` 退化为形状适配器。
+
+| 阶段 | 观测 | receipt |
+|---|---|---|
+| RED | `Cannot find module .../src/domain/budget-rule.mjs`，退出 1 | `receipt:07a4634f` |
+| GREEN | 子模块 6/6 新引擎测试 + 全量 238/238 | `receipt:2917db72` |
+
+迁移保真度（不是"我声称等价"，是同一条命令的前后数字）：私有门迁移前后都输出
+`[dir-budget] 768 dirs, 24 over budget 8: 0 blocking, 0 recovered`；26 条豁免从脚本常量搬进
+`config/standards.json`，`baselines` 为空。既有 `dir-budget.test.mjs` **一字未改**仍绿
+（`countDirEntries` 保留为引擎函数的别名，判定不再有两份）。
+
+C7/C8 的担保方式：新测试一律在 fixture git 仓库上跑，不引用本仓库数字。
+- 9 条目的 fixture 目录 → `root` 等于调用方给的目录、`blocking=1`、退出 1（过去钉死自家仓库时，
+  这条断言在别人仓库里跑不出来，正是 ADR 0002 记的 767 dirs 反例）
+- 非 git 目录 → `status:"skip"`、`reason:/not a git work tree/`、`measured:null`、退出 0
+- 配置写错段名（`budget` 而非 `budgets`）→ 退出 1 并报 `unknown-key`：静默按默认预算跑就是第二个 owner

@@ -230,6 +230,7 @@
       "scripts/tests/tooling/tools/aios-tmp-gc.test.mjs",
       "scripts/tests/tooling/tools/check-site-sync.test.mjs",
       "scripts/tests/tooling/tools/dir-budget.test.mjs",
+      "scripts/tests/foundation/standards/standards-cli.test.mjs",
       "scripts/tests/tooling/tools/doc-citations.test.mjs",
       "scripts/tests/tooling/tools/doctor-bootstrap-task.test.mjs",
       "scripts/tests/tooling/tools/llms-txt.test.mjs",

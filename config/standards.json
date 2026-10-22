@@ -1,0 +1,116 @@
+{
+  "budgets": {},
+  "exemptions": {
+    "directoryEntries": [
+      {
+        "path": ".",
+        "reason": "repo layout root (entry surface)"
+      },
+      {
+        "path": "scripts",
+        "reason": "CLI entry surface; moves break package.json bin + hook/docs references"
+      },
+      {
+        "path": "skill-sources",
+        "reason": "skill registry surface (one dir per skill)"
+      },
+      {
+        "path": "docs/plans",
+        "reason": "plan-discovery flat contract (preflight/dry-run/MCP create flat there)"
+      },
+      {
+        "path": "docs/reports",
+        "reason": "report log; same flat-discovery convention as plans"
+      },
+      {
+        "path": "docs/reports/evidence/harness2-2026-10",
+        "reason": "one harness2 ladder run kept as a single artifact: drivers, result blobs and the stability log are cross-referenced by its README; splitting them loses reproducibility"
+      },
+      {
+        "path": "docs/evidence/skill-training",
+        "reason": "training evidence log blobs"
+      },
+      {
+        "path": "blog-site",
+        "reason": "generated site output"
+      },
+      {
+        "path": "blog-site/ja",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "blog-site/ko",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "blog-site/zh",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "blog-site/assets",
+        "reason": "generated site assets"
+      },
+      {
+        "path": "docs-site",
+        "reason": "generated site output"
+      },
+      {
+        "path": "docs-site/ja",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "docs-site/ko",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "docs-site/zh",
+        "reason": "generated locale mirror"
+      },
+      {
+        "path": "docs-site/assets",
+        "reason": "generated site assets"
+      },
+      {
+        "path": "docs-site/overrides/partials/rex",
+        "reason": "generated site partials"
+      },
+      {
+        "path": "docs/superpowers/plans",
+        "reason": "imported snapshot, not hand-maintained structure"
+      },
+      {
+        "path": "docs/superpowers/specs",
+        "reason": "imported snapshot, not hand-maintained structure"
+      },
+      {
+        "path": "pptx-ai-coding-share/pptxgenjs_helpers",
+        "reason": "vendored helpers"
+      },
+      {
+        "path": "mcp-server",
+        "reason": "TS package entry surface (package.json/tsconfig + src/scripts/tests); 7 configs immovable, floor is 9"
+      },
+      {
+        "path": "mcp-server/test-results",
+        "reason": "generated bench output"
+      },
+      {
+        "path": "config",
+        "reason": "user-facing config surface (documented stable paths in messages/installers/docs; loaders join rootDir+config+name)"
+      },
+      {
+        "path": "client-sources/native-base",
+        "reason": "client registry surface (one dir per client, mirrors skill-sources precedent)"
+      },
+      {
+        "path": "agent-sources/roles",
+        "reason": "agent registry surface (one file per role; flat readdir contract in agents/source-tree.mjs)"
+      }
+    ],
+    "fileLines": []
+  },
+  "baselines": {
+    "directoryEntries": [],
+    "fileLines": []
+  }
+}
