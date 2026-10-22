@@ -149,3 +149,15 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 | C10 归属由源侧目录名决定 | **新用户可观察行为**（今天用 `/^rex-/` 前缀猜） | 同上 `unmanaged` 计数 | fixture 源侧存在 `helper-ui/`，投影侧同名目录存在但无 marker → 计入 unmanaged；同时源侧不存在的自有技能（`my-own-skill`）不得计入 |
 
 诚实 RED 两条都是行为差异，不用字面断言凑数。本轮不新增 CLI 参数：覆盖面来自注册表就是默认行为，`--clients` 之类的覆盖留给以后有真实需求时再加（§2 反对预留参数）。
+
+## 第六轮范围（C0 / C5：wiring 担保）
+
+| 标准 | 行为性质 | 缝 | 断言 |
+|---|---|---|---|
+| C0 源侧担保 | **behavior-preserving-hardening**：第 0 步自 0.8.0 就在源码里，缺的是担保不是行为 | 子模块 `tests/skills/standards-provider-wiring.test.mjs`，名单取自公开面 `standardsReferenceConsumers`（测试不抄第二份名单） | 登记表里每个 Provider：① 是 bundled provider；② 提到 `rex-engineering-standards`；③ 位置在正文首个 `##`/`###` 之前；④ 空表变红 |
+| C5 送达担保 | 同上 | 父侧 `scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs`（工单 V0 指定的文件名） | 经公开面 `installClientProjection` 落到临时项目根后，每个 Provider 的 SKILL.md 与源侧**逐字节相同**且仍含标准引用 |
+
+基线（加担保前的真实通过）：`node --test scripts/tests/clients/projection-delivery/projection-drift.test.mjs rex-harness/tests/skills/skill-sources.test.mjs` → 14/14，退出 0（`receipt:83c6e2ee`）。
+两条反向验证（子代理式自证，不是嘴上说绿）：删掉 rex-code-review 的第 0 步 → 4 条里 1 红，报 "no longer references"；
+把第 0 步移到正文之后 → 1 红（位置担保）。两次都还原并复测 4/4；`git status` 确认源文件已回原状。
+过程中还纠掉一处自我实现断言：`firstHeadingAt` 原本从 reference 之后开始找，使 `referenceAt < firstHeadingAt` 恒真。

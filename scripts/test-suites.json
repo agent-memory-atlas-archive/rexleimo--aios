@@ -212,6 +212,7 @@
       "scripts/tests/tooling/contracts/integration.test.mjs",
       "scripts/tests/tooling/contracts/judgment.test.mjs",
       "scripts/tests/tooling/contracts/public-content-contract.test.mjs",
+      "scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
       "scripts/tests/tooling/contracts/standard-rule-config.test.mjs",
       "scripts/tests/tooling/contracts/workflow-runner-support.test.mjs",
       "scripts/tests/tooling/io-safety/atomic-write.test.mjs",
