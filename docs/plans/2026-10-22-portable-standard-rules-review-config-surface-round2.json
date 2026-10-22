@@ -56,7 +56,7 @@
         "file:scripts/tests/tooling/contracts/standard-rule-config.test.mjs"
       ],
       "severity": "judgement",
-      "recommendation": "已达成：父侧读到的 DEFAULT_BUDGET 与清单逐项比对，父侧单独改数即红。固有边界如实记录：两侧同时改成同一个别的数值不会变红——那是「一个 owner」定义下可接受的行为，不需要额外担保。"
+      "recommendation": "已达成：父侧读到的 DEFAULT_BUDGET 与清单逐项比对，父侧单独改数即红。固有边界如实记录：两侧同时改成同一个别的数值不会变红——那是「一个 owner」定义下可接受的行为，不需要额外担保。（round-3 复核：加固通过，focused 6/6、全量 227/227、父侧 3/3）"
     },
     {
       "id": "SP-R2-2",
@@ -94,6 +94,8 @@
     "file:docs/plans/2026-10-22-portable-standard-rules-review-config-surface-round2.md",
     "receipt:9a314e3a-81cb-4d2c-a1a5-98b573045519",
     "git:fe16235f",
-    "git:48040bb"
+    "git:48040bb",
+    "receipt:790c27c8-b06d-431a-9839-ae16a42f340e",
+    "git:00f2ee0"
   ]
 }

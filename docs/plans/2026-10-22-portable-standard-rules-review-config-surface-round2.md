@@ -58,3 +58,21 @@ git -C rex-harness diff --stat 48bbe7a...48040bb →  5 files changed, 181 inser
 需求的验收 #1。Spec 轴 4 条发现（hard 2 / judgement 2），最严重 C5：只做了文档就差点当成做完。
 verdict `changes-requested`：下一轮补第 2 条的两条断言与第 3 条的契约声明，SKIP 实现与目标根解析按工单进
 `work-budget-engine`。
+
+## Round-3 加固复核（S4-R2-2 / S4-R2-3 处置）
+
+结论：**行为保持不变，断言只增不减**，两条 finding 关闭。逐条按客观事实核：
+
+| 不变式 | 核对方式 | 实测 |
+|---|---|---|
+| 生产逻辑未改 | `git -C rex-harness diff 48040bb..00f2ee0 -- src/domain/standard-config.mjs` 的 +/- 行 | 只有 4 行，全在头部注释块内（声明错误码闭集与 `missing-reason` 的覆盖面） |
+| 未弱化/删除断言 | `--numstat` 同一区间 | 测试文件 `20 0`（加 20 删 0） |
+| 新断言不是为绿而绿 | 加断言前基线单独跑 | baseline receipt `c5ab3d50` 5/5 退出 0；加完 focused `790c27c8` 6/6 退出 0 —— 覆盖的是**已存在**的分支，所以这是加固而非行为变更 |
+| 全量未退 | 子模块 `npm test` | 227 tests / 227 pass / 0 fail |
+| 父侧消费面未断 | `node --test scripts/tests/tooling/contracts/standard-rule-config.test.mjs` | 3/3 pass（公开面仍导出 `resolveStandardConfig` 与清单） |
+
+S4-R2-3 的落点：契约声明写在**拥有该知识的地方**（`standard-config.mjs` 模块头），不在 ADR 里再抄一份码表——
+同一知识点两个 owner 正是本需求要消灭的东西。ADR 只留验收口径。
+
+未关闭项（有意结转，不算本轮失败）：S4-R2-1 的 SKIP 与目标根解析 → `work-budget-engine` C7/C8；
+S4-R2-4 的 `measure` / `dispositions` / `exemptions` 消费或删除 → 同一项的 C3。
