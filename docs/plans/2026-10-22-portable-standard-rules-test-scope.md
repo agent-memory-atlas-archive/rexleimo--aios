@@ -199,3 +199,35 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 - 把默认覆盖面临时缩回旧的 5 个根 → 交叉检查 1 红（`both registry client roots must be measured by default`）；还原 6/6
 - 顺手抓到一个自己造成的假安心：把选项 `clients` 改名成 `clientSkillRoots` 后，测试仍传旧名会被**静默忽略**并落回默认值，
   于是"默认 == 显式全集"退化成同义反复却照样全绿。第二条反向验证就是为了确认它不再同义反复。
+
+## 第八轮范围（C4 doctor 投影状态 + C6 升级后重生投影）
+
+两条都是新增可观察行为，走 behavior-delta；声明场景命令两次逐字一致：
+`node --test scripts/tests/clients/projection-delivery/doctor-projection-drift.test.mjs scripts/tests/clients/projection-delivery/update-projection-refresh.test.mjs`
+
+| 阶段 | 观测 | receipt |
+|---|---|---|
+| RED（lib 改动 stash 起来、测试已提交） | tests 5 / pass 1 / fail 4，退出 1 | `receipt:914f5d5a` |
+| GREEN（stash pop 还原实现） | tests 5 / pass 5 / fail 0，退出 0 | `receipt:<见下行>` |
+
+唯一在 RED 就通过的用例是"从没投过影的项目不会被升级凭空装上技能"——它是"不得发生"性质的负向契约，
+没有实现时也应为真，这正是它该有的表现。
+
+### C4 判定口径
+
+`doctor:projection-drift` 定级只看 `skillDrift>0 || unmanaged>0`；**attachmentDrift 不参与定级**（工单 C8）。
+真实仓库实测（本仓库为安装根口径）：`skillDrift=0 attachmentDrift=103 unmanaged=6 checked=153` → `status: ok`，
+而 6 条 unmanaged 会让它 `warn`。附属物差异若参与定级，这条门只会被人整体关掉——那就回到"没人想到要跑"。
+
+### C6 的三条契约（写在测试里）
+
+1. 升级成功后重生，且把 `--project-root` 显式交给安装器（不能拿安装根当项目根，那量的是自己）。
+2. 项目从没投过影 → 不重生：升级无权改变用户装了哪些技能，那是 `init` 的决定。
+3. 重生失败只 `[warn] projection refresh failed` 并给可执行补救命令，**不得**把已成功的升级报成失败——
+   此时运行时已经换好，谎报失败会诱导人重跑整个安装。
+
+顺带把 `clientSkillRootDirs()` 从投影漂移模块导出：升级侧判断"这个项目投过影没有"必须与度量面同一口径，
+两处各写一份就是第二个所有者（第七轮我把它定为内部默认，这轮出现了第二个合法使用者，因此导出）。
+
+真实仓库只读验证：`countProjectedRexSkills(install=~/.rexcil/aios, project=cwd) = 153`，与漂移工具 `checked=153` 一致。
+回归：`npm run test:affected` → 2280 tests / 2271 pass / 0 fail / 9 skipped；接线门 6/6；dir-budget 0 blocking。

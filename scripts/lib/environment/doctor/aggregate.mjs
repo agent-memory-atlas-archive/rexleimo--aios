@@ -11,6 +11,7 @@ import { doctorContextDbSkills } from '../../tooling/components/skills/skills.mj
 import { getDisabledGateIds, isHarnessGateEnabled } from '../../execution/harness/ops/profile.mjs';
 import { commandExists, captureCommand, runCommand } from '../../foundation/platform/process.mjs';
 import { doctorRexHarness, isAiosRuntimeRoot } from '../../clients/rex-harness/runtime.mjs';
+import { collectProjectionDrift } from '../../clients/rex-harness/projection-drift.mjs';
 import { inspectTokenDiscipline, printTokenDisciplineReport } from '../../execution/token-discipline/index.mjs';
 import { reconcileLegacyWorkflowSurface } from '../../execution/workflows/surface/rex-workflow-surface-lifecycle.mjs';
 import { runNativeOnlyDoctor } from './aggregate/native-only.mjs';
@@ -419,6 +420,42 @@ export async function runDoctorSuite({
       item: 'mcp-server typecheck/build',
       status: 'skip',
       fix: 'Enable gate or run doctor with --profile standard/strict.',
+      note: `disabled for profile=${profile}`,
+    });
+  }
+
+  io.log('');
+  io.log('== rex projection delivery ==');
+  // 中文注释：工单 C4。送达漂移以前只有一个得人去跑的 CLI，而本仓库 6 份没人管的老副本正是
+  // “没人想到要跑”才活下来的；doctor 是所有客户端都会跑的那一趟，所以量度得住在这里。
+  // attachmentDrift 不参与定级（工单 C8）：它不是送达失败，把它算进红灯只会让人关掉整条门。
+  if (isHarnessGateEnabled('doctor:projection-drift', { profile, disabledGates })) {
+    const targetRoot = projectRoot || rootDir;
+    const drift = collectProjectionDrift({ installRoot: rootDir, repoRoot: targetRoot });
+    const counts = `skillDrift=${drift.skillDrift} attachmentDrift=${drift.attachmentDrift}`
+      + ` unmanaged=${drift.unmanaged} checked=${drift.checked}`;
+    io.log(`[projection-drift] ${counts}`);
+    const regenerator = path.join(rootDir, 'scripts', 'install-rex-client-projections.mjs');
+    const drifted = drift.skillDrift > 0 || drift.unmanaged > 0;
+    if (drifted) {
+      effectiveWarns += 1;
+    }
+    addDoctorCheck(checks, {
+      id: 'doctor:projection-drift',
+      item: 'client rex skill projections match the installed skill sources',
+      status: drifted ? 'warn' : 'ok',
+      fix: drifted
+        ? `Regenerate: node ${regenerator} --root ${rootDir} --project-root ${targetRoot} --client all --scope project`
+        : `Inspect: node ${path.join(rootDir, 'scripts', 'aios-projection-drift.mjs')} --install-root ${rootDir} --repo-root ${targetRoot} --fail-on-drift`,
+      note: counts,
+    });
+  } else {
+    logSkippedGate(io, 'doctor:projection-drift', profile);
+    addDoctorCheck(checks, {
+      id: 'doctor:projection-drift',
+      item: 'client rex skill projections match the installed skill sources',
+      status: 'skip',
+      fix: 'Enable the gate to measure projection delivery.',
       note: `disabled for profile=${profile}`,
     });
   }

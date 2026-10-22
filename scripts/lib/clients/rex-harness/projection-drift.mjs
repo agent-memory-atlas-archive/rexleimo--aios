@@ -17,8 +17,9 @@ export const PROJECTION_MARKER = '.rex-projection.json';
  * `definitions.mjs` 里逐客户端登记过，在这里再拄一份就会让"零漂移"只说表面的一部分
  * （实测：硬编码 5 个根 checked=85 vs 注册表全集 checked=153）。
  */
-// 中文注释：不导出——这是本模块的内部默认值，公开的只有 collectProjectionDrift 一个入口（接口越小越深）。
-function registrySkillRoots() {
+/** 中文注释：客户端注册表里的投影目录名集合（去重：pi 与 zcode 共用 .agents）。
+ * 默认度量面用它；升级侧判断“这个项目投过影没有”也用它——两处必须同一口径。 */
+export function clientSkillRootDirs() {
   return [...new Set(Object.values(CLIENT_DEFINITIONS)
     .map((definition) => definition.projectSkillRoot)
     .filter(Boolean)
@@ -66,7 +67,7 @@ function comparePayloads(sourceDir, projectedDir) {
 export function collectProjectionDrift({
   installRoot,
   repoRoot,
-  clientSkillRoots = registrySkillRoots(),
+  clientSkillRoots = clientSkillRootDirs(),
 } = {}) {
   if (!installRoot || !repoRoot) throw new TypeError('collectProjectionDrift requires installRoot and repoRoot');
   const sourceRoot = path.join(installRoot, 'rex-harness', 'skill-sources');
