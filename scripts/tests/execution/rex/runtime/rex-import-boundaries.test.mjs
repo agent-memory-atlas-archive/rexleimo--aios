@@ -157,3 +157,25 @@ test('B4: the test-tree coupling baseline only shrinks', () => {
   const stale = TEST_BASELINE.filter((entry) => !violations.includes(entry));
   assert.deepEqual(stale, [], `baseline entries that no longer violate; remove them: ${stale.join(', ')}`);
 });
+
+test('B5 分层事实只有一个 owner：本测试硬编码的根必须等于 config/standards.json 的分层声明', () => {
+  // 中文注释：这条不重复判方向，只钉住"一份分层两个写者"：本测试用路径集合表达的事实，
+  // 与 standards 的 layers 声明必须逐项相同。任一边偷偷加根、删根，这里就红。
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'standards.json'), 'utf8'));
+  const layers = config.layers ?? {};
+  const prefixes = layers.prefixes ?? {};
+  assert.deepEqual(Object.keys(prefixes).filter((p) => prefixes[p] === 'host').sort(),
+    ['docs', 'mcp-server/src', 'packages', 'scripts'].sort(),
+    'host 根集合漂了：这里和 standards 必须同时改');
+  assert.equal(prefixes['rex-harness/src/index.mjs'], 'kernelSurface',
+    '内核公开面只能是一个入口文件，否则 B1 的白名单就成了第二份事实');
+  assert.equal(prefixes['rex-harness/src'], 'kernelInternals');
+  assert.equal(prefixes['rex-harness/tests'], 'kernelInternals');
+  const surfaceIndex = (layers.order ?? []).indexOf('kernelSurface');
+  const internalsIndex = (layers.order ?? []).indexOf('kernelInternals');
+  // 中文注释：注意这里需要说准：引擎的 reverseDependencies 只拦“内层指向外层”，
+  // 而 host 指内核内部是“外层指内层”——它由上面 B1 的入口文件白名单拦，不由方向预算拦。
+  // 本条断言钉的是“路径事实只有一个写者”，不是“两个判定同一个病”；分层声明与 B1 互补，不互替。
+  assert.ok(surfaceIndex >= 0 && internalsIndex > surfaceIndex,
+    '声明里公开面必须比内部更靠近外层，否则 layers 这段自己就没有方向意义');
+});

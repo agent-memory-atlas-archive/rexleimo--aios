@@ -611,5 +611,25 @@
         "count": 410
       }
     ]
+  },
+  "layers": {
+    "order": [
+      "host",
+      "kernelSurface",
+      "kernelInternals"
+    ],
+    "prefixes": {
+      "scripts": "host",
+      "packages": "host",
+      "mcp-server/src": "host",
+      "docs": "host",
+      "rex-harness/src/index.mjs": "kernelSurface",
+      "rex-harness/src": "kernelInternals",
+      "rex-harness/bin": "kernelInternals",
+      "rex-harness/scripts": "kernelInternals",
+      "rex-harness/skill-sources": "kernelInternals",
+      "rex-harness/tests": "kernelInternals"
+    },
+    "layersNote": "单一事实源：host 只能通过 kernelSurface（rex-harness/src/index.mjs）依赖内核。rex-import-boundaries.test.mjs 断言它的前缀集合与此一致，防止一份分层两个 owner。"
   }
 }

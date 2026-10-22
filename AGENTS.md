@@ -137,6 +137,17 @@ Document manual test steps in PRs when behavior changes.
   is **not** dispositioned yet, so this rule is deliberately not wired into `pretest:scripts`. Shipping
   a red-by-default gate without a disposition plan is how a gate gets muted, not fixed.
 
+## Layer Direction Gate (依赖方向)
+
+- 分层是声明出来的事实，在 `config/standards.json` 的 `layers` 段：`order`（外层→内层）+
+  `prefixes`（路径前缀 → 层名）。引擎不从目录名猜分层。
+- `aios standards check --root . --rule reverseDependencies` 只拦**内层指向外层**的反向边。边来自
+  `rex-harness standards check --write-edges` 生成的 `.aios/standards/module-edges.json`（正则近似，
+  不解析 AST）；没声明 `layers` 或没有图 → SKIP + 原因，绝不拿空数据冒充干净。
+- 本仓库实测：`measured=0 blocking=0`。这是真结论（目前确实没有内→外反向边），不是未测。
+- “外层只能通过公开面依赖内核”不由这条预算拦，仍由 `rex-import-boundaries` 的入口白名单拦；
+  它们的 B5 断言钉住“路径事实只有一个写者”。两个判定互补，不互替。
+
 ## Commit & Pull Request Guidelines
 Git history follows Conventional Commit style:
 - `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`
