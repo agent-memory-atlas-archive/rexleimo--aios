@@ -234,6 +234,8 @@
       "scripts/tests/foundation/standards/standards-cli.test.mjs",
       "scripts/tests/foundation/standards/standards-route.test.mjs",
       "scripts/tests/foundation/standards/architecture-line-owner.test.mjs",
+      "scripts/tests/tooling/standards/duplication.test.mjs",
+      "scripts/tests/tooling/standards/layer-dependency.test.mjs",
       "scripts/tests/tooling/tools/doc-citations.test.mjs",
       "scripts/tests/tooling/tools/doctor-bootstrap-task.test.mjs",
       "scripts/tests/tooling/tools/llms-txt.test.mjs",
