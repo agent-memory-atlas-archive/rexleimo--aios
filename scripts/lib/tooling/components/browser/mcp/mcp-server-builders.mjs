@@ -23,10 +23,10 @@ export function buildLocalBrowserMcpServer(rootDir, existingAlias = {}, runtime 
    * 结果是登录态写进一个谁都不看的角落。已有值（用户自己设的）不覆盖：传 nextEnv 进解析。
    */
   nextEnv[PROFILE_ROOT_ENV] = resolveProfileRoot({ env: { ...process.env, ...nextEnv } });
-  // 中文注释：不钉 `cwd`。旧写法 `cwd: rootDir` 会把这个长期运行的 MCP 服务器的 CWD 大到安装树里，
+  // 中文注释：不钉 `cwd`。旧写法 `cwd: rootDir` 会把这个长期运行的 MCP 服务器的 CWD 钉到安装树里，
   // 而 Windows 上目录改名只被“某进程 CWD 在该子树内”拦住——等于每次注册都在给自己下一次
   // `aios update` 上锁（实测 EPERM/EBUSY）。不写这个键就是让客户端用自己的工作目录起服务，
-  // 子进程再靠 scripts/run-local-browser-mcp.mjs 和 with-project-node.mjs 的树外兵库保。
+  // 子进程再靠 scripts/run-local-browser-mcp.mjs 和 with-project-node.mjs 的树外选路兜底。
   return {
     type: 'stdio',
     command: runtime.nodeCommand || 'node',
