@@ -97,3 +97,13 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 | C5 无 git tracked-file 列表时的行为 | 不可观察（文档验收） | 无 | 记为文档缺口，不伪造测试 |
 
 诚实 RED 只登记 C3：C1/C2 两侧数值本就相同，若把它们写成"红"就是把字面断言当行为差异。
+
+## 第三轮范围（关闭 round-2 的 changes-requested）
+
+| 项 | 行为性质 | 缝 | 断言 |
+|---|---|---|---|
+| S4-R2-2 豁免结构分支 | **behavior-preserving-hardening**：代码已有分支与文案，缺的是担保，不新增用户可观察行为 | 子模块 `tests/domain/standard-config.test.mjs` | `exemptions.fileLines` 不是数组 → missing-reason 且 path 指到 `exemptions.fileLines`；条目缺 path → missing-reason 且 path 为 `exemptions.fileLines[0]` |
+| S4-R2-3 码语义声明 | 文档契约（不可测） | `ADR 0002` 度量口径节 | 写明 missing-reason 覆盖「豁免条目整体不成立（缺 path / 列表形状错）」，不新增第四个码 |
+
+基线（加断言前必须真实通过）：`node --test rex-harness/tests/domain/standard-config.test.mjs`，5 条用例全绿。
+本轮不产生诚实 RED：若把已有行为写成"新行为"就是伪造差异；因此按 hardening 分流，Rex 应选加固验证而非 TDD。

@@ -1,0 +1,19 @@
+{
+  "kind": "behavior-preserving-hardening",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-config-round3",
+  "baseline": {
+    "publicEntry": "rex-harness/src/domain/standard-config.mjs 的 resolveStandardConfig（经子模块自己的 tests/domain 用例驱动）",
+    "setup": "工作树处于 round-2 收尾状态（子模块 48040bb），未新增任何断言；基线场景 = 单独运行既有 5 条 standard-config 用例",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "rex-harness/tests/domain/standard-config.test.mjs"
+      ],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "既有 5 条用例全绿，作为加断言前的独立可清理基线",
+    "observed": "tests 5 / pass 5 / fail 0，退出码 0",
+    "receiptRef": "receipt:c5ab3d50-3d62-4d7f-88f6-1b7094131075"
+  }
+}
