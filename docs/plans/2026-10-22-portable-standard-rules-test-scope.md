@@ -124,3 +124,14 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 | C4 doctor | 新行为 | `scripts/lib/environment/doctor/aggregate.mjs` 的 `doctor:rex-*` gate | 新增 check，note 内含 `skillDrift=<n>` 与重生命令 |
 
 诚实 RED 只登记机读漂移这一条。测试文件不得依赖本机安装：用 fixture 双根目录，真实安装只作为额外证据。
+
+### 送达证据（真实安装态，工具产出）
+
+重生前：`checked=66 skillDrift=30 attachmentDrift=15`，生成版本 `0.5.0, 0.5.1, 0.7.0`（安装运行时 rex-harness 0.11.1）。
+重生后：`checked=81 skillDrift=0 attachmentDrift=15`，生成版本 `0.11.1, 0.5.0, 0.7.0`。
+
+- `skillDrift` 30 → 0 ✓（C3 达成，口径 = 投影 ↔ 安装运行时 skill-sources）
+- `checked` 66 → 81：重生把缺失的 rex workflow skill 补齐进来，被检查面变大而非变小——归零不是在缩分母
+- `attachmentDrift` 仍 15：只有 evals/references 差异，按 C8 单独报数，不作通过条件
+- 安装器同时报 **7 条 `unmanaged-target-differs` 冲突**并保留原文件（人管文件不被覆盖）。这正是漂移能长期存活的
+  机制：升级时冲突只打 warn、不回写、也没人计数。所以"重生"不是幂等免费的，doctor 必须把冲突数一并暴露。
