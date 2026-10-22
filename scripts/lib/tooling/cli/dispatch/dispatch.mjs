@@ -35,7 +35,7 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
     }
 
     if (parsed.mode === 'help') {
-      printHelp(parsed, { stdout });
+      await printHelp(parsed, { stdout });
       return;
     }
 
@@ -406,6 +406,14 @@ export function createAiosDispatch({ rootDir, projectRoot, stdout = process.stdo
         rootDir: workspaceFor(parsed),
         stdout,
       }));
+      return;
+    }
+
+    if (parsed.command === 'standards') {
+      // 中文注释：转发到子模块命令的同一个实现入口（公开面），不 spawn 也不二次判定。
+      const { runStandardsArgs } = await import('../../../../../rex-harness/src/index.mjs');
+      const result = await runStandardsArgs(['check', ...(parsed.options.argv || [])], { cwd: projectRoot });
+      process.exitCode = result.exitCode ?? 0;
       return;
     }
 

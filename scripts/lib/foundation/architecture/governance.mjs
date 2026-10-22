@@ -1,8 +1,8 @@
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { applyBudgetRule, measureFileLines } from '../../../../rex-harness/src/index.mjs';
-import { loadProjectConfig } from './standards-check.mjs';
+// 中文注释：判定、度量、以及项目配置的加载全部来自子模块公开面；本模块不再持有其中任何一条。
+import { applyBudgetRule, loadProjectConfig, measureFileLines } from '../../../../rex-harness/src/index.mjs';
 import { DEFAULT_ARCHITECTURE_RULES } from './rules.mjs';
 
 export { DEFAULT_ARCHITECTURE_RULES } from './rules.mjs';

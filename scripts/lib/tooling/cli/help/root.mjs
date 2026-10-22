@@ -8,6 +8,7 @@ Usage:
   aios <command> [options]
 
 Commands:
+  aios standards check [--root <dir>] [--rule all|directoryEntries|fileLines] [--json]
   init          Initialize ContextDB registry markers for this project
   version       Print the installed AIOS version
   setup         Install AIOS integrations

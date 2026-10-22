@@ -111,6 +111,17 @@ live mode — so any change that reaches that hub is still a full-length run.
 
 Document manual test steps in PRs when behavior changes.
 
+## Standards Check (one command, one owner)
+
+- `aios standards check [--root <dir>] [--rule all|directoryEntries|fileLines] [--json]` reports one
+  disposition per entity (`pass` / `exempt` / `baseline` / `violation`). The implementation lives in
+  `rex-harness/src/standards/check.mjs` (public product surface, ADR 0001); `scripts/aios-standards.mjs` and
+  `scripts/check-dir-budget.mjs` are forwarder / compat entries and must never re-implement a judgement.
+- Project overrides live in `config/standards.json` (`budgets` / `exemptions` / `baselines`; closed key set —
+  unknown keys fail with exit 1 instead of silently running on defaults).
+- Exit codes: 0 clean or skipped (no git work tree), 1 violation or invalid project config, 2 usage error.
+- Adding a new gate means pointing CI at this command, not writing a second checker.
+
 ## Commit & Pull Request Guidelines
 Git history follows Conventional Commit style:
 - `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`

@@ -1,4 +1,8 @@
-// scripts/check-dir-budget.mjs — 目录条目预算门禁（本仓库的入口，判定不在此处）
+// scripts/check-dir-budget.mjs — 【已废弃的入口】目录条目预算门禁。
+//
+// 中文注释：唯一入口是 `aios standards check`（父侧 scripts/aios-standards.mjs 转发到子模块命令）。
+// 本文件只剩两件事：CI 的 pretest 还在指它，以及既有测试读的兼容形状。判定与宿主操作一律来自子模块，
+// 这里出现任何一条比较语句都算复发（ADR 0001）。新接线请用 aios standards，不要再指向本文件。
 //
 // 中文注释：判定已搬到 rex-harness 公开面的 `applyBudgetRule`，豁免与存量搬到 `config/standards.json`。
 // 这个文件只剩两件事：把本仓库的 tracked 列表交给引擎，以及把引擎的处置表转成 CI 熟悉的
@@ -8,8 +12,14 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { measureDirectoryEntries, QUANTITATIVE_STANDARD_RULES, applyBudgetRule } from '../rex-harness/src/index.mjs';
-import { loadProjectConfig, runStandardsRule } from './lib/foundation/architecture/standards-check.mjs';
+// 中文注释：判定、度量、tracked 列表、配置加载全部来自子模块公开面；本文件不再持有其中任何一条。
+import {
+  applyBudgetRule,
+  loadProjectConfig,
+  measureDirectoryEntries,
+  QUANTITATIVE_STANDARD_RULES,
+  runStandards,
+} from '../rex-harness/src/index.mjs';
 
 // 中文注释：既有调用方与测试用的名字保留为别名——引擎才是度量的实现者，这里不再写第二份算法。
 export { measureDirectoryEntries as countDirEntries } from '../rex-harness/src/index.mjs';
@@ -61,13 +71,14 @@ async function main() {
   }
   const merged = budget === undefined ? config : { ...config, budgets: { ...config.budgets, [RULE_ID]: budget } };
 
-  const result = await runStandardsRule({ rootDir, rule: RULE_ID, config: merged });
-  if (result.status === 'skip') {
-    console.log(`[dir-budget] SKIP: ${result.reason}`);
+  const run = await runStandards({ rootDir, rule: RULE_ID, config: merged, io: { log: () => {}, error: () => {} } });
+  const entry = run.results[0];
+  if (entry.status === 'skip') {
+    console.log(`[dir-budget] SKIP: ${entry.reason}`);
     process.exitCode = 0;
     return;
   }
-  const report = result.report;
+  const report = entry.report;
   for (const violation of report.violations) console.log(`[dir-budget] FAIL ${violation.detail}`);
   for (const item of report.recovered) {
     console.log(`[dir-budget] RECOVERED ${item.path} now ${item.count}; remove its baseline entry`);

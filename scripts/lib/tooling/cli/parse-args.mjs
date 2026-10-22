@@ -311,6 +311,10 @@ export function parseArgs(argv = []) {
   if (first === 'agents') return parseAgentsArgs(argv);
   if (first === 'clients') return parseClientsArgs(argv);
   if (first === 'workflow') return parseWorkflowArgs(argv);
+  // 中文注释：standards 只做参数透传——判定与实现在子模块命令里，这里不得出现第二条语义（ADR 0001）。
+  if (first === 'standards') {
+    return { mode: 'command', command: 'standards', options: { argv: argv.slice(1) } };
+  }
   if (first === 'rex') {
     return { mode: 'command', help: false, command: 'rex', options: { args: argv.slice(1) } };
   }

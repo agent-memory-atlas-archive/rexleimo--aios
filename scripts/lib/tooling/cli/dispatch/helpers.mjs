@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { getCommandHelpText, getInternalHelpText, getMemoHelpText, getRootHelpText } from '../help/help.mjs';
 
 /** 帮助输出也走统一分发器，保证新增 interception 子命令后 CLI 和文档入口一致 */
-function printHelp(parsed, { stdout = process.stdout } = {}) {
+async function printHelp(parsed, { stdout = process.stdout } = {}) {
   if (!parsed || parsed.command === 'root') {
     stdout.write(getRootHelpText());
     return;
@@ -16,6 +16,12 @@ function printHelp(parsed, { stdout = process.stdout } = {}) {
 
   if (parsed.command === 'internal') {
     stdout.write(getInternalHelpText(parsed.options.target, parsed.options.action));
+    return;
+  }
+
+  if (parsed.command === 'standards') {
+    const { standardsHelp } = await import('../../../../../rex-harness/src/index.mjs');
+    stdout.write(standardsHelp() + n);
     return;
   }
 
