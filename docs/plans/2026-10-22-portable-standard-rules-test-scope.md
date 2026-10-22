@@ -208,7 +208,7 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 | 阶段 | 观测 | receipt |
 |---|---|---|
 | RED（lib 改动 stash 起来、测试已提交） | tests 5 / pass 1 / fail 4，退出 1 | `receipt:914f5d5a` |
-| GREEN（stash pop 还原实现） | tests 5 / pass 5 / fail 0，退出 0 | `receipt:<见下行>` |
+| GREEN（stash pop 还原实现） | tests 5 / pass 5 / fail 0，退出 0 | `receipt:e5002dd0` |
 
 唯一在 RED 就通过的用例是"从没投过影的项目不会被升级凭空装上技能"——它是"不得发生"性质的负向契约，
 没有实现时也应为真，这正是它该有的表现。
