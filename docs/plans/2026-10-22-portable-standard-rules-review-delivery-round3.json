@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:1cd5a942",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round3.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-delivery-guarantee",
+  "standardsFindings": [
+    {
+      "id": "S4-R6-1",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (REX_PACKAGE = path.resolve(process.cwd(), ...))",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "送达担保不应依赖运行目录：改为静态相对导入公开面 ../../../../rex-harness/src/index.mjs，源文件路径同样用 import.meta.url 解析；CI 固定在仓库根，这种脆弱是静默的"
+    },
+    {
+      "id": "S4-R6-2",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (const STANDARDS)",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
+        "file:rex-harness/src/clients/install.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "本轮刚把登记表放到公开面就是为了没人再抄名单；断言应使用 sharedReferenceSkillIds[0]，字面量只留在被担保的数据里"
+    },
+    {
+      "id": "S4-R6-3",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (client: codex)",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
+        "file:rex-harness/src/index.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "只担保一个客户端；外层循环 supportedClients() 可覆盖全部 10 个，代价是运行时长"
+    },
+    {
+      "id": "S4-R6-4",
+      "position": "file:rex-harness/tests/skills/standards-provider-wiring.test.mjs (deepEqual sharedReferenceSkillIds)",
+      "evidence": [
+        "file:rex-harness/tests/skills/standards-provider-wiring.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "把元素个数钉死，加第二个共享参照技能会因形状变红；改断言包含关系"
+    },
+    {
+      "id": "S4-R6-5",
+      "position": "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs (new Promise wrapper)",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "同步 API 包成 Promise 只为拿返回值，属无信息中间层，直接调用"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R6-1",
+      "position": "delivery-ticket work-delivery-guarantee C4/C6",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json",
+        "git:41db8fcc"
+      ],
+      "severity": "hard",
+      "recommendation": "doctor 机读漂移与 unmanaged 数未实现；aios update 不重生投影（grep 零命中）。completionClaim 保持 soft"
+    },
+    {
+      "id": "SP-R6-2",
+      "position": "work-delivery-guarantee C0",
+      "evidence": [
+        "receipt:736a40d7-21f4-4228-a2fb-08ff92753559",
+        "file:rex-harness/tests/skills/standards-provider-wiring.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "达成且可证伪：删第 0 步→存在性红，移到正文之后→位置红；过程中修掉一条自我实现断言（firstHeadingAt 从 reference 之后找，使位置判断恒真）"
+    },
+    {
+      "id": "SP-R6-3",
+      "position": "work-delivery-guarantee C5 + V0/V1",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
+        "file:docs/plans/2026-10-22-portable-standard-rules-test-scope.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "逐字节送达是正确方向（源侧绿不等于客户端读到绿）；文件名与工单 V0 一致并已登记进回归套件；修好 S4-R6-1/2 后本条才算立得住"
+    }
+  ],
+  "verdict": "changes-requested",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round3.md",
+    "receipt:736a40d7-21f4-4228-a2fb-08ff92753559",
+    "git:3c670274",
+    "git:cab9105"
+  ]
+}
