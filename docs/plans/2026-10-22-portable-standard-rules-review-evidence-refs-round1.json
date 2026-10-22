@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "workItemKey": "evidence-ref-integrity",
+  "reviewRound": 1,
+  "fixedPoint": "git:5c537d5",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-evidence-refs-round1.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-evidence-ref-integrity",
+  "standardsFindings": [
+    {
+      "id": "S-R1-1",
+      "position": "file:rex-harness/src/application/validate-command-evidence.mjs GIT_OBJECT_REF had the i flag",
+      "evidence": [
+        "receipt:5539767a-0c86-42b2-9cd1-86e7758e9653",
+        "file:rex-harness/tests/standalone/evidence-ref-integrity.test.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "大写十六进制被放行，git 形状规则形同虚设；去掉 i 并补一条 assert.throws —— 轮内已修，修复后该断言首跑即红、随后 4/4",
+      "resolution": "fixed-in-round"
+    },
+    {
+      "id": "S-R1-2",
+      "position": "file:rex-harness/src/application/validate-command-evidence.mjs ref loop threw the same message from two branches",
+      "evidence": [
+        "file:rex-harness/src/application/validate-command-evidence.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "报错文本出现两个所有者（Duplicated Code）；并入单一条件式 throw —— 轮内已修",
+      "resolution": "fixed-in-round"
+    },
+    {
+      "id": "S-R1-3",
+      "position": "file:rex-harness/src/application/validate-command-evidence.mjs receipt: namespace detected by two bare startsWith checks while ref normalization lives in domain/evidence.mjs",
+      "evidence": [
+        "file:rex-harness/src/domain/evidence.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "抽 isReceiptRef() 之前要先裁决 artifact:/doc: 是否也给解析器接口（见 specFindings S-R1-E），否则只是把裸字符串换个地方放；本轮只记录",
+      "resolution": "recorded"
+    },
+    {
+      "id": "S-R2-1",
+      "position": "file:rex-harness/tests/architecture/import-boundaries.test.mjs SRC_ROOT from process.cwd(); file:rex-harness/tests/contract/package-boundary.test.mjs packageRoot from process.cwd()",
+      "evidence": [
+        "receipt:39a91aec-db3d-4d62-a12d-a34551c70100",
+        "receipt:077e69fe-5a2a-46e2-9bdf-eb82766d3651",
+        "receipt:3ae89376-06cf-4fc6-bcd6-8396a5c991d9"
+      ],
+      "severity": "hard",
+      "recommendation": "量错仓库的结构守卫会报假违规（forbidden catch-all directory: shared 说的是宿主目录）；锈定到 import.meta.url 的仓库根 —— 轮内已修，双 cwd 验证",
+      "resolution": "fixed-in-round"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "S-R1-A",
+      "position": "criterion 1 receipt existence resolved before journal write",
+      "evidence": [
+        "receipt:f32c833b-d05e-4043-b9b9-0868709e8054",
+        "file:rex-harness/tests/standalone/evidence-ref-integrity.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "满足：appendEvidence 在校验之后，测试按「账本未被写」断言",
+      "resolution": "satisfied"
+    },
+    {
+      "id": "S-R1-B",
+      "position": "criterion 2 non-receipt namespaces untouched",
+      "evidence": [
+        "file:rex-harness/tests/standalone/evidence-ref-integrity.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "满足，且有守卫防止过度收紧",
+      "resolution": "satisfied"
+    },
+    {
+      "id": "S-R1-C",
+      "position": "criterion 3 git ref shape + non-goal",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json"
+      ],
+      "severity": "judgement",
+      "recommendation": "满足；但 activation 427dce66 账本里那条 receipt:00000000-... 假凭证因本项不做更正通道而无法标 superseded，属已知遗留",
+      "resolution": "satisfied-with-residue"
+    },
+    {
+      "id": "S-R1-D",
+      "position": "criterion 4 per-kind exit code expectations unchanged",
+      "evidence": [
+        "receipt:dddd476a-98b3-4c84-8b8a-3585bc52dfa3",
+        "receipt:4b406f4b-16a8-4dc2-bc5d-e411fd97472c"
+      ],
+      "severity": "judgement",
+      "recommendation": "满足：子模块 246/246、父侧全量 237 files / 2294 tests / fail 0",
+      "resolution": "satisfied"
+    },
+    {
+      "id": "S-R1-E",
+      "position": "artifact: / doc: / git: refs are still never resolved",
+      "evidence": [
+        "file:rex-harness/src/application/validate-command-evidence.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "本项把伪造面收窄而非消灭：需要另立工作项为 artifact:/doc: 定义可解析边界，否则「ref 必须可核验」只是半真",
+      "resolution": "follow-up-required"
+    }
+  ],
+  "verdict": "pass-with-findings-fixed",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-evidence-refs-round1.md",
+    "receipt:5539767a-0c86-42b2-9cd1-86e7758e9653",
+    "receipt:077e69fe-5a2a-46e2-9bdf-eb82766d3651",
+    "git:c6635b0"
+  ]
+}
