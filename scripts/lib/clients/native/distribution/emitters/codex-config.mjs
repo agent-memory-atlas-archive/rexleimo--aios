@@ -94,7 +94,9 @@ export function buildManagedCodexConfig({ rootDir }) {
   lines.push('type = "stdio"');
   lines.push('command = "node"');
   lines.push(`args = ${tomlBasicArray([path.join(root, 'scripts', 'memory-mcp-server.mjs')])}`);
-  lines.push(`cwd = ${tomlLiteral(root)}`);
+  // 中文注释：不钉 cwd。memory-mcp-server 的工作区根由 AIOS_WORKSPACE_ROOT 决定（下一行已经显式给出），
+  // `cwd` 对它的语义是冗余的；但在 Windows 上这个冗余代价是整次升级：安装器要把安装目录改名让位，
+  // 而目录改名只被“某进程 CWD 在该子树内”拦住。实测同类钉法已在安装树里留下 9 个长驻进程。
   lines.push('startup_timeout_sec = 30');
   lines.push('');
   lines.push('[mcp_servers.aios-memory.env]');

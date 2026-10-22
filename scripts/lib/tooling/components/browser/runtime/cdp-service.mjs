@@ -40,8 +40,8 @@ export function resolveCdpServiceLayout(rootDir, port = DEFAULT_CDP_SERVICE_PORT
   }
 
   const resolvedPort = normalizeCdpPort(port);
-  // 中文注释：CDP 的 user-data-dir 必须落在安装树外——它在安装树里时，一个活着的 Chrome
-  // 就能把下一次 `aios update` 的换入（Directory::Move）顶死。
+  // 中文注释：CDP 的 user-data-dir 必须落在安装树外——理由不是“Chrome 会挡住换入”（实测不挡，
+  // 真正挡住 `Directory::Move` 的是某进程的 CWD 在树内），而是用户态数据不该住在会被替换的安装产物里。
   const profileRoot = resolveProfileRoot({ env: process.env, homeDir });
   const label = `${CDP_SERVICE_LABEL_PREFIX}${resolvedPort}`;
   const logsDir = path.join(homeDir, 'Library', 'Logs');

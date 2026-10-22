@@ -110,6 +110,31 @@ export function isVolatileAiosRoot(candidate, { env = process.env, fsImpl = fs, 
   return prefixes.some((prefix) => startsUnder(resolved, prefix) || startsUnder(real, prefix));
 }
 
+/* 中文注释：长驻子进程的 CWD 选择——单一 owner。
+ *
+ * 存在理由：Windows 上「目录改名」只被一种持有者拦住：某个进程的 CWD 落在该目录的子树内。
+ * 实测（在真安装树内新建子目录做可逆 rename 探针）：Chrome 的 profile 句柄、tsx 的 fs.watch
+ * 目录通知句柄、SQLite 的打开文件句柄——三种全不拦；只有 CWD 拦，报 EPERM/EBUSY。
+ * 而 `aios update` 换入靠把旧安装目录改名让位，所以把一个长期运行的 MCP 服务器的 CWD
+ * 钉在安装树里，等于每启动一次就在给自己下一次升级上锁（实测留下过 9 个树内 CWD 进程）。
+ *
+ * 旧写法 `cwd: rootDir` / `cwd: PROJECT_ROOT` 就是把锁钉下的那两行。
+ * 新规则：继承调用方（客户端）的 CWD，那通常是项目根；仅当它落在本安装树内（例如有人
+ * 从安装目录里手动起服务）才退回用户主目录，两边都不把 CWD 留在树里。
+ *
+ * @param {{ cwd?: string, rootDir?: string, homeDir?: string }} input
+ * @returns {{ cwd: string, relocated: boolean }} relocated=true 表示调用方给的 CWD 在树内、已改选
+ */
+export function resolveCwdOutsideRootDir({ cwd = process.cwd(), rootDir = '', homeDir = os.homedir() } = {}) {
+  const candidate = String(cwd || '').trim();
+  const root = String(rootDir || '').trim();
+  if (!candidate || !root) return { cwd: candidate || homeDir, relocated: false };
+  if (!startsUnder(candidate, root) && comparisonKey(candidate) !== comparisonKey(root)) {
+    return { cwd: candidate, relocated: false };
+  }
+  return { cwd: homeDir, relocated: true };
+}
+
 /** 是否像一个真的 AIOS 运行时根（存在 scripts/aios.mjs 标记文件）。 */
 export function isAiosRuntimeRoot(candidate, { fsImpl = fs } = {}) {
   const text = String(candidate || '').trim();

@@ -27,7 +27,9 @@ test('local browser MCP uses the platform-neutral Node entrypoint', async () => 
   assert.equal(entry.type, 'stdio');
   assert.equal(entry.command, '/custom/node');
   assert.deepEqual(entry.args, [resolveLocalBrowserMcpScript(rootDir)]);
-  assert.equal(entry.cwd, rootDir);
+  // 中文注释：必须不钉 cwd——注册时把 CWD 指到安装树，等于这个服务一起进程就在给下一次
+  // `aios update` 上锁（Windows 上目录改名只被“某进程 CWD 在子树内”拦住）。
+  assert.equal('cwd' in entry, false, 'browser MCP 注册不得钉 cwd');
   assert.equal(entry.env.BROWSER_USE_CDP_URL, 'http://127.0.0.1:9222');
   assert.equal('AIOS_BROWSER_USE_REPO' in entry.env, false);
 });
@@ -43,7 +45,7 @@ test('preferred browser MCP falls back locally on any platform when external rep
 
     assert.equal(entry.command, `/node/${platform}`);
     assert.deepEqual(entry.args, [resolveLocalBrowserMcpScript(rootDir)]);
-    assert.equal(entry.cwd, rootDir);
+    assert.equal('cwd' in entry, false, `${platform} 上也不得钉 cwd`);
   }
 });
 

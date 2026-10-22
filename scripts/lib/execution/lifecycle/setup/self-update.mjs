@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 import { resolveNewestStableRelease } from '../release/release-lookup.mjs';
+import { resolveCwdOutsideRootDir } from '../../../foundation/platform/aios-runtime-root.mjs';
 import { downloadReleaseAsset } from '../release/release-download.mjs';
 
 const DEFAULT_REPO = 'rexleimo/aios';
@@ -267,7 +268,9 @@ async function updateFromReleaseInstaller(rootDir, {
 export function ensureWorkingDirectoryOutsideInstallTree(rootDir, io = console) {
   const resolved = path.resolve(rootDir);
   const cwd = process.cwd();
-  if (cwd !== resolved && !cwd.startsWith(resolved + path.sep)) {
+  // 中文注释：判定收到 resolveCwdOutsideRootDir 一个 owner（与两个启动器同一口径）。
+  const { relocated } = resolveCwdOutsideRootDir({ cwd, rootDir: resolved });
+  if (!relocated) {
     return false;
   }
   const outside = process.env.USERPROFILE || process.env.HOME || os.tmpdir();

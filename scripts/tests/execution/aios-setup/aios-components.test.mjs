@@ -122,7 +122,7 @@ test('browser MCP always uses the repository-local Node entrypoint', () => {
   const server = buildPreferredMcpServer(rootDir);
   assert.equal(server.command, 'node');
   assert.deepEqual(server.args, expectedBrowserMcpArgs(rootDir));
-  assert.equal(server.cwd, rootDir);
+  assert.equal('cwd' in server, false, 'browser MCP 注册不得钉 cwd：钉了就把 CWD 锁在安装树里，挡住 aios update 的改名换入');
   assert.equal(server.env.AIOS_BROWSER_USE_REPO, undefined);
 });
 

@@ -44,6 +44,40 @@ test('buildManagedCodexConfig: trust 段 + 五大 MCP 表 + 管理区标记', ()
   assert.match(config, /# <<< aios-managed-end/);
 });
 
+/* 中文注释：安装树里的 CWD 是升级杀手——Windows 上目录改名只被“某进程 CWD 在该子树内”拦住
+ * （实测：文件句柄/watch 句柄/Chrome profile 句柄都不拦），而 `aios update` 换入正是把旧安装目录
+ * 改名让位。所以 AIOS 自己起的 MCP 服务一律不钉 cwd；工作区语义由显式契约变量承担。
+ * code-review-graph 不在名单里：它是外部工具，cwd 就是它要索引的工作区，属于它的参数不是我们的布局。 */
+test('buildManagedCodexConfig: AIOS 自己起的 MCP 表不钉 cwd，工作区语义靠契约变量', () => {
+  const config = buildManagedCodexConfig({ rootDir: ROOT });
+  const tables = new Map();
+  let current = null;
+  for (const line of config.split('\n')) {
+    const header = line.match(/^\[([^\]]+)\]\s*$/u);
+    if (header) {
+      current = header[1];
+      tables.set(current, []);
+      continue;
+    }
+    if (current) tables.get(current).push(line);
+  }
+
+  for (const name of ['mcp-browser-use', 'aios-memory', 'aios-shell', 'aios-auth-tools']) {
+    const body = tables.get(`mcp_servers.${name}`) || [];
+    assert.ok(
+      !body.some((line) => /^\s*cwd\s*=/u.test(line)),
+      `mcp_servers.${name} 不得钉 cwd（会把安装树锁住）`,
+    );
+  }
+
+  // 去掉了冗余的 cwd，但记忆服务的工作区根必须仍由 AIOS_WORKSPACE_ROOT 显式给出，不能漂回客户端 cwd。
+  const memoryEnv = tables.get('mcp_servers.aios-memory.env') || [];
+  assert.ok(
+    memoryEnv.some((line) => line.includes('AIOS_WORKSPACE_ROOT') && line.includes(ROOT)),
+    `aios-memory 缺 AIOS_WORKSPACE_ROOT 契约行：${memoryEnv.join(' | ')}`,
+  );
+});
+
 test('syncCodexHomeConfig: 空目录 → created 且只含一个管理区', async () => {
   const home = await mkdtemp(path.join(os.tmpdir(), 'aios-codex-home-'));
   const { impl, files } = memoryFs();

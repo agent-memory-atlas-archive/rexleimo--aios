@@ -1,10 +1,15 @@
 /* 中文注释：浏览器 profile 根的唯一定义处。
  *
  * 为什么要单独有这一层：profile 目录原本住在 AIOS 安装根里面（`<install>/.browser-profiles`），
- * 于是"升级换入"和"浏览器会话"争同一个目录——换入靠 `Directory::Move` 改名让位，而 Chrome 用
- * `--user-data-dir=<安装树内路径>` 活着时这个改名会被 Windows 直接拒绝（本机实测两次：一次孤儿
- * 会话、一次活会话正在写 `grill`/`headless-check`）。对照事实：十几个只持有安装树内**脚本文件**的
- * bridge 进程并不挡改名，挡的是**目录句柄**。
+ * 于是"升级换入"和"浏览器会话"争同一个目录。安装产物里不该住用户态数据，这一层因此存在。
+ *
+ * 但换入为什么被拒，这里的旧说法是**错的**，v6.10.1 的实测把它纠正了：挡住 `Directory::Move`
+ * 改名让位的不是 Chrome，也不是任何"目录句柄"，而是**某个进程的 CWD 落在该目录子树内**。
+ * 对照实验（在真安装树内建子目录做可逆 rename）：16 个用树内 profile 的 Chrome 进程 +
+ * `fs.watch` 目录通知句柄 + 打开的 SQLite 文件句柄同时在，rename 仍 `MOVE-OK`；只加一个 CWD
+ * 在树内的进程就变 `EPERM`，杀掉它又回到 `MOVE-OK`。当年真机上的真 blocker 是启动器把长驻子进程
+ * 的 CWD 钉成安装根（现在收到 `resolveCwdOutsideRootDir` 一个 owner）。
+ * 也就是说：profile 搬家是对的，但它不是 `aios update` 的修复——把它当修复，才导致 6.9.0 之后依旧报错。
  *
  * 所以根搬到安装树外（`~/.rexcil/browser-profiles`，与安装根同卷，迁移是一次 rename）。
  * `config/browser-profiles.json` 里的 `.browser-profiles/<name>` 相对串**不改**——那是 profile

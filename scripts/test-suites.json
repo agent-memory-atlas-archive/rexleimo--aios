@@ -131,6 +131,7 @@
       "scripts/tests/foundation/lifecycle-ops/self-update-lifecycle.test.mjs",
       "scripts/tests/foundation/lifecycle-ops/update-notice.test.mjs",
       "scripts/tests/foundation/native/codex-config.test.mjs",
+      "scripts/tests/foundation/platform/cwd-outside-install-tree.test.mjs",
       "scripts/tests/foundation/native/native-agent-guidance.test.mjs",
       "scripts/tests/foundation/native/native-doctor.test.mjs",
       "scripts/tests/foundation/native/native-repairs.test.mjs",

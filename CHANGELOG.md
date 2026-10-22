@@ -4,12 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
-## [6.10.1] - 2026-10-22
+## [6.10.1] - 2026-10-22（重新发布）
+
+> **重发说明**：本版本号包含两次内容。原 6.10.1（只含发布查询配额修复）与中间版本 6.9.0 / 6.10.0
+> 的 GitHub Release 已下架，`v6.10.1` tag 移到含本页全部修复的提交上重发。已知代价：**已经装上原 6.10.1 的机器
+> 拿不到本次修复**——`compareVersionStrings` 把同版本判为 `equal` → `not-newer-than-installed` 直接 skip，
+> 那些机器需手动重跑安装器（`scripts/aios-install.ps1 -StopHolders`）才能跟上。6.8.0 / 6.9.0 / 6.10.0
+> 的机器不受影响，它们看到的是“更新”，能直接升。保留历史号段（6.9.0 / 6.10.0）的 changelog 条目不改写；
+> 其中的错误因果由下面“更正 6.9.0 的因果陈述”一条指回。
 
 ### Fixed
 
 - **发布查询不再被匿名配额打回降级路径**：GitHub 的匿名 API 配额（60/h）按出口 IP 计，共用出口时会被别人烧光——本机实测 `api.github.com` 对公开仓库返回 HTTP 403 且 `x-ratelimit-remaining: 0`。旧行为是打一行 warn 然后退回 `releases/latest` 指针，而该指针按创建时间排序，补发旧版本会抢占它，正是当初写 `release-lookup` 要防的降级缺陷。现在：有 token 就带（`AIOS_RELEASE_TOKEN` > `GITHUB_TOKEN` > `GH_TOKEN`，再试 `gh auth token`）；403/429 且配额头明确为 0 才判 `release-lookup-rate-limited`（缺头仍是 `release-lookup-http`，因为处置动作不同）；第二事实源是不吃 API 配额的 `releases.atom`，公告页分不清 draft/prerelease，所以返回一律标 `exact:false` 且按 tag 形状排除预发布；三个来源全失败抛 `release-source-unreachable` 并带上两次尝试，`aios update` 在此**停止**而不是装一个没验过版本的包。
 - 本机限流状态下的真实解析结果：`{"tag":"v6.10.0","source":"feed","exact":false}`。
+- **`aios update` 在安装树被自己锁死：长驻子进程的 CWD 不再钉在安装根**。Windows 换入靠把旧安装目录改名让位（`Directory::Move`），而目录改名**只被一种持有者拦住：某个进程的 CWD 落在该目录子树内**。实测（在真安装树内新建子目录做可逆 rename 探针）：16 个 Chrome 进程持树内 profile、`fs.watch` 目录通知句柄、SQLite 打开文件句柄——三种同时在场仍 `MOVE-OK`；加一个 CWD 在树内的进程立刻 `EPERM`，杀掉它又回 `MOVE-OK`。旧写法在两处把 CWD 焊进树里：`scripts/run-local-browser-mcp.mjs` 的 `cwd: rootDir` 与 `mcp-server/scripts/with-project-node.mjs` 的 `cwd: PROJECT_ROOT`，另加注册面 `mcp-server-builders.mjs` 的 `cwd: rootDir` 与 codex emitter 的 `cwd = <安装根>`。本机实测残留 9 个树内 CWD 进程，父链是别的会话的 browser MCP——**每一次用过浏览器工具都在给下一次升级上锁，且随会话重启自动复现**。现在判定收到单一 owner `resolveCwdOutsideRootDir`（`scripts/lib/foundation/platform/aios-runtime-root.mjs`）：继承调用方（客户端）的 CWD，仅当它本身在树内才退回用户主目录；启动器还先把自己择出去（它是 `spawnSync` 阻塞式长驻进程，只挪子进程等于自己继续锁着）。`with-project-node` 的默认**保持** `PROJECT_ROOT`，因为 mcp-server 的 npm 脚本靠它解相对 glob 与 `src/index.ts`——改成无条件继承实测把 `contextdb-lazy-load` 整组跑真 CLI 的套件跑红；长驻链由上游入口用 `AIOS_MCP_CHILD_CWD` 显式声明，npm 用法零变化。
+- **安装器预检改测真实 CWD，不再拿命令行字符串猜**。旧启发式在本机一次列出 39 个 PID（Chrome、别的会话的 bridge、连安装器自己的 shell 都在里面），噪音盖掉了真正挡路的 3 个；它连“没有持有者”和“测不到”都分不开。现在读 PEB 取真实 CWD，报 `PID/名称/cwd`，探针不可用（非 x64、Add-Type 失败、安装目录不存在）时**明说测不准**并退回旧启发式，绝不把空结果当干净。失败文案也从“被某个运行中的进程占用”改成指名那一类持有者。
+- **更正 6.9.0 的因果陈述**（不撤回它做对的事）：CHANGELOG 6.9.0 与 AGENTS.md「Browser MCP Selection」、博客 `2026-10-v690-browser-profile-root-leaves-the-install-tree.md` 都写着“树内 profile 的活 Chrome 持有目录，导致 `Directory::Move` 被拒”。上面的探针否证了这个因果：Chrome 在场时改名照样成功。profile 根搬家仍然正确（安装产物里不该住用户态数据），但它**不是** `aios update` 失败的原因；拿它当原因，才是这次“修了还是报错”的直接成因。6.9.0 现场那一次真正的 blocker 是被 `cwd: rootDir` 钉住的 `run-local-browser-mcp.mjs` 自己。
+
+Evidence: `node --test scripts/tests/foundation/platform/cwd-outside-install-tree.test.mjs` → 5/5（树外继承 / 四种树内写法一律改选到树外 / Windows 大小写不敏感且 `aios-other` 不误伤 / POSIX 同判定 / 缺参不炸）；`scripts/tests/foundation/native/codex-config.test.mjs` → 8/8（新增：四个 AIOS 服务表一律不钉 `cwd`，且 `aios-memory` 的工作区语义仍由 `AIOS_WORKSPACE_ROOT` 显式承载——去掉冗余 `cwd` 是零语义变化）；`browser-local-mcp` + `profile-root` + `mcp-path-repair` + `aios-components` → 70/70（`'cwd' in entry === false` 取代旧 `entry.cwd === rootDir` 契约）；`contextdb-lazy-load` 6/6（这条是先红后修的：无条件继承 cwd 会把 npm 驱动的相对解析打碎）；`npm run test:affected` → tests=2316 pass=2307 fail=0 skipped=9；`npm --prefix mcp-server run typecheck` → 0 错，`npm --prefix mcp-server test` → tests=117 pass=105 fail=0，`npm --prefix mcp-server run build` → OK（npm 用法未受影响）；`Parser::ParseFile` 对 `aios-install.ps1` 0 语法错，且 BOM + CRLF 保持（`irm | iex` 远程加载依赖它）；**真机端到端**：从安装树内部起真启动器，`A 正例`（自造的树内 CWD 进程）探针读出 `insideTree=1`，证明探针不是恒 null；`B` 链上 4 个进程（启动器 + with-project-node + tsx + server）`insideTree=0`，全部落在 `C:\Users\Administrator`；从树外起时同一链 4 个进程全部原样继承项目根 `D:\Temp\fakeproj`（没有多改一刀）；安装器函数在真机上对现存旧 6.8.0 残留报 `ok=true holders=6`，与独立交叉核对同一批 PID。
 
 ## [6.10.0] - 2026-10-22
 

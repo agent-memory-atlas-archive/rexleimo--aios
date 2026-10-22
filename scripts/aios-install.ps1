@@ -12,6 +12,86 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+<#
+.DESCRIPTION
+  列出把 CWD 落在 $InstallDir 子树内的进程。
+  中文注释：Windows 上“目录改名”只被一种持有者拦住：某个进程的 CWD 在该目录的子树里。
+  实测（在安装树内新建子目录做可逆 rename 探针）：Chrome 的 profile 句柄、tsx 的 fs.watch
+  目录通知句柄、SQLite 的打开文件句柄都不拦；只有 CWD 拦，报 EPERM/EBUSY。
+  旧预检按命令行字符串匹配安装目录，一次列出 39 个 PID，把 Chrome、别的会话、连安装器
+  自己的 shell 都算进去——噪音盖掉了真正挡路的那几个。这里读 PEB 拿真实 CWD。
+  返回一个结果对象 @{ ok = <探针是否可用>; holders = @(...) }。
+  中文注释：**不能直接 return 数组**——PowerShell 在赋值语境里会把 `@()` 塔成 `$null`（空集合展开成
+  nothing），那样“真没有持有者”和“探针不可用”就是同一个值，等于拿猜值冒充干净。
+  包一层 hashtable 后两种情形各有自己的处置：ok=false 必须降级走启发式并明说测不准。
+#>
+function Get-InstallDirCwdHolder([string]$InstallDir) {
+  if (-not ('AiosPebProbe' -as [type])) {
+    try {
+      Add-Type -Language CSharp -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
+public class AiosPebProbe {
+  [DllImport("ntdll.dll")] static extern int NtQueryInformationProcess(IntPtr h, int cls, byte[] buf, int len, out int ret);
+  [DllImport("kernel32.dll")] static extern IntPtr OpenProcess(int acc, bool inh, int pid);
+  [DllImport("kernel32.dll")] static extern bool ReadProcessMemory(IntPtr h, IntPtr addr, byte[] buf, int size, out int read);
+  [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
+  static IntPtr Rd(byte[] b, int off) { return new IntPtr(IntPtr.Size == 8 ? Marshal.ReadInt64(b, off) : Marshal.ReadInt32(b, off)); }
+  public static string Cwd(int pid) {
+    if (IntPtr.Size != 8) return null;   // 只实现 x64 布局；其他架构宁可不报，不拿猜值当事实
+    IntPtr h = OpenProcess(0x0410, false, pid);
+    if (h == IntPtr.Zero) return null;
+    try {
+      byte[] mi = new byte[48]; int ret;
+      if (NtQueryInformationProcess(h, 0, mi, mi.Length, out ret) != 0) return null;
+      IntPtr peb = Rd(mi, 8);
+      if (peb == IntPtr.Zero) return null;
+      byte[] pb = new byte[0x40];
+      if (!ReadProcessMemory(h, peb, pb, pb.Length, out ret)) return null;
+      IntPtr pp = Rd(pb, 0x20);
+      if (pp == IntPtr.Zero) return null;
+      byte[] ub = new byte[0x80];
+      if (!ReadProcessMemory(h, pp, ub, ub.Length, out ret)) return null;
+      ushort len = BitConverter.ToUInt16(ub, 0x38);          // RTL_USER_PROCESS_PARAMETERS.CurrentDirectory.DosPath
+      IntPtr addr = Rd(ub, 0x40);
+      if (len == 0 || addr == IntPtr.Zero) return null;
+      byte[] s = new byte[len];
+      if (!ReadProcessMemory(h, addr, s, len, out ret)) return null;
+      return Encoding.Unicode.GetString(s);
+    } finally { CloseHandle(h); }
+  }
+}
+'@
+    } catch {
+      Write-Host ("[warn] CWD probe unavailable ({0}); falling back to the command-line heuristic." -f $_.Exception.Message)
+      return @{ ok = $false; holders = @() }
+    }
+  }
+  # 安装目录名解析成真实路径，并换出 NT 形式：PEB 里的 CWD 是 \Device\HarddiskVolumeN\… 。
+  $resolved = (Resolve-Path -LiteralPath $InstallDir -ErrorAction SilentlyContinue).Path
+  if (-not $resolved) { return @{ ok = $false; holders = @() } }   # 安装目录还不存在（首装）：探针无从测，交给调用方判
+  $native = $null
+  try { $native = [System.IO.Path]::GetFullPath($resolved) } catch { $native = $resolved }
+  $prefixes = @($native.TrimEnd('\'), "\\?\$($native.TrimEnd('\'))")
+  $out = @()
+  foreach ($p in Get-CimInstance Win32_Process) {
+    if ($p.ProcessId -eq $PID) { continue }
+    $cwd = $null
+    try { $cwd = [AiosPebProbe]::Cwd([int]$p.ProcessId) } catch { $cwd = $null }
+    if (-not $cwd) { continue }
+    # CWD 可能是符号链/junction 下的路径，也可能带尾反斜杠；统一去尾后比前缀。
+    $clean = $cwd.TrimEnd('\')
+    foreach ($pre in $prefixes) {
+      if ($clean -eq $pre -or $clean.StartsWith("$pre\", [StringComparison]::OrdinalIgnoreCase)) {
+        $out += [pscustomobject]@{ ProcessId = $p.ProcessId; Name = $p.Name; Cwd = $clean }
+        break
+      }
+    }
+  }
+  return @{ ok = $true; holders = @($out) }
+}
+
 function Enable-Tls12() {
   try {
     $tls12 = [Net.SecurityProtocolType]::Tls12
@@ -214,35 +294,42 @@ try {
     throw "Archive layout unexpected: neither aios/ prefix nor expected files found in $extract"
   }
 
-  # 占用预检：从安装目录跑起来的进程会占着旧文件。
-  # 默认只告警（旧目录是“改名让位”而不是删除，所以占用不再会弄坏安装）；
-  # 想直接停掉它们就加 -StopHolders。
+  # 占用预检：只拦“会把目录改名挡住”的那一类持有者——进程 CWD 在树内（见 Get-InstallDirCwdHolder）。
+  # 默认只告警（旧目录是“改名让位”而不是删除）；想直接停掉它们就加 -StopHolders。
   $retired = $null
+  $holders = @()
   if (Test-Path -LiteralPath $InstallDir) {
-    try {
-      $holders = @(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+    $probed = Get-InstallDirCwdHolder -InstallDir $InstallDir
+    if (-not $probed.ok) {
+      # 探针不可用（非 x64 / Add-Type 失败）时退回旧的命令行启发式，并明说它是近似：
+      # 静默跳过与拿猜值当事实是同一种毛病，所以这里不报“干净”，只报“测不准”。
+      $holders = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
         $_.ProcessId -ne $PID -and $_.CommandLine -and ($_.CommandLine -like ("*" + $InstallDir + "*"))
       })
-    } catch {
-      # 探测失败不能静默：那和旧版“删除失败静默跳过”是同一种毛病。
-      $holders = @()
-      Write-Host ("[warn] occupancy pre-check failed ({0}); continuing with the rename-aside swap." -f $_.Exception.Message)
-    }
-    if ($holders.Count -gt 0) {
-      Write-Host ("[warn] {0} process(es) reference the install dir (heuristic): {1}" -f $holders.Count, $InstallDir)
-      foreach ($holder in $holders) { Write-Host ("        PID {0}  {1}" -f $holder.ProcessId, $holder.Name) }
-      if ($StopHolders) {
-        foreach ($holder in $holders) {
-          try {
-            Stop-Process -Id $holder.ProcessId -Force -ErrorAction Stop
-            Write-Host ("        stopped PID {0}" -f $holder.ProcessId)
-          } catch {
-            Write-Host ("        [warn] could not stop PID {0}: {1}" -f $holder.ProcessId, $_.Exception.Message)
-          }
-        }
-      } else {
-        Write-Host "[warn] continuing anyway (old dir is renamed aside, not deleted); pass -StopHolders to stop them automatically."
+      if ($holders.Count -gt 0) {
+        Write-Host ("[warn] CWD probe unavailable; the {0} process(es) below are a command-line approximation, not proof: {1}" -f $holders.Count, $InstallDir)
+        foreach ($holder in $holders) { Write-Host ("        PID {0}  {1}" -f $holder.ProcessId, $holder.Name) }
       }
+    } else {
+      $holders = @($probed.holders)
+      if ($holders.Count -gt 0) {
+        Write-Host ("[warn] {0} process(es) hold a working directory inside the install dir — these DO block the rename-aside swap:" -f $holders.Count)
+        foreach ($holder in $holders) { Write-Host ("        PID {0}  {1}  cwd={2}" -f $holder.ProcessId, $holder.Name, $holder.Cwd) }
+      } else {
+        Write-Host "[info] CWD probe: no process holds a working directory inside the install dir; the swap is not blocked."
+      }
+    }
+    if ($holders.Count -gt 0 -and $StopHolders) {
+      foreach ($holder in $holders) {
+        try {
+          Stop-Process -Id $holder.ProcessId -Force -ErrorAction Stop
+          Write-Host ("        stopped PID {0}" -f $holder.ProcessId)
+        } catch {
+          Write-Host ("        [warn] could not stop PID {0}: {1}" -f $holder.ProcessId, $_.Exception.Message)
+        }
+      }
+    } elseif ($holders.Count -gt 0) {
+      Write-Host "[warn] continuing anyway (old dir is renamed aside, not deleted); pass -StopHolders to stop them automatically."
     }
   }
 
@@ -267,12 +354,13 @@ try {
       # 关键：这里必须“干净地拒绝”，而不是删一半。旧版就是删不动还继续，
       # 把安装目录留成半截（实测只剩过 mcp-server/），用户下次连 aios 都跑不起来。
       # 此刻旧安装**完全未动**，直接退出是安全的。
-      Write-Host "[error] cannot swap the install dir: it is held open by a running process."
+      Write-Host "[error] cannot rename the install dir: a process holds a working directory inside it."
       Write-Host ("        dir:   {0}" -f $InstallDir)
       Write-Host ("        why:   {0}" -f $_.Exception.Message)
+      Write-Host "        note:  open file handles, watcher handles and Chrome profiles do NOT block a directory rename on Windows; only a process CWD inside the tree does."
       if ($holders.Count -gt 0) {
-        Write-Host "        holders (heuristic):"
-        foreach ($holder in $holders) { Write-Host ("          PID {0}  {1}" -f $holder.ProcessId, $holder.Name) }
+        Write-Host "        CWD holders:"
+        foreach ($holder in $holders) { Write-Host ("          PID {0}  {1}  cwd={2}" -f $holder.ProcessId, $holder.Name, $holder.Cwd) }
       }
       Write-Host "        fix:   stop those processes and re-run, or re-run with -StopHolders."
       Write-Host "        note:  your existing AIOS install was left untouched by this failure."
