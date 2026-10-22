@@ -7,6 +7,7 @@
 import path from 'node:path';
 
 import { collectProjectionDrift } from './lib/clients/rex-harness/projection-drift.mjs';
+import { projectionRegenCommand } from './lib/clients/rex-harness/projection-refresh.mjs';
 import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 export const USAGE = 'usage: node scripts/aios-projection-drift.mjs --install-root <dir> --repo-root <dir> [--json] [--fail-on-drift]';
@@ -42,8 +43,8 @@ export function formatDriftReport(report) {
   for (const entry of report.entries.filter((item) => item.skillDrift)) {
     lines.push(`[projection-drift] STALE ${entry.client}/skills/${entry.skill} (generated ${entry.generated}): ${entry.files.join(', ')}`);
   }
-  const installer = path.join(report.installRoot, 'scripts', 'install-rex-client-projections.mjs');
-  lines.push(`[projection-drift] 重生：node ${installer} --root ${report.installRoot} --project-root <项目根> --client all --scope project`);
+  // 中文注释：命令口径来自 projection-refresh，不在这里二次拼装（三处各拼一次就是三个 owner）。
+  lines.push(`[projection-drift] 重生：${projectionRegenCommand({ installRoot: report.installRoot, projectRoot: '<项目根>' }).join(' ')}`);
   return lines.join('\n');
 }
 

@@ -9,6 +9,7 @@ import path from 'node:path';
 import { clientSkillRootDirs, collectProjectionDrift } from './projection-drift.mjs';
 
 /** 中文注释：项目里已经存在的 rex 投影目录（数量，不是名字）——0 就意味着这个项目从没投过影。 */
+/** 中文注释：重生命令的唯一口径。它原本在漂移 CLI、doctor 和本模块各拼一次——`--scope` 之类 * 的参数一变就是三处要记得改，而"没人记得改"正是本需求要消灭的东西。谁调用都从这里取。 */export function projectionRegenCommand({ installRoot, projectRoot }) {  return [    process.execPath,    path.join(installRoot, 'scripts', 'install-rex-client-projections.mjs'),    '--root', installRoot,    '--project-root', projectRoot,    '--client', 'all',    '--scope', 'project',  ];}
 export function countProjectedRexSkills({ installRoot, projectRoot }) {
   const sourceRoot = path.join(installRoot, 'rex-harness', 'skill-sources');
   if (!fs.existsSync(sourceRoot)) return 0;
@@ -38,23 +39,21 @@ export async function refreshProjectProjections({
     return { ran: false, reason: 'no-rex-projections', projected: 0 };
   }
 
-  const installer = path.join(installRoot, 'scripts', 'install-rex-client-projections.mjs');
-  if (!fs.existsSync(installer)) {
-    io.log(`[warn] projection refresh skipped: installer not found at ${installer}`);
+  const command = projectionRegenCommand({ installRoot, projectRoot });
+  if (!fs.existsSync(command[1])) {
+    io.log(`[warn] projection refresh skipped: installer not found at ${command[1]}`);
     return { ran: false, reason: 'installer-missing', projected, ok: false };
   }
 
   const before = collectProjectionDrift({ installRoot, repoRoot: projectRoot }).skillDrift;
   io.log(`+ refresh rex projections for ${projectRoot} (${projected} projected skills, skillDrift=${before})`);
-  const result = await runImpl(process.execPath, [
-    installer, '--root', installRoot, '--project-root', projectRoot, '--client', 'all', '--scope', 'project',
-  ], { cwd: projectRoot, io });
+  const result = await runImpl(command[0], command.slice(1), { cwd: projectRoot, io });
 
   // 中文注释：运行时此刻已经换好了，重生失败只能 warn——把已成功的升级报成失败，
   // 会让人去做更危险的事（重跑整个安装）。但失败必须可见且带可执行补救命令。
   if ((result?.code ?? 0) !== 0) {
     io.log(`[warn] projection refresh failed (exit ${result?.code}): stale skill copies remain in ${projectRoot}`);
-    io.log(`[warn]   retry manually: node ${installer} --root ${installRoot} --project-root ${projectRoot} --client all --scope project`);
+    io.log(`[warn]   retry manually: ${command.join(' ')}`);
     return { ran: true, ok: false, projected, before, exitCode: result?.code };
   }
 

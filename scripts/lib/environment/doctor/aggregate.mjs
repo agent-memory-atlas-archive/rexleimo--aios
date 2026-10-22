@@ -11,7 +11,7 @@ import { doctorContextDbSkills } from '../../tooling/components/skills/skills.mj
 import { getDisabledGateIds, isHarnessGateEnabled } from '../../execution/harness/ops/profile.mjs';
 import { commandExists, captureCommand, runCommand } from '../../foundation/platform/process.mjs';
 import { doctorRexHarness, isAiosRuntimeRoot } from '../../clients/rex-harness/runtime.mjs';
-import { collectProjectionDrift } from '../../clients/rex-harness/projection-drift.mjs';
+import { inspectProjectionDelivery } from './aggregate/projection-drift-gate.mjs';
 import { inspectTokenDiscipline, printTokenDisciplineReport } from '../../execution/token-discipline/index.mjs';
 import { reconcileLegacyWorkflowSurface } from '../../execution/workflows/surface/rex-workflow-surface-lifecycle.mjs';
 import { runNativeOnlyDoctor } from './aggregate/native-only.mjs';
@@ -431,23 +431,17 @@ export async function runDoctorSuite({
   // attachmentDrift 不参与定级（工单 C8）：它不是送达失败，把它算进红灯只会让人关掉整条门。
   if (isHarnessGateEnabled('doctor:projection-drift', { profile, disabledGates })) {
     const targetRoot = projectRoot || rootDir;
-    const drift = collectProjectionDrift({ installRoot: rootDir, repoRoot: targetRoot });
-    const counts = `skillDrift=${drift.skillDrift} attachmentDrift=${drift.attachmentDrift}`
-      + ` unmanaged=${drift.unmanaged} checked=${drift.checked}`;
-    io.log(`[projection-drift] ${counts}`);
-    const regenerator = path.join(rootDir, 'scripts', 'install-rex-client-projections.mjs');
-    const drifted = drift.skillDrift > 0 || drift.unmanaged > 0;
-    if (drifted) {
+    const drift = inspectProjectionDelivery({ installRoot: rootDir, projectRoot: targetRoot });
+    io.log(drift.line);
+    if (drift.drifted) {
       effectiveWarns += 1;
     }
     addDoctorCheck(checks, {
       id: 'doctor:projection-drift',
       item: 'client rex skill projections match the installed skill sources',
-      status: drifted ? 'warn' : 'ok',
-      fix: drifted
-        ? `Regenerate: node ${regenerator} --root ${rootDir} --project-root ${targetRoot} --client all --scope project`
-        : `Inspect: node ${path.join(rootDir, 'scripts', 'aios-projection-drift.mjs')} --install-root ${rootDir} --repo-root ${targetRoot} --fail-on-drift`,
-      note: counts,
+      status: drift.drifted ? 'warn' : 'ok',
+      fix: drift.fix,
+      note: drift.counts,
     });
   } else {
     logSkippedGate(io, 'doctor:projection-drift', profile);
