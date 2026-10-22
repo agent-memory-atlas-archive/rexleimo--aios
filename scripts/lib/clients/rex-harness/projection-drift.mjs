@@ -62,7 +62,18 @@ export function collectProjectionDrift({
     for (const skill of fs.readdirSync(skillsDir).sort()) {
       const projected = path.join(skillsDir, skill);
       const marker = path.join(projected, PROJECTION_MARKER);
-      if (!fs.existsSync(marker)) continue;
+      if (!fs.existsSync(marker)) {
+        // 中文注释：安装器会把“目标已被人管”的 skill 原文保留（unmanaged-target-differs），于是它
+        // 不在这张度量面里。只看 marker 会把“零漂移”说满：客户端读的可能正是这份没人管的旧副本。
+        // 所以没 marker 但是 rex-* 的目录单独计入 unmanaged（不进 skillDrift：覆盖它是人的决定）。
+        if (/^rex-/u.test(skill) && fs.statSync(projected).isDirectory()) {
+          entries.push({
+            client, skill, generated: 'unmanaged', unmanaged: true,
+            skillDrift: false, attachmentDrift: false, files: ['无 projection marker'],
+          });
+        }
+        continue;
+      }
       let generated = 'unknown';
       try {
         generated = JSON.parse(fs.readFileSync(marker, 'utf8')).packageVersion ?? 'unknown';
@@ -86,7 +97,11 @@ export function collectProjectionDrift({
   return Object.freeze({
     checked: entries.length,
     skillDrift: entries.filter((entry) => entry.skillDrift).length,
+    unmanaged: entries.filter((entry) => entry.unmanaged).length,
+    // 中文注释：只算“没别的差异、只有附属物差异”的条目。SKILL.md 与附属物同时不一致的条目已经
+    // 被 skillDrift 计入，再计一次会把同一个条目数两个错——而附属物差异本身按 C8 不作通过条件。
     attachmentDrift: entries.filter((entry) => !entry.skillDrift && entry.attachmentDrift).length,
+    installRoot: path.resolve(installRoot),
     sourceRoot,
     entries: Object.freeze(entries),
   });

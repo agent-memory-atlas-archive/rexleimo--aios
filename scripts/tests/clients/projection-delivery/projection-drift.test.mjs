@@ -81,3 +81,23 @@ test('--fail-on-drift turns skill drift into a nonzero exit so CI can gate on it
     await cleanup(fx.root);
   }
 });
+
+test('an unmanaged rex skill copy is counted separately, not silently dropped', async () => {
+  const fx = await makeFixture({ skillContent: '# clean\n' });
+  try {
+    // 安装器对 unmanaged-target-differs 的条目保留原文且不写 marker：
+    // 只量 marker 覆盖面的话，"零漂移"会把客户端真正在读的旧副本说成没问题。
+    await mkdir(path.join(fx.repo, '.agents', 'skills', 'rex-tdd'), { recursive: true });
+    await writeFile(path.join(fx.repo, '.agents', 'skills', 'rex-tdd', 'SKILL.md'), '# 手工维护的旧副本\n');
+    // 非 rex-* 的自有技能不该被算进来
+    await mkdir(path.join(fx.repo, '.agents', 'skills', 'my-own-skill'), { recursive: true });
+    await writeFile(path.join(fx.repo, '.agents', 'skills', 'my-own-skill', 'SKILL.md'), '# mine\n');
+
+    const report = JSON.parse(runTool(fx));
+    assert.equal(report.unmanaged, 1, 'rex-tdd without a marker must show up as unmanaged');
+    assert.equal(report.skillDrift, 0, 'unmanaged copies are not counted as drift: overwriting them is a human call');
+    assert.equal(report.checked, 2);
+  } finally {
+    await cleanup(fx.root);
+  }
+});

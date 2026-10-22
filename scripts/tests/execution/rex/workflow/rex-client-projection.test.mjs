@@ -130,9 +130,20 @@ test('standalone installer entrypoint defaults to an all-client global Rex proje
 test('standalone installer entrypoint validates arguments and keeps help side-effect free', async () => {
   assert.deepEqual(parseRexClientProjectionArgs(['--root', '/tmp/aios', '--client', 'grok', '--scope', 'project']), {
     rootDir: path.resolve('/tmp/aios'),
+    projectRoot: null,
     client: 'grok',
     scope: 'project',
   });
+  // 中文注释：两个根必须能分开——送达漂移只发生在项目仓库，绑死在一起就没法用 CLI 重生别人的投影。
+  const twoRoots = parseRexClientProjectionArgs(['--root', '/tmp/aios', '--project-root', '/tmp/work', '--scope', 'project']);
+  assert.equal(twoRoots.projectRoot, path.resolve('/tmp/work'));
+  const twoRootCalls = [];
+  await installRexClientSkills(['--root', '/tmp/aios', '--project-root', '/tmp/work', '--scope', 'project'], {
+    installRexClientProjections: async (options) => { twoRootCalls.push(options); return { status: 'installed' }; },
+    io: { log: () => {} },
+  });
+  assert.equal(twoRootCalls[0].rootDir, path.resolve('/tmp/aios'));
+  assert.equal(twoRootCalls[0].projectRoot, path.resolve('/tmp/work'));
   assert.throws(() => parseRexClientProjectionArgs(['--unknown']), /unknown option: --unknown/u);
 
   const messages = [];

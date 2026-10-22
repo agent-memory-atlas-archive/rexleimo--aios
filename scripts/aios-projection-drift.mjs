@@ -35,13 +35,14 @@ export function parseDriftArgs(argv = []) {
 export function formatDriftReport(report) {
   const versions = [...new Set(report.entries.map((entry) => entry.generated))].sort();
   const lines = [
-    `[projection-drift] checked=${report.checked} skillDrift=${report.skillDrift} attachmentDrift=${report.attachmentDrift}`,
+    `[projection-drift] checked=${report.checked} skillDrift=${report.skillDrift} attachmentDrift=${report.attachmentDrift} unmanaged=${report.unmanaged}`,
     `[projection-drift] source=${report.sourceRoot} 生成版本=${versions.join(', ') || 'none'}`,
   ];
   for (const entry of report.entries.filter((item) => item.skillDrift)) {
     lines.push(`[projection-drift] STALE ${entry.client}/skills/${entry.skill} (generated ${entry.generated}): ${entry.files.join(', ')}`);
   }
-  lines.push('[projection-drift] 重生命令：aios init --clients <客户端> --scope local --yes');
+  const installer = path.join(report.installRoot, 'scripts', 'install-rex-client-projections.mjs');
+  lines.push(`[projection-drift] 重生：node ${installer} --root ${report.installRoot} --project-root <项目根> --client all --scope project`);
   return lines.join('\n');
 }
 

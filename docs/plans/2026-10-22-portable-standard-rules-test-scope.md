@@ -128,10 +128,14 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 ### 送达证据（真实安装态，工具产出）
 
 重生前：`checked=66 skillDrift=30 attachmentDrift=15`，生成版本 `0.5.0, 0.5.1, 0.7.0`（安装运行时 rex-harness 0.11.1）。
-重生后：`checked=81 skillDrift=0 attachmentDrift=15`，生成版本 `0.11.1, 0.5.0, 0.7.0`。
+重生后：`checked=81 skillDrift=0 attachmentDrift=15`，生成版本 `0.11.1, 0.5.0, 0.7.0`；再补 unmanaged 维度后最终：
+`checked=85 skillDrift=0 attachmentDrift=15 unmanaged=4`。
 
 - `skillDrift` 30 → 0 ✓（C3 达成，口径 = 投影 ↔ 安装运行时 skill-sources）
 - `checked` 66 → 81：重生把缺失的 rex workflow skill 补齐进来，被检查面变大而非变小——归零不是在缩分母
 - `attachmentDrift` 仍 15：只有 evals/references 差异，按 C8 单独报数，不作通过条件
-- 安装器同时报 **7 条 `unmanaged-target-differs` 冲突**并保留原文件（人管文件不被覆盖）。这正是漂移能长期存活的
-  机制：升级时冲突只打 warn、不回写、也没人计数。所以"重生"不是幂等免费的，doctor 必须把冲突数一并暴露。
+- **口径边界（refactor 阶段自曝）**：只量 marker 覆盖面会把"零漂移"说满。安装器对
+  `unmanaged-target-differs` 的条目保留原文且不写 marker，于是客户端真正在读的旧副本不在度量里。
+  实测例：`.agents/skills/rex-tdd/` 无 marker（`UNMARKED`），而 `.codex/skills/rex-tdd/` 有并被计入。
+  故工具新增 `unmanaged`（无 marker 的 `rex-*` 目录）：单独报数，**不计入 skillDrift，也不触发
+  `--fail-on-drift`**——覆盖人管文件是人的决定，不是门的决定。
