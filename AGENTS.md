@@ -122,6 +122,21 @@ Document manual test steps in PRs when behavior changes.
 - Exit codes: 0 clean or skipped (no git work tree), 1 violation or invalid project config, 2 usage error.
 - Adding a new gate means pointing CI at this command, not writing a second checker.
 
+## Duplicate Code Measure (approximation-grade, first phase)
+
+- `aios standards check --root . --rule duplicateLines` reports, per file, how many lines belong to
+  a run of **>= 6 consecutive normalized lines** that also appears elsewhere. Budget is **0**
+  (zero tolerance) because the measure is a text-line approximation, not a precision guarantee: a
+  budget of 10 would pretend the tool can tell real duplication from coincidence, and it cannot.
+- Declared limits (they are the contract, not caveats): renaming identifiers hides it; similarity
+  below the 6-line window is not reported; self-repetition inside one file is not reported. AST-grade
+  accuracy is a later phase.
+- False positives go through `exempt` with a written reason; existing stock goes through `baselines`
+  (shrink-only). Silent skipping is not a disposition.
+- Measured on this repository on 2026-10-22: **596 files** carry duplicated runs (exit 1). That stock
+  is **not** dispositioned yet, so this rule is deliberately not wired into `pretest:scripts`. Shipping
+  a red-by-default gate without a disposition plan is how a gate gets muted, not fixed.
+
 ## Commit & Pull Request Guidelines
 Git history follows Conventional Commit style:
 - `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`
