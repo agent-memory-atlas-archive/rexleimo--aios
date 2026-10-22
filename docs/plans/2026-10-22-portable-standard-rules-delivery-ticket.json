@@ -63,7 +63,9 @@
         "目录条目度量与单文件行数度量共用同一处置模型（exempt / baseline / new 红灯）",
         "现有 dir-budget 测试保持全绿，并新增针对任意 rootDir fixture 的测试",
         "引擎输出不含 AIOS 专有路径假设",
-        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义",
+        "命令的目标根由调用方决定（cwd 或 --root），不再固定为脚本自身所在仓库；在外部仓库运行时报的是那个仓库的数字。实测反例见 ADR 0002 度量口径节：在非 git 临时目录跑私有门仍输出 767 dirs 且退出 0，量的是 AIOS 自己",
+        "取不到 tracked-file 列表（无 git / 非 git 目录）时输出 SKIP 加原因并退出 0，禁止用文件系统遍历猜一份口径"
       ],
       "verification": [
         "node --test scripts/tests/tooling/tools/dir-budget.test.mjs",

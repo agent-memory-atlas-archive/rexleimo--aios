@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:d701ea6a",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-config-surface-round2.md#diff",
+  "specStatus": "available",
+  "specSource": "file:docs/adr/0002-portable-engineering-standard-rules.md",
+  "standardsFindings": [
+    {
+      "id": "S4-R2-1",
+      "position": "docs/adr/0002-portable-engineering-standard-rules.md:101 (度量口径与降级) vs scripts/check-dir-budget.mjs:109",
+      "evidence": [
+        "file:scripts/check-dir-budget.mjs",
+        "file:docs/adr/0002-portable-engineering-standard-rules.md",
+        "receipt:9a314e3a-81cb-4d2c-a1a5-98b573045519"
+      ],
+      "severity": "hard",
+      "recommendation": "文档原写「无 git 目录时输出 SKIP + 退出 0」，实测不存在：私有门把目标根固定为脚本自身仓库，在非 git 临时目录运行仍输出 [dir-budget] 767 dirs 且退出 0，量的是 AIOS 自己。已把该条改写为目标行为并附实测事实，同时把「目标根由调用方决定」与「取不到 tracked-file 列表即 SKIP」写成 work-budget-engine 的 C7/C8 完成标准。真正的 SKIP 实现归引擎切片，本轮不得声称已落地。"
+    },
+    {
+      "id": "S4-R2-2",
+      "position": "rex-harness/src/domain/standard-config.mjs:69-82 (parseExemptions 的结构分支)",
+      "evidence": [
+        "file:rex-harness/src/domain/standard-config.mjs",
+        "file:rex-harness/tests/domain/standard-config.test.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "两个分支零覆盖：exemption 条目缺 path / 非对象，以及 exemptions.<ruleId> 不是数组。补两条断言（各返回 missing-reason 且 path 指到出错的条目下标），否则这两条路径的报错文案与实际行为无人担保。"
+    },
+    {
+      "id": "S4-R2-3",
+      "position": "rex-harness/src/domain/standard-config.mjs:70,76",
+      "evidence": [
+        "file:rex-harness/src/domain/standard-config.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "结构缺陷借用 missing-reason 这个码：entry 缺 path 与 list 不是数组都归入它。三个码是工单 C3 的闭集，不擅自加第四个是对的，但要在契约里显式声明 missing-reason 覆盖「豁免条目整体不成立」，否则消费方按码分支会把没填 path 当成没填 reason 处理。"
+    },
+    {
+      "id": "S4-R2-4",
+      "position": "rex-harness/src/domain/quantitative-rules.mjs:11-24 (measure / dispositions / exemptions 字段)",
+      "evidence": [
+        "file:rex-harness/src/domain/quantitative-rules.mjs",
+        "file:rex-harness/src/domain/standard-config.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "解析器目前只读 rule id 与 budget；measure、dispositions、fileLines.exemptions 还没有消费者，而 ADR 已把 measure 指认为口径唯一权威——权威暂时无人读取等于口径仍活在脚本行为里。引擎切片必须消费这三个字段，否则删除它们（公开 schema 未发布前删除不算破坏性变更）。"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R2-1",
+      "position": "delivery-ticket work-config-surface C1",
+      "evidence": [
+        "file:scripts/tests/tooling/contracts/standard-rule-config.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "已达成：父侧读到的 DEFAULT_BUDGET 与清单逐项比对，父侧单独改数即红。固有边界如实记录：两侧同时改成同一个别的数值不会变红——那是「一个 owner」定义下可接受的行为，不需要额外担保。"
+    },
+    {
+      "id": "SP-R2-2",
+      "position": "delivery-ticket work-config-surface C5",
+      "evidence": [
+        "file:docs/adr/0002-portable-engineering-standard-rules.md",
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json"
+      ],
+      "severity": "hard",
+      "recommendation": "C5 只能算「文档达成、实现未做」：降级行为已结转 work-budget-engine C7/C8。本项 completionClaim 保持 soft，验收口径以工单为准，不得对外声称非 git 目录已有 SKIP。"
+    },
+    {
+      "id": "SP-R2-3",
+      "position": "上一轮 finding 4（Speculative Generality: QUANTITATIVE_RULE_OVERRIDE_KEYS）与 finding 1（注释承诺拒绝未知键）",
+      "evidence": [
+        "file:rex-harness/src/index.mjs",
+        "file:rex-harness/src/domain/quantitative-rules.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "已修：死面未在发布前带出去（公开面不再导出该常量与 quantitativeRuleBudget，预算解析只剩 resolveStandardConfig 一条入口），注释与代码不再互相矛盾。"
+    },
+    {
+      "id": "SP-R2-4",
+      "position": "过程缺陷：scripts/test-suites.json 接线",
+      "evidence": [
+        "file:scripts/test-suites.json",
+        "file:scripts/test-wiring-snapshot.json"
+      ],
+      "severity": "hard",
+      "recommendation": "重命名测试时误删了 search/search.test.mjs 的登记，并用 AIOS_UPDATE_TEST_WIRING=1 刷新基线把这次删除伪装成存量未接线。是门自己的报错文本（列出被移除的文件）戳穿的：恢复登记后 knownUnwired 回到空集，wiring 套件 6/6。规则：门报错先读它在说什么，禁止用刷新基线换绿。"
+    }
+  ],
+  "verdict": "changes-requested",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-config-surface-round2.md",
+    "receipt:9a314e3a-81cb-4d2c-a1a5-98b573045519",
+    "git:fe16235f",
+    "git:48040bb"
+  ]
+}
