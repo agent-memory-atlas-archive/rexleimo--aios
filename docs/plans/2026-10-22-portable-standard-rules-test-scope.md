@@ -128,8 +128,9 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 ### 送达证据（真实安装态，工具产出）
 
 重生前：`checked=66 skillDrift=30 attachmentDrift=15`，生成版本 `0.5.0, 0.5.1, 0.7.0`（安装运行时 rex-harness 0.11.1）。
-重生后：`checked=81 skillDrift=0 attachmentDrift=15`，生成版本 `0.11.1, 0.5.0, 0.7.0`；再补 unmanaged 维度后最终：
-`checked=85 skillDrift=0 attachmentDrift=15 unmanaged=4`。
+重生后（当时覆盖面仍是硬编码 5 个根）：`checked=81 skillDrift=0 attachmentDrift=15`。
+覆盖面改为注册表全集后的**最终口径**：`checked=153 skillDrift=0 attachmentDrift=35 unmanaged=6`。
+前一组数字（包拮 85/15/4 那一次）只覆盖部分表面，不能当验收结论：68 个条目当时对报告不可见（审查 S4-R4-1）。
 
 - `skillDrift` 30 → 0 ✓（C3 达成，口径 = 投影 ↔ 安装运行时 skill-sources）
 - `checked` 66 → 81：重生把缺失的 rex workflow skill 补齐进来，被检查面变大而非变小——归零不是在缩分母
@@ -139,3 +140,12 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
   实测例：`.agents/skills/rex-tdd/` 无 marker（`UNMARKED`），而 `.codex/skills/rex-tdd/` 有并被计入。
   故工具新增 `unmanaged`（无 marker 的 `rex-*` 目录）：单独报数，**不计入 skillDrift，也不触发
   `--fail-on-drift`**——覆盖人管文件是人的决定，不是门的决定。
+
+## 第五轮范围（关闭 delivery 第一轮审查的 S4-R4-1 / S4-R4-2）
+
+| 标准 | 行为性质 | 缝 | 断言 |
+|---|---|---|---|
+| C9 度量面 = 注册表全集 | **新用户可观察行为**（今天注册表 9 个根，工具只看 5 个；实测 `checked` 85 vs 153） | `collectProjectionDrift()` 默认覆盖面（不传 clients） | fixture 在 `.claude`（旧清单内）与 `.opencode`（旧清单外）各放一条带 marker 的投影 → 默认口径必须 `checked=2`；且默认口径结果 == 显式传注册表全集的结果 |
+| C10 归属由源侧目录名决定 | **新用户可观察行为**（今天用 `/^rex-/` 前缀猜） | 同上 `unmanaged` 计数 | fixture 源侧存在 `helper-ui/`，投影侧同名目录存在但无 marker → 计入 unmanaged；同时源侧不存在的自有技能（`my-own-skill`）不得计入 |
+
+诚实 RED 两条都是行为差异，不用字面断言凑数。本轮不新增 CLI 参数：覆盖面来自注册表就是默认行为，`--clients` 之类的覆盖留给以后有真实需求时再加（§2 反对预留参数）。

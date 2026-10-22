@@ -8,7 +8,23 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { CLIENT_DEFINITIONS } from '../../../lib/foundation/clients/selection/core/definitions.mjs';
+import { collectProjectionDrift } from '../../../lib/clients/rex-harness/projection-drift.mjs';
+
+const PROJECTION_MARKER_NAME = '.rex-projection.json';
 const TOOL = path.resolve(process.cwd(), 'scripts/aios-projection-drift.mjs');
+
+/** 中文注释：期望值取自客户端注册表本身，不在测试里再拄一份硬编码清单——
+ * 否则测试与实现就是同一条规则的两个 owner，而这正是本轮要修的缺陷。 */
+function registrySkillRoots() {
+  return [...new Set(Object.values(CLIENT_DEFINITIONS)
+    .map((definition) => definition.projectSkillRoot)
+    .map((relative) => path.dirname(relative)))];
+}
+
+async function collectDrift({ install, repo }) {
+  return collectProjectionDrift({ installRoot: install, repoRoot: repo });
+}
 
 async function makeFixture({ skillContent, attachment = false }) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'rex-drift-'));
@@ -82,22 +98,81 @@ test('--fail-on-drift turns skill drift into a nonzero exit so CI can gate on it
   }
 });
 
-test('an unmanaged rex skill copy is counted separately, not silently dropped', async () => {
+test('an undelivered skill copy is counted separately, not silently dropped', async () => {
   const fx = await makeFixture({ skillContent: '# clean\n' });
   try {
     // 安装器对 unmanaged-target-differs 的条目保留原文且不写 marker：
     // 只量 marker 覆盖面的话，"零漂移"会把客户端真正在读的旧副本说成没问题。
+    const sourceTdd = path.join(fx.install, 'rex-harness', 'skill-sources', 'rex-tdd');
+    await mkdir(sourceTdd, { recursive: true });
+    await writeFile(path.join(sourceTdd, 'SKILL.md'), '# source of truth\n');
     await mkdir(path.join(fx.repo, '.agents', 'skills', 'rex-tdd'), { recursive: true });
     await writeFile(path.join(fx.repo, '.agents', 'skills', 'rex-tdd', 'SKILL.md'), '# 手工维护的旧副本\n');
-    // 非 rex-* 的自有技能不该被算进来
+    // 项目自有技能：源侧根本没有这个名字，不该被算成未送达
     await mkdir(path.join(fx.repo, '.agents', 'skills', 'my-own-skill'), { recursive: true });
     await writeFile(path.join(fx.repo, '.agents', 'skills', 'my-own-skill', 'SKILL.md'), '# mine\n');
 
     const report = JSON.parse(runTool(fx));
-    assert.equal(report.unmanaged, 1, 'rex-tdd without a marker must show up as unmanaged');
+    assert.equal(report.unmanaged, 1, '源侧认识但没有 marker 的副本必须现形');
     assert.equal(report.skillDrift, 0, 'unmanaged copies are not counted as drift: overwriting them is a human call');
     assert.equal(report.checked, 2);
   } finally {
     await cleanup(fx.root);
+  }
+});
+
+async function makeMarked({ root, client, skill, sourceSkill = skill, content = '# clean\n' }) {
+  const install = path.join(root, 'install', 'rex-harness', 'skill-sources', sourceSkill);
+  const projected = path.join(root, 'repo', client, 'skills', skill);
+  await mkdir(install, { recursive: true });
+  await mkdir(projected, { recursive: true });
+  await writeFile(path.join(install, 'SKILL.md'), content);
+  await writeFile(path.join(projected, 'SKILL.md'), content);
+  await writeFile(path.join(projected, PROJECTION_MARKER_NAME), JSON.stringify({
+    schemaVersion: 1, packageVersion: '0.11.1', skillId: skill,
+  }));
+  return projected;
+}
+
+test('the default measurement surface is the whole client registry, not a local list', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'rex-drift-registry-'));
+  try {
+    // .claude 在旧的硬编码清单里，.opencode 只在客户端注册表里有——
+    // 默认口径看不见 .opencode 就意味着"零漂移"只说了表面的一部分。
+    await makeMarked({ root, client: '.claude', skill: 'rex-implement' });
+    await makeMarked({ root, client: '.opencode', skill: 'rex-implement' });
+    const fx = { root, install: path.join(root, 'install'), repo: path.join(root, 'repo') };
+
+    const report = await collectDrift(fx);
+    assert.equal(report.checked, 2, 'both registry client roots must be measured by default');
+
+    const registryRoots = registrySkillRoots();
+    const explicit = await collectProjectionDrift({
+      installRoot: fx.install, repoRoot: fx.repo,
+      clients: registryRoots,
+    });
+    assert.equal(report.checked, explicit.checked,
+      '默认覆盖面必须等于注册表 projectSkillRoot 全集（一条规则只有一个 owner）');
+  } finally {
+    await cleanup(root);
+  }
+});
+
+test('ownership of an unmanaged copy comes from the source directory, not a name prefix', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'rex-drift-owner-'));
+  try {
+    // 源侧有 helper-ui（不带 rex- 前缀），投影侧同名目录存在但没有 marker → 这是没人管的旧副本
+    await makeMarked({ root, client: '.claude', skill: 'helper-ui', content: '# source\n' });
+    const unmanaged = path.join(root, 'repo', '.claude', 'skills', 'helper-ui');
+    await rm(path.join(unmanaged, PROJECTION_MARKER_NAME), { force: true });
+    // 项目自有技能：源侧根本没有，不该被算成未送达
+    await mkdir(path.join(root, 'repo', '.claude', 'skills', 'my-own-skill'), { recursive: true });
+    await writeFile(path.join(root, 'repo', '.claude', 'skills', 'my-own-skill', 'SKILL.md'), '# mine\n');
+
+    const report = await collectDrift({ root, install: path.join(root, 'install'), repo: path.join(root, 'repo') });
+    assert.equal(report.unmanaged, 1, 'a source-known skill without a marker is unmanaged regardless of its name');
+    assert.equal(report.checked, 1, 'only the marked projection is counted as delivered');
+  } finally {
+    await cleanup(root);
   }
 });

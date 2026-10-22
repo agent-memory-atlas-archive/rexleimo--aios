@@ -1,0 +1,20 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-delivery-round2",
+  "redCandidate": {
+    "publicEntry": "collectProjectionDrift({installRoot,repoRoot}) 的默认度量面（scripts/lib/clients/rex-harness/projection-drift.mjs）",
+    "setup": "fixture 双根目录：场景一在 .claude（旧硬编码清单内）与 .opencode（只在客户端注册表里有）各放一条带 marker 的投影，断言默认 checked=2 且默认口径 == 显式传注册表全集；场景二源侧存在 helper-ui（不带 rex- 前缀）而投影侧同名目录无 marker，断言 unmanaged=1、checked=1，同时源侧不存在的 my-own-skill 不得计入",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "scripts/tests/clients/projection-delivery/projection-drift.test.mjs"
+      ],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "默认度量面等于注册表 projectSkillRoot 全集（9 个根），注册表外根里的投影也被看见；unmanaged 由源侧目录名判定，与前缀无关",
+    "observed": "tests 6 / pass 4 / fail 2，退出码 1：checked actual 1 / expected 2（.opencode 完全不可见）；unmanaged actual 0 / expected 1（helper-ui 因不带 rex- 前缀被漏掉）",
+    "failureReason": "两处都是行为差异而非工具故障：模块里硬编码 CLIENT_SKILL_ROOTS 五项清单，把 projectSkillRoot 的权威从客户端注册表抢走了（实测全量口径 checked=153 vs 硬编码 85，68 个条目对报告不可见，于是“零漂移”只说了表面三分之一）；unmanaged 用 /^rex-/ 前缀猜归属，源侧目录名才是权威——这跟本需求要消灭的“一条知识两个 owner”是同一类缺陷",
+    "receiptRef": "receipt:3426699f-ab25-4ee9-bc54-cf6dfb66209a"
+  }
+}

@@ -5,10 +5,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { CLIENT_DEFINITIONS } from '../../foundation/clients/selection/core/definitions.mjs';
+
 export const PROJECTION_MARKER = '.rex-projection.json';
-export const CLIENT_SKILL_ROOTS = Object.freeze([
-  '.agents', '.claude', '.codex', '.grok', '.gemini',
-]);
+
+/**
+ * 度量面的权威是客户端注册表，不是本模块里的一份清单：`projectSkillRoot` 己在
+ * `definitions.mjs` 里逐客户端登记过，在这里再拄一份就会让"零漂移"只说表面的一部分
+ * （实测：硬编码 5 个根 checked=85 vs 注册表全集 checked=153）。
+ */
+export function registrySkillRoots() {
+  return [...new Set(Object.values(CLIENT_DEFINITIONS)
+    .map((definition) => definition.projectSkillRoot)
+    .filter(Boolean)
+    .map((relative) => String(relative).split('/')[0]))];
+}
 
 function payload(dir) {
   const map = new Map();
@@ -51,7 +62,7 @@ function comparePayloads(sourceDir, projectedDir) {
 export function collectProjectionDrift({
   installRoot,
   repoRoot,
-  clients = CLIENT_SKILL_ROOTS,
+  clients = registrySkillRoots(),
 } = {}) {
   if (!installRoot || !repoRoot) throw new TypeError('collectProjectionDrift requires installRoot and repoRoot');
   const sourceRoot = path.join(installRoot, 'rex-harness', 'skill-sources');
@@ -65,8 +76,9 @@ export function collectProjectionDrift({
       if (!fs.existsSync(marker)) {
         // 中文注释：安装器会把“目标已被人管”的 skill 原文保留（unmanaged-target-differs），于是它
         // 不在这张度量面里。只看 marker 会把“零漂移”说满：客户端读的可能正是这份没人管的旧副本。
-        // 所以没 marker 但是 rex-* 的目录单独计入 unmanaged（不进 skillDrift：覆盖它是人的决定）。
-        if (/^rex-/u.test(skill) && fs.statSync(projected).isDirectory()) {
+        // 归属由源侧目录名决定（而不是猜 `rex-` 前缀）：源侧有这个名字且投影无 marker 才是未送达；
+        // 项目自有技能源侧根本没有，不该被算成问题。
+        if (fs.existsSync(path.join(sourceRoot, skill))) {
           entries.push({
             client, skill, generated: 'unmanaged', unmanaged: true,
             skillDrift: false, attachmentDrift: false, files: ['无 projection marker'],

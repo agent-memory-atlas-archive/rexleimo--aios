@@ -33,7 +33,8 @@ export function parseDriftArgs(argv = []) {
 }
 
 export function formatDriftReport(report) {
-  const versions = [...new Set(report.entries.map((entry) => entry.generated))].sort();
+  // 中文注释：unmanaged 是状态不是版本，混进版本列表会被读成一个版本号（审查 S4-R4-4）。
+  const versions = [...new Set(report.entries.map((entry) => entry.generated))].filter((value) => value !== 'unmanaged').sort();
   const lines = [
     `[projection-drift] checked=${report.checked} skillDrift=${report.skillDrift} attachmentDrift=${report.attachmentDrift} unmanaged=${report.unmanaged}`,
     `[projection-drift] source=${report.sourceRoot} 生成版本=${versions.join(', ') || 'none'}`,
