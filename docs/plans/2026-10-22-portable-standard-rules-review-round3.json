@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:d59f16ff",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-round3.md#scope",
+  "specStatus": "available",
+  "specSource": "file:docs/adr/0002-portable-engineering-standard-rules.md",
+  "standardsFindings": [],
+  "specFindings": [],
+  "verdict": "pass",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-round3.md",
+    "receipt:14d0c942-a397-4f38-9d7e-e39eae0805e0",
+    "git:f4ca9e76",
+    "git:1a1cd75"
+  ]
+}
