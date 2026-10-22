@@ -32,13 +32,23 @@ async function pathExists(rootDir, relativePath) {
   }
 }
 
+/** 中文注释：从引擎的处置表里取那一条命中项。顺序即优先级：红灯压过赦免。 */
+const DISPOSITION_ORDER = Object.freeze(['violation', 'exempt', 'baseline', 'pass']);
+
 function dispositionOf(report) {
-  if (report.violations.length > 0) return { disposition: 'violation', detail: report.violations[0].detail };
-  if (report.exempt.length > 0) return { disposition: 'exempt', reason: report.exempt[0].reason, detail: null };
-  if (report.baseline.length > 0) {
-    return { disposition: 'baseline', detail: `${report.baseline[0].count} lines <= baseline ${report.baseline[0].allowed} (shrink only)` };
+  for (const kind of DISPOSITION_ORDER) {
+    const entry = report.byDisposition.get(kind)[0];
+    if (!entry) continue;
+    return {
+      disposition: kind,
+      count: entry.count,
+      reason: entry.reason ?? null,
+      detail: entry.detail ?? (kind === 'baseline'
+        ? `${entry.count} lines <= baseline ${entry.allowed} (shrink only)`
+        : null),
+    };
   }
-  return { disposition: 'pass', detail: null };
+  return { disposition: 'pass', count: 0, reason: null, detail: null };
 }
 
 async function evaluateArchitectureRule(rootDir, rule, config) {
@@ -59,8 +69,7 @@ async function evaluateArchitectureRule(rootDir, rule, config) {
       baselines: config?.baselines ?? {},
     });
     outcome = dispositionOf(report);
-    count = report.pass[0]?.count ?? report.violations[0]?.count ?? report.exempt[0]?.count
-      ?? report.baseline[0]?.count ?? 0;
+    count = outcome.count;
 
     if (outcome.disposition === 'violation' || outcome.disposition === 'baseline') {
       failures.push(outcome.detail);
