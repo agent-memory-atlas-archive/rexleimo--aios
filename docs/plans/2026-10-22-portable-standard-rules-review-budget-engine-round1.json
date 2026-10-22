@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:52d129f1",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round1.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-budget-engine",
+  "standardsFindings": [
+    {
+      "id": "S5-R9-1",
+      "position": "scripts/check-dir-budget.mjs evaluateBudgets legacy object-shaped input",
+      "evidence": [
+        "file:scripts/tests/tooling/tools/dir-budget.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "豁免数据在仓库里仍有两种拼法（对象表与配置数组）；把测试改喂配置数组后删除兼容层，旧形状不该长存"
+    },
+    {
+      "id": "S5-R9-2",
+      "position": "scripts/lib/foundation/architecture/standards-check.mjs runStandardsRule config default",
+      "evidence": [
+        "file:scripts/tests/foundation/standards/standards-cli.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "config 既可传入也可内部加载；这是本命令的便利默认，出现第二个不传 config 的真实调用者时要重新审"
+    },
+    {
+      "id": "S5-R9-3",
+      "position": "rex-harness/src/domain/quantitative-rules.mjs fileLines.exemptions categories vs {path,reason} entries",
+      "evidence": [
+        "file:docs/adr/0002-portable-engineering-standard-rules.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "清单声明了豁免类别，配置契约只能按精确 path 豁免，导致 vendored blob 要逐条手写；补它要扩配置契约，划给 work-self-consumer / work-dup-metric"
+    },
+    {
+      "id": "S5-R9-4",
+      "position": "fileLines rule has no CI gate",
+      "evidence": [
+        "file:package.json"
+      ],
+      "severity": "judgement",
+      "recommendation": "有意为之：75 个超标文件是存量处置决定（豁免生成的、基线冻结手写的），不由实现者在同一轮替人做完"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R9-1",
+      "position": "scripts/lib/foundation/architecture/governance.mjs countSourceLines + evaluateArchitectureRule",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json",
+        "git:67f609ac"
+      ],
+      "severity": "hard",
+      "recommendation": "验收第 4 条（两种度量共用同一处置模型）在仓库范围尚未成立：governance 自带另一套行数判定，且先 trim 再切行，与清单定义的 physical lines（空行算内容）不是同一个量。下一轮把 governance 接进引擎，并先裁决行数定义以谁为准——那是语义裁决，会改变现有超标计数"
+    },
+    {
+      "id": "SP-R9-2",
+      "position": "work-budget-engine C7/C8",
+      "evidence": [
+        "receipt:07a4634f-752e-4490-bb4f-625727665c88",
+        "receipt:2917db72-c466-4db9-8a83-8e27431fd6e2",
+        "file:scripts/tests/foundation/standards/standards-cli.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "达成且方式可复核：测试全在 git fixture 仓库上跑且默认引用调用方给的根；非 git 目录 SKIP + reason + measured:null + 退出 0；迁移前后私有门同形（768→769，多出的是本批新增文件），既有断言一条未改仍绿"
+    }
+  ],
+  "verdict": "changes-requested",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-budget-engine-round1.md",
+    "receipt:07a4634f-752e-4490-bb4f-625727665c88",
+    "receipt:2917db72-c466-4db9-8a83-8e27431fd6e2",
+    "receipt:ddd3bf21-0ed6-4819-9943-9c63c0e2fd26",
+    "receipt:51a97c8f-c7c7-4a49-a33c-44af7b1a1a91",
+    "git:52244f7a"
+  ]
+}

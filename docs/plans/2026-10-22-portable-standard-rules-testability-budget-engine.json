@@ -1,0 +1,20 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-budget-engine-round1",
+  "redCandidate": {
+    "publicEntry": "rex-harness 公开面新增的预算引擎：applyBudgetRule / measureDirectoryEntries / measureFileLines（rex-harness/src/domain/budget-rule.mjs），以及宿主适配层 runStandardsRule/loadProjectConfig（scripts/lib/foundation/architecture/standards-check.mjs）与命令 scripts/aios-standards.mjs",
+    "setup": "引擎侧：三处置共用一张表——同一份 measurements 里放 gen/out(12,豁免)、legacy/big(9,基线=9)、fresh/dir(9,新增)、clean/dir(2,达标)，断言 byDisposition 键序为 exempt/baseline/violation/pass 且 blocking=1、豁免条目带回 reason；基线只许收缩——count 10 的条目测得 11 报 growth、测得 6 报 recovered 并提示删除条目；引擎不回传任何根。适配层侧：用 git init 造 fixture 仓库（9 个条目的 wide/ 目录），断言 JSON 的 root 等于调用方给的目录、blocking=1、退出 1；非 git 目录断言 status=skip、reason 匹配 not a git work tree、measured=null、退出 0；配置段名写成 budget（单数）断言退出 1 并报 unknown-key",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "rex-harness/tests/domain/budget-rule.test.mjs"
+      ],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "预算与三处置成为第三方可独立调用的公开面；度量输入是键→数，判定与宿主仓库无关；调用方能指定目标根；取不到 tracked 列表时 SKIP 而不是猜",
+    "observed": "退出码 1，ERR_MODULE_NOT_FOUND：Cannot find module 'E:\\\\coding\\\\harness-cli\\\\rex-harness\\\\src\\\\domain\\\\budget-rule.mjs'（测试文件级失败，即整条契约此刻在子模块里根本不存在）",
+    "failureReason": "缺失的能力而非工具故障：目录条目上限 8、单文件约 400 行写在标准文本里，但可执行形态只存在于宿主仓库的 scripts/check-dir-budget.mjs，且同文件硬编码 26 条 EXEMPT_DIRS；第三方装了 rex-harness 读得到规则却跑不动它。私有门还把目标根钉成脚本自己的仓库——实测在非 git 临时目录运行仍输出 767 dirs 且退出 0，报的是 AIOS 自己的数字（ADR 0002 度量口径节）",
+    "receiptRef": "receipt:07a4634f-752e-4490-bb4f-625727665c88"
+  }
+}
