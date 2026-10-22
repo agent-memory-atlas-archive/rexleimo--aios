@@ -270,3 +270,10 @@ C7/C8 的担保方式：新测试一律在 fixture git 仓库上跑，不引用�
   这条断言在别人仓库里跑不出来，正是 ADR 0002 记的 767 dirs 反例）
 - 非 git 目录 → `status:"skip"`、`reason:/not a git work tree/`、`measured:null`、退出 0
 - 配置写错段名（`budget` 而非 `budgets`）→ 退出 1 并报 `unknown-key`：静默按默认预算跑就是第二个 owner
+
+### 第九轮重构步（纯结构，行为不变）
+
+`runStandardsRule` 把"选文件 + 读内容 + 折成度量"和"取根 + SKIP + 调引擎 + 定退出码"混在一起；
+拆出 `measureForRule()` 后主流程只剩控制流。复测 receipt:51a97c8f（退出 0，11/11）。
+私有门仍输出同一形状：目录数 768 → 769，多出的一个是本批新增文件本身，不是回归——
+这条差异是**可解释的增长**，与"数字变了但没人知道为什么"是两回事。

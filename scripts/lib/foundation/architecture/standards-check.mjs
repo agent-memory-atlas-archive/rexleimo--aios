@@ -59,6 +59,22 @@ export async function loadProjectConfig({ rootDir, configRelativePath = 'config/
   return resolveStandardConfig(parsed);
 }
 
+async function measureForRule({ rule, trackedFiles, rootDir, extensions, readImpl }) {
+  const files = selectFiles(trackedFiles, { rule, extensions });
+  if (rule !== 'fileLines') return measureDirectoryEntries(files);
+  const reads = [];
+  for (const file of files) {
+    try {
+      reads.push({ path: file, content: await readImpl(path.join(rootDir, file), 'utf8') });
+    } catch {
+      // 中文注释：tracked 但读不到（工作树里被删）就不计入，也不猜行数——
+      // 报一条凭空的超标，和漏报一条真超标，是同一种不诚实。
+      continue;
+    }
+  }
+  return measureFileLines(reads);
+}
+
 function selectFiles(files, { rule, extensions = SOURCE_FILE_EXTENSIONS }) {
   if (rule !== 'fileLines') return files;
   return files.filter((file) => extensions.some((ext) => file.endsWith(ext)));
@@ -94,23 +110,7 @@ export async function runStandardsRule({
     return { status: 'config-error', errors, exitCode: 1 };
   }
 
-  const files = selectFiles(tracked.files, { rule, extensions });
-  let measurements;
-  if (rule === 'fileLines') {
-    const reads = [];
-    for (const file of files) {
-      try {
-        reads.push({ path: file, content: await readImpl(path.join(rootDir, file), 'utf8') });
-      } catch {
-        // 中文注释：tracked 但读不到（工作树里被删）就不计入，也不猜行数——
-        // 报一条凭空的超标，和漏报一条真超标，是同一种不诚实。
-        continue;
-      }
-    }
-    measurements = measureFileLines(reads);
-  } else {
-    measurements = measureDirectoryEntries(files);
-  }
+  const measurements = await measureForRule({ rule, trackedFiles: tracked.files, rootDir, extensions, readImpl });
 
   const report = applyBudgetRule({
     rule,
