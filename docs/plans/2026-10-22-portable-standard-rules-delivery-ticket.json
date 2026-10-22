@@ -201,28 +201,39 @@
       "dependsOn": [
         "work-layer-gate"
       ]
+    },
+    {
+      "id": "work-evidence-ref-integrity",
+      "title": "凭证引用的存在性校验覆盖所有证据种类 — Landing: 子模块 application 层（validate-command-evidence），父侧不持有任何校验规则。",
+      "outcome": "编造的 receipt ref 在任何 kind 上都无法入账；非凭证命名空间（artifact:/doc:）不被强塞进 receipt store；git: 只收对象 id。",
+      "completionCriteria": [
+        "任何 evidence kind 的 receipt: ref 必须能在本工作区 receipt store 解析到文件，解析失败在写账本之前抛出（RED 先行：rex-harness/tests/standalone/evidence-ref-integrity.test.mjs）",
+        "artifact:/doc: 等非凭证命名空间保持原样，不要求伪装成执行回执",
+        "git: ref 必须是 7-40 位十六进制对象 id；对象存在性的跨仓库/子模块 odb 证明列为非目标，另立边界裁决",
+        "按 kind 的退出码期望（nonzero/zero）行为不变，现有子模块与父侧 rex 套件全绿",
+        "更正通道（同 kind 显式 amend + append-only 账本）本项不做：存在性校验补上后，伪造 ref 根本进不了账本，更正通道的必要性需重新评估"
+      ],
+      "verification": [
+        "node --test rex-harness/tests/standalone/evidence-ref-integrity.test.mjs",
+        "(cd rex-harness && npm test)"
+      ],
+      "evidenceRefs": [
+        "file:rex-harness/src/application/validate-command-evidence.mjs",
+        "file:rex-harness/tests/standalone/evidence-ref-integrity.test.mjs"
+      ],
+      "dependsOn": [
+        "work-cli-surface"
+      ]
     }
   ],
   "frontier": {
     "ready": [
-      "work-config-surface",
-      "work-delivery-guarantee"
+      "work-evidence-ref-integrity",
+      "work-self-consumer",
+      "work-layer-gate",
+      "work-dup-metric"
     ],
     "blocked": [
-      {
-        "workItemId": "work-budget-engine",
-        "reason": "上游未完成：work-config-surface 决定配置契约形状，引擎常量迁移动作依赖它",
-        "evidenceRefs": [
-          "artifact:plan:portable-standard-rules"
-        ]
-      },
-      {
-        "workItemId": "work-cli-surface",
-        "reason": "上游未完成：work-budget-engine（命令只是引擎的发行外壳）",
-        "evidenceRefs": [
-          "artifact:plan:portable-standard-rules"
-        ]
-      },
       {
         "workItemId": "work-self-consumer",
         "reason": "上游未完成：work-cli-surface（本仓库改消费方需要真实存在的发行命令）",
@@ -252,7 +263,15 @@
           "artifact:plan:portable-standard-rules"
         ]
       }
-    ]
+    ],
+    "closedOnFrontier": [
+      "work-config-surface",
+      "work-delivery-guarantee",
+      "work-budget-engine",
+      "work-cli-surface",
+      "work-evidence-ref-integrity"
+    ],
+    "note": "frontier 曾长期把已关闭项留在 ready 里；本轮按 review 结论把五项移入 closedOnFrontier。work-evidence-ref-integrity 是事故驱动新增项：review 阶段一条凭记忆写出的 receipt ref 被控制面收进账本（.rex-harness/receipts/00000000-0000-4000-8000-000000000000.json 不存在），根因是存在性校验只对白名单 kind 运行。"
   },
   "parallelGroups": [
     [
