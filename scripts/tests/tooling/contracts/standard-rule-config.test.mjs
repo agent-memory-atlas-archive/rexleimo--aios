@@ -32,9 +32,14 @@ test('project config parser rejects unknown keys, illegal budgets and reason-les
 
   const cases = [
     ['unknown-key', { budgets: { directoryEntries: 10 }, budgets_x: {} }],
-    ['invalid-budget', { budgets: { fileLines: 0 } }],
+    ['invalid-budget', { budgets: { fileLines: -1 } }],
+    ['invalid-budget', { budgets: { fileLines: 1.5 } }],
+    // 中文注释：0 不再是非法值：零容忍是合法声明（重复行规则的预算就是 0）。拿 0 当反例
+    // 会把产品能力当成 bug 锁住，所以这里同时钉住两头。-1 与 1.5 仍然是非法。
     ['missing-reason', { exemptions: { fileLines: [{ path: 'src/tables.ts' }] } }],
   ];
+  assert.equal(rex.resolveStandardConfig({ budgets: { duplicateLines: 0 } }).ok, true,
+    '预算 0 必须合法：否则零容忍规则无法在清单里声明');
   for (const [code, config] of cases) {
     const result = rex.resolveStandardConfig(config);
     assert.equal(result.ok, false, `${code} must be rejected`);
