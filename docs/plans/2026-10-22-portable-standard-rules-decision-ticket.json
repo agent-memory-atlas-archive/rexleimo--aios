@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.decision-ticket.v1",
+  "decisionTicketRef": "artifact:decision-ticket:portable-standard-rules",
+  "objective": "让工程标准的可量化规则成为任何安装了 AIOS 的仓库都能复用的检查能力，而不是 AIOS 自身仓库的私有门禁。",
+  "decision": "采用预算式规则模型（一个度量 + 一个预算 + exempt/baseline/新违规三类处置），检查能力以 aios 子命令加非零退出码随发行物提供，不要求调用方携带脚本副本；AIOS 本仓库改为消费方，现有 24 条 facade maxLines 规则、目录预算与 rex-import-boundaries 双向门全部迁到同一机制，不允许双轨。依赖方向（标准 §1）进第一期，因此新增分层声明输入契约；项目未声明分层时该门输出 SKIP 并说明原因，不得猜测分层。送达是前提条件：投影重生、漂移检测与 Provider wiring 担保测试先行，否则守的是客户端读不到的旧文本。完整裁决见 docs/adr/0002-portable-engineering-standard-rules.md。",
+  "approvedBy": "user",
+  "nonGoals": [
+    "不替项目引入平行的 lint、格式化或 pre-commit 规范（标准 §6：与仓库现有规范一致，不另起炉灶）。",
+    "不做语义质量判定（薄转发、模块深度）——仍由 rex Provider 与 review 轴负责。",
+    "不修改 rex-engineering-standards 的规则数值口径，只改其送达、检查与验收方式。",
+    "不要求非 JS/TS 仓库达到 AST 级精度，标明近似即可。",
+    "不在本需求内实现自动拆分文件类修复动作。"
+  ]
+}

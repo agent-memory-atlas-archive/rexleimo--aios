@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.delivery-ticket.v1",
+  "status": "ready",
+  "objective": "把工程标准的可量化规则从 AIOS 仓库私有门禁抽离为随发行物提供的一条检查命令，任何装了 AIOS 的仓库都能复用同一套预算、处置与退出码，并让依赖方向（标准 §1）在同一机制内可判定。",
+  "decisionTicketRef": "artifact:decision-ticket:portable-standard-rules",
+  "workItems": [
+    {
+      "id": "work-config-surface",
+      "title": "Define the portable standards rule config contract — Landing: rex-harness submodule (public schema) with a parent-side parity test.",
+      "outcome": "项目侧一份配置声明预算覆盖、豁免理由与（依赖方向门用的）分层映射；未配置时发行默认预算生效，豁免缺理由或未知键被结构化拒绝。",
+      "completionCriteria": [
+        "默认预算的单一权威在子模块机器可读规则清单（目录 8 / 单文件 400 / 重复阈值），父仓库只声明覆盖项与豁免理由",
+        "存在契约测试：父侧读到的默认值与子模块清单逐项相等，不一致即红灯（一条规则只有一个 owner）",
+        "父仓库消费该清单，不在父侧二次实现任何预算语义",
+        "解析器对未知键、缺 reason 的 exempt、非法预算值返回结构化错误而不是静默忽略",
+        "AIOS 发行默认预算（目录 8 项 / 单文件 400 行），项目只声明覆盖项与豁免理由",
+        "文档写明无 git tracked-file 列表时的行为（现引擎依赖 git ls-files），并给出非 git 目录的降级口径",
+        "验收标准 #1 的非目标写进文档：不要求项目携带任何脚本副本",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/standards/rule-config.test.mjs"
+      ],
+      "evidenceRefs": [
+        "artifact:decision-ticket:portable-standard-rules"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-delivery-guarantee",
+      "title": "Make standards delivery observable before adding gates — Landing: split — submodule (projection + wiring test) and parent (update hook + doctor).",
+      "outcome": "客户端读到的 rex 投影与安装源码一致，且投影漂移与 Provider wiring 都变成机器可检测状态。",
+      "completionCriteria": [
+        "Provider『第 0 步先加载标准』的担保测试落在子模块自己的 tests（测的是子模块 skill-sources，不能只在下游拦）",
+        "升级自动重生投影与 aios doctor 漂移报告落在父仓库（AIOS 集成路径）",
+        "子模块侧改动批量成一个子模块 release；父仓库的子模块指针移动作为独立 commit，不与功能改动混提",
+        "本机 rex 投影与安装源码内容不一致数从实测 45/66 降到 0",
+        "aios doctor 输出一条可机读的投影漂移计数（落后条目数 + 重生命令），当前该 grep 无任何 projection 检查",
+        "存在测试：去掉任一 code-producing Provider 的『先加载 rex-engineering-standards』第 0 步即变红（当前 scripts/tests 与 rex-harness/tests 对该 wiring 零命中）",
+        "aios update / init 路径会重生投影，升级后不再残留旧版本投影",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/contracts/rex-standards-wiring.test.mjs",
+        "投影漂移审计从 .aios/tmp 提升为受版本控制的工具与测试（如 scripts/aios-projection-drift.mjs + 对应 test），否则该验收不可重复"
+      ],
+      "evidenceRefs": [
+        "file:CONTEXT.md",
+        "artifact:decision-ticket:portable-standard-rules"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "work-budget-engine",
+      "title": "Extract the budget-rule engine out of repo-private constants — Landing: rex-harness submodule (independently usable measure engine).",
+      "outcome": "度量 + 预算 + 三处置的引擎不再引用本仓库常量，接受任意 rootDir 与规则集输入，逐条输出结果。",
+      "completionCriteria": [
+        "引擎落在子模块：纯客观度量、不含 AIOS 集成知识，第三方可独立安装使用",
+        "引擎读取子模块规则清单作为默认值，仓库专有值一律来自项目配置",
+        "EXEMPT_DIRS / BASELINE_COUNTS 从脚本常量变为配置输入，本仓库现有豁免与理由迁到配置文件",
+        "目录条目度量与单文件行数度量共用同一处置模型（exempt / baseline / new 红灯）",
+        "现有 dir-budget 测试保持全绿，并新增针对任意 rootDir fixture 的测试",
+        "引擎输出不含 AIOS 专有路径假设",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/tools/dir-budget.test.mjs",
+        "npm run test:affected"
+      ],
+      "evidenceRefs": [
+        "file:scripts/check-dir-budget.mjs",
+        "file:scripts/lib/foundation/architecture/governance.mjs"
+      ],
+      "dependsOn": [
+        "work-config-surface",
+        "work-delivery-guarantee"
+      ]
+    },
+    {
+      "id": "work-cli-surface",
+      "title": "Ship the check as one aios subcommand — Landing: submodule CLI implements; parent aios subcommand is a forwarding adapter only.",
+      "outcome": "装了 AIOS 的仓库敲一条命令即得报告，超标时退出码非零，输出逐条给出 文件/目录 : 度量值 : 预算 : 处置。",
+      "completionCriteria": [
+        "检查命令的实现在子模块 CLI（公开产品面，已有 bin/rex-harness.mjs 先例）",
+        "父仓库 aios standards check 只做转发：只 import rex-harness/src/index.mjs 或走进程调用，deep import 即违反公开面规则",
+        "父侧不得二次实现判定语义（落点边界 ADR 0001 认定的决策语义外泄缺陷不得复发）",
+        "命令、--json 结构化输出与退出码契约有测试担保（0 与非 0 两条路径）",
+        "命令登记进 aios --help 与 AGENTS 文档，不新增第二条并行入口",
+        "在一个只含默认配置的临时仓库 fixture 上跑通红 → 改 → 绿",
+        "输出可直接贴进 PR（每条违规自带理由与处置建议）",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/standards/standards-cli.test.mjs",
+        "node scripts/lib/tooling/cli/dispatch/dispatch.mjs 路由断言测试"
+      ],
+      "evidenceRefs": [
+        "file:scripts/lib/tooling/cli/dispatch/dispatch.mjs"
+      ],
+      "dependsOn": [
+        "work-budget-engine"
+      ]
+    },
+    {
+      "id": "work-self-consumer",
+      "title": "AIOS becomes a consumer of its own shipped check — Landing: parent repository only (consumer migration, no submodule release).",
+      "outcome": "AIOS 自己不再持有私有门：目录预算、24 条 facade maxLines 规则、import 边界都由同一份配置驱动。",
+      "completionCriteria": [
+        "纯父仓库改动：私有常量与 24 条规则迁入配置，不动子模块公开面",
+        "父侧预算报告数据改由自己的配置文件提供，与子模块默认值分离清楚",
+        "pretest:scripts 第二步改为调用发行命令，脚本内的硬编码豁免/基线特权删除",
+        "rules/{components,lifecycle,rl}.mjs 的 24 条 maxLines/requiredModules 迁到配置，不留双轨读路径",
+        "rex-import-boundaries 的两个方向断言改吃同一分层声明；若无法同批完成，须在 ADR 0002 记录重开裁决而不是悄悄保留双轨",
+        "迁移后 npm run test:scripts 与 aios doctor --strict 均绿，且 dir-budget 报告 0 blocking",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "npm run test:scripts",
+        "aios doctor --strict --json"
+      ],
+      "evidenceRefs": [
+        "file:package.json",
+        "file:scripts/lib/foundation/architecture/rules/lifecycle.mjs"
+      ],
+      "dependsOn": [
+        "work-cli-surface"
+      ]
+    },
+    {
+      "id": "work-layer-gate",
+      "title": "Dependency-direction gate with an explicit layer declaration — Landing: schema in submodule, AIOS layer declaration in parent.",
+      "outcome": "声明了分层的项目得到新增跨层反向依赖红灯并指名具体引用；未声明的项目得到 SKIP，绝不出猜测式违规。",
+      "completionCriteria": [
+        "分层声明的 schema 落子模块（公开 schema），判定实现随引擎同在子模块",
+        "AIOS 自己的分层声明与 rex-import-boundaries 的双向断言迁移落父仓库配置",
+        "分层声明形态定为路径前缀 → 层名 + 层序；无解析器的语言退回引用字面量近似，输出标明为近似值",
+        "未声明分层 → SKIP + 原因；层序成环等错误配置 → 结构化错误而不是崩",
+        "存量违规进 baseline 只许收缩，新增违规即红灯（沿用预算式规则处置模型）",
+        "JS/TS 复用现有 codemap 能力解析 import 图；若必须新写解析器，回到 ADR 0002 重开裁决",
+        "验收标准 #4 的两条路径（有声明红、无声明 SKIP）都有测试",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/standards/layer-dependency.test.mjs",
+        "npm run test:regression"
+      ],
+      "evidenceRefs": [
+        "file:scripts/tests/execution/rex/runtime/rex-import-boundaries.test.mjs",
+        "artifact:decision-ticket:portable-standard-rules"
+      ],
+      "dependsOn": [
+        "work-self-consumer"
+      ]
+    },
+    {
+      "id": "work-external-proof",
+      "title": "Prove acceptance on a real non-AIOS repository — Landing: no code change on either side (verification evidence).",
+      "outcome": "在一个非 AIOS 的真实仓库（默认 E:/coding/rex-ai-tools）只装 AIOS 即跑通验收标准 #1 #2 #3 #5，留下真实命令输出与退出码。",
+      "completionCriteria": [
+        "验收证据落点：目标仓库自己的证据文件（两边都不为验收而改代码）",
+        "首次运行不把存量超标仓库刷成红：超标项自动进 baseline 并报告已收缩量",
+        "人为制造一个超预算文件即红灯，拆小到预算内转绿，全程不修改 AIOS 安装物",
+        "该仓库 CI 接入这条命令，或留下可复现的接入片段作为证据",
+        "输出被保存为该仓库自己的证据文件（不是 AIOS 仓库里的转述）"
+      ],
+      "verification": [
+        "在 rex-ai-tools 仓库运行发行命令并保留退出码与逐条输出"
+      ],
+      "evidenceRefs": [
+        "file:docs/adr/0002-portable-engineering-standard-rules.md",
+        "file:CONTEXT.md"
+      ],
+      "dependsOn": [
+        "work-self-consumer",
+        "work-delivery-guarantee"
+      ]
+    },
+    {
+      "id": "work-dup-metric",
+      "title": "Add the approximation-grade duplication measure — Landing: submodule engine (threshold in the submodule rule manifest).",
+      "outcome": "重复片段作为第一期最后一个量化门接入同一条命令，阈值可解释、存量走 baseline。",
+      "completionCriteria": [
+        "阈值定义进子模块规则清单，近似实现与判定都在子模块，父侧不重复",
+        "近似实现的阈值与局限写进文档（对齐假设清单：第一期不追求工具级精度）",
+        "误报处置走 exempt 且必须写明理由，不允许静默跳过",
+        "至少一条正反例测试：复制成块即红、提取共享结构后转绿",
+        "回退点：子模块公开面受阻时，本项记 blocked 并回 ADR 0002 重开落点裁决，禁止退回父仓库二次实现同一条语义"
+      ],
+      "verification": [
+        "node --test scripts/tests/tooling/standards/duplication.test.mjs"
+      ],
+      "evidenceRefs": [
+        "file:rex-harness/skill-sources/rex-engineering-standards/SKILL.md"
+      ],
+      "dependsOn": [
+        "work-layer-gate"
+      ]
+    }
+  ],
+  "frontier": {
+    "ready": [
+      "work-config-surface",
+      "work-delivery-guarantee"
+    ],
+    "blocked": [
+      {
+        "workItemId": "work-budget-engine",
+        "reason": "上游未完成：work-config-surface 决定配置契约形状，引擎常量迁移动作依赖它",
+        "evidenceRefs": [
+          "artifact:plan:portable-standard-rules"
+        ]
+      },
+      {
+        "workItemId": "work-cli-surface",
+        "reason": "上游未完成：work-budget-engine（命令只是引擎的发行外壳）",
+        "evidenceRefs": [
+          "artifact:plan:portable-standard-rules"
+        ]
+      },
+      {
+        "workItemId": "work-self-consumer",
+        "reason": "上游未完成：work-cli-surface（本仓库改消费方需要真实存在的发行命令）",
+        "evidenceRefs": [
+          "artifact:plan:portable-standard-rules"
+        ]
+      },
+      {
+        "workItemId": "work-layer-gate",
+        "reason": "上游未完成：work-self-consumer；且分层声明是本需求新增输入契约，须在消费方迁移定型后才能接入，避免配置面返工",
+        "evidenceRefs": [
+          "artifact:decision-ticket:portable-standard-rules"
+        ]
+      },
+      {
+        "workItemId": "work-external-proof",
+        "reason": "外部前置条件：需要包含该命令的 AIOS 版本安装到本机。本机仍为 6.8.0；2026-10-22 实测 aios update 的 Directory::Move 被 13 个活着的 AIOS MCP 进程拒绝（安装树完好，失败发生在改名之前），因此该切片排在送达与发行命令之后",
+        "evidenceRefs": [
+          "file:CONTEXT.md",
+          "artifact:plan:portable-standard-rules"
+        ]
+      },
+      {
+        "workItemId": "work-dup-metric",
+        "reason": "上游未完成：work-layer-gate；且与引擎/配置为同一模块所有权，串行以避开同文件冲突（独立性存疑时不为并行而并行）",
+        "evidenceRefs": [
+          "artifact:plan:portable-standard-rules"
+        ]
+      }
+    ]
+  },
+  "parallelGroups": [
+    [
+      "work-config-surface",
+      "work-delivery-guarantee"
+    ],
+    [
+      "work-budget-engine"
+    ],
+    [
+      "work-cli-surface"
+    ],
+    [
+      "work-self-consumer"
+    ],
+    [
+      "work-layer-gate",
+      "work-external-proof"
+    ],
+    [
+      "work-dup-metric"
+    ]
+  ],
+  "convergenceGate": {
+    "requiredEvidenceRefs": [
+      "artifact:decision-ticket:portable-standard-rules",
+      "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json"
+    ],
+    "verification": "npm run test:scripts（含迁移后的预算门）+ aios doctor --strict --json 报告投影漂移 0 + 在 rex-ai-tools 真实仓库运行发行命令并保留退出码与逐条输出 + rex-standards-wiring 契约测试对『去掉第 0 步即变红』给出真反例",
+    "joinCondition": "8 个工作项全部达成各自 completionCriteria；本仓库不存在双轨读路径（私有门残留即不收敛）；送达证据与外部仓库验收证据同时存在，缺一不得声明完成"
+  },
+  "completionClaim": "soft"
+}
