@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
-## [6.10.1] - 2026-10-22（重新发布）
+## [6.10.1] - 2026-10-22
 
-> **重发说明**：本版本号包含两次内容。原 6.10.1（只含发布查询配额修复）与中间版本 6.9.0 / 6.10.0
+> **本号段重新发布（2026-10-22）**：标题保持严格形状，因为 `release-preflight.sh:77` 用
+> `^## \[<ver>\] - YYYY-MM-DD$` 全行匹配（带任何后缀就 `changelog missing matching release heading`，
+> CI 实测撞过一次）。本号包含两次内容：原 6.10.1（只含发布查询配额修复）与中间版本 6.9.0 / 6.10.0
 > 的 GitHub Release 已下架，`v6.10.1` tag 移到含本页全部修复的提交上重发。已知代价：**已经装上原 6.10.1 的机器
 > 拿不到本次修复**——`compareVersionStrings` 把同版本判为 `equal` → `not-newer-than-installed` 直接 skip，
 > 那些机器需手动重跑安装器（`scripts/aios-install.ps1 -StopHolders`）才能跟上。6.8.0 / 6.9.0 / 6.10.0
