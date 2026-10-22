@@ -28,6 +28,10 @@ async function gitFixture() {
   for (const name of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']) {
     await writeFile(path.join(repo, 'wide', `${name}.mjs`), 'export const x = 1;\n', 'utf8');
   }
+  // 中文注释：路由测试要测的是“红灯能不能穿过转发层”，所以 fixture 必须是一个**已配置**的项目：
+  // 命令层对从未写过 config/standards.json 的仓库只报不拦（exit 0），那是发给用户的默认宽。
+  await mkdir(path.join(repo, 'config'), { recursive: true });
+  await writeFile(path.join(repo, 'config', 'standards.json'), JSON.stringify({ budgets: {} }), 'utf8');
   const git = (args) => execFileSync('git', ['-C', repo, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
   git(['init', '--quiet']);
   git(['config', 'user.email', 'route@example.invalid']);

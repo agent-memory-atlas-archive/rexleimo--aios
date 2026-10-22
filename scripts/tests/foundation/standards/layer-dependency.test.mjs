@@ -31,9 +31,9 @@ async function repo({ layers = LAYERS, edges = { 'src/kernel/core.mjs': ['src/ho
   // 外层指内层 = 正常方向，但让宿主文件真的有一条 import，这样 --write-edges 生成的图不是空表。
   await writeFile(path.join(root, 'src/host/app.mjs'), "import { core } from '../kernel/core.mjs';\nexport const app = core;\n", 'utf8');
   await writeFile(path.join(root, 'src/kernel/core.mjs'), 'export const core = 1;\n', 'utf8');
-  if (layers) {
-    await writeFile(path.join(root, 'config/standards.json'), JSON.stringify({ layers }), 'utf8');
-  }
+  // 中文注释：这个 fixture 永远处于“已配置”状态：没声明 layers 时写空配置，这样“没声明”这件事
+  // 只能由 SKIP 原因说出来，不会被“整个仓库还没配置”掩盖成另一种语义。
+  await writeFile(path.join(root, 'config/standards.json'), JSON.stringify(layers ? { layers } : { budgets: {} }), 'utf8');
   if (edges) {
     await mkdir(path.dirname(path.join(root, EDGES_RELATIVE)), { recursive: true });
     await writeFile(path.join(root, EDGES_RELATIVE), JSON.stringify(edges), 'utf8');

@@ -46,10 +46,10 @@ async function repo({ config, duplicate = true }) {
   for (const [rel, content] of Object.entries(files)) {
     await writeFile(path.join(root, rel), content, 'utf8');
   }
-  if (config) {
-    await mkdir(path.join(root, 'config'), { recursive: true });
-    await writeFile(path.join(root, 'config', 'standards.json'), JSON.stringify(config), 'utf8');
-  }
+  // 中文注释：这条测的是“副本能不能在父侧路由上变红”，所以 fixture 一律已配置；
+  // 未配置仓库只报不拦是命令层对用户的默认，不是这里要的语义。
+  await mkdir(path.join(root, 'config'), { recursive: true });
+  await writeFile(path.join(root, 'config', 'standards.json'), JSON.stringify(config ?? { budgets: {} }), 'utf8');
   const git = (args) => execFileSync('git', ['-C', root, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
   git(['init', '--quiet']);
   git(['config', 'user.email', 'dup@example.invalid']);

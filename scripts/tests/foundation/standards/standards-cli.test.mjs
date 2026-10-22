@@ -24,10 +24,15 @@ function runCli(args, cwd = REPO) {
   }
 }
 
-async function makeGitFixture({ dirs }) {
+async function makeGitFixture({ dirs, config = { budgets: {} } }) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'aios-std-fixture-'));
   const project = path.join(root, 'project');
   await mkdir(project, { recursive: true });
+  // 中文注释：这些 fixture 测的是路由/退出码/报告形状，所以声明自己是**已配置项目**；
+  // 命令层对从未写过 config/standards.json 的仓库只报不拦（exit 0），那是给用户的第一次体验，
+  // 不是这里要的语义。想测那个默认宽请去 standards-command.test.mjs 的 --strict/--freeze 两条。
+  await mkdir(path.join(project, 'config'), { recursive: true });
+  await writeFile(path.join(project, 'config', 'standards.json'), JSON.stringify(config), 'utf8');
   const git = (args) => execFileSync('git', ['-C', project, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   git(['init', '--quiet']);
   git(['config', 'user.email', 'test@example.invalid']);
