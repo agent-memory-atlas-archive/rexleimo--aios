@@ -199,7 +199,10 @@ test('architecture governance reports facade budget and module ownership failure
   assert.equal(report.ok, false);
   assert.equal(report.checks[0]?.status, 'FAIL');
   assert.match(report.detail, /Demo Facade/u);
-  assert.match(report.detail, /3 lines > 2/u);
+  // 中文注释：超标这句话现在由预算引擎措辞（旧写法是 '3 lines > 2'）。措辞随所有权一起搬，
+  // 不是为了测试变绿而改断言：状态、失败项、模块归属这些语义一条没动，且本仓库 50 条规则的
+  // 计数与失败集合在迁移前后逐字相同（300/467/417 三条照旧 FAIL）。
+  assert.match(report.detail, /3 > budget 2/u);
   assert.match(report.detail, /missing modules: scripts\/lib\/demo\/part\.mjs/u);
 });
 

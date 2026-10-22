@@ -277,3 +277,28 @@ C7/C8 的担保方式：新测试一律在 fixture git 仓库上跑，不引用�
 拆出 `measureForRule()` 后主流程只剩控制流。复测 receipt:51a97c8f（退出 0，11/11）。
 私有门仍输出同一形状：目录数 768 → 769，多出的一个是本批新增文件本身，不是回归——
 这条差异是**可解释的增长**，与"数字变了但没人知道为什么"是两回事。
+
+## 第十轮范围（消掉第二条行数 owner）
+
+行为等价迁移：governance 的行数**度量**与**超标判定**改走子模块公开面 `measureFileLines` + `applyBudgetRule`。
+
+| 阶段 | 观测 | receipt |
+|---|---|---|
+| RED | 4 tests / 3 fail（`check.disposition` 当时不存在；旧实现不报处置，只报 `3 lines > 2`） | `receipt:49eed7ab` |
+| GREEN | 4/4；邻域 144/144（aios-harness / standards / dir-budget / contracts 全套） | `receipt:d43865bc` |
+
+**语义裁决的证据**（我先量了再选，不是先选再找理由）：50 条既有规则上，两种行数定义
+（旧：先 `trim()` 再按 `/\r?\n/` 切；清单：physical lines，空行算内容、尾随换行不多算）**计数完全一致，0 条差异**。
+所以这条 owner 没有产出过任何一个不同的数字，它只带来两种可能各自漂移的语义。迁移后本仓库判定集合逐字不变：
+`47 pass / 3 violation`，三条仍是 `cli-top-level-parser-facade(300>80)`、`doctor-aggregate-facade(467>320)`、
+`lifecycle-orchestrate-facade(417>320)`。
+
+一处断言确实改了：`aios-harness.test.mjs:202` 期望的措辞从 `3 lines > 2` 改为 `3 > budget 2`——
+措辞随所有权一起搬。状态、失败集合、模块归属判定一条未动。
+
+### 顺手挖到的事实（比本轮改动更值得看）
+
+架构治理门**在本仓库没有任何自动化路径会执行它**：`quality:architecture` 只在 `aios quality-gate` 里跑，
+`package.json` 没有 quality 脚本，`ci-main.yml` 不跑，`release-preflight.sh` 也不跑。
+于是那 3 条 facade 超标是**长期存在但无人可见**的红灯——本轮把它们接进引擎时没有登记 baselines，
+就是为了让它们继续是可见的违规而不是被静默赦免。是否要冻结存量（300/467/417）是存量处置决定，留给用户。
