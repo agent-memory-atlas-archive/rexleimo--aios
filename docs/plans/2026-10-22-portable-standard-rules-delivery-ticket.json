@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "rex.delivery-ticket.v1",
-  "status": "ready",
+  "status": "shipped-v6.10.0",
   "objective": "把工程标准的可量化规则从 AIOS 仓库私有门禁抽离为随发行物提供的一条检查命令，任何装了 AIOS 的仓库都能复用同一套预算、处置与退出码，并让依赖方向（标准 §1）在同一机制内可判定。",
   "decisionTicketRef": "artifact:decision-ticket:portable-standard-rules",
   "workItems": [
@@ -25,7 +25,8 @@
       "evidenceRefs": [
         "artifact:decision-ticket:portable-standard-rules"
       ],
-      "dependsOn": []
+      "dependsOn": [],
+      "status": "closed"
     },
     {
       "id": "work-delivery-guarantee",
@@ -52,7 +53,8 @@
         "file:CONTEXT.md",
         "artifact:decision-ticket:portable-standard-rules"
       ],
-      "dependsOn": []
+      "dependsOn": [],
+      "status": "closed"
     },
     {
       "id": "work-budget-engine",
@@ -80,7 +82,8 @@
       "dependsOn": [
         "work-config-surface",
         "work-delivery-guarantee"
-      ]
+      ],
+      "status": "closed"
     },
     {
       "id": "work-cli-surface",
@@ -105,7 +108,8 @@
       ],
       "dependsOn": [
         "work-budget-engine"
-      ]
+      ],
+      "status": "closed"
     },
     {
       "id": "work-self-consumer",
@@ -130,7 +134,8 @@
       ],
       "dependsOn": [
         "work-cli-surface"
-      ]
+      ],
+      "status": "closed"
     },
     {
       "id": "work-layer-gate",
@@ -156,7 +161,8 @@
       ],
       "dependsOn": [
         "work-self-consumer"
-      ]
+      ],
+      "status": "closed"
     },
     {
       "id": "work-external-proof",
@@ -179,6 +185,18 @@
       "dependsOn": [
         "work-self-consumer",
         "work-delivery-guarantee"
+      ],
+      "status": "deferred-by-owner",
+      "deferredReason": "owner 2026-10-22: 其他仓库在 aios 更新时自然会验，不在本轮专门跑",
+      "partialEvidence": [
+        "真实外来仓库 E:/coding/rex-ai-tools 上跑通发行命令：首版 1077 行 FAIL / exit 1（正是本项禁止的形态）",
+        "补上未配置=只报不拦后同仓库：63 行 STOCK / exit 0（directoryEntries 单规则）",
+        "--freeze 在该仓库写入 baselines=169 并报告数量；随后 baseline=169 blocking=0 exit 0；证据已回收（临时 config/standards.json 已删除，该仓库 git status 干净）",
+        "scratch 仓库端到端：freeze -> exit 0 (wide count 9) -> 新增一项 -> FAIL 10 > baseline 9 (kind=growth) exit 1"
+      ],
+      "remaining": [
+        "该仓库 CI 接入这条命令（或可复现的接入片段）",
+        "证据落该仓库自己的文件（本轮按要求未在其仓库留痕）"
       ]
     },
     {
@@ -200,7 +218,8 @@
       ],
       "dependsOn": [
         "work-layer-gate"
-      ]
+      ],
+      "status": "closed"
     },
     {
       "id": "work-evidence-ref-integrity",
@@ -223,7 +242,8 @@
       ],
       "dependsOn": [
         "work-cli-surface"
-      ]
+      ],
+      "status": "closed"
     }
   ],
   "frontier": {
@@ -303,5 +323,10 @@
     "verification": "npm run test:scripts（含迁移后的预算门）+ aios doctor --strict --json 报告投影漂移 0 + 在 rex-ai-tools 真实仓库运行发行命令并保留退出码与逐条输出 + rex-standards-wiring 契约测试对『去掉第 0 步即变红』给出真反例",
     "joinCondition": "8 个工作项全部达成各自 completionCriteria；本仓库不存在双轨读路径（私有门残留即不收敛）；送达证据与外部仓库验收证据同时存在，缺一不得声明完成"
   },
-  "completionClaim": "soft"
+  "completionClaim": "soft",
+  "releaseRefs": {
+    "parentTag": "v6.10.0",
+    "submoduleTag": "v0.12.0",
+    "preflightLog": ".aios/artifacts/release-preflight-v6.10.0-20261022-172644.log"
+  }
 }
