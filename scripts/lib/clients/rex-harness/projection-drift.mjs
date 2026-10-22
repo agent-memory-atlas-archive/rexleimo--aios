@@ -14,7 +14,8 @@ export const PROJECTION_MARKER = '.rex-projection.json';
  * `definitions.mjs` 里逐客户端登记过，在这里再拄一份就会让"零漂移"只说表面的一部分
  * （实测：硬编码 5 个根 checked=85 vs 注册表全集 checked=153）。
  */
-export function registrySkillRoots() {
+// 中文注释：不导出——这是本模块的内部默认值，公开的只有 collectProjectionDrift 一个入口（接口越小越深）。
+function registrySkillRoots() {
   return [...new Set(Object.values(CLIENT_DEFINITIONS)
     .map((definition) => definition.projectSkillRoot)
     .filter(Boolean)

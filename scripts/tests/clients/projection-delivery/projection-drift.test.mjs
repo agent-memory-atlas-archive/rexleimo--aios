@@ -28,18 +28,11 @@ async function collectDrift({ install, repo }) {
 
 async function makeFixture({ skillContent, attachment = false }) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'rex-drift-'));
-  const install = path.join(root, 'install', 'rex-harness', 'skill-sources', 'rex-code-review');
-  const projected = path.join(root, 'repo', '.agents', 'skills', 'rex-code-review');
-  await mkdir(install, { recursive: true });
-  await mkdir(projected, { recursive: true });
-  await writeFile(path.join(install, 'SKILL.md'), skillContent);
-  await writeFile(path.join(projected, 'SKILL.md'), skillContent);
-  await writeFile(path.join(projected, '.rex-projection.json'), JSON.stringify({
-    schemaVersion: 1, packageVersion: '0.11.1', skill: 'rex-code-review',
-  }));
+  await makeMarked({ root, client: '.agents', skill: 'rex-code-review', content: skillContent });
   if (attachment) {
-    await mkdir(path.join(install, 'references'), { recursive: true });
-    await writeFile(path.join(install, 'references', 'extra.md'), 'only in source');
+    const refs = path.join(root, 'install', 'rex-harness', 'skill-sources', 'rex-code-review', 'references');
+    await mkdir(refs, { recursive: true });
+    await writeFile(path.join(refs, 'extra.md'), 'only in source');
   }
   return { root, install: path.join(root, 'install'), repo: path.join(root, 'repo') };
 }
@@ -121,7 +114,8 @@ test('an undelivered skill copy is counted separately, not silently dropped', as
   }
 });
 
-async function makeMarked({ root, client, skill, sourceSkill = skill, content = '# clean\n' }) {
+/** 中文注释：一条“带 marker 的投影对”只有一个构造方式；两个近乎相同的 fixture helper 就是同一个知识有两处表示。 */
+async function makeMarked({ root, client, skill, sourceSkill = skill, content }) {
   const install = path.join(root, 'install', 'rex-harness', 'skill-sources', sourceSkill);
   const projected = path.join(root, 'repo', client, 'skills', skill);
   await mkdir(install, { recursive: true });
@@ -139,8 +133,8 @@ test('the default measurement surface is the whole client registry, not a local 
   try {
     // .claude 在旧的硬编码清单里，.opencode 只在客户端注册表里有——
     // 默认口径看不见 .opencode 就意味着"零漂移"只说了表面的一部分。
-    await makeMarked({ root, client: '.claude', skill: 'rex-implement' });
-    await makeMarked({ root, client: '.opencode', skill: 'rex-implement' });
+    await makeMarked({ root, client: '.claude', skill: 'rex-implement', content: '# clean\n' });
+    await makeMarked({ root, client: '.opencode', skill: 'rex-implement', content: '# clean\n' });
     const fx = { root, install: path.join(root, 'install'), repo: path.join(root, 'repo') };
 
     const report = await collectDrift(fx);
