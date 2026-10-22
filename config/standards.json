@@ -317,7 +317,299 @@
     "fileLines": []
   },
   "baselines": {
-    "directoryEntries": [],
-    "fileLines": []
+    "fileLines": [
+      {
+        "path": "docs-site/assets/redesign/home-webgl-runtime.js",
+        "count": 676
+      },
+      {
+        "path": "docs-site/assets/vendor/three.module.js",
+        "count": 53044
+      },
+      {
+        "path": "mcp-server/src/browser/actions/snapshot.ts",
+        "count": 973
+      },
+      {
+        "path": "mcp-server/src/browser/session/launcher.ts",
+        "count": 520
+      },
+      {
+        "path": "mcp-server/src/contextdb/store/core.ts",
+        "count": 3088
+      },
+      {
+        "path": "mcp-server/src/contextdb/store/genealogy.ts",
+        "count": 577
+      },
+      {
+        "path": "mcp-server/src/index.ts",
+        "count": 422
+      },
+      {
+        "path": "mcp-server/tests/contextdb/contextdb.test.ts",
+        "count": 1986
+      },
+      {
+        "path": "packages/debug-hub/src/storage.ts",
+        "count": 602
+      },
+      {
+        "path": "pptx-ai-coding-share/create-ppt-en.js",
+        "count": 442
+      },
+      {
+        "path": "pptx-ai-coding-share/create-ppt.js",
+        "count": 442
+      },
+      {
+        "path": "pptx-ai-coding-share/pptxgenjs_helpers/layout.js",
+        "count": 643
+      },
+      {
+        "path": "pptx-ai-coding-share/pptxgenjs_helpers/text.js",
+        "count": 789
+      },
+      {
+        "path": "scripts/aios-mcp-server.mjs",
+        "count": 803
+      },
+      {
+        "path": "scripts/benchmarks/context-lifecycle-v1-differential.mjs",
+        "count": 604
+      },
+      {
+        "path": "scripts/benchmarks/context-lifecycle-v1.mjs",
+        "count": 1115
+      },
+      {
+        "path": "scripts/check-site-sync.mjs",
+        "count": 536
+      },
+      {
+        "path": "scripts/lib/clients/integrations/install.mjs",
+        "count": 464
+      },
+      {
+        "path": "scripts/lib/environment/aios-init/compression-tools.mjs",
+        "count": 524
+      },
+      {
+        "path": "scripts/lib/execution/harness/solo/solo-runtime/loop/loop.mjs",
+        "count": 596
+      },
+      {
+        "path": "scripts/lib/execution/lifecycle/evolve/dream/governance.mjs",
+        "count": 538
+      },
+      {
+        "path": "scripts/lib/execution/lifecycle/evolve/evolution/integration.mjs",
+        "count": 408
+      },
+      {
+        "path": "scripts/lib/execution/workflows/adapters/rex-capability-runtime.mjs",
+        "count": 491
+      },
+      {
+        "path": "scripts/lib/execution/workflows/surface/rex-workflow-surface-reconciliation.mjs",
+        "count": 907
+      },
+      {
+        "path": "scripts/lib/foundation/ctx-agent-core/entry/run.mjs",
+        "count": 534
+      },
+      {
+        "path": "scripts/lib/foundation/planning/contract/contract.mjs",
+        "count": 484
+      },
+      {
+        "path": "scripts/lib/foundation/planning/contract/workflow-policy.mjs",
+        "count": 474
+      },
+      {
+        "path": "scripts/lib/foundation/planning/flow/auto-gate.mjs",
+        "count": 515
+      },
+      {
+        "path": "scripts/lib/foundation/planning/ops/cli.mjs",
+        "count": 454
+      },
+      {
+        "path": "scripts/lib/foundation/planning/ops/context-candidates.mjs",
+        "count": 519
+      },
+      {
+        "path": "scripts/lib/memory/contextdb/runtime/execution-context.mjs",
+        "count": 894
+      },
+      {
+        "path": "scripts/lib/memory/memo/storage/govern/candidates.mjs",
+        "count": 418
+      },
+      {
+        "path": "scripts/lib/memory/search/unified-search.mjs",
+        "count": 408
+      },
+      {
+        "path": "scripts/lib/tooling/cli/dispatch/dispatch.mjs",
+        "count": 506
+      },
+      {
+        "path": "scripts/lib/tooling/components/shell.mjs",
+        "count": 457
+      },
+      {
+        "path": "scripts/lib/tooling/skills/training/training-gate.mjs",
+        "count": 456
+      },
+      {
+        "path": "scripts/tests/clients/client-platform/client-registry.test.mjs",
+        "count": 403
+      },
+      {
+        "path": "scripts/tests/clients/client-platform/codemap.test.mjs",
+        "count": 582
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/aios-harness.test.mjs",
+        "count": 674
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/aios-learn-eval.test.mjs",
+        "count": 1593
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/aios-lifecycle-plan.test.mjs",
+        "count": 479
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/aios-orchestrator-agents.test.mjs",
+        "count": 553
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/aios-orchestrator.test.mjs",
+        "count": 4220
+      },
+      {
+        "path": "scripts/tests/execution/aios-runtime/ctx-agent-core.test.mjs",
+        "count": 1646
+      },
+      {
+        "path": "scripts/tests/execution/aios-setup/aios-cli.test.mjs",
+        "count": 2326
+      },
+      {
+        "path": "scripts/tests/execution/aios-setup/aios-components.test.mjs",
+        "count": 1288
+      },
+      {
+        "path": "scripts/tests/execution/aios-setup/aios-init.test.mjs",
+        "count": 418
+      },
+      {
+        "path": "scripts/tests/execution/harness/hud-state.test.mjs",
+        "count": 3126
+      },
+      {
+        "path": "scripts/tests/execution/harness/team/groupchat-runtime.test.mjs",
+        "count": 846
+      },
+      {
+        "path": "scripts/tests/execution/rex/runtime/rex-activation-store.test.mjs",
+        "count": 592
+      },
+      {
+        "path": "scripts/tests/execution/rex/runtime/rex-capability-runtime.test.mjs",
+        "count": 763
+      },
+      {
+        "path": "scripts/tests/execution/rex/workflow/rex-workflow-surface-reconciliation.test.mjs",
+        "count": 1027
+      },
+      {
+        "path": "scripts/tests/execution/team/ecc-agent-workflow.test.mjs",
+        "count": 570
+      },
+      {
+        "path": "scripts/tests/execution/team/ecc-uplift.test.mjs",
+        "count": 443
+      },
+      {
+        "path": "scripts/tests/execution/workflow/workflow-adapters.test.mjs",
+        "count": 447
+      },
+      {
+        "path": "scripts/tests/execution/workflow/workflow-policy.test.mjs",
+        "count": 528
+      },
+      {
+        "path": "scripts/tests/foundation/context/context-lifecycle-orchestrate-integration.test.mjs",
+        "count": 692
+      },
+      {
+        "path": "scripts/tests/foundation/interception/core/interception-cli.test.mjs",
+        "count": 416
+      },
+      {
+        "path": "scripts/tests/foundation/native/native-doctor.test.mjs",
+        "count": 414
+      },
+      {
+        "path": "scripts/tests/foundation/native/native-sync.test.mjs",
+        "count": 411
+      },
+      {
+        "path": "scripts/tests/foundation/release/release-pipeline.test.mjs",
+        "count": 785
+      },
+      {
+        "path": "scripts/tests/foundation/site-content/site-redesign-assets.test.mjs",
+        "count": 688
+      },
+      {
+        "path": "scripts/tests/foundation/skills/core/skills-component.test.mjs",
+        "count": 512
+      },
+      {
+        "path": "scripts/tests/learning/gaia/gaia-ab-live-runner.test.mjs",
+        "count": 440
+      },
+      {
+        "path": "scripts/tests/learning/rl/orchestrator/rl-orchestrator-v1-adapter.test.mjs",
+        "count": 615
+      },
+      {
+        "path": "scripts/tests/learning/rl/shell/runtime/rl-shell-v1-orchestrator.test.mjs",
+        "count": 583
+      },
+      {
+        "path": "scripts/tests/memory/contextdb/contextdb-shell-bridge-codex-home.test.mjs",
+        "count": 809
+      },
+      {
+        "path": "scripts/tests/memory/dream/dream.test.mjs",
+        "count": 573
+      },
+      {
+        "path": "scripts/tests/tooling/contracts/integration.test.mjs",
+        "count": 550
+      },
+      {
+        "path": "scripts/tests/tooling/contracts/judgment.test.mjs",
+        "count": 727
+      },
+      {
+        "path": "scripts/tests/tooling/offload/offload-tool-offload.test.mjs",
+        "count": 408
+      },
+      {
+        "path": "scripts/tests/tooling/workspace/execution-context-packet.test.mjs",
+        "count": 454
+      },
+      {
+        "path": "scripts/tests/tooling/workspace/pack-manifest.test.mjs",
+        "count": 410
+      }
+    ]
   }
 }

@@ -184,6 +184,11 @@ test('architecture governance reports facade budget and module ownership failure
   const rootDir = await makeRootDir();
   await mkdir(path.join(rootDir, 'scripts', 'lib'), { recursive: true });
   await writeFile(path.join(rootDir, 'scripts', 'lib', 'demo.mjs'), 'a\nb\nc\n', 'utf8');
+  // 中文注释：限额是项目配置的事。以前这个 fixture 把 maxLines 写在规则上、由 governance 拿去顶掉
+  // 配置预算；现在同一条配置面就是唯一入口，所以 fixture 也用项目自己那份声明写限额。
+  await mkdir(path.join(rootDir, 'config'), { recursive: true });
+  await writeFile(path.join(rootDir, 'config', 'standards.json'),
+    JSON.stringify({ budgets: { fileLines: { default: 2 } } }), 'utf8');
 
   const report = await evaluateArchitectureGovernance({
     rootDir,
@@ -191,7 +196,6 @@ test('architecture governance reports facade budget and module ownership failure
       id: 'demo',
       label: 'Demo Facade',
       path: 'scripts/lib/demo.mjs',
-      maxLines: 2,
       requiredModules: ['scripts/lib/demo/part.mjs'],
     }],
   });
