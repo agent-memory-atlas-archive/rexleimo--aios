@@ -8,7 +8,11 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const DEFAULT_BUDGET = 8;
+// 默认预算不在此处二次定义：只有一个权威，即 rex-harness 公开面的机器可读清单。
+// 项目侧只声明覆盖项与豁免理由（resolveStandardConfig 负责拒绝未知键与静默豁免）。
+import { QUANTITATIVE_STANDARD_RULES } from '../rex-harness/src/index.mjs';
+
+export const DEFAULT_BUDGET = QUANTITATIVE_STANDARD_RULES.directoryEntries.budget;
 
 // 豁免：拆了反而错的地方（生成物/镜像、CLI 入口面、扁平发现契约）。
 export const EXEMPT_DIRS = Object.freeze({

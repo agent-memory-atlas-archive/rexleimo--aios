@@ -22,3 +22,38 @@ test('rex public face exposes the quantitative standard rule manifest', async ()
   assert.equal(manifest.directoryEntries.budget, 8, '目录条目预算应为 8');
   assert.equal(manifest.fileLines.budget, 400, '单文件行数预算应为 400（标准 §4 软上限）');
 });
+
+test('project config parser rejects unknown keys, illegal budgets and reason-less exemptions', async () => {
+  const rex = await import(PUBLIC_FACE);
+
+  // C3 的红：第一轮根本没有解析器，未知键被静默忽略（实测 { fileLines.nonsense: 99 } 返回 400）。
+  assert.equal(typeof rex.resolveStandardConfig, 'function',
+    '公开面必须提供 resolveStandardConfig，否则项目侧配置得不到结构化错误');
+
+  const cases = [
+    ['unknown-key', { budgets: { directoryEntries: 10 }, budgets_x: {} }],
+    ['invalid-budget', { budgets: { fileLines: 0 } }],
+    ['missing-reason', { exemptions: { fileLines: [{ path: 'src/tables.ts' }] } }],
+  ];
+  for (const [code, config] of cases) {
+    const result = rex.resolveStandardConfig(config);
+    assert.equal(result.ok, false, `${code} must be rejected`);
+    assert.ok(result.errors.some((e) => e.code === code),
+      `expected a structured ${code} error, got ${JSON.stringify(result.errors)}`);
+  }
+
+  // 合法输入：覆盖项生效，未覆盖项回到清单默认值。
+  const ok = rex.resolveStandardConfig({ budgets: { fileLines: 500 } });
+  assert.equal(ok.ok, true, JSON.stringify(ok.errors));
+  assert.equal(ok.budgets.fileLines, 500);
+  assert.equal(ok.budgets.directoryEntries, rex.QUANTITATIVE_STANDARD_RULES.directoryEntries.budget);
+});
+
+test('the parent reads its directory budget from the public face, not a second literal', async () => {
+  const [rex, parent] = await Promise.all([
+    import(PUBLIC_FACE),
+    import('../../../check-dir-budget.mjs'),
+  ]);
+  assert.equal(parent.DEFAULT_BUDGET, rex.QUANTITATIVE_STANDARD_RULES.directoryEntries.budget,
+    'C1：父侧读到的默认值必须与子模块清单逐项相等（一条规则只有一个 owner）');
+});

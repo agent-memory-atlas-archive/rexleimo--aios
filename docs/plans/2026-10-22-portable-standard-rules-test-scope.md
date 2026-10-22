@@ -84,3 +84,16 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 
 主缝 = 子模块公开面导出（清单 + 预算解析纯函数）；辅缝 = marker 文件解析（仅用于 B3 漂移报数）。
 本切片不新增窄缝，不新增第二条命令入口。
+
+## 第二轮范围（审查未完成项 C1/C2/C3/C5）
+
+来源：`docs/plans/2026-10-22-portable-standard-rules-review-config-surface.md`（verdict incomplete）。
+
+| 标准 | 行为性质 | 测试缝 | 断言 |
+|---|---|---|---|
+| C3 未知键 / 缺 reason 的 exempt / 非法预算 → 结构化错误 | **新用户可观察行为**（第一轮无解析器，实测未知键被静默忽略） | 子模块公开面 `resolveStandardConfig()` | 返回 `{ ok:false, errors:[{code,path,message}] }`，三种输入各命中一条 code；合法输入返回合并后的预算 |
+| C1 父侧读到的默认值与清单逐项相等 | 担保测试（当前两侧同为 8，不产生红；作用是让父侧改数即红） | 父侧 `scripts/check-dir-budget.mjs` 导出的 `DEFAULT_BUDGET` ↔ 公开面清单 | `equal(parent.DEFAULT_BUDGET, manifest.directoryEntries.budget)` |
+| C2 父侧不二次实现预算语义 | 担保测试 | 同上 + 父侧从公开面读数 | 独立字面量 8 从父侧消失，值由清单提供 |
+| C5 无 git tracked-file 列表时的行为 | 不可观察（文档验收） | 无 | 记为文档缺口，不伪造测试 |
+
+诚实 RED 只登记 C3：C1/C2 两侧数值本就相同，若把它们写成"红"就是把字面断言当行为差异。

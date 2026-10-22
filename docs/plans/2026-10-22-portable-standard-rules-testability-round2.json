@@ -1,0 +1,17 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-config-round2",
+  "redCandidate": {
+    "publicEntry": "rex-harness/src/index.mjs（子模块公开面）",
+    "setup": "在 scripts/tests/tooling/standards/rule-config.test.mjs 追加 C3 契约断言：公开面须导出 resolveStandardConfig，并对未知键、非法预算、缺 reason 的豁免各返回一条结构化错误；同文件另加 C1 担保断言（父侧 check-dir-budget.mjs 导出的 DEFAULT_BUDGET 与清单逐项相等，两侧当前同为 8 故不产生红，已在 test-scope 第二轮表中注明）",
+    "command": {
+      "executable": "node",
+      "args": ["--test", "scripts/tests/tooling/standards/rule-config.test.mjs"],
+      "cwd": "E:\\coding\\harness-cli"
+    },
+    "expected": "公开面提供 resolveStandardConfig，未知键/非法预算/缺 reason 分别返回 code=unknown-key、invalid-budget、missing-reason 的结构化错误；合法输入返回合并预算",
+    "observed": "AssertionError [ERR_ASSERTION]: 公开面必须提供 resolveStandardConfig，否则项目侧配置得不到结构化错误；tests 3 / pass 2 / fail 1，退出码 1",
+    "failureReason": "新用户可观察行为缺失：第一轮完全没有项目侧配置解析入口，实测未知键被静默忽略（quantitativeRuleBudget(\"fileLines\", { fileLines.nonsense: 99 }) 返回 400，无错误无警告），因此验收标准 C3 无法被满足",
+    "receiptRef": "receipt:565cef62-7c6a-4196-80e5-e848cd70f2e9"
+  }
+}
