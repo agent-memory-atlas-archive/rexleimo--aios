@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:172218c1",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round2.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-delivery-guarantee",
+  "standardsFindings": [
+    {
+      "id": "S4-R5-1",
+      "position": "scripts/lib/clients/rex-harness/projection-drift.mjs:22 (split) vs scripts/tests/clients/projection-delivery/projection-drift.test.mjs:22 (path.dirname)",
+      "evidence": [
+        "file:scripts/lib/clients/rex-harness/projection-drift.mjs",
+        "file:scripts/tests/clients/projection-delivery/projection-drift.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "两种写法只在每个 projectSkillRoot 都含斜杠时等价（实测 10/10 含斜杠且逐一致）。在注册表侧加一条客观断言钉住该前提，而不是靠巧合"
+    },
+    {
+      "id": "S4-R5-2",
+      "position": "scripts/tests/clients/projection-delivery/projection-drift.test.mjs:26 (collectDrift)",
+      "evidence": [
+        "file:scripts/tests/clients/projection-delivery/projection-drift.test.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "薄转发，两处调用可内联"
+    },
+    {
+      "id": "S4-R5-3",
+      "position": "scripts/lib/clients/rex-harness/projection-drift.mjs:112 (checked)",
+      "evidence": [
+        "file:scripts/aios-projection-drift.mjs"
+      ],
+      "severity": "judgement",
+      "recommendation": "checked 同时含已送达与未送达条目；公开字段本轮不改名，但 doctor 必须逐字段命名输出，不能合并成一个总数"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R5-1",
+      "position": "delivery-ticket work-delivery-guarantee C0/C4/C5/C6",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json",
+        "git:08e8cddc"
+      ],
+      "severity": "hard",
+      "recommendation": "doctor 机读漂移与 unmanaged 数未实现；aios update 不重生投影（grep 零命中）；子模块 Provider 第 0 步 wiring 担保测试未写。completionClaim 保持 soft"
+    },
+    {
+      "id": "SP-R5-2",
+      "position": "work-delivery-guarantee C3/C8/C9/C10 + V1",
+      "evidence": [
+        "receipt:1a8144b4-cfaa-4d96-9da3-44bffb04b976",
+        "file:docs/plans/2026-10-22-portable-standard-rules-test-scope.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "C9/C10 达成且证据口径改为全集（checked 85→153）；旧数字已标注为部分表面，防止后续拿旧数交差"
+    }
+  ],
+  "verdict": "changes-requested",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round2.md",
+    "receipt:1a8144b4-cfaa-4d96-9da3-44bffb04b976",
+    "git:08e8cddc",
+    "git:94161ccf"
+  ]
+}
