@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.10.1] - 2026-10-22
+
+### Fixed
+
+- **发布查询不再被匿名配额打回降级路径**：GitHub 的匿名 API 配额（60/h）按出口 IP 计，共用出口时会被别人烧光——本机实测 `api.github.com` 对公开仓库返回 HTTP 403 且 `x-ratelimit-remaining: 0`。旧行为是打一行 warn 然后退回 `releases/latest` 指针，而该指针按创建时间排序，补发旧版本会抢占它，正是当初写 `release-lookup` 要防的降级缺陷。现在：有 token 就带（`AIOS_RELEASE_TOKEN` > `GITHUB_TOKEN` > `GH_TOKEN`，再试 `gh auth token`）；403/429 且配额头明确为 0 才判 `release-lookup-rate-limited`（缺头仍是 `release-lookup-http`，因为处置动作不同）；第二事实源是不吃 API 配额的 `releases.atom`，公告页分不清 draft/prerelease，所以返回一律标 `exact:false` 且按 tag 形状排除预发布；三个来源全失败抛 `release-source-unreachable` 并带上两次尝试，`aios update` 在此**停止**而不是装一个没验过版本的包。
+- 本机限流状态下的真实解析结果：`{"tag":"v6.10.0","source":"feed","exact":false}`。
+
 ## [6.10.0] - 2026-10-22
 
 ### Added
