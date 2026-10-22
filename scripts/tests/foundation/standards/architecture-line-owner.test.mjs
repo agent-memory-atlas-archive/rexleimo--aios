@@ -28,13 +28,15 @@ const RULE = {
   id: 'demo-facade',
   label: 'Demo Facade',
   path: 'scripts/lib/demo.mjs',
-  maxLines: 2,
   requiredModules: [],
 };
+// 中文注释：限额是项目配置的事，不是规则声明的事。本仓库 50 条 facade 的数字全部住在
+// config/standards.json 的 budgets.fileLines.entries 里；规则文件只留 path 与 requiredModules。
+const BUDGET_2 = { budgets: { fileLines: { default: 2 } } };
 const OVER = 'line1\nline2\nline3\n';
 
 test('an over-budget facade is reported through the engine disposition, not a local comparison', async () => {
-  const root = await makeRoot({ files: { 'scripts/lib/demo.mjs': OVER } });
+  const root = await makeRoot({ files: { 'scripts/lib/demo.mjs': OVER }, config: BUDGET_2 });
   try {
     const report = await evaluateArchitectureGovernance({ rootDir: root, rules: [RULE] });
     const check = report.checks[0];
@@ -43,7 +45,7 @@ test('an over-budget facade is reported through the engine disposition, not a lo
       '超标这件事必须由预算引擎给出处置，governance 不再自己比大小');
     assert.equal(check.count, 3, '行数用清单定义的 physical lines（尾随换行不额外计一行）');
     assert.equal(check.maxLines, 2,
-      '每条 facade 声明的 maxLines 就是喂给引擎的那一次预算；不再新增一个同义 budget 字段');
+      '报告里的限额只准从引擎的处置里读；本模块自己再去查一遍 entries 就是第三个 owner');
     assert.equal(report.ok, false);
   } finally {
     await rm(root, { recursive: true, force: true });
@@ -53,7 +55,7 @@ test('an over-budget facade is reported through the engine disposition, not a lo
 test('a facade exempted in the project config stops being a violation', async () => {
   const root = await makeRoot({
     files: { 'scripts/lib/demo.mjs': OVER },
-    config: { exemptions: { fileLines: [{ path: 'scripts/lib/demo.mjs', reason: 'generated facade' }] } },
+    config: { ...BUDGET_2, exemptions: { fileLines: [{ path: 'scripts/lib/demo.mjs', reason: 'generated facade' }] } },
   });
   try {
     const report = await evaluateArchitectureGovernance({ rootDir: root, rules: [RULE] });
@@ -70,7 +72,7 @@ test('a facade exempted in the project config stops being a violation', async ()
 test('stock over-budget facades are frozen, not silently forgiven and not blocking forever', async () => {
   const root = await makeRoot({
     files: { 'scripts/lib/demo.mjs': OVER },
-    config: { baselines: { fileLines: [{ path: 'scripts/lib/demo.mjs', count: 3 }] } },
+    config: { ...BUDGET_2, baselines: { fileLines: [{ path: 'scripts/lib/demo.mjs', count: 3 }] } },
   });
   try {
     const report = await evaluateArchitectureGovernance({ rootDir: root, rules: [RULE] });
@@ -99,7 +101,7 @@ test('the fold keeps the other two judgement kinds it owns', async () => {
 
     const missingModule = await evaluateArchitectureGovernance({
       rootDir: root,
-      rules: [{ ...RULE, maxLines: 5, requiredModules: ['scripts/lib/part.mjs'] }],
+      rules: [{ ...RULE, requiredModules: ['scripts/lib/part.mjs'] }],
     });
     assert.match(missingModule.checks[0].failures.join(' '), /missing modules/iu,
       '模块归属不是预算，不该被塞进预算引擎');

@@ -42,6 +42,8 @@ function dispositionOf(report) {
     return {
       disposition: kind,
       count: entry.count,
+      // 中文注释：限额只从引擎的处置里读。本模块自己再去查一遍 entries，就是第三个 owner。
+      limit: entry.limit ?? report.budget,
       reason: entry.reason ?? null,
       detail: entry.detail ?? (kind === 'baseline'
         ? `${entry.count} lines <= baseline ${entry.allowed} (shrink only)`
@@ -60,11 +62,11 @@ async function evaluateArchitectureRule(rootDir, rule, config) {
   try {
     const content = await readFile(path.join(rootDir, entryPath), 'utf8');
     const report = applyBudgetRule({
-      // 中文注释：行数这件事只有 fileLines 一条规则；每条 facade 声明的 maxLines 是喂给引擎的那一次预算，
-      // 不是一条新规则——否则同一个数字又要分两处拥有它。
+      // 中文注释：行数这件事只有 fileLines 一条规则。预算一律用项目自己声明的那一份（里面可以有
+      // 按实体的限额），本模块不再拿代码常量去顶它——顶一次，同一条规则就又多一个读路径。
       rule: 'fileLines',
       measurements: measureFileLines([{ path: entryPath, content }]),
-      budgets: { fileLines: rule.maxLines },
+      budgets: config?.budgets ?? {},
       exemptions: config?.exemptions ?? {},
       baselines: config?.baselines ?? {},
     });
@@ -76,7 +78,7 @@ async function evaluateArchitectureRule(rootDir, rule, config) {
     }
   } catch {
     failures.push(`missing entrypoint: ${entryPath}`);
-    outcome = { disposition: 'violation', detail: `missing entrypoint: ${entryPath}` };
+    outcome = { disposition: 'violation', detail: `missing entrypoint: ${entryPath}`, limit: null, count: 0 };
   }
 
   const requiredModules = Array.isArray(rule.requiredModules) ? rule.requiredModules : [];
@@ -104,11 +106,11 @@ async function evaluateArchitectureRule(rootDir, rule, config) {
     disposition: outcome.disposition,
     count,
     lineCount: count,
-    maxLines: rule.maxLines,
+    maxLines: outcome.limit,
     reason: outcome.reason ?? null,
     failures,
     detail: failures.length === 0
-      ? (outcome.detail ?? `${count} lines <= ${rule.maxLines}`)
+      ? (outcome.detail ?? `${count} lines <= ${outcome.limit}`)
       : failures.join('; '),
   };
 }
@@ -121,9 +123,19 @@ export async function evaluateArchitectureGovernance({
   config,
 } = {}) {
   const resolved = config ?? await loadProjectConfig({ rootDir });
+  if (resolved.ok === false) {
+    // 中文注释：配置不合法时不能“拿默认预算继续跑”——那恰好是「写了却没生效」的本体。
+    // 预算现在只来自这一份配置，配置读坏了就必须响，而不是静默放宽。
+    return {
+      ok: false,
+      status: 'FAIL',
+      detail: `invalid project standards config: ${resolved.errors.map((e) => `${e.code} at ${e.path}`).join(', ')}`,
+      checks: [],
+    };
+  }
   const checks = [];
   for (const rule of rules) {
-    checks.push(await evaluateArchitectureRule(rootDir, rule, resolved.ok === false ? {} : resolved));
+    checks.push(await evaluateArchitectureRule(rootDir, rule, resolved));
   }
 
   const failed = checks.filter((item) => item.status === 'FAIL');

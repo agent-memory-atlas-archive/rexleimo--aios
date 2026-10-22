@@ -4,7 +4,6 @@ export const HUD_COMPONENT_RULES = Object.freeze([
     id: 'hud-state-facade',
     label: 'HUD State Facade',
     path: 'scripts/lib/execution/hud/state.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/hud/state/sessions/shared.mjs',
       'scripts/lib/execution/hud/state/sessions/providers.mjs',
@@ -22,7 +21,6 @@ export const HUD_COMPONENT_RULES = Object.freeze([
     id: 'hud-state-artifacts-facade',
     label: 'HUD State Artifacts Facade',
     path: 'scripts/lib/execution/hud/state/store/artifacts.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/hud/state/store/artifacts/cache.mjs',
       'scripts/lib/execution/hud/state/store/artifacts/dispatch.mjs',
@@ -33,7 +31,6 @@ export const HUD_COMPONENT_RULES = Object.freeze([
     id: 'hud-render-facade',
     label: 'HUD Render Facade',
     path: 'scripts/lib/execution/hud/render.mjs',
-    maxLines: 180,
     requiredModules: Object.freeze([
       'scripts/lib/execution/hud/render/shared.mjs',
       'scripts/lib/execution/hud/render/telemetry.mjs',

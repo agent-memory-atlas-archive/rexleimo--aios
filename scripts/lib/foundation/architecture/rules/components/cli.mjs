@@ -4,7 +4,6 @@ export const CLI_COMPONENT_RULES = Object.freeze([
     id: 'cli-maintenance-parser-facade',
     label: 'CLI Maintenance Parser Facade',
     path: 'scripts/lib/tooling/cli/parse-args/maintenance.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/cli/parse-args/platform/internal.mjs',
       'scripts/lib/tooling/cli/parse-args/knowledge/memo.mjs',
@@ -19,7 +18,6 @@ export const CLI_COMPONENT_RULES = Object.freeze([
     id: 'cli-team-parser-facade',
     label: 'CLI Team Parser Facade',
     path: 'scripts/lib/tooling/cli/parse-args/run/team.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/cli/parse-args/run/team/defaults.mjs',
       'scripts/lib/tooling/cli/parse-args/run/team/shared.mjs',
@@ -34,7 +32,6 @@ export const CLI_COMPONENT_RULES = Object.freeze([
     id: 'cli-top-level-parser-facade',
     label: 'CLI Top-Level Parser Facade',
     path: 'scripts/lib/tooling/cli/parse-args/top-level.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/cli/parse-args/top-level/defaults.mjs',
       'scripts/lib/tooling/cli/parse-args/top-level/positionals.mjs',
@@ -48,7 +45,6 @@ export const CLI_COMPONENT_RULES = Object.freeze([
     id: 'cli-help-facade',
     label: 'CLI Help Facade',
     path: 'scripts/lib/tooling/cli/help/help.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/cli/help/root.mjs',
       'scripts/lib/tooling/cli/help/codemap.mjs',

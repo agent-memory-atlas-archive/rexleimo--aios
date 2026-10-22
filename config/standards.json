@@ -1,5 +1,212 @@
 {
-  "budgets": {},
+  "budgets": {
+    "directoryEntries": 8,
+    "fileLines": {
+      "default": 400,
+      "entries": [
+        {
+          "path": "scripts/lib/tooling/model-router.mjs",
+          "budget": 120
+        },
+        {
+          "path": "scripts/lib/tooling/components/codemap/codemap.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/components/codemap/targets/mcp-targets.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/components/browser/browser.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/components/browser/mcp/mcp-config.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/components/skills/skills.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/cli/parse-args/maintenance.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/cli/parse-args/run/team.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/cli/parse-args/top-level.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/tooling/cli/help/help.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/foundation/platform/process.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/clients/native/routing/route-commands.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/clients/native/synchronize/sync.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/clients/native/health/doctor.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/clients/native/repair/repairs.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/team/subagent-runtime.mjs",
+          "budget": 260
+        },
+        {
+          "path": "scripts/lib/foundation/interception/transport/clients/capabilities.mjs",
+          "budget": 120
+        },
+        {
+          "path": "scripts/lib/execution/harness/solo/solo-runtime.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/solo/solo-journal.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/orchestration/orchestrator-evidence.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/orchestration/orchestrator-runtimes.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/team/groupchat-runtime.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/quality/clarity-gate.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/hud/state.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/hud/state/store/artifacts.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/hud/render.mjs",
+          "budget": 180
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/govern/options.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/govern/quality-gate.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/environment/doctor/aggregate.mjs",
+          "budget": 320
+        },
+        {
+          "path": "scripts/doctor-security-config.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/harness/orchestration/orchestrator.mjs",
+          "budget": 320
+        },
+        {
+          "path": "scripts/lib/execution/harness/quality/learn-eval.mjs",
+          "budget": 320
+        },
+        {
+          "path": "scripts/lib/execution/harness/quality/hindsight-eval.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/run/orchestrate.mjs",
+          "budget": 320
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/run/harness.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/fleet/team-ops.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/release/release-status.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/govern/entropy-gc.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/execution/lifecycle/fleet/watchdog.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/contextdb-shell-bridge.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/memory/memo/memo.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/memory/memo/storage.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-shell-v1/eval/schema.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-shell-v1/eval/temp-runner.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-core/learning/trainer.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-core/control/campaign-controller.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-shell-v1/eval/run-orchestrator.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-orchestrator-v1/decision-runner.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-orchestrator-v1/policy-release-gate.mjs",
+          "budget": 80
+        },
+        {
+          "path": "scripts/lib/learning/rl-mixed-v1/run/run-orchestrator.mjs",
+          "budget": 320
+        }
+      ]
+    }
+  },
   "exemptions": {
     "directoryEntries": [
       {

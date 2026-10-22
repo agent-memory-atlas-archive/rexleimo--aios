@@ -4,7 +4,6 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
     id: 'platform-process-facade',
     label: 'Platform Process Facade',
     path: 'scripts/lib/foundation/platform/process.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/foundation/platform/process/env.mjs',
       'scripts/lib/foundation/platform/process/windows-command.mjs',
@@ -15,7 +14,6 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
     id: 'native-route-commands-facade',
     label: 'Native Route Commands Facade',
     path: 'scripts/lib/clients/native/routing/route-commands.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/clients/native/routing/route-commands/constants.mjs',
       'scripts/lib/clients/native/routing/route-commands/selection.mjs',
@@ -28,7 +26,6 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
     id: 'native-sync-facade',
     label: 'Native Sync Facade',
     path: 'scripts/lib/clients/native/synchronize/sync.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/clients/native/synchronize/sync/constants.mjs',
       'scripts/lib/clients/native/synchronize/sync/fs-ops.mjs',
@@ -41,7 +38,6 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
     id: 'native-doctor-facade',
     label: 'Native Doctor Facade',
     path: 'scripts/lib/clients/native/health/doctor.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/clients/native/health/doctor/shared.mjs',
       'scripts/lib/clients/native/health/doctor/inspect-operation.mjs',
@@ -55,7 +51,6 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
     id: 'native-repairs-facade',
     label: 'Native Repairs Facade',
     path: 'scripts/lib/clients/native/repair/repairs.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/clients/native/repair/repairs/constants.mjs',
       'scripts/lib/clients/native/repair/repairs/paths.mjs',

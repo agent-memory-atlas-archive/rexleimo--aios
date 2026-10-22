@@ -4,7 +4,6 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
     id: 'codemap-component-facade',
     label: 'Codemap Component Facade',
     path: 'scripts/lib/tooling/components/codemap/codemap.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/components/codemap/constants.mjs',
       'scripts/lib/tooling/components/codemap/paths.mjs',
@@ -27,7 +26,6 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
     id: 'codemap-mcp-targets-facade',
     label: 'Codemap MCP Targets Facade',
     path: 'scripts/lib/tooling/components/codemap/targets/mcp-targets.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/components/codemap/targets/mcp-targets/entries.mjs',
       'scripts/lib/tooling/components/codemap/targets/mcp-targets/toml.mjs',
@@ -40,7 +38,6 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
     id: 'browser-component-facade',
     label: 'Browser Component Facade',
     path: 'scripts/lib/tooling/components/browser/browser.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/components/browser/constants.mjs',
       'scripts/lib/tooling/components/browser/shared.mjs',
@@ -55,7 +52,6 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
     id: 'browser-mcp-config-facade',
     label: 'Browser MCP Config Facade',
     path: 'scripts/lib/tooling/components/browser/mcp/mcp-config.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/components/browser/mcp/mcp-snippet.mjs',
       'scripts/lib/tooling/components/browser/mcp/mcp-server-builders.mjs',
@@ -67,7 +63,6 @@ export const BROWSER_CODEMAP_COMPONENT_RULES = Object.freeze([
     id: 'skills-component-facade',
     label: 'Skills Component Facade',
     path: 'scripts/lib/tooling/components/skills/skills.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/components/skills/constants.mjs',
       'scripts/lib/tooling/components/skills/normalizers.mjs',

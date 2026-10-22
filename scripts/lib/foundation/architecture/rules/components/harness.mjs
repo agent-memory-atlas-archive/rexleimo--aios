@@ -4,7 +4,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'subagent-runtime-facade',
     label: 'Subagent Runtime Facade',
     path: 'scripts/lib/execution/harness/team/subagent-runtime.mjs',
-    maxLines: 260,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/team/subagent-runtime/state/constants.mjs',
       'scripts/lib/execution/harness/team/subagent-runtime/context/client-args.mjs',
@@ -21,7 +20,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'interception-capability-facade',
     label: 'Interception Capability Facade',
     path: 'scripts/lib/foundation/interception/transport/clients/capabilities.mjs',
-    maxLines: 120,
     requiredModules: Object.freeze([
       'scripts/lib/foundation/interception/transport/mcp/proxy/proxy-config.mjs',
       'scripts/lib/foundation/interception/transport/mcp/proxy/proxy-inspector.mjs',
@@ -31,7 +29,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'solo-runtime-facade',
     label: 'Solo Runtime Facade',
     path: 'scripts/lib/execution/harness/solo/solo-runtime.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/solo/solo-runtime/support/constants.mjs',
       'scripts/lib/execution/harness/solo/solo-runtime/support/normalizers.mjs',
@@ -46,7 +43,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'solo-journal-facade',
     label: 'Solo Journal Facade',
     path: 'scripts/lib/execution/harness/solo/solo-journal.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/solo/solo-journal/plumbing/constants.mjs',
       'scripts/lib/execution/harness/solo/solo-journal/content/normalizers.mjs',
@@ -64,7 +60,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'orchestrator-evidence-facade',
     label: 'Orchestrator Evidence Facade',
     path: 'scripts/lib/execution/harness/orchestration/orchestrator-evidence.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/orchestration/orchestrator-evidence/constants.mjs',
       'scripts/lib/execution/harness/orchestration/orchestrator-evidence/shared.mjs',
@@ -79,7 +74,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'orchestrator-runtimes-facade',
     label: 'Orchestrator Runtimes Facade',
     path: 'scripts/lib/execution/harness/orchestration/orchestrator-runtimes.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/orchestration/orchestrator-runtimes/constants.mjs',
       'scripts/lib/execution/harness/orchestration/orchestrator-runtimes/catalog.mjs',
@@ -94,7 +88,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'groupchat-runtime-facade',
     label: 'GroupChat Runtime Facade',
     path: 'scripts/lib/execution/harness/team/groupchat-runtime.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/team/groupchat-runtime/support/constants.mjs',
       'scripts/lib/execution/harness/team/groupchat-runtime/support/shared.mjs',
@@ -112,7 +105,6 @@ export const HARNESS_COMPONENT_RULES = Object.freeze([
     id: 'clarity-gate-facade',
     label: 'Clarity Gate Facade',
     path: 'scripts/lib/execution/harness/quality/clarity-gate.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/quality/clarity-gate/constants.mjs',
       'scripts/lib/execution/harness/quality/clarity-gate/shared.mjs',

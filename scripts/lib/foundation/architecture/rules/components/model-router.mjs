@@ -4,7 +4,6 @@ export const MODEL_ROUTER_ARCHITECTURE_RULES = Object.freeze([
     id: 'model-router-facade',
     label: 'Model Router Facade',
     path: 'scripts/lib/tooling/model-router.mjs',
-    maxLines: 120,
     requiredModules: Object.freeze([
       'scripts/lib/tooling/model-router/entry/shared.mjs',
       'scripts/lib/tooling/model-router/entry/registry.mjs',

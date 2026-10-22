@@ -3,7 +3,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-options-facade',
     label: 'Lifecycle Options Facade',
     path: 'scripts/lib/execution/lifecycle/govern/options.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/govern/options/constants.mjs',
       'scripts/lib/execution/lifecycle/govern/options/defaults.mjs',
@@ -14,7 +13,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-quality-gate-facade',
     label: 'Lifecycle Quality Gate Facade',
     path: 'scripts/lib/execution/lifecycle/govern/quality-gate.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/govern/quality-gate/constants.mjs',
       'scripts/lib/execution/lifecycle/govern/quality-gate/commands.mjs',
@@ -27,7 +25,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'doctor-aggregate-facade',
     label: 'Doctor Aggregate Facade',
     path: 'scripts/lib/environment/doctor/aggregate.mjs',
-    maxLines: 320,
     requiredModules: Object.freeze([
       'scripts/lib/environment/doctor/aggregate/reporting.mjs',
       'scripts/lib/environment/doctor/aggregate/native-only.mjs',
@@ -37,7 +34,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'doctor-security-config-facade',
     label: 'Doctor Security Config Facade',
     path: 'scripts/doctor-security-config.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/environment/doctor/security-config/args.mjs',
       'scripts/lib/environment/doctor/security-config/files.mjs',
@@ -49,7 +45,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'harness-orchestrator-facade',
     label: 'Harness Orchestrator Facade',
     path: 'scripts/lib/execution/harness/orchestration/orchestrator.mjs',
-    maxLines: 320,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/orchestration/orchestrator/shared.mjs',
       'scripts/lib/execution/harness/orchestration/orchestrator/planning/blueprints.mjs',
@@ -70,7 +65,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'learn-eval-facade',
     label: 'Learn Eval Facade',
     path: 'scripts/lib/execution/harness/quality/learn-eval.mjs',
-    maxLines: 320,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/quality/learn-eval/io.mjs',
       'scripts/lib/execution/harness/quality/learn-eval/report.mjs',
@@ -86,7 +80,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'hindsight-eval-facade',
     label: 'Hindsight Eval Facade',
     path: 'scripts/lib/execution/harness/quality/hindsight-eval.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/harness/quality/hindsight-eval/shared.mjs',
       'scripts/lib/execution/harness/quality/hindsight-eval/cache.mjs',
@@ -100,7 +93,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-orchestrate-facade',
     label: 'Lifecycle Orchestrate Facade',
     path: 'scripts/lib/execution/lifecycle/run/orchestrate.mjs',
-    maxLines: 320,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/run/orchestrate/recovery/shared.mjs',
       'scripts/lib/execution/lifecycle/run/orchestrate/guards/live-capability-guard.mjs',
@@ -118,7 +110,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-harness-facade',
     label: 'Lifecycle Harness Facade',
     path: 'scripts/lib/execution/lifecycle/run/harness.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/run/harness/support/shared.mjs',
       'scripts/lib/execution/lifecycle/run/harness/session/session.mjs',
@@ -135,7 +126,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'team-ops-facade',
     label: 'Team Ops Facade',
     path: 'scripts/lib/execution/lifecycle/fleet/team-ops.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/fleet/team-ops/shared.mjs',
       'scripts/lib/execution/lifecycle/fleet/team-ops/status-options.mjs',
@@ -151,7 +141,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-release-status-facade',
     label: 'Lifecycle Release Status Facade',
     path: 'scripts/lib/execution/lifecycle/release/release-status.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/release/release-status/constants.mjs',
       'scripts/lib/execution/lifecycle/release/release-status/shared.mjs',
@@ -166,7 +155,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-entropy-gc-facade',
     label: 'Lifecycle Entropy GC Facade',
     path: 'scripts/lib/execution/lifecycle/govern/entropy-gc.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/govern/entropy-gc/constants.mjs',
       'scripts/lib/execution/lifecycle/govern/entropy-gc/shared.mjs',
@@ -182,7 +170,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'lifecycle-watchdog-facade',
     label: 'Lifecycle Watchdog Facade',
     path: 'scripts/lib/execution/lifecycle/fleet/watchdog.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/execution/lifecycle/fleet/watchdog/constants.mjs',
       'scripts/lib/execution/lifecycle/fleet/watchdog/shared.mjs',
@@ -197,7 +184,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'contextdb-shell-bridge-facade',
     label: 'ContextDB Shell Bridge Facade',
     path: 'scripts/contextdb-shell-bridge.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/memory/contextdb/shell-bridge/runtime/constants.mjs',
       'scripts/lib/memory/contextdb/shell-bridge/entry/shared.mjs',
@@ -216,7 +202,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'memo-cli-facade',
     label: 'Memo CLI Facade',
     path: 'scripts/lib/memory/memo/memo.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/memory/memo/cli/core/constants.mjs',
       'scripts/lib/memory/memo/cli/core/shared.mjs',
@@ -240,7 +225,6 @@ export const LIFECYCLE_ARCHITECTURE_RULES = Object.freeze([
     id: 'memo-storage-facade',
     label: 'Memo Storage Facade',
     path: 'scripts/lib/memory/memo/storage.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/memory/memo/storage/base/constants.mjs',
       'scripts/lib/memory/memo/storage/base/paths.mjs',

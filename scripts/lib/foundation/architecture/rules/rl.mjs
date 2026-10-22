@@ -3,7 +3,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-shell-schema-facade',
     label: 'RL Shell Schema Facade',
     path: 'scripts/lib/learning/rl-shell-v1/eval/schema.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-shell-v1/eval/schema/constants.mjs',
       'scripts/lib/learning/rl-shell-v1/eval/schema/assertions.mjs',
@@ -17,7 +16,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-shell-temp-runner-facade',
     label: 'RL Shell Temp Runner Facade',
     path: 'scripts/lib/learning/rl-shell-v1/eval/temp-runner.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-shell-v1/eval/temp-runner/run/policy.mjs',
       'scripts/lib/learning/rl-shell-v1/eval/temp-runner/observe/text.mjs',
@@ -34,7 +32,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-core-trainer-facade',
     label: 'RL Core Trainer Facade',
     path: 'scripts/lib/learning/rl-core/learning/trainer.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-core/learning/trainer/core.mjs',
       'scripts/lib/learning/rl-core/learning/trainer/config.mjs',
@@ -49,7 +46,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-core-campaign-controller-facade',
     label: 'RL Core Campaign Controller Facade',
     path: 'scripts/lib/learning/rl-core/control/campaign-controller.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-core/control/campaign-controller/ids.mjs',
       'scripts/lib/learning/rl-core/control/campaign-controller/epoch-state.mjs',
@@ -65,7 +61,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-shell-run-orchestrator-facade',
     label: 'RL Shell Run Orchestrator Facade',
     path: 'scripts/lib/learning/rl-shell-v1/eval/run-orchestrator.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-shell-v1/eval/run-orchestrator/helpers.mjs',
       'scripts/lib/learning/rl-shell-v1/eval/run-orchestrator/episode-record.mjs',
@@ -78,7 +73,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-orchestrator-decision-runner-facade',
     label: 'RL Orchestrator Decision Runner Facade',
     path: 'scripts/lib/learning/rl-orchestrator-v1/decision-runner.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-orchestrator-v1/decision-runner/shared.mjs',
       'scripts/lib/learning/rl-orchestrator-v1/decision-runner/evidence.mjs',
@@ -89,7 +83,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-orchestrator-policy-release-gate-facade',
     label: 'RL Orchestrator Policy Release Gate Facade',
     path: 'scripts/lib/learning/rl-orchestrator-v1/policy-release-gate.mjs',
-    maxLines: 80,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-orchestrator-v1/policy-release-gate/shared.mjs',
       'scripts/lib/learning/rl-orchestrator-v1/policy-release-gate/config.mjs',
@@ -102,7 +95,6 @@ export const RL_ARCHITECTURE_RULES = Object.freeze([
     id: 'rl-mixed-run-orchestrator-facade',
     label: 'RL Mixed Run Orchestrator Facade',
     path: 'scripts/lib/learning/rl-mixed-v1/run/run-orchestrator.mjs',
-    maxLines: 320,
     requiredModules: Object.freeze([
       'scripts/lib/learning/rl-mixed-v1/evidence/contextdb-summary.mjs',
       'scripts/lib/learning/rl-mixed-v1/shared.mjs',
