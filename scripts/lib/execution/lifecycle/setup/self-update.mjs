@@ -8,8 +8,6 @@ import { downloadReleaseAsset } from '../release/release-download.mjs';
 
 const DEFAULT_REPO = 'rexleimo/aios';
 
-import { refreshProjectProjections } from '../../../clients/rex-harness/projection-refresh.mjs';
-
 async function pathExists(filePath) {
   try {
     await access(filePath);
@@ -274,9 +272,6 @@ export async function updateHarnessRuntime({
   platform,
   downloadImpl,
   tempDirBase,
-  // 中文注释：默认取当前工作目录——aios update 就在项目里跑；测试用注入覆盖它。
-  projectRoot = process.cwd(),
-  refreshImpl = refreshProjectProjections,
 } = {}) {
   const before = await readVersion(rootDir);
   if (before) {
@@ -298,14 +293,6 @@ export async function updateHarnessRuntime({
          downloadImpl,
          tempDirBase,
        }));
-
-  // 中文注释：工单 C6——投影是拷贝，运行时一换源侧就变了；不重生，每个项目都得记得再跑一次 init。
-  // 只写在这一处：升级成功后刷新是一条规则，不是 win32/posix 两个平台各实现一遍。
-  if (result?.updated) {
-    result.projectionRefresh = await refreshImpl({
-      installRoot: rootDir, projectRoot, io, runImpl: runCommandImpl,
-    });
-  }
 
   const after = await readVersion(rootDir);
   if (after && after !== before) {

@@ -6,8 +6,7 @@
  * 用法：node scripts/aios-projection-drift.mjs --json --install-root <aios 安装根> --repo-root <项目根> [--fail-on-drift] */
 import path from 'node:path';
 
-import { collectProjectionDrift } from './lib/clients/rex-harness/projection-drift.mjs';
-import { projectionRegenCommand } from './lib/clients/rex-harness/projection-refresh.mjs';
+import { collectProjectionDrift, projectionRegenCommand } from './lib/clients/rex-harness/projection-drift.mjs';
 import { isDirectModuleInvocation } from './lib/foundation/platform/module-entry.mjs';
 
 export const USAGE = 'usage: node scripts/aios-projection-drift.mjs --install-root <dir> --repo-root <dir> [--json] [--fail-on-drift]';
@@ -43,7 +42,7 @@ export function formatDriftReport(report) {
   for (const entry of report.entries.filter((item) => item.skillDrift)) {
     lines.push(`[projection-drift] STALE ${entry.client}/skills/${entry.skill} (generated ${entry.generated}): ${entry.files.join(', ')}`);
   }
-  // 中文注释：命令口径来自 projection-refresh，不在这里二次拼装（三处各拼一次就是三个 owner）。
+  // 中文注释：命令口径由 projection-drift 模块给出（projectionRegenCommand），不在这里二次拼装（三处各拼一次就是三个 owner）。
   lines.push(`[projection-drift] 重生：${projectionRegenCommand({ installRoot: report.installRoot, projectRoot: '<项目根>' }).join(' ')}`);
   return lines.join('\n');
 }

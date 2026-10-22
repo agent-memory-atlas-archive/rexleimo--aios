@@ -231,3 +231,19 @@ SKILL.md 漂移（用户会读到错的那一份）    30 条 = 6 技能 × 5 �
 
 真实仓库只读验证：`countProjectedRexSkills(install=~/.rexcil/aios, project=cwd) = 153`，与漂移工具 `checked=153` 一致。
 回归：`npm run test:affected` → 2280 tests / 2271 pass / 0 fail / 9 skipped；接线门 6/6；dir-budget 0 blocking。
+
+### 第八轮后半段：我自己造的重复，以及怎么发现的
+
+按工单字面在 `updateHarnessRuntime` 里加了"升级后重生投影"（RED 914f5d5a → GREEN e5002dd0，当时 5/5）。
+写审查时发现 `runUpdate` 的 `skills` 组件**早已**调 `installRexClientProjections`（update.mjs:268）：
+于是我加的是一条重复路径，而且更危险——它的项目根来自 `projectRoot = process.cwd()`，
+而同一函数体内会 `ensureWorkingDirectoryOutsideInstallTree()` → `process.chdir(HOME)`。
+今天侥幸正确只是因为默认参数在函数体之前求值；把重生挪进那个三元分支，它就会去重生 `$HOME`。
+
+处置（同轮完成）：删掉 self-update 里的重生与 `projection-refresh.mjs` 模块；
+`update-projection-refresh.test.mjs` 三个用例作废，改写成 `projection-regen-ownership.test.mjs`——
+用 `runUpdate` 已有的 `deps` 接缝断言既有路径的**时序**（runtime 先、projections 后）与**参数**
+（projectRoot 必须是调用方给的那个），外加"重生命令只有一个拼法"（两个消费者各自产出后逐字相等）、
+"没测到 ≠ 零漂移"与"不用 rex 的项目不被报噪"两面。既有 `aios-doctor.test.mjs` 的 `effective_warn=2`
+一字未改仍绿，说明新门没有把噪声塞进别人的断言。复测 receipt:1865c148（退出 0），邻域 77/77，
+test:affected 2282/2273/0 fail。

@@ -1,0 +1,21 @@
+{
+  "kind": "behavior-delta",
+  "decisionRef": "artifact:decision-testability:portable-standard-rules-delivery-round8",
+  "redCandidate": {
+    "publicEntry": "runDoctorSuite({rootDir,projectRoot,...}) 的 doctor:projection-drift 检查项；updateHarnessRuntime({rootDir,projectRoot,runCommandImpl,io}) 的升级后重生",
+    "setup": "doctor 侧 fixture 造双根（install 有 rex-harness/skill-sources/rex-demo，project 的 .agents/skills/rex-demo 带 marker）：场景一投影内容不一致，断言出现 [check] doctor:projection-drift 与单行 skillDrift=1…unmanaged=0 以及 install-rex-client-projections.mjs 重生命令；场景二一致，断言 status: ok；场景三去掉 marker 且源侧同名目录存在，断言 skillDrift=0 且 unmanaged=1 并定级 warn。update 侧用注入的 runCommandImpl 记录每一次调用（不真跑进程）：场景四升级成功后必须有一次带 --project-root <项目根> 的重生调用；场景五项目从没投过影则不得出现该调用；场景六重生退出码 1 时必须有 [warn] projection 且 result.updated 仍为 true",
+    "command": {
+      "executable": "node",
+      "args": [
+        "--test",
+        "scripts/tests/clients/projection-delivery/doctor-projection-drift.test.mjs",
+        "scripts/tests/clients/projection-delivery/update-projection-refresh.test.mjs"
+      ],
+      "cwd": "E:\\\\coding\\\\harness-cli"
+    },
+    "expected": "doctor 携带一条可机读的投影送达状态（skillDrift 与 unmanaged 分开计数、attachmentDrift 只报数不定级、fix 里给可执行重生命令）；aios update 成功后自动重生本项目已有投影，且不越权给没投过影的项目装技能、重生失败不谎报升级失败",
+    "observed": "tests 5 / pass 1 / fail 4，退出码 1：doctor 断言 'doctor must carry a projection delivery check, not only a stand-alone CLI' 失败（聚合日志里没有 doctor:projection-drift，也没有任何 skillDrift= 计数）；update 断言 'the update path must regenerate projections' 失败（注入调用序列只有 git status/pull/submodule update，没有 install-rex-client-projections.mjs）；'the refresh failure has to be visible' 失败（无 [warn] projection 行）。唯一 RED 即通过的是负向契约：从没投过影的项目不会被升级装上技能——没有实现时它本就该为真",
+    "failureReason": "两条都是缺失的行为而非工具故障：投影度量只存在于一个得人去跑的独立 CLI（scripts/aios-projection-drift.mjs），doctor 里对 projection 零命中，因此客户端照常读到旧拷贝而 doctor 仍是绿灯；升级路径从未考虑投影，运行时换完源侧就变了而拷贝留着，本仓库实测 6 份无人管的老副本正是这条路径的产物",
+    "receiptRef": "receipt:914f5d5a-a842-4f1b-947a-032453d688de"
+  }
+}

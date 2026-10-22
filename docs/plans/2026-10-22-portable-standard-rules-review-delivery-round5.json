@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "kind": "rex.standards-spec-review.v1",
+  "status": "complete",
+  "fixedPoint": "git:6419ffc3",
+  "diffRef": "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round5.md",
+  "specStatus": "available",
+  "specSource": "file:docs/plans/2026-10-22-portable-standard-rules-delivery-ticket.json#work-delivery-guarantee",
+  "standardsFindings": [
+    {
+      "id": "S5-R8-1",
+      "position": "scripts/lib/execution/lifecycle/setup/self-update.mjs (projectionRefresh hook, removed)",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round5.md",
+        "git:8ce61c3f",
+        "file:scripts/tests/clients/projection-delivery/projection-regen-ownership.test.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "我在本轮新增第二条自动重生路径，而 runUpdate 的 skills 组件早已重生；且新路径的项目根来自隐式 cwd，同函数体内还会 process.chdir(HOME)。已删除该路径，并把 C6 担保改写为守卫既有路径的时序与参数"
+    },
+    {
+      "id": "S5-R8-2",
+      "position": "重生命令一度在 CLI / doctor fix / refresh 模块各拼一遍",
+      "evidence": [
+        "file:scripts/tests/clients/projection-delivery/projection-regen-ownership.test.mjs",
+        "file:scripts/lib/clients/rex-harness/projection-drift.mjs"
+      ],
+      "severity": "hard",
+      "recommendation": "收敛为 projectionRegenCommand 单一拼法；担保形式改为两个消费者各自产出命令后逐字相等，而不是统计字符串出现次数"
+    },
+    {
+      "id": "S5-R8-3",
+      "position": "scripts/lib/environment/doctor/aggregate.mjs 已超文件预算",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round5.md"
+      ],
+      "severity": "judgement",
+      "recommendation": "门实现拆到 aggregate/projection-drift-gate.mjs（与 reporting.mjs / native-only.mjs 同惯例），已做"
+    }
+  ],
+  "specFindings": [
+    {
+      "id": "SP-R8-1",
+      "position": "work-delivery-guarantee C4 语义",
+      "evidence": [
+        "file:scripts/tests/clients/projection-delivery/projection-regen-ownership.test.mjs",
+        "receipt:1865c148-4483-4e63-bd84-1ccd3fc99e43"
+      ],
+      "severity": "judgement",
+      "recommendation": "checked=0 有两种相反含义：没投过影（ok，无义务）与有副本但没源可测（warn + Repair）。只看 checked===0 会对不使用 rex 的项目报噪，也差点把既有 aios-doctor 断言的 effective_warn=2 顶掉；改按项目内是否存在注册表投影目录判定，两面都有测试"
+    },
+    {
+      "id": "SP-R8-2",
+      "position": "work-delivery-guarantee 11 条验收",
+      "evidence": [
+        "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round5.md",
+        "receipt:e5002dd0-07f4-459f-a761-260abd97532a",
+        "receipt:914f5d5a-a842-4f1b-947a-032453d688de",
+        "git:8ce61c3f"
+      ],
+      "severity": "judgement",
+      "recommendation": "逐条达成，本工作项关闭；整体 work item portable-standard-rules 仍 open（还剩 budget engine / CLI / 自我消费 / 依赖方向 / 外部证明 / DRY 六项），completionClaim 保持 soft"
+    }
+  ],
+  "verdict": "pass",
+  "evidenceRefs": [
+    "file:docs/plans/2026-10-22-portable-standard-rules-review-delivery-round5.md",
+    "receipt:914f5d5a-a842-4f1b-947a-032453d688de",
+    "receipt:e5002dd0-07f4-459f-a761-260abd97532a",
+    "receipt:1865c148-4483-4e63-bd84-1ccd3fc99e43",
+    "git:8ce61c3f"
+  ]
+}

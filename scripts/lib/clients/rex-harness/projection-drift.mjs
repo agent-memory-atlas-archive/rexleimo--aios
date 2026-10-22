@@ -19,6 +19,21 @@ export const PROJECTION_MARKER = '.rex-projection.json';
  */
 /** 中文注释：客户端注册表里的投影目录名集合（去重：pi 与 zcode 共用 .agents）。
  * 默认度量面用它；升级侧判断“这个项目投过影没有”也用它——两处必须同一口径。 */
+/**
+ * 中文注释：重生命令的唯一拼法。它一度在漂移 CLI、doctor 的 fix 行、以及升级路径里各拼了一次，
+ * “--scope / --client” 一变就是三处要记得改——本项目立项要消灭的就是这种"一条知识多个 owner"。
+ */
+export function projectionRegenCommand({ installRoot, projectRoot }) {
+  return [
+    process.execPath,
+    path.join(installRoot, 'scripts', 'install-rex-client-projections.mjs'),
+    '--root', installRoot,
+    '--project-root', projectRoot,
+    '--client', 'all',
+    '--scope', 'project',
+  ];
+}
+
 export function clientSkillRootDirs() {
   return [...new Set(Object.values(CLIENT_DEFINITIONS)
     .map((definition) => definition.projectSkillRoot)
