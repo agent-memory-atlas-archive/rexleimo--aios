@@ -186,6 +186,89 @@ test('pi bridge doctor stops warning about a missing adapter once built-in MCP s
   });
 });
 
+// A4-3 (docs/plans/2026-10-23-pi-stall-self-heal-test-scope.md): a reasoning model served over
+// `openai-completions` from a relay baseUrl gets its system prompt sent in the `developer` role
+// unless the model declares `compat.supportsDeveloperRole: false` - pi-ai
+// openai-completions.js:905 + :1272 + :1324. Relays that reject that role answer 400, pi treats a
+// 400 as non-retryable, and the run stops: 10 recorded bailian stops on this machine. `models.json`
+// is the only place the declaration can live, because settings.json has no per-provider compat key.
+test('pi bridge doctor flags reasoning providers that never declared the developer-role compat', async () => {
+  await withPiHome('aios-pi-doctor-compat-risk-', async (piHome) => {
+    const mcpJsonPath = resolvePiMcpJsonPath(piHome);
+    await fs.mkdir(path.dirname(mcpJsonPath), { recursive: true });
+    await fs.writeFile(mcpJsonPath, JSON.stringify({
+      mcpServers: buildAiosPiMcpServers({ aiosRoot: '/aios' }),
+    }, null, 2), 'utf8');
+    await fs.writeFile(path.join(piHome, 'models.json'), JSON.stringify({
+      providers: {
+        testrelay: {
+          name: 'Test Relay',
+          baseUrl: 'https://relay.example.test:8443/v1',
+          api: 'openai-completions',
+          models: [
+            { id: 'r-flash', reasoning: true, contextWindow: 128000 },
+            { id: 'r-plain', reasoning: false, contextWindow: 32000 },
+          ],
+        },
+      },
+    }, null, 2), 'utf8');
+    const logs = [];
+    const result = await doctorPiBridge({
+      aiosRoot: '/aios',
+      env: doctorEnv(piHome),
+      io: { log: (line) => logs.push(line) },
+      ...noPi,
+      ...adapterMissingLegacy,
+    });
+    assert.deepEqual(result.compatAtRisk, ['testrelay/r-flash']);
+    const hint = logs.join('\n');
+    assert.match(hint, /testrelay\/r-flash.*supportsDeveloperRole/su);
+    assert.match(hint, /aios init --agent pi --pi-compat-self-heal/u);
+    assert.equal(result.effectiveWarnings, 2);
+  });
+});
+
+test('pi bridge doctor reports no compat risk when the declaration exists or the surface is native', async () => {
+  await withPiHome('aios-pi-doctor-compat-ok-', async (piHome) => {
+    const mcpJsonPath = resolvePiMcpJsonPath(piHome);
+    await fs.mkdir(path.dirname(mcpJsonPath), { recursive: true });
+    await fs.writeFile(mcpJsonPath, JSON.stringify({
+      mcpServers: buildAiosPiMcpServers({ aiosRoot: '/aios' }),
+    }, null, 2), 'utf8');
+    await fs.writeFile(path.join(piHome, 'models.json'), JSON.stringify({
+      providers: {
+        declared: {
+          baseUrl: 'https://relay.example.test:8443/v1',
+          api: 'openai-completions',
+          compat: { supportsDeveloperRole: false },
+          models: [{ id: 'm-one', reasoning: true }],
+        },
+        official: {
+          baseUrl: 'https://api.openai.com/v1',
+          api: 'openai-completions',
+          models: [{ id: 'gpt-4o', reasoning: true }],
+        },
+        native: {
+          baseUrl: 'https://relay.example.test:8443/v1',
+          api: 'anthropic-messages',
+          models: [{ id: 'c-opus', reasoning: true }],
+        },
+      },
+    }, null, 2), 'utf8');
+    const logs = [];
+    const result = await doctorPiBridge({
+      aiosRoot: '/aios',
+      env: doctorEnv(piHome),
+      io: { log: (line) => logs.push(line) },
+      ...noPi,
+      ...adapterMissingLegacy,
+    });
+    assert.deepEqual(result.compatAtRisk, []);
+    assert.equal(result.effectiveWarnings, 1);
+    assert.equal(logs.some((line) => /supportsDeveloperRole/u.test(line)), false);
+  });
+});
+
 test('pi bridge doctor falls back to legacy adapter checks when the version cannot be captured', async () => {
   await withPiHome('aios-pi-doctor-noversion-', async (piHome) => {
     const mcpJsonPath = resolvePiMcpJsonPath(piHome);

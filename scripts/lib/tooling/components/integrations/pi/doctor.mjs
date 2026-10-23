@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { captureCommand, commandExists } from '../../../../foundation/platform/process.mjs';
 import { getClientHomes } from '../../../../foundation/platform/paths.mjs';
 import { buildAiosPiMcpServers, isAdapterInstalled, parsePiVersion, piMcpAdapterSpec, resolvePiMcpJsonPath, resolvePiMcpMode } from './mcp-adapter.mjs';
+import { findDeveloperRoleCompatGaps, readPiModelsConfig, resolvePiModelsJsonPath } from './compat-self-heal.mjs';
 
 const MANAGED_SERVER_NAMES = ['code-review-graph', 'aios-memory', 'aios-bridge'];
 
@@ -34,6 +35,7 @@ export async function doctorPiBridge({
     mode: 'adapter',
     notes: [],
     mcpJsonPath: '',
+    compatAtRisk: [],
   };
 
   const piHome = getClientHomes(env).pi;
@@ -131,6 +133,28 @@ export async function doctorPiBridge({
     io.log('[warn] pi CLI not on PATH; adapter status unknown');
     result.adapter = 'unknown';
     result.effectiveWarnings += 1;
+  }
+
+  // Reasoning models behind an undeclared relay compat are the stall shape this reports: pi
+  // defaults the developer role on, the relay 400s, and pi will not retry a 400. Report only;
+  // the write is an explicit `--pi-compat-self-heal` act on the user's global file.
+  const modelsJsonPath = resolvePiModelsJsonPath(piHome);
+  try {
+    const models = readPiModelsConfig(modelsJsonPath);
+    if (models.exists) {
+      const gaps = findDeveloperRoleCompatGaps({ modelsConfig: models.config });
+      result.compatAtRisk = gaps;
+      for (const gap of gaps) {
+        io.log(`[warn] ${gap}: reasoning model over openai-completions does not declare compat.supportsDeveloperRole`);
+        io.log('[warn]   pi sends the system prompt in the `developer` role, relays that reject it answer 400, and pi does not retry a 400');
+        io.log('[warn]   repair: aios init --agent pi --pi-compat-self-heal');
+        result.effectiveWarnings += 1;
+      }
+      if (!gaps.length) io.log('[ok] Pi models.json developer-role compat is declared for every reasoning relay');
+    }
+  } catch (error) {
+    io.log(`[error] Pi models.json is not valid JSON; AIOS never rewrites it automatically (${error?.message || error})`);
+    result.errors += 1;
   }
 
   if (result.errors > 0 || result.effectiveWarnings > 0) {
