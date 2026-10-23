@@ -87,6 +87,70 @@ export function findDeveloperRoleCompatGaps({ modelsConfig } = {}) {
   return gaps;
 }
 
+function declaresTrue(...compatObjects) {
+  return compatObjects.some(
+    (compat) => compat && typeof compat === 'object' && compat.supportsDeveloperRole === true,
+  );
+}
+
+// Models the write rule applies to: reasoning models served over openai-completions from a host
+// that is not natively a developer-role surface. Known non-standard hosts are evaluated too —
+// they are safe by pi default, which is why they report `present` rather than `skipped`.
+function evaluatedRelayModels(modelsConfig) {
+  const providers = modelsConfig?.providers;
+  if (!providers || typeof providers !== 'object' || Array.isArray(providers)) return [];
+  const evaluated = [];
+  for (const [providerId, provider] of Object.entries(providers)) {
+    if (String(provider?.api || '') !== 'openai-completions') continue;
+    if (!provider?.baseUrl || hasNativeDeveloperRole(provider.baseUrl)) continue;
+    for (const model of modelsOf(provider)) {
+      if (model?.reasoning === true) evaluated.push({ providerId, provider, model });
+    }
+  }
+  return evaluated;
+}
+
+// Additive self-heal for the developer-role compat (contract A1-1..A1-6). Reads models.json,
+// declares `compat.supportsDeveloperRole: false` on exactly the gap models, and touches nothing
+// else. Never rewrites a user-chosen value: an explicit `true` is kept wherever it stands.
+// Returns `{ modelsPath, action, gaps, kept }` with action in
+// `added | would-add | kept-user-value | present | skipped`.
+export async function ensureDeveloperRoleCompat({ modelsPath, dryRun = false, io = null } = {}) {
+  if (!modelsPath) throw new Error('ensureDeveloperRoleCompat requires modelsPath');
+  const { exists, config } = readPiModelsConfig(modelsPath);
+  if (!exists) return { modelsPath, action: 'skipped', gaps: [], kept: [] };
+  const evaluated = evaluatedRelayModels(config);
+  const gaps = findDeveloperRoleCompatGaps({ modelsConfig: config });
+  const kept = evaluated
+    .filter(({ provider, model }) => declaresTrue(model.compat, provider.compat))
+    .map(({ providerId, model }) => `${providerId}/${model?.id}`);
+  if (!gaps.length) {
+    if (kept.length) {
+      for (const id of kept) io?.log?.(`[ok] ${id}: keeps user-declared compat.supportsDeveloperRole=true`);
+      return { modelsPath, action: 'kept-user-value', gaps, kept };
+    }
+    if (evaluated.length) {
+      io?.log?.('[ok] Pi models.json developer-role compat already present');
+      return { modelsPath, action: 'present', gaps, kept };
+    }
+    io?.log?.('[skip] no reasoning openai-completions relay models; nothing to declare');
+    return { modelsPath, action: 'skipped', gaps, kept };
+  }
+  if (dryRun) {
+    for (const gap of gaps) io?.log?.(`[plan] would declare compat.supportsDeveloperRole=false for ${gap}`);
+    return { modelsPath, action: 'would-add', gaps, kept };
+  }
+  for (const gap of gaps) {
+    const [providerId, modelId] = gap.split('/');
+    const model = config.providers[providerId]?.models?.find((candidate) => candidate?.id === modelId);
+    model.compat = { ...(model.compat || {}), supportsDeveloperRole: false };
+    io?.log?.(`[ok] ${gap}: declared compat.supportsDeveloperRole=false`);
+  }
+  fs.mkdirSync(path.dirname(modelsPath), { recursive: true });
+  fs.writeFileSync(modelsPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
+  return { modelsPath, action: 'added', gaps, kept };
+}
+
 export function readPiModelsConfig(modelsPath) {
   let raw;
   try {
