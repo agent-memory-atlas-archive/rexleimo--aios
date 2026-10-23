@@ -67,7 +67,7 @@ AIOS is a local-first agent workflow layer that gives coding CLIs (Claude Code, 
 
 ## Blog
 
-- v6.11.0 release post not yet published — see https://cli.rexai.top/changelog/
+- https://cli.rexai.top/blog/2026-10-v6110-pi-agent-stops-stalling/ — v6.11.0: The Pi Agent Stops Stalling — Three Measured Stall Classes Fixed, and the Safety Gate Learns What a Target Is
 - https://cli.rexai.top/blog/2026-10-v6100-portable-engineering-standards/ — v6.10.0: A Gate You Never Configured Must Not Fail Your Build — Engineering Standards Became Portable
 - https://cli.rexai.top/blog/2026-10-v690-browser-profile-root-leaves-the-install-tree/ — v6.9.0: A Browser Session Should Not Be Able to Block an Upgrade — So the Profile Root Moved Out of the Install Tree
 - https://cli.rexai.top/blog/2026-10-v680-test-runner-owns-the-temp-directory/ — v6.8.0: The Test Runner Owns the Temp Directory Now — and Two CLI Commands Stop Lying About Their Exit Code
