@@ -117,7 +117,8 @@ Options:
   --adopt-legacy-superpowers Explicit cleanup; preview first with --dry-run
   --yes                        Authorize unattended installs (RTK/Caveman/Headroom + MCP)
   --yes-compression-tools    Authorize unattended RTK/Caveman/Headroom installation
-  --yes-headroom-mcp         Authorize unattended Gemini/Grok Headroom MCP registration`);
+  --yes-headroom-mcp         Authorize unattended Gemini/Grok Headroom MCP registration
+  --pi-compat-self-heal    Repair undeclared developer-role compat in Pi-global models.json (additive, reasoning relays only)`);
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -132,6 +133,7 @@ export async function main(argv = process.argv.slice(2)) {
   const yesFlag = argv.includes('--yes');
   const yesCompressionTools = yesFlag || argv.includes('--yes-compression-tools');
   const yesHeadroomMcp = yesFlag || argv.includes('--yes-headroom-mcp');
+  const piCompatSelfHeal = argv.includes('--pi-compat-self-heal');
   const agentIdx = argv.indexOf('--agent');
   const requestedAgent = agentIdx !== -1 ? argv[agentIdx + 1] : '';
 
@@ -323,7 +325,7 @@ export async function main(argv = process.argv.slice(2)) {
       if (mcp.keptDiffers.length > 0) {
         console.log(`  Pi MCP kept user-edited servers: ${mcp.keptDiffers.join(', ')}`);
       }
-      // 2e. Project .mcp.json advisory — the Pi-global file carries the
+      // 2d(iii). Project .mcp.json advisory — the Pi-global file carries the
       // cwd-less AIOS servers plus the browser server once its runtime is
       // installed; shell/auth still reach Pi through the project-level
       // .mcp.json that the pi-mcp-adapter reads directly.
@@ -333,6 +335,22 @@ export async function main(argv = process.argv.slice(2)) {
       }
     } catch (err) {
       console.warn(`[warn] Pi MCP bridge setup: ${err.message}`);
+    }
+    // 2e. Pi models.json compat self-heal — additive repair for reasoning relays whose
+    // developer-role compat was never declared. Explicit consent only: without
+    // --pi-compat-self-heal this audits read-only and advises; the flag authorizes the
+    // write to the user's global models.json. Dry runs preview, never write.
+    try {
+      const { getClientHomes } = await import('./lib/foundation/platform/paths.mjs');
+      const { resolvePiModelsJsonPath, runPiCompatStep } = await import('./lib/tooling/components/integrations/pi/compat-self-heal.mjs');
+      await runPiCompatStep({
+        modelsPath: resolvePiModelsJsonPath(getClientHomes(process.env).pi),
+        consent: piCompatSelfHeal,
+        dryRun,
+        io: console,
+      });
+    } catch (err) {
+      console.warn(`[warn] Pi compat self-heal: ${err.message}`);
     }
   }
 

@@ -151,6 +151,28 @@ export async function ensureDeveloperRoleCompat({ modelsPath, dryRun = false, io
   return { modelsPath, action: 'added', gaps, kept };
 }
 
+// Consent-gated init step (contract A4-1/A4-2). `consent` is the explicit `--pi-compat-self-heal`
+// flag: without it the step only audits (read-only) and, when gaps exist, prints the authorizing
+// command. With it the step delegates to the writer. Never creates a missing file and never
+// throws past the caller on absent input — malformed JSON still throws refusing-to-clobber,
+// which init reports as a warning like every other step failure.
+// Returns `{ modelsPath, action, gaps, kept, wrote }`.
+export async function runPiCompatStep({ modelsPath, consent = false, dryRun = false, io = null } = {}) {
+  if (!modelsPath) throw new Error('runPiCompatStep requires modelsPath');
+  const { exists, config } = readPiModelsConfig(modelsPath);
+  if (!exists) return { modelsPath, action: 'skipped', gaps: [], kept: [], wrote: false };
+  const gaps = findDeveloperRoleCompatGaps({ modelsConfig: config });
+  if (!consent) {
+    if (gaps.length) {
+      io?.log?.(`[hint] ${gaps.length} Pi model(s) would get the developer role from a relay that never declared compat.supportsDeveloperRole: ${gaps.join(', ')}`);
+      io?.log?.('[hint] repair (writes your global models.json): aios init --agent pi --pi-compat-self-heal');
+    }
+    return { modelsPath, action: 'needs-consent', gaps, kept: [], wrote: false };
+  }
+  const result = await ensureDeveloperRoleCompat({ modelsPath, dryRun, io });
+  return { ...result, wrote: result.action === 'added' };
+}
+
 export function readPiModelsConfig(modelsPath) {
   let raw;
   try {

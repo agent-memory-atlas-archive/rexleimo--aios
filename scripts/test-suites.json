@@ -37,6 +37,7 @@
       "scripts/tests/clients/mcp-formats/mcp-targets.test.mjs",
       "scripts/tests/clients/mcp-formats/mcp-toml.test.mjs",
       "scripts/tests/clients/opencode/plugin-contract.test.mjs",
+      "scripts/tests/clients/pi-adapter/pi-compat-self-heal.test.mjs",
       "scripts/tests/clients/pi-adapter/pi-doctor.test.mjs",
       "scripts/tests/clients/pi-adapter/pi-extension-settings.test.mjs",
       "scripts/tests/clients/pi-adapter/pi-mcp-adapter.test.mjs",

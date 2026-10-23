@@ -254,3 +254,76 @@ test('writer skips a missing models.json instead of creating one', async () => {
     assert.equal(await fs.stat(modelsPath).then(() => true, () => false), false);
   });
 });
+
+// --- Init consent gate (work-3, contract A4-1/A4-2). ---
+
+async function loadCompatStep() {
+  const mod = await import('../../../lib/tooling/components/integrations/pi/compat-self-heal.mjs');
+  return mod.runPiCompatStep;
+}
+
+test('init step with consent and dry run previews without writing (A4-1)', async () => {
+  const runPiCompatStep = await loadCompatStep();
+  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
+  await withModelsFile('aios-pi-step-dry-', meqwenShaped(), async (modelsPath) => {
+    const before = await fs.readFile(modelsPath, 'utf8');
+    const logs = [];
+    const result = await runPiCompatStep({
+      modelsPath, consent: true, dryRun: true, io: { log: (line) => logs.push(line) },
+    });
+    assert.equal(result.action, 'would-add');
+    assert.deepEqual(result.gaps, ['testrelay/r-flash']);
+    assert.equal(await fs.readFile(modelsPath, 'utf8'), before);
+    assert.equal(logs.some((line) => /\[plan\]/u.test(line) && /testrelay\/r-flash/u.test(line)), true);
+  });
+});
+
+test('init step without consent writes nothing and prints the authorizing command (A4-2)', async () => {
+  const runPiCompatStep = await loadCompatStep();
+  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
+  await withModelsFile('aios-pi-step-noconsent-', meqwenShaped(), async (modelsPath) => {
+    const before = await fs.readFile(modelsPath, 'utf8');
+    const logs = [];
+    const result = await runPiCompatStep({ modelsPath, consent: false, io: { log: (line) => logs.push(line) } });
+    assert.equal(await fs.readFile(modelsPath, 'utf8'), before);
+    assert.equal(
+      logs.some((line) => /aios init --agent pi --pi-compat-self-heal/u.test(line)),
+      true,
+      `expected the authorizing command in output, got: ${logs.join(' | ')}`,
+    );
+    assert.equal(result.wrote, false);
+  });
+});
+
+test('init step with consent repairs the file (flag actually governs the write)', async () => {
+  const runPiCompatStep = await loadCompatStep();
+  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
+  await withModelsFile('aios-pi-step-consent-', meqwenShaped(), async (modelsPath) => {
+    const logs = [];
+    const result = await runPiCompatStep({
+      modelsPath, consent: true, dryRun: false, io: { log: (line) => logs.push(line) },
+    });
+    assert.equal(result.action, 'added');
+    assert.equal(result.wrote, true);
+    const after = JSON.parse(await fs.readFile(modelsPath, 'utf8'));
+    assert.equal(after.providers.testrelay.models[0].compat.supportsDeveloperRole, false);
+    const second = await runPiCompatStep({ modelsPath, consent: true, io: { log: () => {} } });
+    assert.equal(second.action, 'present');
+    assert.equal(second.wrote, false);
+  });
+});
+
+test('init step without consent stays quiet when there is nothing to authorize', async () => {
+  const runPiCompatStep = await loadCompatStep();
+  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
+  const config = meqwenShaped();
+  config.providers.testrelay.models[0].compat = { supportsDeveloperRole: false };
+  await withModelsFile('aios-pi-step-clean-', config, async (modelsPath) => {
+    const before = await fs.readFile(modelsPath, 'utf8');
+    const logs = [];
+    const result = await runPiCompatStep({ modelsPath, consent: false, io: { log: (line) => logs.push(line) } });
+    assert.equal(await fs.readFile(modelsPath, 'utf8'), before);
+    assert.equal(result.wrote, false);
+    assert.equal(logs.some((line) => /--pi-compat-self-heal/u.test(line)), false);
+  });
+});
