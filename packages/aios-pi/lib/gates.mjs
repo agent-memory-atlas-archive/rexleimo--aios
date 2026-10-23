@@ -1,12 +1,16 @@
 // Pure safety-gate logic for the AIOS Pi extension. No pi imports here:
 // every function is a pure function so node --test can verify it directly.
 
+// Text-shape rules are only for what is dangerous whatever its argument is. Recursive delete is
+// judged by TARGET instead (danger-targets.mjs): over 41,823 recorded tool calls the word alone
+// blocked 114 commands and only 2 of them pointed at a real user or system path.
+import { blankQuoted, classifyDeleteTarget, findDeleteTargets, findInterpreterBodies, withoutHeredocs, volatileRoots } from './danger-targets.mjs';
+
 const DANGEROUS_BASH_PATTERNS = Object.freeze([
-  { pattern: /\brm\s+[^|;&]*-[a-z]*r[a-z]*f\b/iu, reason: 'rm -rf is blocked by the AIOS safety gate' },
-  { pattern: /--no-preserve-root/iu, reason: '--no-preserve-root is blocked by the AIOS safety gate' },
+  { pattern: /--no-preserve-root/iu, reason: '--no-preserve-root is blocked by the AIOS safety gate: it deletes an entire mounted filesystem' },
   { pattern: /:\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;/u, reason: 'fork bomb is blocked by the AIOS safety gate' },
-  { pattern: /\bmkfs\b/iu, reason: 'mkfs is blocked by the AIOS safety gate' },
-  { pattern: /\bdd\b[^|;&]*\bof=\/dev\//iu, reason: 'dd to a device is blocked by the AIOS safety gate' },
+  { pattern: /\bmkfs\b/iu, reason: 'mkfs is blocked by the AIOS safety gate: it reformats a device' },
+  { pattern: /\bdd\b[^|;&]*\bof=\/dev\//iu, reason: 'dd writing to /dev/ is blocked by the AIOS safety gate: it overwrites a device' },
 ]);
 
 // Basenames that must never be overwritten through Pi file tools, plus
@@ -18,10 +22,38 @@ function normalizedPathSegments(targetPath) {
   return String(targetPath || '').split(/[\\/]/u).filter(Boolean);
 }
 
-export function checkBashCommand(command) {
-  const text = String(command || '');
+// Blocked with a way out: a reason that only states the prohibition gets retried in another shape,
+// which is how a safety gate turns back into a stall.
+function deleteBlockReason(target, why) {
+  return [
+    `recursive delete of ${target} is blocked by the AIOS safety gate: ${why}.`,
+    'Allowed: a relative subdirectory of the working directory, or an absolute path inside volatile temp space.',
+    'For sandbox leftovers use the repo temp GC (npm run tmp:gc) or name the specific directory.',
+  ].join(' ');
+}
+
+export function checkBashCommand(command, { env = process.env, depth = 0 } = {}) {
+  // One boundary for "is this text something the shell will execute", applied per rule family:
+  // shape rules scan the quote-blanked view (a quoted string is data), while the delete-target scan
+  // reads the unblanked text because shellWords already knows which words are quoted — blanking
+  // first would wash out quoted values like "$DST" into empty targets.
+  const executable = withoutHeredocs(command);
+  const shapeText = blankQuoted(executable);
   for (const { pattern, reason } of DANGEROUS_BASH_PATTERNS) {
-    if (pattern.test(text)) return { blocked: true, reason };
+    if (pattern.test(shapeText)) return { blocked: true, reason };
+  }
+  const volatile = volatileRoots(env);
+  for (const target of findDeleteTargets(executable)) {
+    const verdict = classifyDeleteTarget({ target, volatile });
+    if (!verdict.allowed) return { blocked: true, reason: deleteBlockReason(target, verdict.why) };
+  }
+  // What a shell interpreter is about to run is executed text too: `bash -c "mkfs ..."` hides a
+  // shape-rule hit inside quotes, so the body is judged with the same rules as the outer line.
+  if (depth < 2) {
+    for (const body of findInterpreterBodies(command)) {
+      const inner = checkBashCommand(body, { env, depth: depth + 1 });
+      if (inner.blocked) return inner;
+    }
   }
   return { blocked: false };
 }

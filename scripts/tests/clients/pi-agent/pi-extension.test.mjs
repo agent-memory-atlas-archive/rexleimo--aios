@@ -31,15 +31,20 @@ import aiosExtension from '../../../../packages/aios-pi/extensions/aios.ts';
 // bash call must NOT terminate the run. pi treats `terminate: true` as "skip the automatic
 // follow-up" (pi docs/extensions.md:253), so the old verdict stopped the whole run and the
 // user had to re-prompt — measured in 99 of 135 blocked turns on this machine.
+// Deliberate contract change on top of A2 (measured, see packages/aios-pi/lib/danger-targets.mjs):
+// the delete rule now judges the TARGET. `/tmp/x` and `C:/temp` were blocked by the old text-shape
+// rule and are now allowed, because they are volatile scratch; the dangerous set stays blocked.
 test('gates block destructive bash without terminating the run', () => {
-  assert.deepEqual(checkBashCommand('rm -rf /tmp/x'), { blocked: true, reason: 'rm -rf is blocked by the AIOS safety gate' });
+  assert.deepEqual(checkBashCommand('rm -rf /tmp/x'), { blocked: false });
   assert.deepEqual(checkBashCommand('ls -la'), { blocked: false });
   assert.deepEqual(checkBashCommand('mkfs.ext4 /dev/sda1').blocked, true);
+  assert.equal(checkBashCommand('rm -rf /etc').blocked, true);
   const verdict = decideToolCall({ toolName: 'bash', input: { command: 'rm -rf ~' } });
   assert.equal(verdict.block, true);
   assert.equal(verdict.terminate, false, 'a blocked tool must not end the run');
   assert.equal(decideToolCall({ toolName: 'bash', input: { command: 'git status --short' } }), undefined);
-  assert.equal(decideToolCall({ toolName: 'powershell', input: { command: 'rm -rf C:\\temp' } }).block, true);
+  assert.equal(decideToolCall({ toolName: 'powershell', input: { command: 'rm -rf C:\\temp' } }), undefined);
+  assert.equal(decideToolCall({ toolName: 'powershell', input: { command: 'rm -rf C:\\Windows\\System32' } }).block, true);
 });
 
 test('gates block protected writes without terminating', () => {

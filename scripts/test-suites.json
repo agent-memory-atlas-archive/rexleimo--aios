@@ -43,6 +43,7 @@
       "scripts/tests/clients/pi-adapter/pi-mcp-adapter.test.mjs",
       "scripts/tests/clients/pi-adapter/pi-rpc-client.test.mjs",
       "scripts/tests/clients/pi-agent/pi-extension.test.mjs",
+      "scripts/tests/clients/pi-agent/pi-gate-targets.test.mjs",
       "scripts/tests/clients/pi-agent/pi-offload.test.mjs",
       "scripts/tests/clients/pi-agent/pi-rpc-execute-turn.test.mjs",
       "scripts/tests/clients/pi-agent/pi-shipped-content-hygiene.test.mjs",
