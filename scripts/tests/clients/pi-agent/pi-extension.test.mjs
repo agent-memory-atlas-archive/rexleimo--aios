@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import {
@@ -110,6 +113,47 @@ test('runAios bounds the aios CLI spawn at 8 seconds', async () => {
   assert.equal(seen.length, 1);
   assert.equal(seen[0].timeout, 8000);
 });
+
+// A3-2: the ceiling is only half the guarantee — when it fires, the caller must get the
+// documented AiosCliError shape (exitCode + stderr), never a raw kill signal or a hang.
+// No production change: both cases pin behavior that already holds (hardening).
+test('runAios surfaces a spawn timeout as AiosCliError with exitCode and stderr', async () => {
+  const timeoutShaped = Object.assign(new Error('kill ETIMEDOUT'), { code: 'ETIMEDOUT', signal: 'SIGTERM' });
+  await assert.rejects(
+    () => runAios({
+      aiosRoot: '/aios',
+      argv: ['memo', 'search', 'x'],
+      execFileImpl: (_cmd, _args, _options, cb) => cb(timeoutShaped, '', 'digest partial'),
+    }),
+    (error) => {
+      assert.equal(error instanceof AiosCliError, true);
+      assert.equal(error.exitCode, 1);
+      assert.equal(error.stderr, 'digest partial');
+      assert.match(error.message, /memo/u);
+      return true;
+    },
+  );
+});
+
+test('runAios kills a hung CLI at the ceiling instead of stalling the turn (live child)', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'aios-pi-hung-cli-'));
+  try {
+    await fs.mkdir(path.join(dir, 'scripts'), { recursive: true });
+    await fs.writeFile(path.join(dir, 'scripts', 'aios.mjs'), 'setTimeout(() => {}, 60000);\n', 'utf8');
+    const started = Date.now();
+    await assert.rejects(
+      () => runAios({ aiosRoot: dir, argv: ['memo', 'search', 'x'] }),
+      (error) => {
+        assert.equal(error instanceof AiosCliError, true);
+        return true;
+      },
+    );
+    // The sleeper runs 60s: finishing anywhere near 8s proves the ceiling fired.
+    assert.ok(Date.now() - started < 30000, 'a hung CLI must not stall the turn');
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+}, { timeout: 45000 });
 
 test('defaultExecFile resolves every module shape (regression: execFile TypeError)', async () => {
   // Real ESM namespace from `await import('node:child_process')` — the production
