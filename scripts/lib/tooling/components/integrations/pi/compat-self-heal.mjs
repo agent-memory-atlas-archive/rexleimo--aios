@@ -101,3 +101,30 @@ export function readPiModelsConfig(modelsPath) {
     throw new Error(`invalid Pi models JSON (refusing to clobber): ${modelsPath}`);
   }
 }
+
+// Read-only audit for the doctor: name every model that will get the `developer` role from a relay
+// that never declared the capability, and say how to repair it. The write itself is a separate,
+// explicitly authorised act (`aios init --agent pi --pi-compat-self-heal`) on a user-global file.
+export function auditPiCompat({ modelsJsonPath, io = null } = {}) {
+  const outcome = { gaps: [], warnings: 0, errors: 0 };
+  let models;
+  try {
+    models = readPiModelsConfig(modelsJsonPath);
+  } catch (error) {
+    io?.log?.(`[error] Pi models.json is not valid JSON; AIOS never rewrites it automatically (${error?.message || error})`);
+    outcome.errors += 1;
+    return outcome;
+  }
+  if (!models.exists) return outcome;
+  outcome.gaps = findDeveloperRoleCompatGaps({ modelsConfig: models.config });
+  for (const gap of outcome.gaps) {
+    io?.log?.(`[warn] ${gap}: reasoning model over openai-completions does not declare compat.supportsDeveloperRole`);
+    io?.log?.('[warn]   pi sends the system prompt in the `developer` role, relays that reject it answer 400, and pi does not retry a 400');
+    io?.log?.('[warn]   repair: aios init --agent pi --pi-compat-self-heal');
+    outcome.warnings += 1;
+  }
+  if (!outcome.gaps.length) {
+    io?.log?.('[ok] Pi models.json developer-role compat is declared for every reasoning relay');
+  }
+  return outcome;
+}
