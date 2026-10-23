@@ -13,6 +13,7 @@ import test from 'node:test';
 import {
   auditPiCompat,
   ensureDeveloperRoleCompat as ensure,
+  runPiCompatStep,
   findDeveloperRoleCompatGaps,
   readPiModelsConfig,
   resolvePiModelsJsonPath,
@@ -257,14 +258,7 @@ test('writer skips a missing models.json instead of creating one', async () => {
 
 // --- Init consent gate (work-3, contract A4-1/A4-2). ---
 
-async function loadCompatStep() {
-  const mod = await import('../../../lib/tooling/components/integrations/pi/compat-self-heal.mjs');
-  return mod.runPiCompatStep;
-}
-
 test('init step with consent and dry run previews without writing (A4-1)', async () => {
-  const runPiCompatStep = await loadCompatStep();
-  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
   await withModelsFile('aios-pi-step-dry-', meqwenShaped(), async (modelsPath) => {
     const before = await fs.readFile(modelsPath, 'utf8');
     const logs = [];
@@ -279,8 +273,6 @@ test('init step with consent and dry run previews without writing (A4-1)', async
 });
 
 test('init step without consent writes nothing and prints the authorizing command (A4-2)', async () => {
-  const runPiCompatStep = await loadCompatStep();
-  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
   await withModelsFile('aios-pi-step-noconsent-', meqwenShaped(), async (modelsPath) => {
     const before = await fs.readFile(modelsPath, 'utf8');
     const logs = [];
@@ -296,8 +288,6 @@ test('init step without consent writes nothing and prints the authorizing comman
 });
 
 test('init step with consent repairs the file (flag actually governs the write)', async () => {
-  const runPiCompatStep = await loadCompatStep();
-  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
   await withModelsFile('aios-pi-step-consent-', meqwenShaped(), async (modelsPath) => {
     const logs = [];
     const result = await runPiCompatStep({
@@ -314,8 +304,6 @@ test('init step with consent repairs the file (flag actually governs the write)'
 });
 
 test('init step without consent stays quiet when there is nothing to authorize', async () => {
-  const runPiCompatStep = await loadCompatStep();
-  assert.equal(typeof runPiCompatStep, 'function', 'init step entry must exist');
   const config = meqwenShaped();
   config.providers.testrelay.models[0].compat = { supportsDeveloperRole: false };
   await withModelsFile('aios-pi-step-clean-', config, async (modelsPath) => {
