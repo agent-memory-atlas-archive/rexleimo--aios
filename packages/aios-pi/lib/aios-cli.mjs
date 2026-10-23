@@ -55,8 +55,12 @@ export async function runAios({ aiosRoot = '', argv = [], execFileImpl = null, n
     throw new AiosCliError('AIOS runner unavailable: could not resolve execFile from node:child_process.');
   }
   const cliPath = path.join(aiosRoot, ...AIOS_CLI_REL);
+  // `before_agent_start` awaits this on every turn while pi counts the session as busy, so
+  // the ceiling is the worst silent stall at the start of a run. 120s held a turn hostage;
+  // a slow or wedged aios CLI now fails the digest instead (caller treats it as best-effort).
+  const execFileTimeoutMs = 8000;
   return new Promise((resolve, reject) => {
-    execFile(process.execPath, [cliPath, ...argv], { timeout: 120000 }, (error, stdout, stderr) => {
+    execFile(process.execPath, [cliPath, ...argv], { timeout: execFileTimeoutMs }, (error, stdout, stderr) => {
       if (error) {
         reject(new AiosCliError(`aios ${argv[0] || ''} failed: ${String(stderr || error.message).trim()}`, {
           exitCode: typeof error.code === 'number' ? error.code : 1,

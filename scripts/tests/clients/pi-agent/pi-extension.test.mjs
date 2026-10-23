@@ -24,13 +24,17 @@ import {
 import { buildToolDefs } from '../../../../packages/aios-pi/lib/tools.mjs';
 import aiosExtension from '../../../../packages/aios-pi/extensions/aios.ts';
 
-test('gates block destructive bash and terminate the turn', () => {
+// Behaviour change (docs/plans/2026-10-23-pi-stall-self-heal-test-scope.md A2): a blocked
+// bash call must NOT terminate the run. pi treats `terminate: true` as "skip the automatic
+// follow-up" (pi docs/extensions.md:253), so the old verdict stopped the whole run and the
+// user had to re-prompt — measured in 99 of 135 blocked turns on this machine.
+test('gates block destructive bash without terminating the run', () => {
   assert.deepEqual(checkBashCommand('rm -rf /tmp/x'), { blocked: true, reason: 'rm -rf is blocked by the AIOS safety gate' });
   assert.deepEqual(checkBashCommand('ls -la'), { blocked: false });
   assert.deepEqual(checkBashCommand('mkfs.ext4 /dev/sda1').blocked, true);
   const verdict = decideToolCall({ toolName: 'bash', input: { command: 'rm -rf ~' } });
   assert.equal(verdict.block, true);
-  assert.equal(verdict.terminate, true);
+  assert.equal(verdict.terminate === true, false, 'blocking a tool must not end the run');
   assert.equal(decideToolCall({ toolName: 'bash', input: { command: 'git status --short' } }), undefined);
   assert.equal(decideToolCall({ toolName: 'powershell', input: { command: 'rm -rf C:\\temp' } }).block, true);
 });
@@ -89,6 +93,22 @@ test('runAiosJson parses JSON and fails closed otherwise', async () => {
     assert.ok(error instanceof AiosCliError);
     assert.match(error.message, /err text/iu);
   }
+});
+
+// A3: before_agent_start awaits this runner on every turn, so its ceiling is the worst
+// silent stall at the start of a run. The contract pins the exact value, not a loosened range.
+test('runAios bounds the aios CLI spawn at 8 seconds', async () => {
+  const seen = [];
+  await runAios({
+    aiosRoot: '/aios',
+    argv: ['memo', 'search', 'x', '--limit', '3'],
+    execFileImpl: (_cmd, _args, options, cb) => {
+      seen.push(options);
+      cb(null, 'ok', '');
+    },
+  });
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].timeout, 8000);
 });
 
 test('defaultExecFile resolves every module shape (regression: execFile TypeError)', async () => {

@@ -43,8 +43,10 @@ Tools (callable by the model):
 Events:
 
 - `tool_call` — blocks destructive shell (`rm -rf`, `--no-preserve-root`,
-  fork bombs, `mkfs`, `dd` to devices; terminates the turn) and protected
-  writes (`.env*`, `node_modules/`, `.git/`; blocks without terminating).
+  fork bombs, `mkfs`, `dd` to devices) and protected writes (`.env*`,
+  `node_modules/`, `.git/`). Both block *without* terminating the run: the
+  block reason comes back to the model as a tool result, so it can pick a
+  safer path instead of ending the turn and waiting for a human re-prompt.
 - `before_agent_start` — injects the AIOS workflow policy plus a short
   memory digest for the turn (works even with `--no-context-files`).
 - `session_start` — shows the resolved AIOS root in the status line.

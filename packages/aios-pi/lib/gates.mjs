@@ -44,7 +44,11 @@ export function checkWritePath(targetPath) {
 export function decideToolCall({ toolName, input } = {}) {
   if (toolName === 'bash' || toolName === 'powershell') {
     const verdict = checkBashCommand(input?.command);
-    if (verdict.blocked) return { block: true, reason: verdict.reason, terminate: true };
+    // Blocking is a report back to the model, not a stop sign for the run: pi only skips
+    // the automatic follow-up when a finalized tool result sets `terminate` (pi
+    // docs/extensions.md:253), which measured as 99 of 135 blocked turns ending the run
+    // and waiting for a human re-prompt.
+    if (verdict.blocked) return { block: true, reason: verdict.reason };
     return undefined;
   }
   if (toolName === 'write' || toolName === 'edit') {
