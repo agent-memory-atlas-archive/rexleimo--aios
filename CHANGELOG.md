@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.11.0] - 2026-10-23
+
+### Fixed
+
+- **被拦不再终结整轮对话**：Pi 安全门拦截 bash/powershell 后不再设置 terminate（此前 99 次拦截直接结束了整轮，agent 得等人重问）。现在只报告原因和可行做法，agent 自行恢复继续干活。
+- **起始钩子 8 秒熔断**：`runAios` 的 execFile 超时从 120s 压到 8s（正常 digest 约 0.57s），`before_agent_start` 不再被 wedge 住的子进程拖住每轮开头；超时以显式 `AiosCliError` 失败并保留证据形状。
+
+### Added
+
+- **启动时兼容自愈（需显式同意）**：`aios doctor` 上报缺 `compat.supportsDeveloperRole` 声明的 reasoning relay 模型（此前因此报 400 硬停整轮）；`aios init --pi-compat-self-heal` 经用户同意后只增补声明，不改手写值、不建文件。默认不加 flag 时只读提示修复命令，一个字节不写。
+- **删除门改按目标判定**：42,282 条历史调用实测，旧词形规则 114 次拦截中 112 次误伤（沙箱清理、构建目录等）；新门走命令位置判定（引号/heredoc/重定向/注释/同行变量/`find`/`xargs`/解释器内联脚本），残留 4 条逐条确认为真阳性，37 条对抗性危险形状照样全拦。
+
 ## [6.10.1] - 2026-10-22
 
 > **本号段重新发布（2026-10-22）**：标题保持严格形状，因为 `release-preflight.sh:77` 用
