@@ -41,22 +41,25 @@ export function checkWritePath(targetPath) {
 
 // Decide a Pi tool_call event. Returns undefined to allow, or a Pi
 // blocking verdict { block: true, reason, terminate }.
+//
+// One blocking shape for both families, with `terminate` always declared false: pi skips the
+// automatic follow-up when a finalized tool result sets `terminate` (pi docs/extensions.md:253),
+// and the bash branch used to set it — measured as 99 of 135 blocked turns ending the run and
+// waiting for a human re-prompt. A block is a report back to the model, not a stop sign.
 export function decideToolCall({ toolName, input } = {}) {
   if (toolName === 'bash' || toolName === 'powershell') {
     const verdict = checkBashCommand(input?.command);
-    // Blocking is a report back to the model, not a stop sign for the run: pi only skips
-    // the automatic follow-up when a finalized tool result sets `terminate` (pi
-    // docs/extensions.md:253), which measured as 99 of 135 blocked turns ending the run
-    // and waiting for a human re-prompt.
-    if (verdict.blocked) return { block: true, reason: verdict.reason };
-    return undefined;
+    return verdict.blocked ? blockedVerdict(verdict.reason) : undefined;
   }
   if (toolName === 'write' || toolName === 'edit') {
     const verdict = checkWritePath(input?.path);
-    if (verdict.blocked) return { block: true, reason: verdict.reason, terminate: false };
-    return undefined;
+    return verdict.blocked ? blockedVerdict(verdict.reason) : undefined;
   }
   return undefined;
+}
+
+function blockedVerdict(reason) {
+  return { block: true, reason, terminate: false };
 }
 
 export const AIOS_SYSTEM_PROMPT_ADDITION = [

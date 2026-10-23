@@ -34,7 +34,7 @@ test('gates block destructive bash without terminating the run', () => {
   assert.deepEqual(checkBashCommand('mkfs.ext4 /dev/sda1').blocked, true);
   const verdict = decideToolCall({ toolName: 'bash', input: { command: 'rm -rf ~' } });
   assert.equal(verdict.block, true);
-  assert.equal(verdict.terminate === true, false, 'blocking a tool must not end the run');
+  assert.equal(verdict.terminate, false, 'a blocked tool must not end the run');
   assert.equal(decideToolCall({ toolName: 'bash', input: { command: 'git status --short' } }), undefined);
   assert.equal(decideToolCall({ toolName: 'powershell', input: { command: 'rm -rf C:\\temp' } }).block, true);
 });
