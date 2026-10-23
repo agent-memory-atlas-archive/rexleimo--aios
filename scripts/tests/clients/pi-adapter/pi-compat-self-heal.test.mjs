@@ -1,9 +1,9 @@
 // Pure judgement tests for the Pi models.json compat audit (work-1 of
 // docs/plans/2026-10-23-pi-compat-self-heal-dependency-graph.md). The writer tests (A1-1..A1-6)
 // land in this file too once the write path exists; nothing here touches a real user file.
-// Writer tests load the entry dynamically: the entry does not exist yet at RED, and a static
-// import would fail the whole file at link time instead of failing each writer test on its own
-// behavior. REFACTOR switches this to a static import once the entry exists.
+// Writer tests loaded the entry dynamically at RED (a static import would have failed the whole
+// file at link time instead of failing each writer test on its own behavior); REFACTOR switched
+// to the static import below once the entry existed.
 import assert from 'node:assert/strict';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
@@ -12,6 +12,7 @@ import test from 'node:test';
 
 import {
   auditPiCompat,
+  ensureDeveloperRoleCompat as ensure,
   findDeveloperRoleCompatGaps,
   readPiModelsConfig,
   resolvePiModelsJsonPath,
@@ -112,11 +113,6 @@ test('compat audit fails closed on malformed models.json and rewrites nothing', 
 
 // --- Additive writer (work-2, contract A1-1..A1-6). ---
 
-async function loadWriterEntry() {
-  const mod = await import('../../../lib/tooling/components/integrations/pi/compat-self-heal.mjs');
-  return mod.ensureDeveloperRoleCompat;
-}
-
 async function withModelsFile(prefix, configObject, fn) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
   try {
@@ -154,8 +150,6 @@ function meqwenShaped() {
 }
 
 test('writer adds the missing declaration and leaves every other key untouched (A1-1)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   await withModelsFile('aios-pi-writer-add-', meqwenShaped(), async (modelsPath) => {
     const result = await ensure({ modelsPath });
     assert.equal(result.action, 'added');
@@ -169,8 +163,6 @@ test('writer adds the missing declaration and leaves every other key untouched (
 });
 
 test('writer keeps an explicit user true and writes nothing (A1-2)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   const config = meqwenShaped();
   config.providers.testrelay.models[0].compat = { supportsDeveloperRole: true };
   await withModelsFile('aios-pi-writer-kept-', config, async (modelsPath) => {
@@ -183,8 +175,6 @@ test('writer keeps an explicit user true and writes nothing (A1-2)', async () =>
 });
 
 test('writer dry run previews and writes nothing (A1-3)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   await withModelsFile('aios-pi-writer-dry-', meqwenShaped(), async (modelsPath) => {
     const before = await fs.readFile(modelsPath, 'utf8');
     const logs = [];
@@ -197,8 +187,6 @@ test('writer dry run previews and writes nothing (A1-3)', async () => {
 });
 
 test('writer fails closed on malformed models.json and rewrites nothing (A1-4)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'aios-pi-writer-bad-'));
   try {
     const modelsPath = resolvePiModelsJsonPath(dir);
@@ -211,8 +199,6 @@ test('writer fails closed on malformed models.json and rewrites nothing (A1-4)',
 });
 
 test('writer is idempotent when the declaration already exists (A1-5)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   await withModelsFile('aios-pi-writer-idem-', meqwenShaped(), async (modelsPath) => {
     assert.equal((await ensure({ modelsPath })).action, 'added');
     const settled = await fs.readFile(modelsPath, 'utf8');
@@ -224,8 +210,6 @@ test('writer is idempotent when the declaration already exists (A1-5)', async ()
 });
 
 test('writer skips files where the rule applies to nothing (A1-6)', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   const config = {
     providers: {
       official: {
@@ -250,8 +234,6 @@ test('writer skips files where the rule applies to nothing (A1-6)', async () => 
 });
 
 test('writer never rewrites an explicit true while fixing an undeclared sibling', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   const config = meqwenShaped();
   config.providers.testrelay.models.push({ id: 'r-user', reasoning: true, compat: { supportsDeveloperRole: true } });
   await withModelsFile('aios-pi-writer-mixed-', config, async (modelsPath) => {
@@ -265,8 +247,6 @@ test('writer never rewrites an explicit true while fixing an undeclared sibling'
 });
 
 test('writer skips a missing models.json instead of creating one', async () => {
-  const ensure = await loadWriterEntry();
-  assert.equal(typeof ensure, 'function', 'writer entry must exist');
   await withModelsFile('aios-pi-writer-missing-', null, async (modelsPath) => {
     const result = await ensure({ modelsPath });
     assert.equal(result.action, 'skipped');
