@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.12.0] - 2026-10-26
+
+### Added
+
+- **`rex-debug` 把调试断言变成可核对的证据**（`rex-harness/skill-sources/rex-debug/SKILL.md`）：阶段 1 要求先建立能跑的反馈回路再谈假设——10 种构造手段按速度排序、四条回路判据（red-capable / deterministic / fast / agent-runnable）、每条回路断言附执行回执；非确定性问题必须先给复现率契约并把复现率提上去，回路建不出来即 `blocked`。阶段 2 要求先写 3-5 个按可能性排序、可证伪的假设（各自说明"观察到什么就排除它"），每个探针必须写明它区分哪些假设，性能问题先记录基线测量。阶段 3 把"不存在正确的测试接缝"当作一条发现退回阶段 2，而不是硬挤一个能变红的测试；假红必须与 pristine 基线 diff 后才可判定。阶段 4 统一 `[DEBUG-xxxx]` 标记、抓取前脱敏、清理写进变更摘要。阶段 5 确认的假设随修复一起进 commit/PR，供下一位读者证伪。交付状态词表不变（新判据是自报证据字段，不是新状态）。
+
+### Fixed
+
+- **`typesafe-ai` 投影漂移不再伪装成所有权问题**：真因是 2026-09-18 行尾事故里漏改的一个 `LICENSE`（旧副本 1089B/CRLF vs canonical 1068B/LF，去 `\r` 后逐字节相同；21 行 × 1 字节 = 21B 差额精确吻合），而 `SKILL.md` 从未漂移。收养分支要求"忽略 meta 后快照全等"，21 字节就让 `.agents/skills/typesafe-ai`（被 `.claude`/`.grok`/`.hermes` 以符号链接复用）永远拿不到 `.aios-skill-sync.json`，检查器随之恒判 `[drift]`。修法走既有声明通道：`config/skills-sync-manifest.json` 增 `legacyReplaceable=.agents/skills/typesafe-ai`，sync 两次收敛（替换物理目录 → 三个别名 surface 迁移）。同批隔离 8 个 `*aios-crlf-bak*` 孤儿备份（逐个证明去 CR 后与现役内容同哈希）。`scripts/check-skills-sync.mjs` exit 0，9 个 surface 全部带标记。
+
+### Documentation
+
+- 竞品窗口看板 `docs/reports/2026-10-26-competitor-window-board.html`：覆盖 10-12→10-26 两个快照的增量（左栏可借鉴项带来源/成本/优先级，右栏我们自身的缺口含实测数字），并纠正了一条误判——AIOS 已有 `learning/judgment/` 的 JEV 决策门，因此该案例的价值是"决策问题写得更具体"，不是"是否引入判断解释变量"。
+- `rex-debug` 训练认证证据入库：`docs/evidence/skill-training/rex-debug-certification-2026-10-26T15-13-59-230Z/`（10 任务 × 3 轮，42 份输出，`accepted`，由本地确定性 `compliance-live.mjs` 执行，零模型调用）。
+
 ## [6.11.0] - 2026-10-23
 
 ### Fixed
@@ -861,8 +876,6 @@ First tagged release since v5.11.0: it ships the v5.12.0 memory-plane work (sect
 - 修复 `rex-harness` 子模块与主仓库 gitlink 漂移导致的主仓库 workflow 测试失败（`assertSoftwareWorkflowCommandContract` 导出缺失）。
 - `commandContract` 校验不再把 `anyOf` 收敛组误判为非法 expectedEvidence。
 
-## [Unreleased]
-
 ## [5.5.2] - 2026-08-08
 
 - Disable Chrome launch-agent autostart
@@ -874,8 +887,6 @@ First tagged release since v5.11.0: it ships the v5.12.0 memory-plane work (sect
 - `agents smoke --live` no longer fails for clients that wrap probe replies in their JSON output contract (e.g. Codex): the probe prompt now explicitly overrides the output contract with an ACK-only marker, ACK detection tolerates JSON-wrapped replies, the post-receive compression proof is required only for outputs at or above `minRawBytes` (short outputs are inlined by design and no longer fail the smoke), and empty compression refs no longer crash evidence recording.
 - Add `AIOS_AGENT_SMOKE_TIMEOUT_MS` env var and `agents smoke --timeout-ms <ms>` CLI flag to replace the hardcoded 30s live probe timeout (default raised to 60s).
 - Live smoke probes now auto-retry with escalated timeouts (base, 2x, 4x) on transient slow responses before blocking an agent, so a single slow cold start or model queue delay no longer leaves agents permanently workflow-disabled; the final blocker message includes the recovery command for raising the budget.
-
-## [Unreleased]
 
 ## [5.4.3] - 2026-08-06
 

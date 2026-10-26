@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>竞品窗口决策板 · 2026-10-12 → 10-26 · AIOS</title>
+<style>
+/* 视觉语言遵循仓库根 DESIGN.md：浅色纸面 + Google 蓝、balanced 密度、subtle motion、AA 对比。
+   无外部依赖（离线 file:// 可开），motion 只作用在 color/background/border。 */
+:root{
+  --bg:#f8f9fa; --surface:#ffffff; --text:#202124; --muted:#5f6368;
+  --border:#dadce0; --primary:#1a73e8; --primary-active:#185abc;
+  --ok:#188038; --ok-bg:#e6f4ea; --warn:#b06000; --warn-bg:#fef7e0;
+  --bad:#d93025; --bad-bg:#fce8e6; --info-bg:#e8f0fe; --neutral-bg:#f1f3f4;
+  --mono:'Roboto Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:0 20px 72px;background:var(--bg);color:var(--text);
+  font-family:'Google Sans Text','Google Sans',Roboto,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto}
+a{color:var(--primary);text-decoration:none}
+a:hover{color:var(--primary-active);text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:2px}
+code,.mono{font-family:var(--mono);font-size:12.5px;background:var(--neutral-bg);padding:1px 5px;border-radius:4px;color:#3c4043;word-break:break-all}
+header{padding:28px 0 18px;border-bottom:1px solid var(--border)}
+h1{margin:0 0 6px;font-size:26px;font-weight:500;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:14px}
+.lead{margin-top:18px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:8px;padding:16px 18px;font-size:16px}
+section{margin-top:34px}
+h2{font-size:19px;font-weight:500;margin:0 0 4px}
+.h2sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;vertical-align:middle}
+.dot-ok{background:var(--ok)}.dot-dead{background:#9aa0a6}.dot-hit{background:var(--primary)}
+.chip{display:inline-block;font-size:11.5px;line-height:1.5;padding:2px 9px;border-radius:999px;border:1px solid var(--border);background:var(--neutral-bg);color:#3c4043;white-space:nowrap}
+.chip-bad{background:var(--bad-bg);color:var(--bad);border-color:#f5b9b4}
+.chip-warn{background:var(--warn-bg);color:var(--warn);border-color:#f6e0af}
+.chip-info{background:var(--info-bg);color:var(--primary-active);border-color:#c6dafc}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+caption{text-align:left;color:var(--muted);font-size:13px;padding:0 0 10px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+thead th{background:var(--neutral-bg);font-weight:600;font-size:12.5px;color:#3c4043}
+tbody tr:hover{background:#fafbfc}
+td.repo{font-family:var(--mono);font-size:12px}
+td.num{font-family:var(--mono);font-size:12px;white-space:nowrap}
+.tierhead td{background:#f1f3f4;font-weight:600;font-size:12px;letter-spacing:.3px;color:var(--muted)}
+.scroll{overflow-x:auto}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.kpi{padding:16px 18px}
+.kpi .n{font-size:28px;font-weight:500;font-family:var(--mono);letter-spacing:-.5px}
+.kpi .l{color:var(--muted);font-size:13px;margin-top:2px}
+.item{overflow:hidden;margin-bottom:14px}
+.item-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:#fcfcfd}
+.item-h .idx{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.item-h .t{font-size:16px;font-weight:600;flex:1 1 260px}
+.item-b{display:grid;grid-template-columns:1fr}
+@media(min-width:900px){.item-b{grid-template-columns:repeat(2,1fr)}}
+.cell{padding:14px 18px;border-top:1px solid var(--border)}
+@media(min-width:900px){
+  .item-b{grid-template-columns:repeat(4,1fr)}
+  .cell{border-top:none;border-left:1px solid var(--border)}
+  .cell:first-child{border-left:none}
+}
+.cell h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin:0 0 8px}
+.cell p{margin:0;font-size:13.5px}
+.cell ul{margin:0;padding-left:17px;font-size:13.5px}
+.cell li{margin:3px 0}
+.ev{font-family:var(--mono);font-size:11.5px;color:var(--muted);display:block;margin-top:8px;line-height:1.7;word-break:break-all}
+.quote{background:var(--neutral-bg);border-left:3px solid #c6dafc;padding:7px 10px;border-radius:0 6px 6px 0;font-size:13px;margin:6px 0;color:#3c4043}
+.why{background:#fbfbfc}
+.dia{padding:14px 18px;border-top:1px solid var(--border);background:#fcfcfd}
+.dia svg{max-width:100%;height:auto;display:block}
+.dia .cap{font-size:12px;color:var(--muted);margin-top:8px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;counter-reset:s}
+.step{padding:16px;position:relative}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-9px;left:14px;width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-family:var(--mono);display:grid;place-items:center}
+.step h4{margin:6px 0 5px;font-size:14px;font-weight:600}
+.step p{margin:0;font-size:12.5px;color:var(--muted)}
+.step .cut{margin-top:8px;font-size:12px;border-top:1px dashed var(--border);padding-top:7px;color:#3c4043}
+.opt{padding:16px 18px}
+.opt .name{font-size:15px;font-weight:600}
+.opt dl{margin:8px 0 0;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.opt dt{color:var(--muted)}
+.opt dd{margin:0}
+.notdo{font-size:13.5px;padding:14px 18px}
+.notdo ul{margin:0;padding-left:18px}
+.notdo li{margin:7px 0}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:12.5px}
+.filt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.filt .lb{font-size:12.5px;color:var(--muted)}
+.filt button{font:inherit;font-size:12.5px;padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:#3c4043;cursor:pointer;transition:background .12s,color .12s,border-color .12s}
+.filt button:hover{background:var(--neutral-bg)}
+.filt button[aria-pressed=true]{background:var(--primary);border-color:var(--primary);color:#fff}
+.pri{font-size:11.5px;font-family:var(--mono);color:var(--muted)}
+@media print{body{background:#fff;font-size:11.5pt}.filt{display:none}section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>竞品窗口决策板</h1>
+  <div class="sub">扫描窗口 2026-10-12 → 2026-10-26 · 在册/观察 17 个仓库 · 判据沿用 <code>docs/reports/competitor-watchlist.json</code>（schema v4）的 portfolioPolicy</div>
+  <div class="lead">
+    <b>一句话结论：</b>17 个里 15 个这两周有提交，但只有 <b>3 个</b>真正动了我们登记关注的契约。
+    从里面挑出 <b>6 条</b>值得学的，其中 <b>3 条不是"学竞品"，而是我们自己树上的问题被竞品证实了</b>：
+    一个租约判定缺陷（P0）、一个承诺未兑现（证据信封没有 hash / revision，而 AGENTS.md 已声称有）、一个我们自己记过教训却仍在复现的堆积（311MB 无人回收）。
+  </div>
+  <div class="legend">
+    <span><i class="dot dot-hit"></i>动了登记契约 → 具备 deep dive 资格</span>
+    <span><i class="dot dot-ok"></i>常规活跃（契约未动）</span>
+    <span><i class="dot dot-dead"></i>沉默</span>
+    <span><span class="chip chip-bad">缺陷级</span> 影响正确性</span>
+    <span><span class="chip chip-warn">承诺未兑现</span> 文档已声称、代码没有</span>
+    <span><span class="chip chip-info">语义裁定</span> 需你先拍产品语义</span>
+    <span><span class="chip">形状借鉴</span> 抄做法不抄规模</span>
+  </div>
+</header>
+
+<section id="summary">
+  <h2>0 · 两栏结论：有价值的做什么，不足的在哪里</h2>
+  <p class="h2sub">你问的就是这张表。左栏 = 值得采纳的外部做法；右栏 = 我们自己做得不够的地方。每条都标了<b>动哪里</b>、<b>规模</b>、以及<b>要不要你先拍板</b>。</p>
+  <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(420px,1fr))">
+    <div class="card" style="padding:16px 18px">
+      <h3 style="color:var(--primary)">有价值（值得采纳）—— 共 3 条</h3>
+      <table style="font-size:13px">
+        <thead><tr><th>做什么</th><th>动哪里</th><th>规模</th><th>要拍板？</th></tr></thead>
+        <tbody>
+          <tr><td><b>让判定单元多回答两个问题</b>：① 每轮该加载哪几个技能 ② 这一轮值不值得更新记忆<span class="ev">来源 TencentDB v2.0.3-beta.1</span></td><td><code>learning/judgment/</code> 加 question + 调用点（复用现有出口/预算/fail-closed）</td><td>中</td><td>要：先定漏选度量</td></tr>
+          <tr><td><b>回收要带"值得回收"阈值</b>：可回收比例达阈才做重整理<span class="ev">来源 Hermes v0.22.0</span></td><td><code>refs/recall.mjs</code> + runtime 启动后挂 sweep</td><td>小</td><td>不用</td></tr>
+          <tr><td><b>身份 = (pid, 启动时刻) 双因子</b><span class="ev">来源 Hermes v0.22.2 + letta v0.34.24</span></td><td><code>owner.mjs</code> + <code>reconcile.mjs</code>（原语本仓已有先例）</td><td>小</td><td>不用</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:10px">另可搬的纯工程做法（OMO v5.1.42/43/45/48）：会话读取改分页、用一条 <code>git log</code> 取区间代替 fan-out、链式校验改增量续验、超时返回后停止后台读取。它们是"做法"不是"新能力"，不单列。</p>
+    </div>
+    <div class="card" style="padding:16px 18px">
+      <h3 style="color:var(--bad)">不足（我们的欠账）—— 共 5 条，按严重度</h3>
+      <table style="font-size:13px">
+        <thead><tr><th>欠账</th><th>客观现状</th><th>分级</th></tr></thead>
+        <tbody>
+          <tr><td><b>租约对 PID 复用失明</b></td><td><code>reconcile.mjs:113,133</code> 只 <code>kill(pid,0)</code>；<code>owner.mjs:59</code> 写了启动时刻却无人核对</td><td><span class="chip chip-bad">真 bug</span></td></tr>
+          <tr><td><b>证据不可失效</b></td><td><code>evidence.mjs:20-47</code> 只有 <code>{kind,refs}</code>，合并是并集只增不减；而 <code>AGENTS.md:37</code> 已声称有 hash</td><td><span class="chip chip-warn">承诺未兑现</span></td></tr>
+          <tr><td><b>清扫有策略无调用方</b></td><td><code>pruneInterceptionRefs</code> 只被手工 CLI 调用；实测 311MB / 48,357 文件 / 30,861 个超期</td><td><span class="chip chip-bad">自家教训未执行</span></td></tr>
+          <tr><td><b>Stop 只能终止，不能暂停</b></td><td><code>loop.mjs:139-153</code> stopRequested 直接触发 <code>onSessionEnd</code>（并落一次会话记忆）</td><td><span class="chip chip-info">语义待定</span></td></tr>
+          <tr><td><b>判定层只回答 1 个问题</b></td><td><code>learning/judgment/</code> 纪律完备，但唯一调用点只判 rex 阶段推进；技能侧只有安装期治理，56 个描述每轮常驻</td><td><span class="chip">利用率不足</span></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:10px">另有三项账本卫生（不涉语义）：Headroom pin 漂移 10 个 minor、在册内部引用路径已失效、旧报告以 star 领述与 policy 相左。详见 §5。</p>
+    </div>
+  </div>
+</section>
+
+<section id="activity">
+  <h2>1 · 这些项目到底有没有更新</h2>
+  <p class="h2sub">两个判据分开看，避免"它在发版"被误读成"它在动我们的参照点"。<b>提交</b>取默认分支最近 push；<b>窗口内发版</b>逐个核对发布日期。层级沿用在册的 core / specialist / archive / remove / consumed / observe。</p>
+  <div class="card scroll">
+    <table>
+      <caption>17 个仓库 · 活跃度与契约变化</caption>
+      <thead><tr><th>仓库</th><th>最近提交</th><th>窗口内发版</th><th>它动了我们登记的契约吗</th></tr></thead>
+      <tbody>
+        <tr class="tierhead"><td colspan="4">core-reference（2）</td></tr>
+        <tr><td class="repo">TencentCloud/TencentDB-Agent-Memory</td><td class="num">10-26</td><td class="num">v2.0.3-beta.1 (10-13)</td><td><i class="dot dot-ok"></i> 核心契约未动（InjectionMode / 预算降级 / result_ref 稳定）· 但新增 skill 按需选择属同族机制 → 见 B6</td></tr>
+        <tr><td class="repo">code-yeongyu/oh-my-openagent</td><td class="num">10-26</td><td class="num">v5.1.34→5.1.48（12 版）</td><td><i class="dot dot-hit"></i> <b>命中</b> continuation / lineage：Stop 改暂停、stall 有界化 → 见 B3 / B4</td></tr>
+        <tr class="tierhead"><td colspan="4">specialist-reference（3）</td></tr>
+        <tr><td class="repo">NousResearch/hermes-agent</td><td class="num">10-26</td><td class="num">v0.22.0→v0.22.5</td><td><i class="dot dot-hit"></i> <b>命中</b> curator / provenance：receipt 栅栏成体系、state.db 默认回收、PID 复用修复 → 见 B1 / B2 / B5</td></tr>
+        <tr><td class="repo">getzep/graphiti</td><td class="num">10-25</td><td class="num">v0.31.0 / .1 / .2</td><td><i class="dot dot-ok"></i> 未动：换默认模型 + certifi 安全升级，双时态契约零改动</td></tr>
+        <tr><td class="repo">letta-ai/letta-code</td><td class="num">10-25</td><td class="num">v0.34.12→0.34.24</td><td><i class="dot dot-ok"></i> 未动：citation 仍是 prototype；但 recovery 修复与我们同源 → 见 B2</td></tr>
+        <tr class="tierhead"><td colspan="4">archive-reference（1）· remove（6）—— 按 policy 不做定期刷新，这里只核事实</td></tr>
+        <tr><td class="repo">volcengine/OpenViking</td><td class="num">10-26</td><td class="num">v0.5.1 / v0.5.1.1</td><td><i class="dot dot-ok"></i> 活跃但定位未变（AGPL + 服务化 Gateway）→ 维持 archive 理由</td></tr>
+        <tr><td class="repo">mem0ai/mem0</td><td class="num">10-21</td><td class="num">Py v2.2.0 / Node v3.3.1</td><td><i class="dot dot-ok"></i> 无新问法 → 维持 remove</td></tr>
+        <tr><td class="repo">affaan-m/ecc</td><td class="num">10-26</td><td class="num">v2.2.1 / v2.2.2</td><td><i class="dot dot-ok"></i> 内容/模板面扩张，非 runtime 强制 → 维持 remove</td></tr>
+        <tr><td class="repo">obra/superpowers</td><td class="num">10-21</td><td class="num">v7.0.0（大版本）</td><td><i class="dot dot-ok"></i> 我们 07-31 移除。新大版本<b>本身不构成重入理由</b> → 维持 remove</td></tr>
+        <tr><td class="repo">openclaw/openclaw</td><td class="num">10-26</td><td class="num">2026.9.34</td><td><i class="dot dot-ok"></i> 活跃但为终端用户多渠道 agent 产品 → 维持 remove</td></tr>
+        <tr><td class="repo">kunchenguid/gnhf</td><td class="num">10-03</td><td class="num">feed 顶 v0.1.50（日期未核）</td><td><i class="dot dot-dead"></i> 默认分支这两周无提交 → 维持 remove</td></tr>
+        <tr><td class="repo">HKUDS/OpenHarness</td><td class="num">2026-06-04</td><td class="num">feed 顶 v0.1.8</td><td><i class="dot dot-dead"></i> <b>144 天无提交</b> → 我们当初的 remove 判断被事实验证</td></tr>
+        <tr class="tierhead"><td colspan="4">consumedDependencies —— 已消费的上游，按版本漂移跟，不当竞品</td></tr>
+        <tr><td class="repo">headroomlabs-ai/headroom</td><td class="num">10-24</td><td class="num">v0.36 → v0.41.0</td><td><span class="chip chip-warn">漂移 10 个 minor</span> 我们 pin <code>&gt;=0.31.0,&lt;0.32.0</code>，且测试断言了这个字面值 → 见 E1</td></tr>
+        <tr><td class="repo">NVlabs/SoL-Pi</td><td class="num">10-18</td><td class="num">零 release</td><td><i class="dot dot-ok"></i> 研究仓，只推不发。我们消费的是方法论 → 分类正确，无需跟版本</td></tr>
+        <tr class="tierhead"><td colspan="4">pendingDeepDive（1）· observe（2）</td></tr>
+        <tr><td class="repo">mattpocock/skills</td><td class="num">10-19</td><td class="num">v1.3.0 / v1.3.1</td><td><i class="dot dot-ok"></i> 在册 <code>reevaluateIf</code> 明写"仅发新版本不构成重评" → 保持 pending，不动</td></tr>
+        <tr><td class="repo">stablyai/orca</td><td class="num">10-26</td><td class="num">v1.4.240 + Orca Mobile Android v0.0.59</td><td><span class="chip">建议改判不入册</span> 重心转向移动端 / IDE 产品面，与"本地优先编排控制面"定位不符</td></tr>
+        <tr><td class="repo">paperclipai/paperclip</td><td class="num">10-26</td><td class="num">每日 nightly / canary</td><td><i class="dot dot-ok"></i> 主题全是 recovery candidates / wake targets / auth reads 的查询收窄 → 仍不回答缺口原话</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid3" style="margin-top:14px">
+    <div class="card kpi"><div class="n">15<span style="font-size:15px;color:var(--muted)"> / 17</span></div><div class="l">两周内有 push（"活跃"）</div></div>
+    <div class="card kpi"><div class="n">3</div><div class="l">真正动了我们登记的契约 → 有 deep dive 资格</div></div>
+    <div class="card kpi"><div class="n">6</div><div class="l">挑出的可采纳项，其中 3 条是自家问题被证实</div></div>
+  </div>
+</section>
+
+<section id="learn">
+  <h2>2 · 值得学的 6 条：为什么采纳、为什么这样优化</h2>
+  <p class="h2sub">每条固定四栏：<b>对手怎么做</b>（可核验出处）→ <b>我们现在什么样</b>（本仓文件:行，数字为实测）→ <b>为什么要采纳</b>（不采纳的代价）→ <b>成本与风险</b>。窄屏下四栏纵向堆叠，顺序不变。</p>
+
+  <div class="filt">
+    <span class="lb">筛选：</span>
+    <button type="button" data-p="all" aria-pressed="true">全部 6</button>
+    <button type="button" data-p="P0" aria-pressed="false">P0 · 自家欠账，不用拍板</button>
+    <button type="button" data-p="P1" aria-pressed="false">P1 · 需你先裁定或先建度量</button>
+    <span class="pri" id="filt-note">默认排序 = 优先级从高到低；禁用 JS 也完整可读。（原 P2 档已取消：B6 上调）</span>
+  </div>
+
+  <article class="card item" data-pri="P0">
+    <div class="item-h"><span class="idx">B2</span><span class="t">租约判活要看「PID + 进程启动时刻」双因子</span><span class="chip chip-bad">缺陷级</span><span class="chip">planning / 长任务</span><span class="pri">P0 · 改动面最小</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做</h3>
+        <div class="quote">Hermes v0.22.2：Linux 重启后把早期 PID 发给了无关进程，gateway 误判"还在运行" → 改为<b>记录自己启动在哪个 boot</b>，判不出来时问 host。</div>
+        <div class="quote">letta v0.34.24：<code>treat a pre-reboot listener lock as stale</code> —— 重启前留下的锁一律视为失效。</div>
+        <p style="margin-top:8px">两家在同一个两周内独立命中同一个缺陷类，修复形状一致：<b>身份 = (pid, 启动时刻) 二元组</b>，不是 pid 本身。</p>
+      </div>
+      <div class="cell"><h3>我们现在什么样</h3>
+        <p>我们已经<b>把启动时刻写进了租约</b>，但<b>没有任何读取方去核对它</b>：</p>
+        <ul>
+          <li><code>owner.mjs:59</code> 写入 <code>processStartedAt</code></li>
+          <li><code>owner.mjs:37-46</code> <code>isProcessAlive()</code> 只做 <code>kill(pid,0)</code></li>
+          <li><code>reconcile.mjs:113</code> 只要 PID 存在就 <code>skip:'owner-alive'</code>；<code>:133</code> 同理判 <code>ownerDead</code></li>
+          <li>全仓检索 <code>starttime / boot_id / Get-CimInstance / /proc</code>：无一处用真实进程启动时刻校验租约</li>
+        </ul>
+      </div>
+      <div class="cell why"><h3>为什么要采纳</h3>
+        <p>PID 被复用时，一个<b>已死会话在账本上永远显示"仍被活进程持有"</b>：恢复逻辑永久跳过它、长任务卡死，极端情况下两个 loop 双写同一个 session。这不是效率问题，是正确性问题。</p>
+        <p style="margin-top:6px"><b>便宜在哪：</b>所需原语本仓已有先例 —— <code>profile-root.mjs:140</code> 已在用 <code>Get-CimInstance Win32_Process</code>（含 CreationDate），<code>compression-tools.mjs:48</code> 已在读 <code>/proc</code>。这条等于"抄自己"。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li>2 个文件 + characterization 测试，改动小、可逆</li>
+        <li>风险：各 OS 取进程启动时刻的方式不同 → 需按平台降级；取不到时报 <code>unknown</code>，<b>不得默认当作"活着"</b></li>
+        <li>这条<b>不需要产品裁定</b>，纯缺陷修复</li></ul>
+        <span class="ev">实测出处：owner.mjs:37,59 · reconcile.mjs:113,133 · profile-root.mjs:140 · compression-tools.mjs:48</span>
+      </div>
+    </div>
+    <div class="dia">
+      <svg viewBox="0 0 900 172" role="img" aria-label="PID 复用导致租约永久失效的时间线">
+        <text x="0" y="14" font-size="12" fill="#5f6368" font-family="Roboto Mono,monospace">现在：kill(pid,0) 只看 PID 存不存在</text>
+        <rect x="20" y="24" width="200" height="32" rx="4" fill="#e8f0fe" stroke="#c6dafc"/><text x="32" y="44" font-size="12" fill="#185abc">会话 A 持有 PID 21400</text>
+        <rect x="240" y="24" width="110" height="32" rx="4" fill="#fce8e6" stroke="#f5b9b4"/><text x="252" y="44" font-size="12" fill="#d93025">A 崩溃</text>
+        <rect x="370" y="24" width="230" height="32" rx="4" fill="#fef7e0" stroke="#f6e0af"/><text x="382" y="44" font-size="12" fill="#b06000">OS 把 21400 复用给别的进程</text>
+        <rect x="620" y="24" width="260" height="32" rx="4" fill="#fce8e6" stroke="#f5b9b4"/><text x="632" y="44" font-size="12" fill="#d93025">reconcile: owner-alive → 永不回收</text>
+        <text x="0" y="104" font-size="12" fill="#5f6368" font-family="Roboto Mono,monospace">修后：身份 = (pid, 启动时刻)，启动时刻对不上即视为 stale</text>
+        <rect x="20" y="114" width="200" height="32" rx="4" fill="#e8f0fe" stroke="#c6dafc"/><text x="32" y="134" font-size="12" fill="#185abc">A: 21400 @ t1</text>
+        <rect x="370" y="114" width="230" height="32" rx="4" fill="#f1f3f4" stroke="#dadce0"/><text x="382" y="134" font-size="12" fill="#3c4043">B: 21400 @ t2</text>
+        <rect x="620" y="114" width="260" height="32" rx="4" fill="#e6f4ea" stroke="#b7dfc4"/><text x="632" y="134" font-size="12" fill="#188038">t1 ≠ t2 → stale → 安全 reclaim</text>
+      </svg>
+      <div class="cap">两家竞品的修复形状相同：引入一个不属于 PID 数字本身的第二因子。</div>
+    </div>
+  </article>
+
+  <article class="card item" data-pri="P0">
+    <div class="item-h"><span class="idx">B5</span><span class="t">回收策略必须有调用方，还要带"值得回收"阈值</span><span class="chip chip-bad">缺陷级 · 自家复现</span><span class="chip">memo / 运行时卫生</span><span class="pri">P0 · 收益即时可量化</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做</h3>
+        <div class="quote">Hermes v0.22.0：<code>state.db</code> <b>默认开启</b> auto-prune（清理 &gt;90 天的结束会话，并关闭 stale 的 cron / kanban / subagent 会话），而 <b>VACUUM 只在可回收 25% 时才跑</b>。</div>
+        <p>另一半是我们自己 2026-09-28 记下的教训：OMO 的 checkpoint <b>7 天保留策略存在、但没有任何代码调用清扫</b>，结果积压 711 个 / 170MB。</p>
+      </div>
+      <div class="cell"><h3>我们现在什么样</h3>
+        <ul>
+          <li><code>refs/recall.mjs:54</code> 有 <code>pruneInterceptionRefs(keepDays=30)</code> —— 策略本身是对的</li>
+          <li>唯一调用方是<b>人手敲的 CLI</b>：<code>tooling/cli/dispatch/offload.mjs:77</code>；runtime 生命周期里<b>零调用</b></li>
+          <li>实测堆积：<code>.aios/interception/refs</code> = <b>311MB</b> / <b>48,357</b> 个文件，其中 <b>30,861</b> 个已超过 30 天（即"本该被清掉"的部分）</li>
+          <li><code>.aios</code> 总占用 827MB</li>
+        </ul>
+      </div>
+      <div class="cell why"><h3>为什么要采纳</h3>
+        <p>这是<b>我们已经承认正确、却没落地</b>的一条。抄的不是新想法，是把自家 09-28 的教训执行掉。竞品贡献的是第二个细节：<b>回收要设阈值</b>（可回收够多才做昂贵的空间重整理），否则每次启动都跑一遍 VACUUM 级别的动作。</p>
+        <p style="margin-top:6px">不采纳的代价：本地运行时目录单调增长，证据越多 <code>list / grep</code> 越慢 —— 直接拖慢我们自己的 recall 面。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li>小：把已有函数挂到 runtime 启动后，<b>非阻塞</b>启动路径</li>
+        <li>风险：按 mtime 清理会误删仍被引用的 ref → 需把"活跃 lease 不删"从注释意图实现为真实条件</li>
+        <li>先 dry-run 报数（清多少 / 释放多少字节）再默认开</li></ul>
+        <span class="ev">实测出处：refs/recall.mjs:54 · dispatch/offload.mjs:77 · du / find 计数 311M · 48,357 · 30,861（2026-10-26）</span>
+      </div>
+    </div>
+    <div class="dia">
+      <svg viewBox="0 0 900 156" role="img" aria-label="策略存在但无调用方">
+        <rect x="20" y="18" width="250" height="46" rx="6" fill="#e6f4ea" stroke="#b7dfc4"/>
+        <text x="34" y="40" font-size="12" fill="#188038">策略：keepDays = 30</text>
+        <text x="34" y="56" font-size="11" fill="#188038">pruneInterceptionRefs()</text>
+        <rect x="330" y="18" width="250" height="46" rx="6" fill="#fef7e0" stroke="#f6e0af"/>
+        <text x="344" y="40" font-size="12" fill="#b06000">唯一入口：手工 CLI</text>
+        <text x="344" y="56" font-size="11" fill="#b06000">aios offload prune</text>
+        <rect x="640" y="18" width="240" height="46" rx="6" fill="#fce8e6" stroke="#f5b9b4"/>
+        <text x="654" y="40" font-size="12" fill="#d93025">结果：311MB / 48,357 文件</text>
+        <text x="654" y="56" font-size="11" fill="#d93025">30,861 个已超期未清</text>
+        <text x="20" y="104" font-size="12" fill="#5f6368" font-family="Roboto Mono,monospace">改后：runtime 启动后异步 sweep（不阻塞启动）+ 仅当可回收比例 ≥ 阈值才做重整理</text>
+        <rect x="20" y="114" width="860" height="26" rx="4" fill="#e8f0fe" stroke="#c6dafc"/>
+        <text x="32" y="131" font-size="12" fill="#185abc">有策略 → 有调用方 → 有阈值 → 有实测计数（dry-run 先报数）</text>
+      </svg>
+    </div>
+  </article>
+
+  <article class="card item" data-pri="P0">
+    <div class="item-h"><span class="idx">B1</span><span class="t">证据信封要有栅栏与版本：文档已承诺，代码未实现</span><span class="chip chip-warn">承诺未兑现级</span><span class="chip">planning / team 地基</span><span class="pri">P0 · 爆炸半径最大，需先裁定</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做</h3>
+        <p>Hermes v0.22.1 <b>一个 patch</b> 里有 <b>76 行</b>在做"带栅栏的变更回执"，五种栅栏反复出现：</p>
+        <ul>
+          <li><code>Fence delegation receipts with shared worker sequence and epoch</code></li>
+          <li><code>Reuse transactional rewind with generation and receipt fences</code></li>
+          <li><code>Add revision-fenced runtime rename and archive receipts</code></li>
+          <li><code>Reject foreign local receipts inside lineage publication</code></li>
+          <li><code>Fence destructive deletion without erasing runtime obligations</code></li>
+        </ul>
+        <p>OMO v5.1.35 是同族：记忆改写<b>绑定它当时看到的那个快照</b>，所以 stale 设备的写入被当并发编辑合并，而不是覆盖。</p>
+      </div>
+      <div class="cell"><h3>我们现在什么样</h3>
+        <ul>
+          <li><code>rex-harness/src/domain/evidence.mjs:20-35</code>：证据记录只有 <code>{kind, refs[]}</code> —— <b>无 hash、无 revision、无 generation/epoch、无时间戳、无幂等键</b></li>
+          <li><code>evidence.mjs:36-47</code> <code>mergeEvidence</code> 是<b>按 kind 的 Set 并集</b> → 过期 ref 永远合并得进、<b>永不失效</b></li>
+          <li><code>createHash</code> 在本栈只出现在 <code>projection-manifest</code> / <code>turn-contract</code> / <code>standalone/store</code> 三处，<b>证据路径零命中</b></li>
+          <li><code>AGENTS.md:37</code> 原文承诺：guarantees are enforced by runtime verification（<b>exit codes / hashes in evidence envelopes</b>）</li>
+        </ul>
+      </div>
+      <div class="cell why"><h3>为什么要采纳</h3>
+        <p>控制面唯一不可替代的价值是<b>"做完了"这件事能不能追证</b>。证据一旦不可失效，一次 stale 通过会永久留在合并结果里，Command 推进时读到的可能是上一轮的证明 —— 门就形同虚设。</p>
+        <p style="margin-top:6px"><b>这不是"抄竞品"，是补我们自己开出的支票。</b>竞品的价值是给了规模化的实现参照：栅栏字段 + 幂等重放 + "删除动作要栅栏但不消灭运行义务"这条边界。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li><b>半径最大</b>：动的是 rex 公开契约面（ADR 0001），所有 Provider 的证据形状都要跟</li>
+        <li>可切最小片：先加 <code>revision</code> <b>或</b>内容 hash 之一，并把 <code>mergeEvidence</code> 从"并集"改为"同 kind 按 revision 取代"</li>
+        <li>必须同批处理 <code>AGENTS.md:37</code>：要么实现它，要么改掉它，不能继续不匹配</li>
+        <li>因此顺序上排在 B2 / B5 之后：先裁定再施工</li></ul>
+        <span class="ev">实测出处：evidence.mjs:20-47 · createHash 三处命中 · AGENTS.md:37 · Hermes v0.22.1（76 行 receipt 相关，逐行核过）</span>
+      </div>
+    </div>
+    <div class="dia">
+      <svg viewBox="0 0 900 160" role="img" aria-label="证据并集与按版本取代的差别">
+        <text x="20" y="14" font-size="12" fill="#5f6368" font-family="Roboto Mono,monospace">现在 mergeEvidence：并集，只增不减</text>
+        <rect x="20" y="22" width="150" height="30" rx="4" fill="#e8f0fe" stroke="#c6dafc"/><text x="32" y="42" font-size="12" fill="#185abc">R1: test-pass@a</text>
+        <rect x="180" y="22" width="150" height="30" rx="4" fill="#fef7e0" stroke="#f6e0af"/><text x="192" y="42" font-size="12" fill="#b06000">R2: test-pass@b</text>
+        <rect x="340" y="22" width="150" height="30" rx="4" fill="#fce8e6" stroke="#f5b9b4"/><text x="352" y="42" font-size="12" fill="#d93025">R3: test-fail@c</text>
+        <rect x="566" y="22" width="314" height="30" rx="4" fill="#f1f3f4" stroke="#dadce0"/><text x="578" y="42" font-size="12" fill="#3c4043">{a, b, c} 并存 → 无法判定哪条是现在</text>
+        <text x="20" y="94" font-size="12" fill="#5f6368" font-family="Roboto Mono,monospace">改后：同 kind 按 revision 取代 + 内容 hash</text>
+        <rect x="20" y="102" width="470" height="30" rx="4" fill="#f1f3f4" stroke="#dadce0"/><text x="32" y="122" font-size="12" fill="#3c4043">R1 / R2 被取代：历史可追溯，但不参与当前判定</text>
+        <rect x="566" y="102" width="314" height="30" rx="4" fill="#e6f4ea" stroke="#b7dfc4"/><text x="578" y="122" font-size="12" fill="#188038">当前有效 = R3@hash(c)，Command 只读这一条</text>
+      </svg>
+    </div>
+  </article>
+
+  <article class="card item" data-pri="P1">
+    <div class="item-h"><span class="idx">B3</span><span class="t">Stop 应当是"暂停整条 run"，不是"取消并收尾"</span><span class="chip chip-info">语义裁定级</span><span class="chip">planning / 长任务</span><span class="pri">P1 · 需你拍语义</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做</h3>
+        <div class="quote">OMO v5.1.47：A user Stop <b>pauses</b> the workflow run it started instead of cancelling it. DAG nodes, workpool workers and task children <b>hold where they are</b>; a message to the paused run or Resume continues it from where it stopped.</div>
+        <div class="quote">Hermes 同期：<code>Pause workers on outbox I/O failure and preserve local lease waits</code> —— 连失败路径也是"保持租约地暂停"，而非销毁。</div>
+        <p>两家同时收敛到这条，说明它是真实用户诉求，不是巧合。</p>
+      </div>
+      <div class="cell"><h3>我们现在什么样</h3>
+        <ul>
+          <li><code>solo-runtime/loop/loop.mjs:139</code>：<code>control.stopRequested === true</code> → <code>buildStopOutcome</code></li>
+          <li><code>:147</code> 紧接着触发 <b><code>onSessionEnd</code></b>，而这条钩子链上有 <code>autoMemoSessionClose</code></li>
+          <li>控制词汇里<b>只有 stop</b>：solo 目录下 <code>pause / resume</code> 零命中</li>
+        </ul>
+        <p>即我们的 Stop = 终态，<b>并且会给这次会话落一条"结束"记忆</b>。</p>
+      </div>
+      <div class="cell why"><h3>为什么要采纳（以及为什么要先裁定）</h3>
+        <p>用户按 Stop 的真实意图是"我先停手"，不是"丢掉进度并给这次会话盖棺"。但直接照抄会踩我们自己的两个坑：</p>
+        <ul><li>pause→resume 若仍走 <code>onSessionEnd</code>，会<b>重复写一次会话记忆</b>，污染 memo 与 dream 的输入</li>
+        <li>"子节点原地保持"需要一个新的持久面（暂停点存哪里、谁有权恢复）—— 正是 session-owner 租约要扩语义的地方</li></ul>
+        <p style="margin-top:6px">所以正确顺序是：<b>先拍语义（Stop = 暂停 or 终止），再施工</b>。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li>中：涉及生命周期钩子契约 + 新增 paused 状态</li>
+        <li>风险：与现有 <code>TERMINAL_STATUSES</code> 判据冲突，恢复路径要重测</li>
+        <li>依赖 B2：暂停的 run 更需要可靠租约，否则"暂停"与"死锁"无法区分</li></ul>
+        <span class="ev">实测出处：loop.mjs:139-153 · reconcile.mjs:23（TERMINAL_STATUSES）· solo 目录 pause/resume 零命中</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="card item" data-pri="P1">
+    <div class="item-h"><span class="idx">B4</span><span class="t">stall：等待要有界、被取消 ≠ 失败、诊断要指到组件与 hook</span><span class="chip">形状借鉴级</span><span class="chip">已在做的延长线</span><span class="pri">P1 · 小-中</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做（四条带数字的收敛）</h3>
+        <ul>
+          <li><b>v5.1.48</b>：turn-end 订阅者最多等 <b>2 秒</b>；"被取消的等待"<b>不算</b> reflection 失败（记忆仍可重试）；stall 诊断<b>指到 component + hook</b>，不再只报笼统文件名</li>
+          <li><b>v5.1.45</b>：<code>session_read</code> 改分页 —— 2.3 万消息会话从 <b>39.6s / 1848MB</b> 降到 <b>42ms / 68MB</b>；<b>超时返回后立即停止后台读取</b>（此前还会在背后再读 228MB）</li>
+          <li><b>v5.1.43</b>：首个提示词为读记忆增量 fan-out <b>数千个 git 子进程</b>，阻塞同宿主所有会话（1 会话 28s、7 会话 142s）→ 改<b>一条 <code>git log</code> 取区间</b>，最长阻塞降到 16s</li>
+          <li><b>v5.1.42</b>：链式校验从"重读全链"改为<b>增量续验</b>（1000 条链追加 1 条不再回传 1006 条），拒绝语义（重放 / 低 seq）不变</li>
+        </ul>
+      </div>
+      <div class="cell"><h3>我们现在什么样</h3>
+        <ul>
+          <li>方向已对：v6.11.0 刚发 <b>Pi stall self-heal</b>（<code>702c0fe1</code>），并用测试钉住超时错误形状（<code>4020cc27</code>）</li>
+          <li>缺三块：<b>归因维度</b>（哪个组件 / hook 卡的）、<b>分类</b>（取消的等待 ≠ 失败的运行）、<b>取消传播</b>（返回后是否仍在后台读）</li>
+          <li>会话起始的记忆读取：尚未做"一条命令取区间"式的 fan-out 收敛（同类敞口存在，但我们没实测出问题量级）</li>
+        </ul>
+      </div>
+      <div class="cell why"><h3>为什么要采纳</h3>
+        <p>自愈若不能指认"是谁卡的"，就只是"再试一次"，同一种 stall 会反复发生。</p>
+        <p style="margin-top:6px"><b>"取消 ≠ 失败"这个分类尤其关键</b>：否则用户主动打断会被记成一次失败，污染失败计数、退避与复盘判断 —— 而我们恰好有 consecutiveFailures 一类的中止判据。</p>
+        <p style="margin-top:6px">这一条基本是<b>补完已经在做的事</b>，不是转向。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li>小-中：超时上限与错误形状已有，只补字段与传播</li><li>风险低，可分片落地：先归因 → 再分类 → 再取消传播</li><li>建议与 B2 同批（都动 stall / 恢复语义）</li></ul>
+        <span class="ev">实测出处：本仓 git log 702c0fe1 / 4020cc27 · OMO v5.1.42 / 43 / 45 / 48 release notes（日期经 API 核对）</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="card item" data-pri="P1">
+    <div class="item-h"><span class="idx">B6</span><span class="t">本轮唯一真正的"新机制"候选：让已有的判定单元多回答两个问题</span><span class="chip chip-info">新能力 · 地基已在</span><span class="chip">team-workflow / token</span><span class="pri">P1（初稿列 P2，因下述更正上调）</span></div>
+    <div class="item-b">
+      <div class="cell"><h3>对手怎么做</h3>
+        <div class="quote">TencentDB v2.0.3-beta.1：开启后由 Proxy 每轮自动选出合适的技能，通过<b>一次客户端工具调用</b>加载；<b>不再向系统提示词注入完整技能目录</b>，减少提示词开销。</div>
+        <p>同一版把 skill 选择与记忆 L3 更新判定收敛到<b>可插拔决策服务</b>（内置 JEV，即 TypeSafe 的 System One 判定单元），并给了三条部署纪律：<b>默认关闭</b>、<b>旧配置无需修改</b>、<b>决策服务调用失败不影响对话与记忆写入</b>。</p>
+      </div>
+      <div class="cell"><h3>我们现在什么样（含一处自我更正）</h3>
+        <p><b>这块地基我们早就有，而且纪律比它更严。</b>初稿把"接 JEV"写成需单独评估的外部依赖面 —— 错判：</p>
+        <ul>
+          <li><code>learning/judgment/jev-client.mjs</code> 自称判定调用的<b>唯一出口</b>（防绕过开关的第二条出网路径）</li>
+          <li><code>config.mjs</code>：默认关、<b>fail closed</b>（配置缺失/坏 JSON 一律当未开启，绝不因解析失败放行外部付费调用），出自 <code>docs/plans/2026-09-18-optin-judgment-gate.md</code></li>
+          <li><code>stage-gate.mjs</code>：闸门<b>只能收窄</b>（只有 advance / hold，永远不能把该拒的变放行）；关掉后 rex 行为逐字节相同</li>
+          <li><code>availability.mjs</code> 单一判据 + 会话预算 <code>maxCallsPerSession / maxInputChars</code></li>
+        </ul>
+        <p style="margin-top:6px">缺口不在"有没有"，而在<b>它今天只回答 1 个问题</b>（<code>verifiable_evidence</code>，唯一调用点 <code>ctx-agent-core/entry/run.mjs:326-327</code>，即 rex 阶段推进）。技能一侧我们只有<b>安装期</b>治理（<code>install-policy.mjs</code>），没有<b>轮次期</b>选择：<code>.agents/skills</code> 实测 56 个技能描述每轮全量常驻，靠宿主 16KB/条截断兜底 —— 治标，截断会静默降低可发现性。</p>
+      </div>
+      <div class="cell why"><h3>为什么要采纳</h3>
+        <p>参考价值的正确形状不是"要不要接判定服务"（已接完），而是<b>它指出了两个我们没让判定单元去回答的高价值决策</b>：① 每轮该加载哪几个技能（替掉全量常驻）；② 这一轮值不值得更新记忆（替掉纯靠模型自报告的写入判定）。</p>
+        <p style="margin-top:6px">地基已在 → 边际成本从"新建一层依赖"降到"加一个问题 + 加一个调用点"，所以上调为 P1。第 ② 点恰好落在我们 memo 的痛点上："要不要记"今天完全由模型自报告承担。</p>
+        <p style="margin-top:6px">错因也值得记一笔：初稿只查了 skills 目录一侧、没查 <code>learning/</code> 一侧 —— 正是 decisionRules 第②条"先自查自家代码"该拦住的那类错。</p>
+      </div>
+      <div class="cell"><h3>成本 / 风险</h3>
+        <ul><li>每个消费点 = 1 个 question 定义 + 1 个调用点，复用同一出口、预算与 fail-closed 语义</li>
+        <li><b>必须沿用"只能收窄"约束</b>：判定失败或未开启时保持现状，不得让外部判定把该拒的放行</li>
+        <li>主要回归风险是<b>漏选</b>：从"全量常驻"换成"静默漏选"是更难查的缺陷 → 先建漏选度量再上</li>
+        <li>默认关 + 灰度，用采纳率决定是否前移（现成计量面可复用）</li></ul>
+        <span class="ev">实测出处：jev-client / config / stage-gate / availability 四个文件的头部契约 · 唯一调用点 run.mjs:326-327 · .agents/skills 计数 56 · TencentDB v2.0.3-beta.1 release notes 全文</span>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="policy">
+  <h2>3 · 我们凭什么决定"学 / 不学"—— 判据，而不是热度</h2>
+  <p class="h2sub">这套判据不是本轮新造的，是 <code>competitor-watchlist.json</code> 里 portfolioPolicy 的 decisionRules（已累积 8 条）。下面四步按实际执行顺序排列，每步都附了本轮真的被它拦下的例子。</p>
+  <div class="flow">
+    <div class="card step"><h4>它回答一个没被覆盖的问题吗？</h4><p>三支柱（memo 记忆 / 智能规划 / team 工作流）里必须有一个<b>缺口</b>被它填上。star 数、生态大小、"它很火"都不是保留理由。</p><div class="cut">本轮拦下：CodeWhale（40K★，ledger 已被自家 solo-journal 覆盖）、mattpocock v1.3.1（新版本号不构成重评）</div></div>
+    <div class="card step"><h4>先自查自家代码，再立项</h4><p>给出"本仓哪个模块最接近该能力"的行号级自查结论。纯外部视角会<b>系统性高估缺口</b>。</p><div class="cut">上轮 5 个"值得学"里 2 个在自查后自行消解：Headroom 是已消费依赖、CodeWhale 已有等价实现</div></div>
+    <div class="card step"><h4>是"我们的承诺未兑现"吗？</h4><p>若文档已声明而代码没有，优先级<b>高于</b>抄竞品 —— 因为它已经是我们的对外契约。</p><div class="cut">本轮命中：B1（AGENTS.md:37 声称证据信封有 hash，代码里没有）</div></div>
+    <div class="card step"><h4>改判一个参照前，先扫谁引用了它</h4><p>账本的引用完整性问题不是外部信息不足：移除 X 会让"已被 X 覆盖"的理由静默悬空。</p><div class="cut">上轮三次踩到：OpenViking / Hermes 归档理由悬空、Hermes 归错 pillar 两处落空、SoL-Pi 影响过决策却不在册</div></div>
+  </div>
+</section>
+
+<section id="notdo">
+  <h2>4 · 明确不学的，以及理由</h2>
+  <div class="card notdo">
+    <ul>
+      <li><b>Graphiti / Letta 的新版本</b> —— 我们登记的双时态契约、citation 契约都没动，属常规发版。不做 deep dive，<b>不因为"它发了 12 个版本"就产生学习义务</b>。</li>
+      <li><b>Orca 的产品面</b> —— 重心已转向 Android / IDE（v1.4.240 与 Orca Mobile Android v0.0.59）。按定位口径建议从 observe 改判为不入册。</li>
+      <li><b>superpowers v7.0.0</b> —— 2026-07-31 已按你的决定移除（"太重，与 rex-harness 方向不符"）。大版本更新<b>本身不是重入理由</b>；若它出现"证据门控交付"这类新机制才按新候选重评。</li>
+      <li><b>SoL-Pi 的版本号</b> —— 研究仓零 release，我们消费的是方法论（闸门规则、冻结任务集）。已正确归入 consumedDependencies。</li>
+      <li><b>（已撑回一条判断）"接 JEV 需单独评估"</b> —— 初稿把这条列进不学清单，理由写的"引入外部判定服务涉及新的依赖面与外发面"。<b>这是错的</b>：我们 2026-09-18 就做了 opt-in 判定闸门并接入 JEV，纪律还更严（唯一出口 / fail closed / 只能收窄 / 带预算）。参考点已挑到 B6：不是接不接，而是<b>让它多回答两个问题</b>。保留这条撑回记录，是为了让下次刷新知道这里判断错过一次。</li>
+      <li><b>git 化记忆 / 后台整理 worker</b> —— 2026-09-28 你已否决，理由是与 Context Lifecycle 预算降级主线偏离过大。本轮无新证据推翻，维持否决。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="ledger">
+  <h2>5 · 顺手发现的账本卫生问题（不改语义，可一次清掉）</h2>
+  <div class="card notdo">
+    <ul>
+      <li><b>E1 Headroom pin 漂移</b>：<code>headroom-installer.mjs:5</code> 仍是 <code>headroom-ai[all]&gt;=0.31.0,&lt;0.32.0</code>，上游已 v0.41.0；<code>headroom-install.test.mjs:14</code> 断言了这个字面值，所以升级是"显式改测试"的动作，不是自动漂移。</li>
+      <li><b>E2 在册内部路径已失效</b>（违反 decisionRules 第①条"引用本仓能力要给行号"）：<code>aios-init/</code> → 实为 <code>environment/aios-init/</code>；<code>components/pi/</code> → <code>tooling/components/integrations/pi/</code>；<code>interception/metrics/</code> → <code>foundation/interception/observability/metrics/</code>；<code>harness/solo-journal/</code> → <code>execution/harness/solo/solo-journal/</code>。这些是 10-12 报告的引用，脚本层重组后账本没跟上。</li>
+      <li><b>E3 口径冲突未闭环</b>：policy 说"不维护 star 作决策依据"，但历史报告正文通篇以 star 叙述。上轮已补 decisionRules，旧报告文本未标注。建议在新报告里声明"历史数字仅作附注、不参与决策"。</li>
+    </ul>
+  </div>
+</section>
+
+<section id="next">
+  <h2>6 · 下一步：三条路，我建议 A</h2>
+  <div class="grid3">
+    <div class="card opt">
+      <div class="name">A · 修租约双因子（B2）</div><span class="chip chip-ok" style="background:var(--ok-bg);color:var(--ok);border-color:#b7dfc4">推荐先做</span>
+      <dl><dt>性质</dt><dd>正确性缺陷修复</dd><dt>半径</dt><dd>2 文件 + 测试，可逆</dd><dt>收益</dt><dd>死会话可回收，长任务不再假"运行中"</dd><dt>要拍的</dt><dd>不用拍，可直接开工</dd></dl>
+    </div>
+    <div class="card opt">
+      <div class="name">B · 裁定证据栅栏（B1）</div><span class="chip chip-warn">需你先裁定</span>
+      <dl><dt>性质</dt><dd>补自己开出的支票</dd><dt>半径</dt><dd>rex 公开契约面，所有 Provider</dd><dt>收益</dt><dd>"做完了"变成可追证的门</dd><dt>要拍的</dt><dd>加 revision 还是加 hash；AGENTS.md:37 是实现还是改文</dd></dl>
+    </div>
+    <div class="card opt">
+      <div class="name">C · 一次性清卫生（B5 + E1 + E2）</div><span class="chip">即时收益</span>
+      <dl><dt>性质</dt><dd>执行自家已承认的教训</dd><dt>半径</dt><dd>小；先 dry-run 报数</dd><dt>收益</dt><dd>311MB 可回收；账本引用重新可核</dd><dt>要拍的</dt><dd>是否默认开启 sweep</dd></dl>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>方法与可复核性</b>：提交活跃度取各仓库默认分支 commits feed（不消耗 API 配额）；发版与日期逐个经 GitHub API 核对；本仓一切 <code>文件:行</code> 均可当场复跑（grep / read）。<br>
+  <b>已知未核项</b>（不装作核过）：gnhf 的 v0.1.50 发布日期未核；OMO 各版我只取到 release notes 首段正文（约 700 字符/版），未读源码 —— 若要按 B3/B4 施工，需做一次有界源码核对。<br>
+  <b>修订 v2（同日）</b>：更正 B6 与 §4。初稿误判"我们还没有外部判定层"，实为 <code>learning/judgment/</code> 已接入并用作 rex stage gate。错因：只查了 skills 目录一侧，没查 <code>learning/</code> 一侧 —— decisionRules 第②条本来就是为了拦住这类错。<br>
+  <b>本页不改变任何在册状态</b>：它是只读扫描的呈现层。在册判据变更（Orca 改判、Hermes 条目的 receipt 面扩展、路径漂移修正）需你点头后才写入 <code>competitor-watchlist.json</code> 与刷新报告。
+</footer>
+
+</div>
+<script>
+(function(){
+  var btns=document.querySelectorAll('.filt button'),items=document.querySelectorAll('.item');
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    btns.forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
+    var p=b.getAttribute('data-p'),n=0;
+    items.forEach(function(it){var s=(p==='all'||it.getAttribute('data-pri')===p);it.style.display=s?'':'none';if(s)n++;});
+    document.getElementById('filt-note').textContent=p==='all'?('全部 6 条，按优先级排序'):(p+' · 命中 '+n+' 条（其余隐藏，未删除内容）');
+  });});
+})();
+</script>
+</body>
+</html>
