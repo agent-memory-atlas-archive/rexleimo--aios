@@ -159,6 +159,7 @@
       "scripts/tests/foundation/skills/core/skills-resolution.test.mjs",
       "scripts/tests/foundation/skills/core/skills-source-tree.test.mjs",
       "scripts/tests/foundation/skills/core/skills-sync.test.mjs",
+      "scripts/tests/foundation/skills/install/snapshot-line-endings.test.mjs",
       "scripts/tests/foundation/skills/governance/install-policy.test.mjs",
       "scripts/tests/foundation/skills/governance/legacy-skill-prune-cli.test.mjs",
       "scripts/tests/foundation/skills/governance/verdict-schema.test.mjs",
