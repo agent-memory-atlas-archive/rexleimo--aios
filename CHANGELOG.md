@@ -10,6 +10,10 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 - **`rex-debug` 把调试断言变成可核对的证据**（`rex-harness/skill-sources/rex-debug/SKILL.md`）：阶段 1 要求先建立能跑的反馈回路再谈假设——10 种构造手段按速度排序、四条回路判据（red-capable / deterministic / fast / agent-runnable）、每条回路断言附执行回执；非确定性问题必须先给复现率契约并把复现率提上去，回路建不出来即 `blocked`。阶段 2 要求先写 3-5 个按可能性排序、可证伪的假设（各自说明"观察到什么就排除它"），每个探针必须写明它区分哪些假设，性能问题先记录基线测量。阶段 3 把"不存在正确的测试接缝"当作一条发现退回阶段 2，而不是硬挤一个能变红的测试；假红必须与 pristine 基线 diff 后才可判定。阶段 4 统一 `[DEBUG-xxxx]` 标记、抓取前脱敏、清理写进变更摘要。阶段 5 确认的假设随修复一起进 commit/PR，供下一位读者证伪。交付状态词表不变（新判据是自报证据字段，不是新状态）。
 
+### Changed
+
+- `rex-harness` 子模块升级到 **v0.13.0**（`rex-debug` 的反馈回路/假设排序/执行回执契约，与 `skill-sources/**` 整树 LF 钉；已发布产物 `rex-harness-0.13.0.tar.gz`）。宿主 gitlink 指向该 tag 剥皮后的 release 提交 `59d1e70`，符合“宿主 release 不得骑在未打 tag 的内核提交上”。
+
 ### Fixed
 
 - **`typesafe-ai` 投影漂移不再伪装成所有权问题**：真因是一个**未被 `.gitattributes` 钉住的 `LICENSE`**——blob 是 1068B/LF，而 `core.autocrlf=true` 的 Windows 检出把它刷成 1089B/CRLF（21 行 × 1 字节 = 21B 差额精确吻合，去 `\r` 后逐字节相同）；`SKILL.md` 从未漂移。收养分支要求"忽略 meta 后快照全等"，21 字节就让 `.agents/skills/typesafe-ai`（被 `.claude`/`.grok`/`.hermes` 以符号链接复用）永远拿不到 `.aios-skill-sync.json`，而检查器的期望快照含 meta 文件，于是恒判 `[drift]`。本轮走既有声明通道收下它：`config/skills-sync-manifest.json` 增 `legacyReplaceable=.agents/skills/typesafe-ai`，sync 两次收敛（替换物理目录 → 三个别名 surface 迁移），9 个 surface 全部带标记，`check-skills-sync.mjs` exit 0。同批隔离 8 个 `*aios-crlf-bak*` 孤儿备份（逐个证明去 CR 后与现役内容同哈希）。
