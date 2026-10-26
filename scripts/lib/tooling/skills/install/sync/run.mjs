@@ -21,7 +21,7 @@ import {
   resolveGeneratedTargetPath,
   resolveGeneratedTargetRelativePath,
 } from '../../source-tree.mjs';
-import { snapshotDirectory, snapshotsEqual } from '../directory-snapshot.mjs';
+import { describeSnapshotDiff, snapshotDirectory, snapshotsEqual } from '../directory-snapshot.mjs';
 import {
   convertSkillToTomlCommand,
   isManagedTomlCommand,
@@ -264,7 +264,7 @@ async function syncGeneratedSkillsUnlocked({
             continue;
           }
           if (!legacyUnmanaged.has(path.resolve(targetPath))) {
-            io.log(`[skills] skip unmanaged blocker: ${formatTargetPath(resolvedTargetRootDir, targetPath)}`);
+            io.log(`[skills] skip unmanaged blocker: ${formatTargetPath(resolvedTargetRootDir, targetPath)}${describeSnapshotDiff(currentSnapshotWithoutMeta, nextSnapshotWithoutMeta)}`);
           }
           skipped += 1;
           continue;

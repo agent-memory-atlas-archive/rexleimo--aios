@@ -12,7 +12,13 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 ### Fixed
 
-- **`typesafe-ai` 投影漂移不再伪装成所有权问题**：真因是 2026-09-18 行尾事故里漏改的一个 `LICENSE`（旧副本 1089B/CRLF vs canonical 1068B/LF，去 `\r` 后逐字节相同；21 行 × 1 字节 = 21B 差额精确吻合），而 `SKILL.md` 从未漂移。收养分支要求"忽略 meta 后快照全等"，21 字节就让 `.agents/skills/typesafe-ai`（被 `.claude`/`.grok`/`.hermes` 以符号链接复用）永远拿不到 `.aios-skill-sync.json`，检查器随之恒判 `[drift]`。修法走既有声明通道：`config/skills-sync-manifest.json` 增 `legacyReplaceable=.agents/skills/typesafe-ai`，sync 两次收敛（替换物理目录 → 三个别名 surface 迁移）。同批隔离 8 个 `*aios-crlf-bak*` 孤儿备份（逐个证明去 CR 后与现役内容同哈希）。`scripts/check-skills-sync.mjs` exit 0，9 个 surface 全部带标记。
+- **`typesafe-ai` 投影漂移不再伪装成所有权问题**：真因是一个**未被 `.gitattributes` 钉住的 `LICENSE`**——blob 是 1068B/LF，而 `core.autocrlf=true` 的 Windows 检出把它刷成 1089B/CRLF（21 行 × 1 字节 = 21B 差额精确吻合，去 `\r` 后逐字节相同）；`SKILL.md` 从未漂移。收养分支要求"忽略 meta 后快照全等"，21 字节就让 `.agents/skills/typesafe-ai`（被 `.claude`/`.grok`/`.hermes` 以符号链接复用）永远拿不到 `.aios-skill-sync.json`，而检查器的期望快照含 meta 文件，于是恒判 `[drift]`。本轮走既有声明通道收下它：`config/skills-sync-manifest.json` 增 `legacyReplaceable=.agents/skills/typesafe-ai`，sync 两次收敛（替换物理目录 → 三个别名 surface 迁移），9 个 surface 全部带标记，`check-skills-sync.mjs` exit 0。同批隔离 8 个 `*aios-crlf-bak*` 孤儿备份（逐个证明去 CR 后与现役内容同哈希）。
+  > 更正：本条目初稿把因归给"2026-09-18 行尾事故漏改的文件"，该归因已被实测推翻——`git checkout-index` 在本机对 `LICENSE` 直接产出 1089B/CRLF，对已钉 `eol=lf` 的 `SKILL.md` 产出纯 LF；那批 `.bak` 是另一次人工归一化的残留，只处了 `SKILL.md`。
+- **从源头消除这一类漂移：`skill-sources/**` 整树钉 LF**（父仓 + rex-harness 两份 `.gitattributes`，`text=auto eol=lf` 保留 git 二进制自检）。原规则只钉了 `skill-sources/**/SKILL.md`，所以**任何非 md 资产一检出就是 CRLF**：实测两仓 128 个资产中 68 个磁盘为 CRLF（含训练用的 16 个 `evals.json`），而两仓 blob **全为纯 LF**（0/87、0/41）。刷新工作树后 CRLF 计数归 0 且 `git status -- skill-sources` 为空——即**未改动一个字节提交内容**，只纠正本地检出。
+- **投影相等判定不再被行尾卡住，也不再只报路径**：`hashFileBuffer` 在**摘要输入层**归一 CRLF→LF（latin1 字节保真，因此二进制除 CRLF 序列外仍逐项可区分；调用方六处守卫均只做相等比较、不反解摘要）；新增 `describeSnapshotDiff` 让门禁说出到底是哪个文件——`[drift] <path> (missing: .aios-skill-sync.json; content: LICENSE)`、`skip unmanaged blocker: <path> (extra in target: …)`。本轮定位那 21 字节做了 5 次探针，因为旧日志只给一个目录路径。
+  > 与既有决策的边界：`.gitattributes` 里已有一条相反取向——"钉 LF 而不是在测试里归一化换行，因为归一化会把'内容真变了'和'只是被检出转了行尾'合并掉"。那条适用于**已提交文档与重渲染产物**的对比（基线即字节约定）；此处对比的是**生成面 vs canonical 物料**，契约是内容而非行尾，所以两层一起动：属性钉住才是两类信号不合并的前提，摘要归一只作为存量安装的兼容垫（不强行重写已有字节）。
+- **行尾兼容不再只靠约定，有三例反例守卫**（`scripts/tests/foundation/skills/install/snapshot-line-endings.test.mjs`）：CRLF-only 副本被**收养而非阻塞**（标记写入、skipped=0）；真内容差仍**拒绝收养**且 blocker 行点名 `content: LICENSE` / `extra in target: EXTRA.md`；drift 行必须同时说出缺失的标记文件与被改的资产。归一化不会放过真漂移。
+- **`rex-debug` 认证基线重跑**：子模块提交 `5f87da7` 后，旧认证的 base 落后于当前 git 基线，`verify-training` 按设计报 `baseline-differs-from-git-base`/`certification-base-mismatch`（没有伪装成内容陈旧）；`skill certify` 重跑后 `verified/accepted`（证据 `…T21-36-40-932Z`，旧证据作为历史保留）。
 
 ### Documentation
 

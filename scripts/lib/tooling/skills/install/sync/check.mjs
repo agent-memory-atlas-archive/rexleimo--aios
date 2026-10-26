@@ -20,7 +20,7 @@ import {
   GENERATED_SKILL_META_FILE,
   writeGeneratedSkillMetadata,
 } from '../install-metadata.mjs';
-import { snapshotDirectory, snapshotsEqual } from '../directory-snapshot.mjs';
+import { describeSnapshotDiff, snapshotDirectory, snapshotsEqual } from '../directory-snapshot.mjs';
 import {
   convertSkillToTomlCommand,
 } from '../../emitters/toml-command.mjs';
@@ -115,7 +115,7 @@ export async function checkGeneratedSkillsSync({
         const currentSnapshot = snapshotDirectory(targetPath);
         const nextSnapshot = snapshotDirectory(materialized.directoryPath);
         if (!snapshotsEqual(currentSnapshot, nextSnapshot)) {
-          issues.push(`[drift] ${formatTargetPath(resolvedTargetRootDir, targetPath)}`);
+          issues.push(`[drift] ${formatTargetPath(resolvedTargetRootDir, targetPath)}${describeSnapshotDiff(currentSnapshot, nextSnapshot)}`);
         }
       } finally {
         materialized.cleanup();

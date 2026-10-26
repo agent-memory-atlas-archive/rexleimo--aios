@@ -1,5 +1,11 @@
-# Keep canonical skill frontmatter LF-only for strict parser tests on Windows.
-skill-sources/**/SKILL.md text eol=lf
+# Keep EVERY canonical skill asset LF-only, not just SKILL.md. The guard that compares a
+# generated projection against canonical material is a byte-for-byte snapshot equality, and
+# core.autocrlf=true rewrites any unpinned asset to CRLF on Windows checkouts. Measured
+# 2026-10-26: skill-sources/typesafe-ai/LICENSE was blob 1068B/LF vs checkout 1089B/CRLF, and
+# 68 of 128 skill-source assets (both repos) arrived CRLF - a 21-byte line-ending-only diff
+# that permanently blocked projection adoption and made the drift gate report an ownership
+# problem. text=auto keeps git's own binary detection for non-text assets.
+skill-sources/** text=auto eol=lf
 
 # Drift guards compare generated specs against canonical sources byte-for-byte;
 # pin the working tree to LF on every platform so Windows checkouts do not
