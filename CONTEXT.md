@@ -152,7 +152,7 @@
 
 **定义**：已被 git 跟踪、但对未来会话没有决策价值的文件（只有自动脚手架的空 plan、跨站点字节相同的重复二进制、一次性产出物）。删除它的代价是**一次可见的 commit**，且必须先过 `check-doc-citations.mjs` 引用检查。
 
-**为什么**：本仓库实测 `docs/plans/` 有 692 个文件、其中 47 个只有 `t1-understand` 自动脚手架；这类东西不是垃圾而是过程副产品，处置它需要人批准，不能靠一次「清理」顺手删掉历史证据。
+**为什么**：本仓库实测 `docs/plans/` 共 692 个目录条目（567 个顶层 md + 117 个 ticket/testability json）。这里的东西**不是同一种东西**：纯自动脚手架 plan（0 条勾选任务、无 Task Details、无 evidence）删了不丢决策；而 `*-decision-ticket/*.json` 里装的是真决策（objective / decision / blockingUnknowns / nonGoals），docs 里指向它们的引用只是记录。所以处置它的判据是「引用图分区 + 内容是否承载决策」，不是文件名，也不是「历史证据一律不能碰」。裁决与两次测量的出入见 `docs/adr/0003-repo-junk-cleanup-tiering.md`。
 
 ## 变更落点
 
