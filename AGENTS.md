@@ -174,6 +174,8 @@ PRs should include:
 - 建沙箱：`mktemp -d -p "${TMPDIR:-/tmp}" aios-probe-XXXXXX`（`-p` 不可省略；`mktemp -d foo-XXXXXX` 会落在当前 cwd，而 cwd 常常是仓库父目录）。
 - 假 `$HOME` / `npm pack` 探针 / 复现工作树一律落在上述路径之下，并配 `trap` 或 `--older-than` 回收。
 - 回收已散落的残留：`node scripts/aios-tmp-gc.mjs --root "$HOME/codes"` 先预览（默认 `dry-run`），确认后 `--mode to-trash` 移到废纸篓暂存目录（可逆）；`--mode purge --yes` 才真删。判定只用客观事实（名字形状 + 年龄 + git 脏/未推送/stash 状态 + 是否含 `.env*.local`），含未提交改动或凭据的目录一律保留，系统临时目录根需 `--allow-volatile-root` 显式放行。
+- **暂存目录必须与仓库同卷，并且真删时要落在安全门允许的路径里**（实测 2026-10-26，见 `docs/adr/0003-repo-junk-cleanup-tiering.md`）：`aios-tmp-gc.mjs` 的 `to-trash` 用 `fs.renameSync`，而 `trashDirFor()` 默认落 `os.homedir()/.Trash`——家目录与仓库不同卷时必须显式传 `--trash-dir`；而 `--mode purge` 之外的手工 `rm -rf` 会被 AIOS 安全门拒绝（易失临时区之外的绝对路径递归删除）。合规做法：把暂存 `mv` 进仓库内相对路径（`temp/.trash-purge-<date>/`，同卷 rename 瞬时），再在该相对路径下真删。
+- 名字谓词「后缀须含大写或数字」是刻意的 fail-safe，代价是全小写随机后缀的同族残留**不会被自动回收**（实测漏 2 个）：确认无凭据、无 git 状态后人工搬，不要为了让工具命中而放宽谓词。
 - 回收系统临时目录里的测试沙箱残留：`npm run tmp:gc`（= `--temp --older-than 1440`，默认 dry-run）/ `npm run tmp:gc:trash`。`--temp` 比通用形状判定更窄：只收自己家的 `aios-<fixture>-<6 位随机>` 家族，其他 app 的随机名目录一律原地不动。
 
 ## Browser MCP Selection
