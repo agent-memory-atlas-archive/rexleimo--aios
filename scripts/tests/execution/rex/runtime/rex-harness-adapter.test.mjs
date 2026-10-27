@@ -9,6 +9,7 @@ import {
   startSoftwareWorkflow,
   supportedClients,
 } from '../../../../../rex-harness/src/index.mjs';
+import { advanceAiosCapabilityActivation } from '../../../../lib/execution/workflows/adapters/rex-harness-adapter.mjs';
 import { resolveClientsWithCapability } from '../../../../lib/foundation/clients/reporting/capabilities/index.mjs';
 import {
   AIOS_REX_PROVIDER_BINDINGS,
@@ -315,4 +316,17 @@ test('AIOS ignores legacy compatibility options and remains rex-native', () => {
   assert.equal(result.providerMode, 'rex-native');
   assert.equal(result.decision.provider.id, 'rex-requirements');
   assert.ok(AIOS_REX_PROVIDER_BINDINGS.every((binding) => binding.provider.id.startsWith('rex-')));
+});
+
+test('the unvalidated activation bypass is a loud failure, not a silent second writer', () => {
+  // 中文注释：自查 B1 留下的入口。这个名字曾经可以直接把证据推进 Activation 而不过任何栅栏；
+  // 它零调用方，所以选择“报错路碑”而不是静默删除：名字还在，但绕过栅栏变成响亮失败。
+  // 报错信息必须说下去哪条合规路径，否则只是一个没有出口的拒绝。
+  assert.throws(
+    () => advanceAiosCapabilityActivation({ capabilityId: 'rex-implement' }, [{ kind: 'tests-passed', refs: ['receipt:ghost'] }], {}),
+    (error) => /was removed/u.test(error.message)
+      && /validateCommandEvidence/u.test(error.message)
+      && /rex-activation-store submit path/u.test(error.message),
+    'the error must name the fence it bypassed and the path to use instead',
+  );
 });

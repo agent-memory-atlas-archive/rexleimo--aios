@@ -298,6 +298,10 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color
   <article class="card item" data-pri="P0">
     <div class="item-h"><span class="idx">B1</span><span class="t">证据信封要有栅栏与版本：文档已承诺，代码未实现</span><span class="chip chip-warn">承诺未兑现级</span><span class="chip">planning / team 地基</span><span class="pri">P0 · 爆炸半径最大，需先裁定</span></div>
     <div class="item-b">
+      <div class="cell"><h3>裁定（2026-10-27 补）</h3>
+        <p><span class="chip chip-ok" style="background:var(--ok-bg);color:var(--ok);border-color:#b7dfc4">主张不成立</span> 栅栏已存在于校验层与写入口顺序，只是不在 <code>domain/evidence.mjs</code>。本行结论来自只读一个文件的推断；详见页尾「裁定与后续」B1 节。保留原文不回写。</p>
+      </div>
+
       <div class="cell"><h3>对手怎么做</h3>
         <p>Hermes v0.22.1 <b>一个 patch</b> 里有 <b>76 行</b>在做"带栅栏的变更回执"，五种栅栏反复出现：</p>
         <ul>
@@ -435,6 +439,36 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color
       </div>
     </div>
   </article>
+</section>
+
+<section id="disposition">
+  <h2>2.5 裁定与后续（2026-10-27 补记，不是原报告内容）</h2>
+  <p class="h2sub">这一节是发布后补的。带日期的报告不回写历史：下面每一项都说清“板上当时写的”与“真裁定后的事实”。</p>
+  <div class="card">
+    <div class="item-b">
+      <div class="cell"><h3>已落地（三项）</h3>
+        <ul>
+          <li><b>B2 租约双因子</b> → <code>v6.12.1</code>：PID 回收不再当作活主人，<code>EPERM</code> 不再被当作已证死亡；判词 <code>self|ours|dead|recycled|unprovable|invalid</code>。</li>
+          <li><b>B5 回收策略调用方</b> → <code>v6.13.0</code>： retention 拿到首个自动调用方（session close），时钟以每个 ref 自己声明的 <code>created_at + ttl_days</code> 为准，默认只报不删。</li>
+          <li><b>B4 stall 有界等待</b> → <code>v6.14.0</code>：结论从 <code>ok|error</code> 分为 <code>ok|cancelled|timed-out|failed</code>；停滞计数与失败计数分开；中止记录不再由计数器反推 <code>failureClass</code>。</li>
+        </ul>
+      </div>
+      <div class="cell"><h3>B1：本报告的主张被证伪</h3>
+        <p><span class="chip chip-ok" style="background:var(--ok-bg);color:var(--ok);border-color:#b7dfc4">裁定：栅栏已存在，错在报告</span></p>
+        <p>板上写的是“文档已承诺，代码未实现：证据记录只有 <code>{kind, refs}</code>”。这个结论是<b>只读了 <code>rex-harness/src/domain/evidence.mjs</code> 一个文件</b>得出的，而栅栏本来就不在记录层：</p>
+        <ul>
+          <li><b>校验层</b>：<code>src/application/validate-command-evidence.mjs</code> 已经拒绝未知 <code>receipt:</code> 引用、拒绝 resolver 返回 id 不一致、要求回执命令与声明场景命令逐字段相等、并按 kind 强制退出码极性。<code>git:</code> 命名空间只收对象 id，就是为了不让占位符换个前缀冒充证据。</li>
+          <li><b>写入口顺序</b>：<code>scripts/lib/execution/workflows/adapters/rex-activation-store.mjs</code> 先 <code>validateCommandEvidence</code> 再推进再落盘，并额外钉住“Provider 命令必须匹配存储的 activation 命令”。</li>
+          <li><b>测试担保</b>：<code>rex-harness/tests/application/validate-command-evidence.test.mjs</code> 与 <code>tests/standalone/evidence-ref-integrity.test.mjs</code> 直接断言这些拒绝，连 <code>stdoutSha256</code> 必须是 64 位十六进制都钉了。</li>
+        </ul>
+        <p>所以栅栏是<b>校验期实施</b>而不是记录期盖章，不是缺失。哈希封套在 <code>scripts/lib/tooling/skills/training/training-certification.mjs</code> 里也真实存在，带篡改检测（<code>baseline-artifact-tampered</code>）。</p>
+        <p><b>剩下的真东西（一个，已处理）</b>：适配层有一个不经验证直接 <code>advanceActivation</code> 的入口 <code>advanceAiosCapabilityActivation</code>。实测全仓零调用方、零文档、零测试，所以它不是当前缺陷，而是一个“下次很容易被人接上”的绕过路径。已改为报错路碑（名字保留，绕过变响亮失败），并在 <code>scripts/tests/execution/rex/runtime/rex-import-boundaries.test.mjs</code> 新增 B6 结构守卫：落盘且推进的文件必须同文件验证。<b>两次变异已证明该守卫有牙</b>（删验证器 → 红；把 <code>advanceActivation</code> 接回去 → 红）。</p>
+      </div>
+      <div class="cell"><h3>B3：仍未裁定</h3>
+        <p>Stop 到底该“暂停整条 run”还是“取消并收尾”，是语义拍板，不是实现问题，板上已标“需你拍”。在裁定前不动 <code>loop.mjs</code> 的 stop 路径，以免把一种暂未被授权的语义当成默认值収进发布。</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="policy">

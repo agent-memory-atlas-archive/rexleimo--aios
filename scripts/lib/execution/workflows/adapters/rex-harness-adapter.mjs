@@ -5,7 +5,6 @@
 import {
   CAPABILITY,
   advanceSoftwareWorkflow,
-  advanceActivation,
   evaluateSoftwareRequest,
   listSoftwareWorkflowRecipes,
   nextCommand,
@@ -145,16 +144,13 @@ export function startAiosCapabilityActivation(decision, options = {}) {
 }
 
 export function advanceAiosCapabilityActivation(activation, evidence = [], options = {}) {
-  const context = bindingContext(options);
-  const configured = context.byCapability.get(activation.capabilityId);
-  const resolved = resolveAiosAgentProvider(configured, activation.triggerEvidenceRefs);
-  return advanceActivation(activation, evidence, {
-    ...coreOptions(options),
-    providerBindings: [
-      ...context.bindings,
-      Object.freeze({ capabilityId: activation.capabilityId, provider: resolved }),
-    ],
-  });
+  // 中文注释：该入口已删除（2026-10-27 自查 B1 裁定）：它把证据**不经验证**直接交给
+  // `advanceActivation`，而栅栏（receipt 存在性 / 命令匹配 / 退出码极性）只在
+  // `validateCommandEvidence` 里实施。零调用方、零文档、零测试引用，所以保留它没有
+  // 兼容代价，只会多出一个“绕开栅栏也能写进 Activation”的第二个更弱的写者。
+  // 唯一合规入口：rex-activation-store.mjs 的 submit —— 先 validateCommandEvidence，
+  // 再 advanceAiosSoftwareWorkflow（见 rex-import-boundaries.test.mjs B6 的结构守卫）。
+  throw new Error('advanceAiosCapabilityActivation was removed: evidence must pass validateCommandEvidence first; use the rex-activation-store submit path');
 }
 
 /**

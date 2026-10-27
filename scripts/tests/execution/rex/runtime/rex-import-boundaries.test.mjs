@@ -179,3 +179,43 @@ test('B5 分层事实只有一个 owner：本测试硬编码的根必须等于 c
   assert.ok(surfaceIndex >= 0 && internalsIndex > surfaceIndex,
     '声明里公开面必须比内部更靠近外层，否则 layers 这段自己就没有方向意义');
 });
+
+test('B6 证据栅栏只有一个写入口：host 不得绕过 validateCommandEvidence 推进 Activation', () => {
+  // 中文注释：2026-10-27 自查 B1 裁定留下的守卫。栅栏（receipt 存在性、命令匹配、退出码极性）
+  // 只实施在 validateCommandEvidence 里；内核的 advanceActivation 本身不验证。曾经存在一个
+  // host 适配器直接用它推进（零调用方，已改为抛错路碑）。这条断言拦的是“再次长出第二个写者”，
+  // 而不是当下已经发生的事——所以现在必须是空集合，且空集合不能是扫了个空目录得来的。
+  const bypass = [];
+  const submitters = [];
+  for (const file of productionFiles()) {
+    let source;
+    try {
+      source = readFromDisk(file);
+    } catch {
+      continue;
+    }
+    if (/\badvanceActivation\s*\(/.test(source)) bypass.push(`${file} calls advanceActivation directly`);
+    if (/\badvanceAiosSoftwareWorkflow\s*\(/.test(source)) {
+      submitters.push(file);
+      // 中文注释：规则对准**落盘边界**，不对准转发层。适配层的 advanceAiosSoftwareWorkflow 只是一层
+      // 薄转发（验证在它的调用方做），把“同文件必须验证”强加到它身上会误报——我自己第一版就误报了。
+      // 真正危险的是“推进完就把 Activation 写进状态”的那个文件：它必须同文件先验证。
+      if (/persistStandaloneWorkflow\s*\(/.test(source)
+        && !/validateCommandEvidence\s*\(/.test(source)) {
+        bypass.push(`${file} persists advanced evidence without validating it in the same file`);
+      }
+    }
+  }
+  assert.deepEqual(bypass, [], `evidence must enter through a validating writer: ${bypass.join('; ')}`);
+  // 中文注释：空扫描不算证据——必须有真文件在这条合规路径上，否则这条守卫是空转。
+  assert.ok(submitters.length > 0, 'no host writer found for advanceAiosSoftwareWorkflow: the scan root moved and B6 is now vacuous');
+  assert.ok(submitters.some((file) => file.includes('rex-activation-store')),
+    'the validated submit path is expected to remain the one host writer');
+  // 中文注释：正向例子必须真存在——落盘那个文件确实同文件调用了验证器，否则上面的规则
+  // 只是“没抓到东西”而不是“拦住了什么”。
+  const storeSource = readFromDisk('scripts/lib/execution/workflows/adapters/rex-activation-store.mjs');
+  assert.match(storeSource, /advanceAiosSoftwareWorkflow\s*\(/, 'the expected submit path must still be the writer');
+  assert.match(storeSource, /validateCommandEvidence\s*\(/, 'and it must still validate before persisting');
+  assert.ok(!bypass.some((entry) => entry.includes('rex-harness-adapter')),
+    'the adapter tombstone must not become a live bypass again');
+});
