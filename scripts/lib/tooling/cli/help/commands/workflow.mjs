@@ -136,7 +136,7 @@ Options:
   AIOS_SOLO_HOOK_TIMEOUT_MS=<n|off> (env) Bounded wait per lifecycle hook; on expiry the wait is cancelled and recorded as stalled (per-phase defaults: turn-start 60000, turn-complete 120000, before-continuity-commit 60000, session-end 300000, iteration-start 60000; "off" restores the old unbounded wait)
   AIOS_SOLO_STALL_ABORT_AFTER=<n>  (env) Consecutive hook stalls that end a run (default: 3; only timed-out waits count, never an operator cancel or a hook that returned an error)
   --reason <text>               (stop) Operator note recorded in control.json
-  --dry-run                     (run) Create/update the journal without invoking a provider
+  --dry-run                     (run/resume) Report readiness without invoking a provider; it also changes no state - the stop flag and worktree stay exactly where they are
   --json                        Output structured JSON instead of text
 
 Notes:
@@ -147,6 +147,9 @@ Notes:
   candidate for that session id, and resume is the documented follow-up: it clears the flag,
   restores the preserved worktree and continues from the last completed iteration (re-finalizing
   reuses the same candidate id, so a stop-then-resume cycle does not duplicate memory).
+  --dry-run is read-only on both run and resume: it reports readiness and touches nothing - the stop
+  flag, the worktree and the provider all stay untouched. A flag whose whole meaning is "do not spend
+  a model call" must never be accepted and then silently ignored.
   -h, --help
 `;
     case 'hud':

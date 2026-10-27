@@ -260,3 +260,59 @@ test('runHarnessCommand persists AIOS install root for workspace-scoped live res
     await rm(rootDir, { recursive: true, force: true });
   }
 });
+
+test('resume --dry-run reports readiness without reaching a provider or moving the stop flag', async () => {
+  // 中文注释：2026-10-27 实测抓出的缺陷：dryRun 过去只在 run 分支读，resume 传了这个开关会
+  // 静默走 buildProductionExecuteTurn —— 一个表示"不要调模型"的词被忽略，就是成本侧意外。
+  // 绊线用注入的 executeTurn 计数：修复前它会被调用（测试红），修复后必须为 0。
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), 'aios-resume-dryrun-'));
+  const logs = [];
+  let providerCalls = 0;
+
+  try {
+    await withFakeProviderPath(['codex'], async () => {
+      await runHarnessCommand(
+        {
+          subcommand: 'run',
+          objective: 'Resume dry-run guard',
+          sessionId: 'dryrun-resume',
+          provider: 'codex',
+          profile: 'standard',
+          dryRun: true,
+          json: true,
+        },
+        { rootDir, io: { log: (line) => logs.push(String(line)) } },
+      );
+      await runHarnessCommand(
+        { subcommand: 'stop', sessionId: 'dryrun-resume', reason: 'operator pause', json: true },
+        { rootDir, io: { log: (line) => logs.push(String(line)) } },
+      );
+
+      const resumed = await runHarnessCommand(
+        { subcommand: 'resume', sessionId: 'dryrun-resume', dryRun: true, json: true },
+        {
+          rootDir,
+          io: { log: (line) => logs.push(String(line)) },
+          executeTurn: async () => {
+            providerCalls += 1;
+            return { outcome: 'success', summary: 'must never run under dry-run', keyChanges: [], keyLearnings: [], nextAction: 'done', shouldStop: true, failureClass: 'none' };
+          },
+          sleepImpl: async () => {},
+        },
+      );
+
+      const payload = JSON.parse(logs.at(-1));
+      assert.equal(providerCalls, 0, 'the word dry-run must never reach a provider');
+      assert.equal(typeof payload.verdict, 'string', 'a readiness report must be structured, not a bare exit code');
+      assert.equal(payload.session.sessionId, 'dryrun-resume');
+      // 中文注释：退出码由 verdict 决定（blocked -> 1），这里钉的是"码与判决一致"，不是"必然为 0"——
+      // 沙箱里 ContextDB 可能未初始化而给出 warning，那是事实，不该被测试假装干净。
+      assert.equal(resumed.exitCode, payload.verdict === 'blocked' ? 1 : 0);
+
+      const control = await readSoloControl({ rootDir, sessionId: 'dryrun-resume' });
+      assert.equal(control.stopRequested, true, 'a readiness report must leave the session exactly where it was');
+    });
+  } finally {
+    await rm(rootDir, { recursive: true, force: true });
+  }
+});

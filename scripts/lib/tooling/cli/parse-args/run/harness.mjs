@@ -69,6 +69,7 @@ const STATUS_OPTIONS = [
 const RESUME_OPTIONS = [
   ['--session <id>', 'Session ID'],
   ['--workspace <path>', 'Workspace root'],
+  ['--dry-run', 'Report readiness without invoking a provider (read-only: no flag or worktree change)'],
   ['--max-iterations <n>', 'Max iterations'],
   ['--transport <mode>', 'Provider transport: one-shot (default) or rpc (long-lived managed pi session)'],
   ['--unattended', 'Unattended tier: should-run pacing gate (quota + cadence + quiet shutdown)'],
@@ -192,6 +193,10 @@ export function parseHarnessArgs(argv) {
       options = createDefaultHarnessResumeOptions();
       if (effectiveFlags.session) options.sessionId = String(effectiveFlags.session);
       if (effectiveFlags.workspace) options.workspaceRoot = String(effectiveFlags.workspace);
+      // 中文注释：这一行就是缺陷本体。过去 resume 分支不映射 --dry-run，而子命令是
+      // allowUnknownOption(true) —— 开关被接受、不报错、也不生效，于是用户以为自己在跑
+      // 只读检查，实际走进了真 provider 调用。不报错的失效比报错危险得多。
+      if (effectiveFlags.dryRun === true) options.dryRun = true;
       if (effectiveFlags.maxIterations !== undefined) {
         const v = parseInt(String(effectiveFlags.maxIterations), 10);
         if (!Number.isFinite(v) || v <= 0) throw new Error('--max-iterations must be a positive integer');

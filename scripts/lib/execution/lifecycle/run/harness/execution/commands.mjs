@@ -21,6 +21,40 @@ import { createLifecycleHooks } from '../support/hooks.mjs';
 import { resolveResumeWorktree } from '../session/worktree.mjs';
 import { writeHarnessDashboard } from '../../../../harness/ops/dashboard.mjs';
 
+/**
+ * `--dry-run` 的唯一渲染器：run 与 resume 共用。它只做本地读与检查，不调 provider、不改状态。
+ * 只有一个渲染者的理由：两个分支各自排版一遍的话，帮助文本与输出就会分叉。
+ */
+async function reportHarnessDryRun({ rootDir, options, io, provider, sessionId, objective, worktreeEnabled }) {
+  const checks = await runHarnessDryRunChecks({ rootDir, provider, sessionId, objective, worktree: worktreeEnabled });
+  const status = await readSoloRunStatus({ rootDir, sessionId });
+  const result = {
+    verdict: checks.verdict,
+    checks: checks.results,
+    nextActions: checks.nextActions,
+    session: status,
+  };
+  if (options.json === true) {
+    io.log(JSON.stringify(result, null, 2));
+  } else {
+    const verdictIcon = checks.verdict === 'ready' ? 'OK' : checks.verdict === 'warning' ? 'WARN' : 'BLOCKED';
+    io.log(`\nHarness Dry-Run: ${verdictIcon} (${checks.verdict})`);
+    io.log(`Objective: ${objective}`);
+    io.log(`Session:   ${sessionId}`);
+    io.log(`Provider:  ${provider}\n`);
+    for (const check of checks.results) {
+      io.log(`  ${check.ok ? '✓' : '✗'} ${check.label}`);
+      if (check.detail) io.log(`    ${check.detail}`);
+    }
+    io.log('');
+    for (const action of checks.nextActions) {
+      io.log(`  → ${action}`);
+    }
+    io.log('');
+  }
+  return { exitCode: checks.verdict === 'blocked' ? 1 : 0, result };
+}
+
 export async function runHarnessCommand(options = {}, {
   rootDir,
   aiosRootDir = '',
@@ -97,34 +131,15 @@ export async function runHarnessCommand(options = {}, {
     });
 
     if (options.dryRun === true) {
-      const checks = await runHarnessDryRunChecks({ rootDir, provider, sessionId: session.sessionId, objective, worktree: options.worktree === true });
-      const status = await readSoloRunStatus({ rootDir, sessionId: session.sessionId });
-      const result = {
-        verdict: checks.verdict,
-        checks: checks.results,
-        nextActions: checks.nextActions,
-        session: status,
-      };
-      if (options.json === true) {
-        io.log(JSON.stringify(result, null, 2));
-      } else {
-        const verdictIcon = checks.verdict === 'ready' ? 'OK' : checks.verdict === 'warning' ? 'WARN' : 'BLOCKED';
-        io.log(`\nHarness Dry-Run: ${verdictIcon} (${checks.verdict})`);
-        io.log(`Objective: ${objective}`);
-        io.log(`Session:   ${session.sessionId}`);
-        io.log(`Provider:  ${provider}\n`);
-        for (const check of checks.results) {
-          const icon = check.ok ? '✓' : '✗';
-          io.log(`  ${icon} ${check.label}`);
-          if (check.detail) io.log(`    ${check.detail}`);
-        }
-        io.log('');
-        for (const action of checks.nextActions) {
-          io.log(`  → ${action}`);
-        }
-        io.log('');
-      }
-      return { exitCode: checks.verdict === 'blocked' ? 1 : 0, result };
+      return await reportHarnessDryRun({
+        rootDir,
+        options,
+        io,
+        provider,
+        sessionId: session.sessionId,
+        objective,
+        worktreeEnabled: options.worktree === true,
+      });
     }
 
     const readiness = await checkSoloHarnessProfileReadiness({
@@ -262,6 +277,21 @@ export async function runHarnessCommand(options = {}, {
     const existing = await readSoloRunSummary({ rootDir, sessionId: options.sessionId });
     if (!existing) {
       return { exitCode: 1 };
+    }
+    // 中文注释：这里以前不读 dryRun —— `resume --dry-run` 会**静默调起真 provider**，
+    // 而 dry-run 这个词的全部含义就是“不要调模型”。一个表示不花钱的开关被忽略，
+    // 是成本侧的意外，不是选项排版问题。现在与 run 共用同一个渲染器，并且只读不写：
+    // 不清 stop 标志、不动 worktree，所以 dry-run 之后这条会话仍停在它本来的位置。
+    if (options.dryRun === true) {
+      return await reportHarnessDryRun({
+        rootDir,
+        options,
+        io,
+        provider: existing.provider,
+        sessionId: existing.sessionId,
+        objective: existing.objective,
+        worktreeEnabled: existing.worktree?.enabled === true,
+      });
     }
     await clearSoloHarnessStop({ rootDir, sessionId: existing.sessionId });
     const restoredWorktree = await resolveResumeWorktree({ rootDir, summary: existing });

@@ -66,4 +66,8 @@ test('harness help documents the bounded hook wait, because an unbounded await i
   assert.match(text, /cooperative flag write, not a process kill/);
   assert.match(text, /control-stop-request/, 'the reason string in the journal must match the word in the help');
   assert.match(text, /restores the preserved worktree/, 'resume is the documented follow-up, so its guarantee belongs here');
+  // 中文注释：--dry-run 的契约。这个开关曾经对 resume 无效但仍被接受 —— 等于拿"不要花钱"的
+  // 词去花钱。帮助面必须把"两个子命令上都只读"写成可断言的句子。
+  assert.match(text, /--dry-run is read-only on both run and resume/);
+  assert.match(text, /\(run\/resume\) Report readiness without invoking a provider/, 'the flag scope must say resume too');
 });

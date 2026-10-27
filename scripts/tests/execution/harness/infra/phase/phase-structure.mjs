@@ -62,6 +62,8 @@ test('harness runtime tests remain split into focused modules', async () => {
     ['scripts/tests/execution/harness/infra/solo/solo-turn.mjs', 180],
     ['scripts/tests/execution/harness/infra/solo/solo-run.mjs', 300],
     ['scripts/tests/execution/harness/infra/command/command-lifecycle.mjs', 320],
+    // 中文注释：新增的解析层用例必须登记预算，不然它就成了一个没人管的长文件。
+    ['scripts/tests/execution/harness/infra/command/command-dry-run.mjs', 40],
     ['scripts/tests/execution/harness/infra/command/command-hooks.mjs', 220],
     ['scripts/tests/execution/harness/infra/support.mjs', 180],
   ];

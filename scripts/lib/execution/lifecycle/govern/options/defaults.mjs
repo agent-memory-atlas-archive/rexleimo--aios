@@ -176,6 +176,9 @@ export function createDefaultHarnessResumeOptions() {
     sessionId: '',
     workspaceRoot: '',
     maxIterations: 20,
+    // 中文注释：resume 也需要 dry-run 声明位。harness 子命令开了 allowUnknownOption(true)，
+    // 一个没被映射的开关不会报错，只会**悄悄失效** —— 而 --dry-run 的含义是“不要花钱调模型”。
+    dryRun: false,
     // provider 边界形态：one-shot 每轮冷启动；rpc 复用长会话（仅 pi provider）。
     transport: 'one-shot',
     lifecycleHooks: true,
