@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
 
+
+## [6.14.0] - 2026-10-27
+
+### Added
+
+- **生命周期钩子现在有预算上限**。此前 `invokeLifecycleHook` 是无界 `await`：一个永不 resolve 的订阅者就能把整条 run 挂住，而日记里只多出一条 `started` 事件——既不失败、也不成功，只是不再出现。“任务是不是卡住了”于是完全依赖人盯。现在钩子等待受 `AbortController` 约束，超预算即取消并记为 `timed-out`。预算按 phase 声明（turn-start / before-continuity-commit / iteration-start 60s，turn-complete 120s，session-end 300s，default 120s），用 `AIOS_SOLO_HOOK_TIMEOUT_MS=<ms>` 覆盖，`off` 退回旧的无界等待。
+  - 默认值故意给到典型耗时的 1–2 个数量级：这是**首次引入**的闸门，漏报比误杀便宜——把一个慢但正常的 run 因预算过紧而中止，等于新造了一个故障。
+
+### Changed
+
+- **等待结论从两个词变成四个**：旧的 `ok | error` 现在分为 `ok | cancelled | timed-out | failed`。这三个语义在旧记录里是同一个字：钩子返回错误（真失败）、操作者取消（不是失败）、等到了预算（停滞）。只有 `failed` 计入运行失败，只有 `timed-out` 计入停滞，`cancelled` 两者都不计。因此一个慢订阅者不会再像旧实现那样把一条正常 run 推进退避。
+- **中止记录不再替被调用方编造原因**。旧写法是 `consecutiveInfraFailures > 0 ? 'runtime-error' : 'no-progress'`，那是拿计数器反推语义：一条反复 `tool-error` / `safety-gate` 失败的 run 会被贴上“无进展”的标签，而那一行恰好是恢复判断要读的内容。现在一律沿用本轮真上报的 `failureClass`，自报缺席就写 `none`，不替它补一个猜的原因。停滞中止走独立阈值（`AIOS_SOLO_STALL_ABORT_AFTER`，默认 3）并单独措辞，因为它的重试不会让卡死的订阅者变好。
+
+### Fixed
+
+- **归因现在能落盘**。`solo-journal` 的事件白名单不含 `component / verdict / budgetMs / elapsedMs`，于是“是哪个钩子、多大预算、实际等了多久”只在内存里成立，写进日记就被静默丢弃。补上后由真实写入器测试钉住，防止未来再退回去。
+- **迟到的 resolve 不再改写已经记下的结论**。钩子被取消后若自己跑完了，旧写法会把结果漏回 loop（看起来像一次真成功）。现在结论一经记入即为终态。
+
+### Internals
+
+- `loop.mjs` 保持在 596 行的 fileLines 基线内：新逻辑拆成 `solo-runtime/support/stall.mjs`（纯策略）、`loop/hook-waits.mjs`（停滞记账）、`loop/abort-records.mjs`（两种放弃各自的措辞与证据），而不是抬高一个 shrink-only 的棘轮。破门的正确反应是拆责任，不是改预算。
+- 新增测试已登记进 `scripts/test-suites.json`（该清单是显式文件列表，不是 glob 发现）：`hook-stall-guard`（含策略、真写入器、预算覆盖）与 `hook-stall-loop`（整条 run 后果）。后者带一条反例守卫：把 HEAD 版本的 `loop.mjs` 换回去，两条均失败（turns=5而非停滞闸介入、类别被洗成 runtime-error），证明断言不是空转。
+- 验证证据：`npm run test:regression` files=248, tests=2407, pass=2398, fail=0, skipped=9；`node scripts/check-syntax.mjs` checked=1283 failures=0；`directoryEntries blocking=0`，`fileLines blocking=6`（存量，无新增）。
+
 ## [6.13.0] - 2026-10-27
 
 ### Added
