@@ -5,6 +5,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { COMMAND_SPECS } from '../../../lib/tooling/cli/commander/specs/index.mjs';
 import { isPassthroughCommand, mustRejectUnknownOption, PASSTHROUGH_COMMANDS, UNKNOWN_OPTION_STRICTNESS_DEFERRED } from '../../../lib/tooling/cli/commander/passthrough.mjs';
@@ -20,8 +21,11 @@ import { isPassthroughCommand, mustRejectUnknownOption, PASSTHROUGH_COMMANDS, UN
  * 安全条款：矩阵里含破坏性命令，所以**每一条都在沙箱 HOME 下 spawn**，绝不允许碰真实用户目录。 */
 
 const UNKNOWN_FLAG = '--definitely-not-a-real-flag';
-const here = path.dirname(new URL(import.meta.url).pathname.replace(/^\//u, ''));
-// scripts/tests/execution/aios-setup -> 仓库根要上**四**层。这里少算一层曾让本文件
+// fileURLToPath 是唯一的跨平台换算：`.pathname.replace(/^\//, '')` 在 Windows 上碰巧对
+// （`/E:/...` 被当作盘符路径），在 Linux 上把绝对路径剪成相对路径，CI 全量红过一次
+// （release #190：spawnargs 拼成了 `repo/home/runner/.../aios.mjs`）。
+const here = path.dirname(fileURLToPath(import.meta.url));
+// 本文件位于 scripts/tests/execution/<dir> -> 仓库根要上**四**层。这里少算一层曾让本文件
 // 拿到一个不存在的 cliPath：node 因为找不到文件而退非零，反而被下面“拒绝未知 flag”的
 // 断言当成通过 —— 这就是契约里禁止的假通过形状，靠下面的阳性对照才能报出来。
 const repoRoot = path.resolve(here, '../../..', '..');
