@@ -5,7 +5,7 @@
  *
  * 中文注释（2026-10-27）：这份名单是**声明**，不是测试里的临时豁免。它的规模被测试上限钉住
  * （`passthrough size <= 4`），因为“为了变绿而加豁免”正是假通过的形状——新增条目必须带上
- * “谁转发、转发给谁”的真实理由，由 `scripts/tests/execution/aios-setup/cli-usage-error-exit.test.mjs`
+ * “谁转发、转发给谁”的真实理由，由 `scripts/tests/execution/aios-cli/cli-usage-error-exit.test.mjs`
  * 的反面断言守住：名单外的任何命令接受未知 flag 还退 0，就是缺陷。
  */
 export const PASSTHROUGH_COMMANDS = new Set([
