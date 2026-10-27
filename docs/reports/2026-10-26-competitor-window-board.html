@@ -464,8 +464,17 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color
         <p>所以栅栏是<b>校验期实施</b>而不是记录期盖章，不是缺失。哈希封套在 <code>scripts/lib/tooling/skills/training/training-certification.mjs</code> 里也真实存在，带篡改检测（<code>baseline-artifact-tampered</code>）。</p>
         <p><b>剩下的真东西（一个，已处理）</b>：适配层有一个不经验证直接 <code>advanceActivation</code> 的入口 <code>advanceAiosCapabilityActivation</code>。实测全仓零调用方、零文档、零测试，所以它不是当前缺陷，而是一个“下次很容易被人接上”的绕过路径。已改为报错路碑（名字保留，绕过变响亮失败），并在 <code>scripts/tests/execution/rex/runtime/rex-import-boundaries.test.mjs</code> 新增 B6 结构守卫：落盘且推进的文件必须同文件验证。<b>两次变异已证明该守卫有牙</b>（删验证器 → 红；把 <code>advanceActivation</code> 接回去 → 红）。</p>
       </div>
-      <div class="cell"><h3>B3：仍未裁定</h3>
-        <p>Stop 到底该“暂停整条 run”还是“取消并收尾”，是语义拍板，不是实现问题，板上已标“需你拍”。在裁定前不动 <code>loop.mjs</code> 的 stop 路径，以免把一种暂未被授权的语义当成默认值収进发布。</p>
+      <div class="cell"><h3>B3：本报告的提法被实测推翻（2026-10-27 裁定）</h3>
+        <p><span class="chip chip-ok" style="background:var(--ok-bg);color:var(--ok);border-color:#b7dfc4">差距不存在</span> 板上写的是“Stop 应当是暂停整条 run，不是取消并收尾”。五条测量后：<b>我们的 stop 已经就是协作式暂停</b>。</p>
+        <ul>
+          <li><code>commands.mjs</code> 的 stop 分支只写 <code>control.json</code> 标志，<b>全程没有任何 signal / kill 路径</b>。</li>
+          <li><code>loop.mjs:143</code> 只在迭代顶部读标志，turn 内部无检查点 → <b>当前 turn 跑完才停</b>，恰好是对手那句 “nodes / workers hold where they are”。</li>
+          <li><code>resume</code> 已经是文档化的后继动作：清标志 + 恢复被保留的 worktree + 从 <code>lastIteration</code> 继续。</li>
+          <li>记录里本来就分得清：<code>reason=control-stop-request</code>、<code>failureClass=stop-requested</code>。</li>
+          <li>重复收尾不会重复产记忆候选：<code>candidateId</code> 与落盘路径都按 sessionId 定，<code>atomicWriteText</code> 是覆盖写。</li>
+        </ul>
+        <p><b>裁定：不加 <code>paused</code> 状态。</b> 三个具体代价：<code>reconcile.mjs:23</code> 把 <code>stopped</code> 当终结态是<b>对的</b>（它判的是进程死活，不是操作者意图）；新状态要穿过 status / watchdog / CLI / hooks / 记忆闭合 五张面，而它想携带的信息 <code>reason</code> 字段已经带着了——同事实两个写者，正是 B1 那条守卫刚在拦的东西；而“随时能续”已经可用。</p>
+        <p><b>唯一真实残留：停止延迟。</b> 一个 turn 正在跑时按 stop，要等该 turn 结束才生效，上限是 <code>--turn-timeout-ms</code>（默认 1800000 = 30 分钟）。这不是“取消 vs 暂停”的语义差，是“边界协作 vs 中途硬砍”的差，而对手的写法也不是硬砍。已按裁定只补文档：<code>aios harness --help</code> 新增 Notes 段，把“下一个迭代边界生效 / 协作式标志写入不是杀进程 / resume 会恢复 worktree”写到用户能看到的地方（由 <code>help-surface-renders</code> 钉住）。中途让路需要 provider 传输层配合（rpc 才谈得上，one-shot 只能等），成本与收益都与“改个状态名”不同性质，故未开为工作项。</p>
       </div>
     </div>
   </div>

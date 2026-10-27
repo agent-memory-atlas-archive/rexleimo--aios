@@ -138,6 +138,15 @@ Options:
   --reason <text>               (stop) Operator note recorded in control.json
   --dry-run                     (run) Create/update the journal without invoking a provider
   --json                        Output structured JSON instead of text
+
+Notes:
+  stop takes effect at the next iteration boundary: the in-flight turn runs to completion first.
+  It is a cooperative flag write, not a process kill - nothing is interrupted mid-turn, so an
+  operator-observed stop can take up to --turn-timeout-ms to land. The run records
+  reason=control-stop-request and failureClass=stop-requested, finalizes the session memory
+  candidate for that session id, and resume is the documented follow-up: it clears the flag,
+  restores the preserved worktree and continues from the last completed iteration (re-finalizing
+  reuses the same candidate id, so a stop-then-resume cycle does not duplicate memory).
   -h, --help
 `;
     case 'hud':

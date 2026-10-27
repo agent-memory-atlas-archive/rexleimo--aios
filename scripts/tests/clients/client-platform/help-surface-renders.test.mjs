@@ -51,7 +51,8 @@ test('refs help documents the automatic sweep and its opt-in, not just the manua
   assert.match(text, /ttl_days/, 'the real retention source, not just the global default');
   assert.match(text, /session close/, 'the automatic caller has to be documented where users look');
 });
-
+
+
 test('harness help documents the bounded hook wait, because an unbounded await is invisible', async () => {
   const module = await import(new URL('../../../lib/tooling/cli/help/commands/workflow.mjs', import.meta.url).href);
   const text = module.getWorkflowCommandHelpText('harness');
@@ -59,4 +60,10 @@ test('harness help documents the bounded hook wait, because an unbounded await i
   assert.match(text, /AIOS_SOLO_STALL_ABORT_AFTER/, 'the stall threshold is user-tunable and must be documented');
   assert.match(text, /recorded as stalled/, 'the vocabulary the journal uses must be the vocabulary the help uses');
   assert.match(text, /off.{1,3} restores the old unbounded wait/, 'a guard that did not exist before must say how to turn it off');
+  // 中文注释：停止语义。这不是新功能，是把一个已经存在但只能读代码才知道的行为写进用户能看到的地方：
+  // stop 不杀进程、在迭代边界生效、上限是 turn 超时。不说清，操作者就会以为自己已经停住了。
+  assert.match(text, /next iteration boundary/, 'the operator must learn when a stop actually lands');
+  assert.match(text, /cooperative flag write, not a process kill/);
+  assert.match(text, /control-stop-request/, 'the reason string in the journal must match the word in the help');
+  assert.match(text, /restores the preserved worktree/, 'resume is the documented follow-up, so its guarantee belongs here');
 });

@@ -68,6 +68,12 @@ aios harness resume --session nightly-auth --max-iterations 10
 
 Resume only after reading the last status, checkpoint, and failing command. Keep the same objective unless you intentionally start a new session.
 
+A stop is cooperative, not a kill: `aios harness stop` writes a control flag and the loop honours it
+at the next iteration boundary, so the turn in flight runs to completion first. That means an
+operator-visible stop can take up to `--turn-timeout-ms` (default 30 minutes) to land. Nothing is
+interrupted mid-turn, the preserved worktree is restored on resume, and re-finalizing a session
+reuses the same memory candidate, so a stop-then-resume cycle does not duplicate memory.
+
 ## Hooks and provider controls
 
 Lifecycle hooks are enabled by default and record stage evidence. You can opt out for a specific run:
