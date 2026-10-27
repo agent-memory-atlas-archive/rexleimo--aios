@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+
+## [6.13.0] - 2026-10-27
+
+### Added
+
+- **refs 回收第一次有了自动调用方**（B5）。`pruneInterceptionRefs` 自诞生起只有一个入口：人敲 `aios refs prune`。九周里没人敲过——本仓存储实测积压 **49,209 个文件 / 161.7MB，其中 30,861 条超过 30 天**，与 2026-09-09 那次审计记录的数字**逐位相同**，这就是"没有调用方"的物证。现在它挂在 `session close` 钩子上，与 `runAutodreamPhaseB` 同一个约定：包在 try/catch 里，**绝不让 close 失败**。
+- 新增配置面（全部向后兼容，默认不删数据）：`AIOS_REFS_SWEEP` = `off` | 默认 `dry-run` | `enforce`；`AIOS_REFS_SWEEP_KEEP_DAYS`（默认 30）；`AIOS_REFS_SWEEP_BUDGET_MS`（默认 1500）；`AIOS_REFS_SWEEP_COOLDOWN_HOURS`（默认 6）。`aios refs prune --dry-run` 新增同名开关。
+- **默认只报告，不删除**——与仓内既有先例同形：`AIOS_AUTODREAM_AUTO` 默认关、dream 只出 preview、governed apply 才是人工动作。新增的自动变异不能默认动数据；真删需要显式 `enforce`，或人敲 `prune`（那是明确意图，固定 enforce）。
+
+### Changed
+
+- **保留期的事实来源从"文件 mtime"改为"每条 ref 自己申报的 `created_at` + `ttl_days`"**。旧实现两条都不读：`ttl_days` 写进 meta 却没有任何代码消费它，等于声明了一个从未生效的契约；而 mtime 会被复制/同步/迁移重置，一次复制就能让一条证据永远年轻、再也清不掉。现在 meta 优先，缺 `ttl_days` 才退回全局默认，缺 `created_at` 才退回 mtime，并且回执里**如实标注用了哪个较弱的钟**（`clockBasis`）。真实存储实测：18,525 对里 `meta.created_at/meta.ttl_days` 命中 18,524、`fs.mtime/default.keepDays` 命中 1——兜底分支在生产数据上被真走过，不只是测试里。
+- **当前会话整体保护**。旧 prune 会连活动会话的 ref 一起删；AIOS 的长任务是可恢复的，30 天前的 ref 可能正是本次要引用的证据，删掉等于在会话中途斩断召回链。真实 dry-run 回执：`sessionsProtected: 1`。
+- `.raw` 与 `.meta.json` 改为**成对处置**，不再逐文件独立判定——否则会留下"列表里有 ref 却没有原文"的孤儿 meta，或"grep 命中却无法解释来源"的孤儿 raw。
+
+### Fixed
+
+- **回收器差点成为一个静默的 no-op**：`decideRefRetention` 调 `refAgeMs` 时漏传 `nowMs`，于是 `ageMs = NaN`、`NaN > keepMs` 永远为 false、**什么都不删**，而回执里的 `clock` 字段照样显示"读到了 created_at"，表面完全正常。这条由新写的测试自己抓出来（RED 阶段 4 条 I/O 测试连带 3 条策略测试同时红），补了一条回归守卫：漏传 `nowMs` 必须退化到真实时间，而不是退化到"干净"。
+- 帮助文案里写反引号把 template literal 提前关掉，模块当场 `SyntaxError`（`Unexpected identifier 'created_at'`）。我当时只对**新建文件**跑了 `node --check`，没覆盖"只改了文案的文件"——于是要等某个恰好 spawn CLI 的测试才炸。**改文案等于改代码**：新增 `scripts/check-syntax.mjs`（并发 8，本仓 `scripts/` 实测 1278 文件 / 16.9s；串行 72.7s 太贵故不进回归）并接进 `pretest:scripts`，同时新增 `help-surface-renders` 套件把每个帮助主题真渲染一遍（覆盖"能解析 / 分支命中 / 产出确实是 help"三类缺陷）。探针目录验证它能抓到同一处反引号断串并 exit 1。
+
+### Verified
+
+- `refs-sweep` 15/15（策略 + 真 I/O 夹具 + 冷却/截断语义 + close 钩子调用方）；`help-surface-renders` 4/4；套件登记守卫 W1–W6 10/10（两个新文件都已登记，regression 244 → **246**）。
+- 成本画像实测：冷却命中 **1ms**、`AIOS_REFS_SWEEP=off` **0ms**、真有积压时 ≤ **1501ms**（预算上界，截断不计完成、下一轮继续清）。
+- 相邻套件 47/47；`npm run test:regression` files=**246**, tests 2390 / pass 2381 / **fail 0** / skipped 9（506.1s；较上轮 +56s 属已知 484s 枢纽文件 `aios-harness.test.mjs` 抖动——我新增的两个套件单独实测总耗时 **147ms**）。
+- CLI 真实贯通：`aios refs prune --dry-run` → `Would prune 5658 refs, freed 39523.6KB (scanned 6700, 1501ms, basis: meta.created_at/meta.ttl_days=6700, truncated by budget)`。
+- `directoryEntries` blocking=0；`fileLines` 6 条 FAIL 全部落在我未触碰的文件上（`git status` 可证），属存量且 CI 未接该规则。
+
+
 ## [6.12.1] - 2026-10-27
 
 ### Fixed
