@@ -116,13 +116,25 @@ async function handleMemoryWrite(args = {}) {
 }
 
 async function handleMemoryCheckpoint(args = {}) {
-  const { appendPinnedMemo } = await import('./lib/memory/memo/storage/govern/pinned.mjs');
+  const { appendPinnedMemo, pinnedServeReceipt, readPinnedMemo } = await import('./lib/memory/memo/storage/govern/pinned.mjs');
   const text = String(args.text || '').trim();
   if (!text) throw new Error('text is required');
   const root = resolveWorkspaceRoot();
   const storage = await getActiveStorage(root);
-  await appendPinnedMemo(root, { storage, space: 'default', content: `[checkpoint] ${text}` });
-  return { content: [{ type: 'text', text: `Checkpoint pinned: ${clip(text, 200)}` }] };
+  const entry = `[checkpoint] ${text}`;
+  await appendPinnedMemo(root, { storage, space: 'default', content: entry });
+  // 中文注释：与 CLI 面同一回执。旧回复只说“pinned”，而写入永远成功、服务窗口却会丢位——
+  // 工具回报必须区分“落盘”与“被注入”，否则调用方会把“成功回复”当成“未来能召回”。
+  const receipt = pinnedServeReceipt(await readPinnedMemo(root, { storage, space: 'default' }));
+  const window = `window ${receipt.chars}/${receipt.maxChars} chars, ${receipt.entriesIncluded}/${receipt.entriesTotal} entries served`;
+  return {
+    content: [{
+      type: 'text',
+      text: receipt.served
+        ? `Checkpoint pinned and served: ${clip(text, 200)} (${window})`
+        : `Checkpoint written but NOT served: ${clip(text, 200)} (${window}, ${receipt.entriesDropped} older entries not injected) — it will not appear in recall until the lane is trimmed`,
+    }],
+  };
 }
 
 export async function handleMessage(message = {}) {

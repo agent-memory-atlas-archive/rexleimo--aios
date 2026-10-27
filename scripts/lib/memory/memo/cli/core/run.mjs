@@ -106,7 +106,7 @@ export async function runMemo(rawOptions = {}, {
   }
 
   if (primary === 'checkpoint') {
-    await handleMemoCheckpointCommand({ secondary, rest, workspaceRoot, io });
+    await handleMemoCheckpointCommand({ secondary, rest, workspaceRoot, io, maxChars: workspacePinnedMaxChars });
     return;
   }
 

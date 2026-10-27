@@ -194,6 +194,7 @@
       "scripts/tests/memory/memo-eval/memo-hygiene.test.mjs",
       "scripts/tests/memory/memo-eval/memo-real-corpus.test.mjs",
       "scripts/tests/memory/memo-eval/memo-report.test.mjs",
+      "scripts/tests/memory/memo-eval/memory-checkpoint-receipt.test.mjs",
       "scripts/tests/memory/memo-govern/memo-authority-env.test.mjs",
       "scripts/tests/memory/memo-govern/memo-candidate-governance.test.mjs",
       "scripts/tests/memory/memo-govern/memo-gc-lock.test.mjs",

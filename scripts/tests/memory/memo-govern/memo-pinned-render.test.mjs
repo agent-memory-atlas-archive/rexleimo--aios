@@ -9,6 +9,9 @@ import { fileURLToPath } from 'node:url';
 import {
   PINNED_DEFAULT_MAX_CHARS,
   renderPinnedBlock,
+  selectPinnedWindow,
+  pinnedServeReceipt,
+  normalizePinnedContent,
 } from '../../../lib/memory/memo/storage/govern/pinned.mjs';
 
 test('render numbers lines and reports margin metadata', () => {
@@ -63,4 +66,73 @@ test('pin status reports the usage triple from the CLI', async () => {
   } finally {
     await rm(rootDir, { recursive: true, force: true });
   }
+});
+
+/* 中文注释（2026-10-27）：pinned 是 append-only 通道，而旧 renderPinnedBlock 在超预算时
+ * `slice(0, limit)` —— 保留最旧。后果被实测出来：本工作区 103,694 字符 / 5,000 预算，
+ * 297 条 [checkpoint] 全部落在服务窗口之外，只有 9 月的冒烟条目还在注入，而写入侧一直报“成功”。
+ * 以下用例钉的是新契约：类内最新优先 + 规则保底 + 丢弃必须可见。 */
+
+const lane = (ruleCount, checkpointCount, entrySize = 180) => {
+  const parts = [];
+  for (let i = 1; i <= ruleCount; i += 1) parts.push(`rule ${i}: ${'r'.repeat(entrySize)}`);
+  for (let i = 1; i <= checkpointCount; i += 1) parts.push(`[checkpoint] milestone ${i} ${'m'.repeat(entrySize)}`);
+  return parts.join('\n\n') + '\n';
+};
+
+test('over-budget lane serves the newest checkpoints instead of the oldest ones', () => {
+  const rendered = renderPinnedBlock(lane(1, 200), { maxChars: 2000 });
+  const text = rendered.lines.map((line) => line.text).join('\n');
+
+  assert.equal(rendered.truncated, true);
+  assert.ok(rendered.entriesDropped > 100, `expected a large drop, got ${rendered.entriesDropped}`);
+  assert.ok(text.includes('milestone 200'), 'the newest milestone must be injected');
+  assert.ok(text.includes('milestone 199'), 'recent history stays contiguous, not a single survivor');
+  assert.ok(!text.includes('milestone 1 '), 'the oldest milestones are the ones that drop out');
+  assert.ok(rendered.chars <= 2000, 'the served block never exceeds the budget');
+});
+
+test('a curated rule is never starved by the checkpoint stream', () => {
+  const rendered = renderPinnedBlock(lane(1, 300), { maxChars: 1200 });
+  const text = rendered.lines.map((line) => line.text).join('\n');
+  assert.ok(text.includes('rule 1:'), 'long-lived preferences are the reason this lane exists');
+  assert.ok(text.includes('milestone 300'), 'and recency still wins the remaining budget');
+});
+
+test('dropped entries are announced, never silently skipped', () => {
+  const rendered = renderPinnedBlock(lane(0, 120), { maxChars: 1500 });
+  const text = rendered.lines.map((line) => line.text).join('\n');
+  const marker = text.match(/pinned window: (\d+) of (\d+) entries served; (\d+) older entries not injected/u);
+  assert.ok(marker, 'the served block must state what it left out');
+  assert.equal(Number(marker[1]) + Number(marker[3]), Number(marker[2]), 'served + dropped must equal the total');
+});
+
+test('a lane inside the budget is served byte-for-byte as before', () => {
+  const content = lane(1, 3);
+  const rendered = renderPinnedBlock(content, { maxChars: PINNED_DEFAULT_MAX_CHARS });
+  assert.equal(rendered.truncated, false);
+  assert.equal(rendered.entriesDropped, 0);
+  assert.equal(rendered.lines.map((line) => line.text).join('\n'), normalizePinnedContent(content).trimEnd());
+});
+
+test('selection keeps the file order so the injected block still reads as a timeline', () => {
+  const entries = ['[checkpoint] oldest-0', '[checkpoint] middle-1', '[checkpoint] newest-2'];
+  const picked = selectPinnedWindow(entries, 80);
+  assert.deepEqual(picked, entries, 'all three fit, so the whole timeline is served in file order');
+  const tight = selectPinnedWindow(entries, 40);
+  assert.equal(tight.length, 1, 'a budget that fits exactly one entry keeps one, not zero');
+  assert.equal(tight[0], entries[2], 'the newest entry is always the one that survives');
+});
+
+test('the write-side receipt distinguishes "written" from "served"', () => {
+  const healthy = pinnedServeReceipt(lane(1, 2), { maxChars: PINNED_DEFAULT_MAX_CHARS });
+  assert.equal(healthy.served, true);
+  assert.equal(healthy.entriesDropped, 0);
+
+  // 单条就超预算：服务窗口只能截前缀兜底，此时"落盘了"与"被完整注入"必须区分开报。
+  const oversized = pinnedServeReceipt(`[checkpoint] ${'x'.repeat(PINNED_DEFAULT_MAX_CHARS + 50)}`, {
+    maxChars: PINNED_DEFAULT_MAX_CHARS,
+  });
+  assert.equal(oversized.served, false, 'an entry that cannot fit must not be reported as served');
+  assert.ok(oversized.chars > 0, 'but the prefix fallback still injects something rather than nothing');
 });

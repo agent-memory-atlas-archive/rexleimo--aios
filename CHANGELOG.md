@@ -9,6 +9,11 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+
+## [6.14.4] - 2026-10-27
+
+- fix: pinned memory serves its newest entries - a checkpoint that lands outside the served window is now reported as not served
+
 ## [6.14.3] - 2026-10-27
 
 ### Fixed
