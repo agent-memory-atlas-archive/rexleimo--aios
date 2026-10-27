@@ -15,7 +15,7 @@ import { atomicWriteText } from '../../../../memory/memo/storage/base/fs-io.mjs'
 import { getSoloHarnessPaths } from '../../../harness/solo/solo-journal/plumbing/paths.mjs';
 import { checkRunSummaryConsistency } from '../../../harness/solo/solo-journal/content/consistency.mjs';
 import { readSoloRunSummary } from '../../../harness/solo/solo-journal/content/summary.mjs';
-import { isProcessAlive, readSessionOwner } from '../../../harness/solo/solo-journal/content/owner.mjs';
+import { readSessionOwner, verifyOwnerLease } from '../../../harness/solo/solo-journal/content/owner.mjs';
 import { autoMemoSessionClose, readSessionCloseCandidate } from './close.mjs';
 
 const INTERRUPTION_FILE = 'session-interruption.json';
@@ -75,6 +75,10 @@ function isStale(summary, nowMs, staleAfterMs) {
   return Number.isFinite(updatedMs) && nowMs - updatedMs >= staleAfterMs;
 }
 
+/* 中文注释：这些判定下旧租约仍然可信，对账不得插手。'recycled' 故意不在列——
+   那正是 B2 要拦的：pid 号被新进程拿走了，kill(pid,0) 会说“活”，但活着的不是这个会话。 */
+const LEASE_HONORED_VERDICTS = new Set(['self', 'ours', 'unprovable']);
+
 /**
  * Reconcile stale non-terminal solo sessions.
  *
@@ -87,6 +91,9 @@ export async function reconcileUnclosedSessions({
   now = new Date(),
   env = process.env,
   logger = console,
+  /* 中文注释：探针依赖可注入，只为让“PID 复用”这个反例能被客观测到。
+     默认值走真实 OS 探测；不注入时行为等于生产路径。 */
+  ownerLeaseProbe = null,
 } = {}) {
   if (!rootDir) return { inspected: 0, reconciled: [], skipped: [] };
   const result = { inspected: 0, reconciled: [], skipped: [] };
@@ -110,8 +117,17 @@ export async function reconcileUnclosedSessions({
       continue;
     }
     const owner = await readSessionOwner(rootDir, sessionId);
-    if (owner && isProcessAlive(owner.pid)) {
-      result.skipped.push({ sessionId, reason: 'owner-alive' });
+    /* 中文注释：不再用“pid 有人用”当“会话还活着”的证据。租约判定分成四种事实：
+       self/ours/unprovable 尊重租约；recycled 是 PID 被复用，不能继续替它保平安。 */
+    const lease = owner ? verifyOwnerLease(owner, ownerLeaseProbe || undefined) : null;
+    if (owner && lease && LEASE_HONORED_VERDICTS.has(lease.verdict)) {
+      result.skipped.push({
+        sessionId,
+        reason: lease.verdict === 'unprovable' ? 'owner-alive-identity-unprovable' : 'owner-alive',
+        ownerPid: lease.pid,
+        ownerVerdict: lease.verdict,
+        ownerIdentityDetail: lease.detail,
+      });
       continue;
     }
     if (!ACTIVE_STATUSES.has(status) || !isStale(summary, nowMs, staleAfterMs)) {
@@ -130,10 +146,13 @@ export async function reconcileUnclosedSessions({
     // 可能滞后，若拿它当证据，恢复记录本身会报出账本不支持的轮数。
     const consistency = await checkRunSummaryConsistency({ rootDir, sessionId, summary });
     const lastCompletedIteration = consistency.ledger.lastIteration;
-    const ownerDead = Boolean(owner && !isProcessAlive(owner.pid));
-    const interruptionReason = ownerDead
-      ? 'process-crashed-during-iteration'
-      : (incompleteIteration !== null ? 'stale-running-with-incomplete-iteration' : 'process-exited-before-session-finalizer');
+    const ownerDead = Boolean(owner && lease && lease.verdict === 'dead');
+    const ownerRecycled = Boolean(owner && lease && lease.verdict === 'recycled');
+    const interruptionReason = ownerRecycled
+      ? 'lease-owner-pid-recycled'
+      : ownerDead
+        ? 'process-crashed-during-iteration'
+        : (incompleteIteration !== null ? 'stale-running-with-incomplete-iteration' : 'process-exited-before-session-finalizer');
     const interruption = {
       schemaVersion: 1,
       kind: 'session-interruption',
@@ -151,6 +170,14 @@ export async function reconcileUnclosedSessions({
         `journal:session/${sessionId}/run-summary.json`,
       ],
     };
+    if (owner && lease) {
+      // 身份判定是本次中断的可驳证依据：没有它，后人只能重跑一次相同探测。
+      interruption.ownerIdentity = {
+        verdict: lease.verdict,
+        pid: lease.pid,
+        detail: lease.detail,
+      };
+    }
     if (!consistency.consistent) {
       // 只记录，不修复：恢复记录必须能解释“为什么完成数与投影不一致”，
       // 而静默改写会把被观测的漂移事实消掉。修复属独立决定（work-6 S3）。

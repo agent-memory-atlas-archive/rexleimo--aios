@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [6.12.1] - 2026-10-27
+
+### Fixed
+
+- **租约不再把"PID 被人复用"读成"会话还活着"**（B2）。`reconcile` 原先用 `isProcessAlive(owner.pid)` 判活，而 `kill(pid,0)` 只能证明"这个号当前有人用"，证明不了"还是当初那个进程"。崩溃对账因此可以无限期把一个已被回收的 pid 当成活owner，再也不会为那个会话写中断记录，恢复被永久挡住。现在判定分成四种事实：`self/ours`（尊重租约）、`recycled`（PID 已复用 → 继续对账，原因 `lease-owner-pid-recycled`）、`unprovable`（探不到启动时间 → 尊重租约并在 skipped 里写明原因）、`dead`。关键设计：不追求精确身份匹配——进程必然早于它写下认领时刻启动，于是"**内核启动时间 > 认领时刻 + 容差**"就等价于复用，一次有界比较即可。Linux 走 `/proc/<pid>/stat` 第 22 字段（从**最后一个** `)` 之后切分，因为 comm 可以带空格与括号），macOS 走 `ps -o lstart=`，Windows 走 `Get-Process StartTime`；未知平台与探测失败一律 `unprovable`，**不把"证明不了"洗成"已证明死亡"**，与 `check-release-submodule` 的失败关闭同一形。
+- **`EPERM` 不再被判成进程已死**（同一条判断曾有 4 个 owner 且语义互相矛盾）。`solo-journal/content/owner.mjs` 在 `process.kill` 抛任何错误时都返回 false，而 `spawn.mjs` 与 `watchdog/signals.mjs` 把 EPERM 当活——EPERM 的含义是"进程存在，只是无权发信号"。旧语义会给一个**活着的**会话写出假崩溃记录。现在判活逻辑单一 owner 落在 `foundation/platform/process/identity.mjs`，`signals.mjs` 改为复用（导出面不变），未知错误码保守按活处理：看门狗宁可不回收也不误杀工人。`spawn.mjs` 那份私有实现保留，因为它是**轮询热路径**（每 `TREE_POLL_INTERVAL_MS` 一次），而 `identity.mjs` 为了走统一的命令解析已经从 `spawn.mjs` 引入 `getCommandSpawnSpec`：反向再引一次就是同目录循环依赖。——**这里刻意不引入跨模块耦合，也不为消灭一份重复而把 PowerShell 探测拖进轮询**。
+- **`parseInt` 截断 pid 被堵住**：原 `normalizePid` 把 `1.5` 解析成 `1`，于是一个小数就能拿真实进程 1 去探测并被判"活着"。现在数字入参必须是整数，字符串入参必须匹配 `^[1-9]\d*$`，非法值不发信号。这条是**新测试自己抓出来的**，不是评审看出来的。
+- **`scripts/release-version.sh` 不再把新条目插错位置**。它对"最新在上"的本仓 CHANGELOG 系统性错位：只认 `## [Unreleased]`，而该锚点要么不存在（走 END 分支把新条目**追加到文件最底部**）、要么残留在中段（插到 5.x 附近）。两种形态今天各咬过一次——第二次就是本次 6.12.1 生成时，条目落到了第 1829 行。现在以"第一个 `## [` 标题"为锚：有 Unreleased 插在其下，没有则插在当前最新条目之上；END 分支只留给尚无任何条目的空文件。
+
+### Added
+
+- `verifyOwnerLease`（`solo-journal/content/owner.mjs`）：把租约身份判定做成可注入的显式结论，`reconcile` 的中断记录新增 `ownerIdentity{verdict,pid,detail}` 字段——恢复证据必须能让人复核"凭什么说这不是原进程"，而不必重跑一次相同探测。
+
 ## [6.12.0] - 2026-10-26
 
 ### Added

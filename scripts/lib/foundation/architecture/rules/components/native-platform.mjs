@@ -8,6 +8,7 @@ export const NATIVE_PLATFORM_COMPONENT_RULES = Object.freeze([
       'scripts/lib/foundation/platform/process/env.mjs',
       'scripts/lib/foundation/platform/process/windows-command.mjs',
       'scripts/lib/foundation/platform/process/spawn.mjs',
+      'scripts/lib/foundation/platform/process/identity.mjs',
     ]),
   }),
   Object.freeze({

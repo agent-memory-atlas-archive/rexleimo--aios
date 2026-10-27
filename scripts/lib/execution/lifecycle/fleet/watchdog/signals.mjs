@@ -4,6 +4,10 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { resolveContextDbRoot } from '../../../../environment/aios/state-root.mjs';
+/* 中文注释：存活性判定的唯一 owner 在平台层。本函数以前在此地再写一份，与平台层有一处
+   实质差异：旧版对 EPERM 以外的未知错误返回 false（宣布已死）。现在统一为“证明不了就不宣布死亡”，
+   看门狗宁可不回收也不误杀工人。对外导出面不变。 */
+import { probeProcessLiveness } from '../../../../foundation/platform/process.mjs';
 import { MAX_SCAN_FILES, SKIP_DIRS } from './constants.mjs';
 import {
   ageMinutesFromEpoch,
@@ -157,14 +161,7 @@ export function extractWorkerPids(source) {
 }
 
 export function isProcessAlive(pid) {
-  const normalizedPid = normalizePid(pid);
-  if (normalizedPid === null) return false;
-  try {
-    process.kill(normalizedPid, 0);
-    return true;
-  } catch (error) {
-    return error?.code === 'EPERM';
-  }
+  return probeProcessLiveness(normalizePid(pid) ?? pid).alive;
 }
 
 export function determineCpuState(workerPids = []) {
