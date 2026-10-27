@@ -6,6 +6,44 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+
+## [6.14.1] - 2026-10-27
+
+### Fixed
+
+- **适配层不再存在“不验证也能把证据写进 Activation”的入口**。`advanceAiosCapabilityActivation`
+  直接把证据交给内核的 `advanceActivation`，而栅栏（receipt 存在性、回执命令与声明场景命令
+  逐字段相等、按 kind 强制退出码极性）只实施在 `validateCommandEvidence` 里。实测全仓
+  **零调用方、零文档引用、零测试引用**，所以保留它没有兼容代价，只会多出一个比合规写者更弱的
+  第二写者。现在它抛错并说明该走哪条路径（仅删名字会让可能的动态引用静默失效，报错路碑不会）。
+
+### Added
+
+- **一条拦“下次又长出绕过入口”的结构守卫**（`rex-import-boundaries.test.mjs` B6）：host 生产文件
+  不得直接调 `advanceActivation`；同时**落盘且推进**的文件必须同文件调用 `validateCommandEvidence`。
+  规则对准落盘边界而不是转发层：适配器的 `advanceAiosSoftwareWorkflow` 只是一层薄转发（验证在它的
+  调用方做），第一版把“同文件必须验证”强加到转发层上会误报——这个形状错误是被自己的守卫纠出来的。
+  守卫自带正向控制（必须真的存在一个“既落盘又同文件验证”的写者），所以空集合不算干净。
+
+### Docs
+
+- **自查 backlog 最后一项 B1 被证伪，而错在报告不在代码**。板上写的是 P0「文档已承诺，代码未实现：
+  证据记录只有 `{kind, refs}`」——该结论来自只读 `rex-harness/src/domain/evidence.mjs` 一个文件。
+  三层查证后的事实：栅栏在**校验层**（`validate-command-evidence.mjs` 拒绝未知 receipt、id 不一致、
+  命令不匹配、退出码极性不符）、在**写入口顺序**（`rex-activation-store.mjs` 先验证再推进再落盘，
+  并钉住 Provider 命令必须匹配存储的 activation 命令）、在**测试担保**（两个子模块测试直接断言这些
+  拒绝，连 `stdoutSha256` 必须是 64 位十六进制都钉了）。哈希封套也真实存在于
+  `training-certification.mjs`，带篡改检测。即栅栏是**校验期实施**而非记录期盖章。
+- 带日期的报告不回写历史：竞争窗口板只在 B1 卡片里加一节明确标注的「裁定（2026-10-27 补）」，
+  详情放在页尾新增 section；该文件的 `git diff` 是 **34 insertions / 0 deletions**。
+
+### Internals
+
+- 两条“守卫是不是装饰”的变异实验：删掉 store 里的验证器 → B6 红；把 `advanceActivation(` 接回适配器
+  → B6 红。两次实验后文件均恢复到预期状态（store 与 HEAD 无差异）。
+- 验证证据：`rex/runtime` 套件 50/50；`npm run test:affected` 120/248 文件、tests=1334、pass=1331、
+  fail=0；`node scripts/check-syntax.mjs` checked=1283 failures=0；看板 HTML 标签平衡。
+
 ## [6.14.0] - 2026-10-27
 
 ### Added
