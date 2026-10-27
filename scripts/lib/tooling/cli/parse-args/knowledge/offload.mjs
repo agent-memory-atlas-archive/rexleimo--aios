@@ -13,6 +13,7 @@ const REFS_CLI = new Command()
   .option('--session <id>', 'Session ID')
   .option('--limit <n>', 'Max results')
   .option('--keep-days <n>', 'Retention days')
+  .option('--dry-run', 'Report what would be pruned without deleting')
   .option('--storage <path>', 'Storage path')
   .option('--workspace <path>', 'Workspace root');
 
@@ -40,6 +41,7 @@ export function parseRefsArgs(argv) {
       session: flags.session || '',
       limit: flags.limit || '20',
       keepDays: flags.keepDays || '30',
+      dryRun: Boolean(flags.dryRun),
       pattern: '',
       nodeId: '',
       storage: flags.storage || '',
@@ -55,7 +57,7 @@ export function parseRefsArgs(argv) {
 
     return { mode: help ? 'help' : 'command', help, command: 'refs', options };
   } catch {
-    return { mode: 'help', help: true, command: 'refs', options: { subcommand: 'list', session: '', limit: '20', keepDays: '30', pattern: '', nodeId: '', storage: '', workspaceRoot: '' } };
+    return { mode: 'help', help: true, command: 'refs', options: { subcommand: 'list', session: '', limit: '20', keepDays: '30', dryRun: false, pattern: '', nodeId: '', storage: '', workspaceRoot: '' } };
   }
 }
 

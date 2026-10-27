@@ -91,14 +91,30 @@ Options:
   aios refs list [--session <id>] [--workspace <path>]
   aios refs grep <pattern> [--session <id>] [--limit N] [--workspace <path>]
   aios refs read <node_id> [--workspace <path>]
-  aios refs prune [--keep-days N] [--workspace <path>]
+  aios refs prune [--keep-days N] [--session <id>] [--dry-run] [--workspace <path>]
+
+Retention is decided from each ref's own metadata: created_at (business time, immune to
+copies that reset mtime) plus ttl_days. Only when a ref carries neither does the sweep fall
+back to filesystem mtime, and the receipt labels that weaker basis. The active session's refs
+are never removed — a resumable long task may still be citing them.
+An automatic pass runs on "aios session close" (bounded, cooldown-guarded, never fails the
+close). It defaults to dry-run: it reports the backlog without deleting. Set AIOS_REFS_SWEEP=enforce
+to let it prune, or AIOS_REFS_SWEEP=off to disable the pass.
+
+Environment:
+  AIOS_REFS_SWEEP                off | (default dry-run) | enforce
+  AIOS_REFS_SWEEP_KEEP_DAYS      retention default when a ref declares no ttl_days (default 30)
+  AIOS_REFS_SWEEP_BUDGET_MS      per-pass work budget (default 1500; a truncated pass retries
+                                 on the next close instead of waiting out its own cooldown)
+  AIOS_REFS_SWEEP_COOLDOWN_HOURS  hours between automatic passes (default 6)
 
 Options:
   --session <id>                 Limit to one offload session
   --storage <file|split>         Override offload storage backend
   --workspace <path>             Workspace root containing .aios/offload
   --limit <n>                    Max refs to list/search (default: 20)
-  --keep-days <n>                Prune refs older than n days (default: 30)
+  --keep-days <n>                Prune refs older than n days when a ref declares no ttl_days (default: 30)
+  --dry-run                      Report the backlog without deleting anything
   -h, --help
 `;
     case 'search':

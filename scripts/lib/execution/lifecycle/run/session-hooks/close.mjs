@@ -141,8 +141,18 @@ export async function runSessionClose(options, { rootDir = process.cwd(), stdout
     autodream = { ran: false, enabled: true, shouldRun: false, reason: `autodream error: ${error?.message || error}` };
   }
 
+  // B5: refs 回收。同一个约定——包住错误，绝不让 close 失败；预算上界，绝不把实测 2.3s 的
+  // 全量扫描变成关闭卡顶。默认只做可见性报告，真删需要显式把 AIOS_REFS_SWEEP 开到 enforce。
+  let refsSweep = null;
+  try {
+    const { runRefsSweepOnSessionClose } = await import('../../../../foundation/interception/observability/refs/index.mjs');
+    refsSweep = await runRefsSweepOnSessionClose({ rootDir, sessionId, env });
+  } catch (error) {
+    refsSweep = { ran: false, reason: `refs sweep error: ${error?.message || error}` };
+  }
+
   if (options.json || options.format === 'json') {
-    stdout.write(`${JSON.stringify({ ...candidate, autodream }, null, 2)}\n`);
+    stdout.write(`${JSON.stringify({ ...candidate, autodream, refsSweep }, null, 2)}\n`);
   } else {
     stdout.write(`Session close candidate written for ${sessionId}\n`);
     stdout.write(`  Candidate: ${candidate.candidateId}\n`);
@@ -150,7 +160,15 @@ export async function runSessionClose(options, { rootDir = process.cwd(), stdout
     if (autodream?.ran) {
       stdout.write(`  Autodream preview: ${autodream.trigger}\n`);
     }
+    if (refsSweep?.ran) {
+      const verb = refsSweep.mode === 'dry-run' ? 'would prune' : 'pruned';
+      stdout.write(`  Refs sweep (${refsSweep.mode}): ${verb} ${refsSweep.pruned} pairs, `
+        + `fre ${(refsSweep.bytesFreed / 1024).toFixed(1)}KB, scanned ${refsSweep.scanned}, ${refsSweep.elapsedMs}ms`
+        + `${refsSweep.truncated ? ' (truncated, continues next close)' : ''}\n`);
+    } else if (refsSweep && !refsSweep.ran && refsSweep.reason) {
+      stdout.write(`  Refs sweep: skipped (${refsSweep.reason})\n`);
+    }
   }
 
-  return { exitCode: 0, event: candidate, candidate, autodream };
+  return { exitCode: 0, event: candidate, candidate, autodream, refsSweep };
 }

@@ -73,10 +73,25 @@ export async function runRefsCommand(parsed, { stdout = process.stdout, stderr =
   }
 
   if (sub === 'prune') {
-    /* 中文注释：prune 同时清理新旧 refs，但只按 TTL/mtime 清理，不参与压缩链路判定。 */
-    const interception = await pruneInterceptionRefs({ workspaceRoot: ws, keepDays: Number(parsed.options.keepDays) || 30 });
-    const result = await pruneRefs(ws, { storage, keepDays: Number(parsed.options.keepDays) || 30 });
-    writeLine(stdout, `Pruned ${result.pruned + interception.pruned} refs, freed ${((result.bytesFreed + interception.bytesFreed) / 1024).toFixed(1)}KB`);
+    /* 中文注释：prune 同时清理新旧 refs。保留期判定单一 owner 在 refs/retention.mjs：
+     * 先读每条 ref 自己申明的 `ttl_days` / `created_at`，没有才退回 mtime；当前会话整体保护，
+     * 否则长任务恢复时召回链会被斩断。 */
+    const keepDays = Number(parsed.options.keepDays) || 30;
+    const dryRun = parsed.options.dryRun === true;
+    const interception = await pruneInterceptionRefs({
+      workspaceRoot: ws,
+      keepDays,
+      activeSessionId: parsed.options.session || '',
+      mode: dryRun ? 'dry-run' : 'enforce',
+    });
+    const result = await pruneRefs(ws, { storage, keepDays });
+    const basis = Object.entries(interception.clockBasis || {})
+      .map(([key, count]) => `${key}=${count}`)
+      .join(', ');
+    writeLine(stdout, `${dryRun ? 'Would prune' : 'Pruned'} ${result.pruned + interception.pruned} refs, `
+      + `freed ${((result.bytesFreed + interception.bytesFreed) / 1024).toFixed(1)}KB `
+      + `(scanned ${interception.scanned}, ${interception.elapsedMs}ms${basis ? `, basis: ${basis}` : ''}`
+      + `${interception.truncated ? ', truncated by budget' : ''})`);
     return;
   }
 

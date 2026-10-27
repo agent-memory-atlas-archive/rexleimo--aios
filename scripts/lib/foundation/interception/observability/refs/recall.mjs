@@ -1,5 +1,5 @@
 /* 中文注释：Refs 层把原始证据留在本地可召回存储，避免大文本直接进入模型上下文。 */
-import { readdir, readFile, stat, unlink } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -50,22 +50,27 @@ export async function listInterceptionRefs({ workspaceRoot, sessionId = '', limi
   return results;
 }
 
-/* 中文注释：prune 只按文件 mtime 清理旧 ref，不理解业务内容，避免误删当前 session 的新证据。 */
-export async function pruneInterceptionRefs({ workspaceRoot, keepDays = 30 }) {
-  const cutoff = Date.now() - Number(keepDays || 30) * 86400_000;
-  let pruned = 0;
-  let bytesFreed = 0;
-  for (const session of await listSessionDirs(workspaceRoot, '')) {
-    for (const file of await safeReaddir(session.path)) {
-      const filePath = path.join(session.path, file);
-      const st = await stat(filePath);
-      if (st.mtimeMs >= cutoff) continue;
-      bytesFreed += st.size;
-      await unlink(filePath);
-      pruned += 1;
-    }
-  }
-  return { pruned, bytesFreed };
+/* 中文注释：旧版 prune 自己拿 mtime 判定，既不看每条 ref 申明的 `ttl_days`，也不保护当前
+ * 会话。现在这里只转发给唯一 owner（retention/sweep），避免同一判断出现两个答案。 */
+export async function pruneInterceptionRefs({ workspaceRoot, keepDays = 30, activeSessionId = '', mode = 'enforce' } = {}) {
+  const { sweepInterceptionRefs } = await import('./sweep.mjs');
+  const result = await sweepInterceptionRefs({
+    workspaceRoot,
+    activeSessionId,
+    keepDays,
+    mode,
+    force: true, // 手工调用就是“现在就扫”，不受自动冷却支配
+  });
+  return {
+    pruned: result.pruned,
+    bytesFreed: result.bytesFreed,
+    scanned: result.scanned,
+    truncated: result.truncated,
+    mode: result.mode,
+    elapsedMs: result.elapsedMs,
+    reasons: result.reasons,
+    clockBasis: result.clockBasis,
+  };
 }
 
 /* 中文注释：refId 查找同时要求 .raw 和 .meta.json 存在，防止坏引用被当成有效证据。 */
