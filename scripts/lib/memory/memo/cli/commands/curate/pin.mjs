@@ -4,7 +4,7 @@ import { assertMaxChars, assertSafeMemoText } from '../../core/capacity.mjs';
 import { mirrorPinnedMemoToLegacy } from '../../core/legacy.mjs';
 import { safePrintText, usageError } from '../../core/shared.mjs';
 import { getActiveMemoStorage, loadMemoStorageApi } from '../../core/storage-api.mjs';
-import { renderPinnedBlock } from '../../../storage/govern/pinned.mjs';
+import { normalizePinnedContent, renderPinnedBlock } from '../../../storage/govern/pinned.mjs';
 import { pinnedPath, readPinned } from '../../core/workspace-state.mjs';
 
 export async function handleMemoPinCommand({
@@ -45,6 +45,13 @@ export async function handleMemoPinCommand({
     }
     const rendered = renderPinnedBlock(content, { maxChars: workspacePinnedMaxChars });
     io.log(`pinned ${space}: ${rendered.chars}/${rendered.maxChars} chars, remaining ${rendered.remaining}${rendered.truncated ? ', truncated' : ''}`);
+    // 中文注释：第一行一直是“服务窗口”的体积，所以 lane 真实长到多少从来看不到——
+    // 本工作区窗口报 4,701/5,000，而 lane 实有 103,694 字符 / 299 条。窗口接近满不等于 lane 满，
+    // 需要清的 backlog 必须可见，并给出真正能清它的那条命令。
+    if (rendered.entriesDropped > 0) {
+      io.log(`  lane holds ${normalizePinnedContent(content).length} chars / ${rendered.entriesTotal} entries; ${rendered.entriesDropped} are outside the served window`);
+      io.log('  to trim the lane: memo pin set "<curated text>" (replaces the lane) or raise WORKSPACE_MEMORY_PINNED_MAX_CHARS');
+    }
     return true;
   }
 

@@ -136,3 +136,35 @@ test('the write-side receipt distinguishes "written" from "served"', () => {
   assert.equal(oversized.served, false, 'an entry that cannot fit must not be reported as served');
   assert.ok(oversized.chars > 0, 'but the prefix fallback still injects something rather than nothing');
 });
+
+test('pin status reports the lane backlog, not only the served window', async () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const cliPath = path.resolve(here, '..', '..', '..', 'aios.mjs');
+  const rootDir = await mkdtemp(path.join(os.tmpdir(), 'memo-pin-backlog-'));
+  const runMemo = (args) => spawnSync(process.execPath, [cliPath, 'memo', ...args], {
+    cwd: rootDir,
+    encoding: 'utf8',
+    env: { ...process.env, AIOS_AGENT_ID: '' },
+  });
+  try {
+    const { mkdir, writeFile } = await import('node:fs/promises');
+    await mkdir(path.join(rootDir, '.aios', 'memo', 'file', 'pinned'), { recursive: true });
+    // 造一条"窗口接近满、lane 远超预算"的现实形状：这正是过去没人看得见 backlog 的原因。
+    const laneEntries = Array.from({ length: 30 }, (_, i) => `[checkpoint] milestone ${i} ${'m'.repeat(400)}`);
+    await writeFile(
+      path.join(rootDir, '.aios', 'memo', 'file', 'pinned', 'default.md'),
+      `${laneEntries.join('\n\n')}\n`,
+      'utf8',
+    );
+
+    const status = runMemo(['pin', 'status']);
+    assert.equal(status.status, 0, status.stderr || status.stdout);
+    const out = String(status.stdout || '');
+    assert.match(out, /pinned default: \d+\/\d+ chars, remaining \d+/um, 'the usage triple stays intact');
+    assert.match(out, /lane holds \d+ chars \/ 30 entries/u, 'the lane size must be stated, not inferred');
+    assert.match(out, /\d+ are outside the served window/u, 'and so must the backlog');
+    assert.match(out, /memo pin set/u, 'with the command that can actually trim it');
+  } finally {
+    await rm(rootDir, { recursive: true, force: true });
+  }
+});
