@@ -8,6 +8,49 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+
+## [6.14.3] - 2026-10-27
+
+### Fixed
+
+- **`harness resume --dry-run` 不再“被接受、静默失效、然后照旧调真 provider”**。发现方式不是读代码，
+  而是执行上一轮刚写进 help 的那句承诺：在沙箱里跑 `aios harness resume --session X --dry-run`，
+  实测 **111 秒**且 `stopRequested` 被清成 `false`。`--dry-run` 这个词的全部含义就是“不要调模型”，
+  而 harness 子命令开着 `allowUnknownOption(true)` —— 一个**静默失效的成本闸门比直接报错危险得多**：
+  用户以为自己站在省钱一侧，实际站在付费一侧。修两层：解析层现在**声明并映射** `--dry-run`
+  （`RESUME_OPTIONS` + resume 分支 + `createDefaultHarnessResumeOptions` 默认 `false`）；
+  命令层现在 resume 也读 `options.dryRun`，并与 run **共用同一个渲染器** `reportHarnessDryRun`
+  （同事实两个写者会各排一遍版、各说一套话），且**只读不写**：不清 stop 标志、不动 worktree，
+  报告完即返回，会话停在它本来的位置。
+
+### Added
+
+- **一条穿过解析层的测试**。上一轮的 dry-run 用例是直接注入 `options` 的，因此它只能证明
+  “命令函数正确”，证明不了“用户实际打的这条命令正确”——而缺陷正好在被绕过的那一层。新增
+  `infra/command/command-dry-run.mjs` 穿过 `parseHarnessArgs` 断言 `resume --dry-run` 能抵达命令层，
+  并带一条反例（不带 `--dry-run` 时仍必须是 `false`）；该模块已登记进 `phase-structure` 的预算表
+  （29 行 / 预算 40），而不是留成一个没人管长度的文件。
+
+### Docs
+
+- `aios harness --help` 的 `--dry-run` 作用域从 `(run)` 改为 `(run/resume)`，并在 Notes 里写明它
+  两个子命令上都只读、不会改 stop 标志也不会动 worktree（新增 2 条断言钉住）。
+
+### Internals
+
+- RED → GREEN 全部由真实执行得到：修复前注入的绊线 `executeTurn` 被调用，断言失败
+  “the word dry-run must never reach a provider”；把 HEAD 版 `commands.mjs` 换回去同样红。
+  修复后 `harness-runtime` 50/50（含 2 条新 parser 用例）、`help-surface-renders` 5/5。
+- 真 CLI 对比：修复前 111s 且 `stopRequested` 由 `true` 变 `false`；修复后 **0s**、输出
+  `Harness Dry-Run: WARN`、`stopRequested` **保持** `true`。
+- `check-syntax` 1284/0；`fileLines blocking=6`（存量未变）、`directoryEntries blocking=0`。
+  沙箱残留按安全门规矩逐个显式命名删除（变量派生的递归删除会被拦，这是预期行为而不是阻碍）。
+
+### Notes
+
+- 本轮同时发布 v6.14.1（关闭不验证的 Activation 旁路 + B1 主张证伪）与 v6.14.2（补 stop 语义文档 +
+  B3 裁定为“差距不存在”）。自查 backlog 六项至此全部处置完毕，每一项都带了当场取的回执。
+
 ## [6.14.2] - 2026-10-27
 
 ### Docs
