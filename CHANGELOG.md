@@ -12,6 +12,14 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+## [6.15.1] - 2026-10-27
+
+- Fixed: bare `aios` (no arguments) crashed with `ReferenceError: getRootHelpText is not defined` instead of printing
+  the root help. The dispatch barrel lost the import when the 425-line dispatch file was split for the directory
+  budget, and the only path that exercises the non-TTY interactive branch has no test, so the crash shipped in both
+  the repo and the release install. The branch now pins its contract in a real-subprocess test: warn line, root help,
+  exit 1, never a ReferenceError.
+
 ## [6.15.0] - 2026-10-27
 
 - CLI unknown-option exit code contract: a misspelled or undeclared flag on `aios …` now exits non-zero instead of
