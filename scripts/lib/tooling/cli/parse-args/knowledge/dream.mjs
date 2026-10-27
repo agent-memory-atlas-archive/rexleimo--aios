@@ -1,5 +1,6 @@
 /* 中文注释：dream 命令参数解析——基于 Commander 声明式替代手写 for 循环。 */
 import { Command } from 'commander';
+import { isHelpDisplay, toUsageError } from '../../commander/passthrough.mjs';
 
 const DREAM_CLI = new Command()
   .name('dream')
@@ -62,7 +63,9 @@ export function parseDreamArgs(argv) {
         format,
       },
     };
-  } catch {
+  } catch (error) {
+    // 中文注释（2026-10-27 P0）：同型缺陷——未知 option 被降级成 help 并退 0。
+    if (!isHelpDisplay(error)) throw toUsageError(error, { command: 'dream' });
     return {
       mode: 'help',
       help: true,

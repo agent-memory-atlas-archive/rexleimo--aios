@@ -11,6 +11,30 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+
+## [6.15.0] - 2026-10-27
+
+- CLI unknown-option exit code contract: a misspelled or undeclared flag on `aios …` now exits non-zero instead of
+  running the command anyway. The root parser (`top-level.mjs`) stopped opting into `allowUnknownOption(true)`, five
+  parsers that swallowed Commander errors into a `{ mode: 'help' }` exit-0 result (`init`, `plan`, `dream`, `hud`, and
+  the shared catch) now rethrow them tagged `error.usage`, and `isUsageError` matches Commander's lowercase message
+  (it looked for `Unknown option`, so a rejected flag used to print a stack trace as if it were an internal fault).
+- **Migration**: `aios uninstall` no longer removes anything without `--yes`; without it the command prints a preview
+  (`would remove components: shell,skills`, `scope=global client=all`) and exits 0. Any script that relied on the old
+  unconditional removal must add `--yes`. This closes the defect where `aios uninstall --<typo>` was rejected by the
+  parser and then ran the destructive defaults anyway.
+- `setup --yes/--retry/--force` and `orchestrate --force` are now declared in the parser that dispatches to handlers
+  reading `options.yes` / `options.force`. Before this they existed only in the help surface, so the flag was accepted,
+  dropped, and the handler silently saw `undefined`.
+- 12 commands whose parsers still declare `allowUnknownOption(true)` are recorded in one place —
+  `scripts/lib/tooling/cli/commander/passthrough.mjs::UNKNOWN_OPTION_STRICTNESS_DEFERRED` — and the new guard test
+  fails if a name goes stale there, so the ledger can only shrink.
+- New guard suite `scripts/tests/execution/aios-setup/cli-usage-error-exit.test.mjs` (9 tests, real subprocess exit
+  codes, sandboxed `HOME`/`USERPROFILE`): positive control that the CLI seam is alive, a matrix over the 32
+  `COMMAND_SPECS` commands, uninstall refusal before and inside, and a no-stack-leak assertion.
+- `plan-single-ledger.test.mjs` N3b was tightened, not relaxed: it could only assert a weak property because the
+  "unknown input degrades into a read-only view" seam was open, and this release closes it.
+
 ## [6.14.5] - 2026-10-27
 
 - fix: memo pin status shows the real lane size and backlog, so a growing pinned lane is no longer invisible

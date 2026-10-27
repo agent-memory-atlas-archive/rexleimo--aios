@@ -1,5 +1,6 @@
 /* 中文注释：plan 命令参数解析 */
 import { Command } from 'commander';
+import { isHelpDisplay, toUsageError } from '../../commander/passthrough.mjs';
 
 function collectOptionValue(value, previous = []) {
   return [...(Array.isArray(previous) ? previous : []), String(value || '')];
@@ -135,7 +136,10 @@ export function parsePlanArgs(argv) {
         format: flags.format || (flags.json ? 'json' : ''),
       },
     };
-  } catch {
+  } catch (error) {
+    // 中文注释（2026-10-27 P0）：裸 catch 会把 commander 对未知 option 的拒绝也降级成 help，
+    // 于是「报错了但退 0」。只有 help/version 展示能当 help；其余一律当用法错误上传。
+    if (!isHelpDisplay(error)) throw toUsageError(error, { command: 'plan' });
     return {
       mode: 'help',
       help: true,

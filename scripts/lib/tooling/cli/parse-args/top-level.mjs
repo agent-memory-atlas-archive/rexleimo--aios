@@ -2,6 +2,7 @@
  * setup/update/uninstall/doctor/quality-gate/orchestrate/entropy-gc/snapshot-rollback/release-status/learn-eval
  * 这 11 个命令共享选项处理器，集中声明 Commander spec。 */
 import { Command } from 'commander';
+import { isHelpDisplay, toUsageError } from '../commander/passthrough.mjs';
 import {
   createDefaultDoctorOptions,
   createDefaultEntropyGcOptions,
@@ -43,7 +44,11 @@ function getCommandProgram(command, defaults) {
     .name(command)
     .helpOption(false)
     .exitOverride()
-    .allowUnknownOption(true);
+    // 中文注释（2026-10-27 P0）：这里原来是 `allowUnknownOption(true)`——未知 flag 被 commander
+    // 直接丢掉，命令带着默认值照跑；`aios uninstall --任意拼错的 flag` 就是这么进了
+    // components=shell,skills / scope=global / client=all 的真删路径。这个解析器自己声明了
+    // 每个命令的完整 option 面，所以它没有理由假装看不见认不出的输入。
+    .allowUnknownOption(false);
 
   // Lifecycle commands have no positional arguments. Reject a stray boolean
   // value before it can accompany a destructive opt-in flag.
@@ -66,7 +71,14 @@ function getCommandProgram(command, defaults) {
       .option('--adopt-legacy-superpowers', 'Explicit cleanup; preview first with the standalone reconciler')
       .option('--apply-client-cost-settings', 'Apply client cost settings')
       .option('--skip-playwright-install', 'Skip Playwright install')
-      .option('--with-playwright-install', 'Include Playwright install');
+      .option('--with-playwright-install', 'Include Playwright install')
+      // 中文注释（2026-10-27 P0）：`--yes/--retry/--force` 在 specs 里已对外承诺，
+      // `setup.mjs` 也真读 `options.yes/retry/force`——但本解析器从未声明它们。
+      // 于是 `aios setup --yes` 在“丢掉未知 flag”的旧行为下一直是静默空操作。现在补齐声明，
+      // 让这个开关第一次真的到达读它的处理器。
+      .option('--yes', 'Skip interactive confirmations')
+      .option('--retry', 'Resume from components that are not yet installed')
+      .option('--force', 'Reinstall components even if already installed');
     if (command === 'update') {
       program
         .option('--self-update', 'Update Hermes CLI itself')
@@ -107,7 +119,10 @@ function getCommandProgram(command, defaults) {
       .option('--recommendation <id>', 'Recommendation ID')
       .option('--dispatch <mode>', 'Dispatch mode')
       .option('--execute <mode>', 'Execution mode')
-      .option('--preflight <mode>', 'Preflight mode');
+      .option('--preflight <mode>', 'Preflight mode')
+      // 中文注释：`dispatch.mjs:156` 读 `parsed.options.force`，但这里从未声明 `--force`
+      // ——同型缺陷的第二例，声明与映射一起补。
+      .option('--force', 'Force orchestrate dispatch despite guards');
   }
 
   if (command === 'snapshot-rollback') {
@@ -185,6 +200,10 @@ export function parseTopLevelArgs(command, argv) {
         if (flags.skills) options.skills = normalizeSkillNames(flags.skills);
       }
       if (flags.installMode != null) options.installMode = normalizeSkillInstallMode(flags.installMode);
+      // 与上面新增声明对应的映射；只声明不映射，就又是下一个“被接受但被忽略”的 flag。
+      if (flags.yes) options.yes = true;
+      if (flags.retry) options.retry = true;
+      if (flags.force) options.force = true;
       if (flags.projectRoot) options.projectRoot = flags.projectRoot;
       if (flags.tokenProfile) options.tokenProfile = normalizeTokenProfile(flags.tokenProfile);
       if (flags.adoptLegacySuperpowers) options.adoptLegacySuperpowers = true;
@@ -225,6 +244,7 @@ export function parseTopLevelArgs(command, argv) {
       if (flags.recommendation) options.recommendationId = flags.recommendation;
       if (flags.dispatch) options.dispatchMode = normalizeOrchestrateDispatchMode(flags.dispatch);
       if (flags.execute) options.executionMode = normalizeOrchestrateExecutionMode(flags.execute);
+      if (flags.force) options.force = true;
       if (flags.preflight) options.preflightMode = normalizeOrchestratePreflightMode(flags.preflight);
       if (flags.format) options.format = normalizeOrchestratorFormat(flags.format);
     }
@@ -269,20 +289,17 @@ export function parseTopLevelArgs(command, argv) {
       options,
     };
   } catch (e) {
-    // 校验类异常向上冒泡，非法值/格式错误不吞掉
-    if (e instanceof Error && (
-      e.message.includes('must be one of') ||
-      e.message.includes('must be a positive integer') ||
-      e.message.includes('must be a number') ||
-      e.message.includes('must not be empty') ||
-      e.message.includes('Missing value') ||
-      e.message.includes('too many arguments'))) throw e;
-    return {
-      mode: 'help',
-      help: true,
-      command,
-      options,
-    };
+    // 中文注释：旧写法只把一串消息白名单往上抛，其余（包括 commander 的 unknown option）
+    // 降级成 help + exit 0。现在只有一种情况可以当 help：commander 自己报的 help/version 展示。
+    if (isHelpDisplay(e)) {
+      return {
+        mode: 'help',
+        help: true,
+        command,
+        options,
+      };
+    }
+    throw toUsageError(e, { command });
   }
 }
 

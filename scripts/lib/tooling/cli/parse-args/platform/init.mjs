@@ -1,5 +1,6 @@
 /* 中文注释：init 解析只校验 agent 名称和初始化开关——基于 Commander 声明式替代手写 for 循环。 */
 import { Command } from 'commander';
+import { isHelpDisplay, toUsageError } from '../../commander/passthrough.mjs';
 import { INIT_AGENT_NAMES } from '../shared.mjs';
 
 const INIT_CLI = new Command()
@@ -57,10 +58,9 @@ export function parseInitArgs(argv) {
       },
     };
   } catch (e) {
-    if (e instanceof Error && (
-      e.message.includes('--agent must be one of')
-      || e.message.includes('too many arguments')
-    )) throw e;
+    // 中文注释（2026-10-27 P0）：同型——白名单外的 commander 拒绝（含 unknown option）
+    // 过去会被降级成 help 并退 0。
+    if (!isHelpDisplay(e)) throw toUsageError(e, { command: 'init' });
     return {
       mode: 'help',
       help: true,

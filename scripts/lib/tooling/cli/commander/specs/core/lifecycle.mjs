@@ -67,6 +67,9 @@ export const LIFECYCLE_COMMAND_SPECS = [
       ['--scope <scope>', 'Skill uninstall scope'],
       ['--project-root <path>', 'Project root for project-scoped skill removals (default: current directory)'],
       ['--skills <list>', 'Comma list of skill names'],
+      // 中文注释（2026-10-27 P0）：移除在旧行为里是“默认值就能发生”的动作，现在需要显式意图。
+      // 沿用仓库已有的 `--yes` token（setup 先用的），不另造新词。
+      ['--yes', 'Confirm destructive removal; without it uninstall only previews'],
     ],
   },
 ];

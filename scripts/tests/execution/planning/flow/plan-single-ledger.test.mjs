@@ -126,12 +126,18 @@ test('N3b the flag parses; a truncated spelling is not accepted as the declared 
   const parsed = parsePlanArgs(['plan', 'auto-gate', '--task', 'x', '--new-work-item', '--json']);
   assert.equal(parsed.options.newWorkItem, true);
 
-  // 截断写法不能被当成声明的那个 flag。注意：解析失败时 parsePlanArgs 返回
-  // { mode: 'help', options: { subcommand: 'status' } }，也就是 A19 里已登记的“把未知输入降级成
-  // 只读视图”尚未闭合的那个 seam（属未决问题，不在本工单里静默改掉）。
-  const truncated = parsePlanArgs(['plan', 'auto-gate', '--task', 'x', '--new-work']);
-  assert.notEqual(truncated.mode, 'command', '--new-work was accepted as --new-work-item');
-  assert.equal(truncated.options?.newWorkItem, undefined, 'a refused invocation must not carry the declaration');
+  // 2026-10-27 P0 更新：这里原先只能断言弱性质，因为注释里登记的“把未知输入降级成
+  // 只读视图”那个 seam 尚未闭合。现在它闭合了：截断写法不再返回 help 降级对象，
+  // 而是抛出一个用法错误——所以断言收紧，而不是放宽。
+  const truncated = ['plan', 'auto-gate', '--task', 'x', '--new-work'];
+  assert.throws(() => parsePlanArgs(truncated), (error) => {
+    assert.match(String(error.message), /unknown option/u, 'a truncated spelling is reported as a usage error');
+    assert.equal(error.usage, true, 'and it carries the marker that makes the process exit non-zero');
+    return true;
+  });
+  // 抛错本身就不可能携带那个声明：保留原断言的意图，用新形状表达。
+  assert.notEqual(parsePlanArgs(['plan', 'auto-gate', '--task', 'x', '--new-work-item']).options?.newWorkItem, undefined,
+    'the declared spelling still parses');
 });
 
 test('N5 a terminal active plan never blocks a new work item', () => {

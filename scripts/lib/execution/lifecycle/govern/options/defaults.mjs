@@ -42,6 +42,9 @@ export function createDefaultUninstallOptions() {
     client: 'all',
     scope: 'global',
     skills: [],
+    // 中文注释（2026-10-27 P0）：默认值必须是“不动手”。旧版本没有这个位，所以
+    // 任何走到 runUninstall 的调用都会直接删；现在删除需要调用方显式声明 `--yes`。
+    yes: false,
   };
 }
 

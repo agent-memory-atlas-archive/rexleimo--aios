@@ -1,5 +1,6 @@
 /* 中文注释：hud 解析——基于 Commander 声明式替代手写 for 循环。保留 watch 逻辑等原有业务语义。 */
 import { Command } from 'commander';
+import { isHelpDisplay, toUsageError } from '../../commander/passthrough.mjs';
 import {
   SKILL_CANDIDATE_VIEWS,
   normalizeHudPreset,
@@ -104,12 +105,9 @@ export function parseHudArgs(argv) {
       options,
     };
   } catch (e) {
-    if (e instanceof Error && (
-      e.message.includes('must be one of') ||
-      e.message.includes('must be a positive integer') ||
-      e.message.includes('must be a number') ||
-      e.message.includes('must not be empty') ||
-      e.message.includes('action must be'))) throw e;
+    // 中文注释（2026-10-27 P0）：旧写法只放行一串消息白名单，commander 的 unknown option
+    // 不在名单里 → 被降级。现在改成：不是 help/version 展示就一律上传。
+    if (!isHelpDisplay(e)) throw toUsageError(e, { command: 'hud' });
     return {
       mode: 'help',
       help: true,
