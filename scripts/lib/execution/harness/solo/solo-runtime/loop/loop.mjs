@@ -9,7 +9,8 @@ import { chargeQuotaSpend, computeQuotaState, resolveQuotaConfig } from '../gate
 import { resolveShouldRun } from '../gate/should-run.mjs';
 import { evaluateDryRunReadiness, formatDryRunReadiness } from '../gate/dry-run-readiness.mjs';
 import { writeSoloIterationCheckpoint } from '../gate/checkpoint.mjs';
-import { invokeLifecycleHook } from '../support/hooks.mjs';
+import { createHookWaitTracker } from './hook-waits.mjs';
+import { resolveAbortRecord } from './abort-records.mjs';
 import { normalizeSoloIterationOutcome } from '../support/normalizers.mjs';
 // work-7：loop 不再自己比 outcome 字符串——材料性由 S 通道确认，其余归类查表。
 import { countsAsNoopPoll, requiresOperatorRelease, terminatesSuccessfully } from '../support/turn-consequences.mjs';
@@ -134,6 +135,10 @@ export async function runSoloHarnessLoop({
   let iteration = Number.isFinite(summary.lastIteration) ? summary.lastIteration + 1 : 1;
   const max = Number.isFinite(maxIterations) ? Math.max(1, Math.floor(maxIterations)) : 20;
 
+  // B4：钩子停滞记账在 hook-waits.mjs（loop.mjs 基线 596、规则 shrink-only：破棘轮要拆责任，不是抬基线）。
+  const hookWaits = createHookWaitTracker();
+  const runHook = hookWaits.run;
+
   while (iteration <= max) {
     const control = await readSoloControl({ rootDir, sessionId });
     if (control?.stopRequested === true) {
@@ -144,7 +149,7 @@ export async function runSoloHarnessLoop({
         outcome: buildStopOutcome({ sessionId, iteration }),
         checkpointWriter,
       });
-      await invokeLifecycleHook({
+      await runHook({
         rootDir,
         sessionId,
         hook: 'onSessionEnd',
@@ -224,7 +229,7 @@ export async function runSoloHarnessLoop({
           outcome: askOutcome,
           checkpointWriter,
         });
-        await invokeLifecycleHook({
+        await runHook({
           rootDir,
           sessionId,
           hook: 'onSessionEnd',
@@ -247,7 +252,7 @@ export async function runSoloHarnessLoop({
     }
 
     const turnLogEntries = [];
-    const onTurnStartResult = await invokeLifecycleHook({
+    const onTurnStartResult = await runHook({
       rootDir,
       sessionId,
       hook: 'onTurnStart',
@@ -368,7 +373,7 @@ export async function runSoloHarnessLoop({
       };
     }
 
-    const onTurnCompleteResult = await invokeLifecycleHook({
+    const onTurnCompleteResult = await runHook({
       rootDir,
       sessionId,
       hook: 'onTurnComplete',
@@ -389,7 +394,7 @@ export async function runSoloHarnessLoop({
       turnLogEntries.push(onTurnCompleteResult.logEntry);
     }
 
-    const onBeforeContinuityCommitResult = await invokeLifecycleHook({
+    const onBeforeContinuityCommitResult = await runHook({
       rootDir,
       sessionId,
       hook: 'onBeforeContinuityCommit',
@@ -483,7 +488,7 @@ export async function runSoloHarnessLoop({
     }
 
     if (effectiveOutcome.shouldStop) {
-      await invokeLifecycleHook({
+      await runHook({
         rootDir,
         sessionId,
         hook: 'onSessionEnd',
@@ -506,18 +511,13 @@ export async function runSoloHarnessLoop({
       });
     }
 
-    // 连续失败 abort：避免 agent 在不可恢复的故障中无限重试浪费 token
-    if (shouldAbortForConsecutiveFailures(summary.backoff)) {
+    // 中止决策（连续失败 / 连续停滞）归 abort-records.mjs；这里只把它翻译成一条迭代记录。
+    const abortRecord = resolveAbortRecord({
+      hookWaits, backoff: summary.backoff, reportedFailureClass: effectiveOutcome?.failureClass || 'none',
+    });
+    if (abortRecord) {
       const abortOutcome = normalizeSoloIterationOutcome({
-        sessionId,
-        iteration,
-        outcome: 'failed',
-        stage: 'handoff',
-        summary: `Aborted after ${maxConsecutiveFailures()} consecutive failures.`,
-        evidence: [`consecutiveFailures=${summary.backoff?.consecutiveFailures || maxConsecutiveFailures()}`],
-        nextAction: 'Inspect the harness journal and checkpoint to diagnose the repeated failure, then resume with a fresh objective.',
-        shouldStop: true,
-        failureClass: summary.backoff?.consecutiveInfraFailures > 0 ? 'runtime-error' : 'no-progress',
+        sessionId, iteration, outcome: 'failed', stage: 'handoff', shouldStop: true, ...abortRecord,
       });
       summary = await persistIterationState({
         rootDir,
@@ -526,7 +526,7 @@ export async function runSoloHarnessLoop({
         outcome: abortOutcome,
         checkpointWriter,
       });
-      await invokeLifecycleHook({
+      await runHook({
         rootDir,
         sessionId,
         hook: 'onSessionEnd',
@@ -571,7 +571,7 @@ export async function runSoloHarnessLoop({
     checkpointWriter,
   });
 
-  await invokeLifecycleHook({
+  await runHook({
     rootDir,
     sessionId,
     hook: 'onSessionEnd',

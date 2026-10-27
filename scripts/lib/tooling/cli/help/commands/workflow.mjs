@@ -133,6 +133,8 @@ Options:
   --max-iterations <n>          (run/resume) Iteration budget for the solo loop (default: 20)
   --turn-timeout-ms <n>         (run/resume) Per-turn provider timeout before staged process-tree kill (default: 1800000)
   --hooks / --no-hooks          (run/resume) Enable or disable lifecycle hook evidence logging (default: enabled)
+  AIOS_SOLO_HOOK_TIMEOUT_MS=<n|off> (env) Bounded wait per lifecycle hook; on expiry the wait is cancelled and recorded as stalled (per-phase defaults: turn-start 60000, turn-complete 120000, before-continuity-commit 60000, session-end 300000, iteration-start 60000; "off" restores the old unbounded wait)
+  AIOS_SOLO_STALL_ABORT_AFTER=<n>  (env) Consecutive hook stalls that end a run (default: 3; only timed-out waits count, never an operator cancel or a hook that returned an error)
   --reason <text>               (stop) Operator note recorded in control.json
   --dry-run                     (run) Create/update the journal without invoking a provider
   --json                        Output structured JSON instead of text

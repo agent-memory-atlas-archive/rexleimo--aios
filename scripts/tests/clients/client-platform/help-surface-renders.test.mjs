@@ -51,3 +51,12 @@ test('refs help documents the automatic sweep and its opt-in, not just the manua
   assert.match(text, /ttl_days/, 'the real retention source, not just the global default');
   assert.match(text, /session close/, 'the automatic caller has to be documented where users look');
 });
+
+test('harness help documents the bounded hook wait, because an unbounded await is invisible', async () => {
+  const module = await import(new URL('../../../lib/tooling/cli/help/commands/workflow.mjs', import.meta.url).href);
+  const text = module.getWorkflowCommandHelpText('harness');
+  assert.match(text, /AIOS_SOLO_HOOK_TIMEOUT_MS/, 'the bound and its escape hatch have to be findable');
+  assert.match(text, /AIOS_SOLO_STALL_ABORT_AFTER/, 'the stall threshold is user-tunable and must be documented');
+  assert.match(text, /recorded as stalled/, 'the vocabulary the journal uses must be the vocabulary the help uses');
+  assert.match(text, /off.{1,3} restores the old unbounded wait/, 'a guard that did not exist before must say how to turn it off');
+});
