@@ -7,6 +7,7 @@ import { runInterceptionCommand } from './interception.mjs';
 import { runCanvasCommand, runRefsCommand } from './offload.mjs';
 import { buildTeamRuntimeEnv, getRuntimeVersion, resolveRuntimeWorkspace } from './runtime.mjs';
 import { printHelp, applyResultExitCode, runInteractiveTui } from './helpers.mjs';
+import { getRootHelpText } from '../help/help.mjs';
 import { applyProjectRootFlag } from '../project-root.mjs';
 
 export { applyResultExitCode } from './helpers.mjs';

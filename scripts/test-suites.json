@@ -56,6 +56,7 @@
       "scripts/tests/execution/aios-runtime/aios-work.test.mjs",
       "scripts/tests/execution/aios-runtime/ctx-agent-core.test.mjs",
       "scripts/tests/execution/aios-runtime/ctx-agent-pending-smoke.test.mjs",
+      "scripts/tests/execution/aios-setup/aios-bare-interactive-help.test.mjs",
       "scripts/tests/execution/aios-setup/aios-cli.test.mjs",
       "scripts/tests/execution/aios-setup/cli-usage-error-exit.test.mjs",
       "scripts/tests/execution/aios-setup/aios-components.test.mjs",
