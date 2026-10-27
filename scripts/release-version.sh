@@ -98,20 +98,35 @@ if grep -q "^## \\[$NEW_VERSION\\]" "$CHANGELOG_FILE"; then
 fi
 
 TMP_FILE="$(mktemp)"
+# 中文注释：本仓 CHANGELOG 是“最新在上”。旧写法只认 `## [Unreleased]`，而它要么不存在
+# （于是走 END 分支把新条目追到文件最底部），要么残留在中段（于是新条目插在 5.x 附近）。
+# 两种错位今天各咬过一次。现在直接以“第一个 `## [` 标题”为锺：有 Unreleased 就插在它下面，
+# 没有就插在当前最新条目上面。END 分支只留给“整个文件还没有任何条目”的真空情形。
 awk -v ver="$NEW_VERSION" -v d="$DATE_UTC" -v s="$SUMMARY" '
-  BEGIN { inserted=0 }
+  BEGIN { inserted=0; saw_heading=0 }
   {
-    print
-    if (!inserted && $0 ~ /^## \[Unreleased\]/) {
+    if (!inserted && $0 ~ /^## \[/) {
+      saw_heading=1
+      if ($0 ~ /^## \[Unreleased\]/) {
+        print
+        print ""
+        print "## [" ver "] - " d
+        print ""
+        print "- " s
+        inserted=1
+        next
+      }
       print ""
       print "## [" ver "] - " d
       print ""
       print "- " s
+      print ""
       inserted=1
     }
+    print
   }
   END {
-    if (!inserted) {
+    if (!inserted && !saw_heading) {
       print ""
       print "## [" ver "] - " d
       print ""
