@@ -7,6 +7,35 @@ The format is based on Keep a Changelog and this project follows Semantic Versio
 
 
 
+
+## [6.14.2] - 2026-10-27
+
+### Docs
+
+- **`aios harness --help` 新增 Notes 段，说清一次 stop 到底何时生效**。这不是新功能，是把一个已经存在、
+  但只能读代码才知道的行为写到用户能看到的地方：`harness stop` **不杀进程**，只写 `control.json` 标志；
+  循环只在迭代顶部读它，所以**当前 turn 会跑完才停**，操作者可见的停止上限是 `--turn-timeout-ms`
+  （默认 1800000 = 30 分钟）。`docs-site/solo-harness.md` 的 Stop 一节补同一段事实。
+- **自查 backlog 收尾：板上 B3（“Stop 应当暂停整条 run，而不是取消并收尾”）经实测后差距不存在**。
+  五条证据：stop 无 signal/kill 路径；`loop.mjs:143` 只在迭代顶部读标志，turn 内不检查（恰好就是对手那句
+  “hold where they are”）；`resume` 早已是文档化后继动作（清标志 + 恢复保留的 worktree + 从 lastIteration 继续）；
+  记录本来就分得清 `reason=control-stop-request` 与 `failureClass=stop-requested`；重复收尾不重复产记忆候选
+  （`candidateId` 与落盘路径都按 sessionId 定，`atomicWriteText` 覆盖写）。这使本窗口内“被实测推翻的对手差距”
+  累计两条：B1（栅栏其实已在校验层）与 B3（暂停语义其实已经成立）。
+
+### Internals
+
+- **裁定不加 `paused` 状态，理由写进报告而不只是提交信息**：`reconcile.mjs:23` 把 `stopped` 当终结态是**对的**
+  （它判的是进程死活，不是操作者意图）；新状态要穿过 status / watchdog / CLI / hooks / 记忆闭合 五张面，
+  而它想携带的信息 `reason` 字段已经携带了——同一个事实两个写者，正是 v6.14.1 里 B6 结构守卫在拦的形状。
+- 唯一真实残留是**停止延迟**，已归为另一个问题（边界协作 vs 中途硬砍），需 provider 传输层配合（`rpc` 才谈得上
+  中途让路，one-shot 只能等）。裁定不混入本次发布，也不隐式开成工作项，只在报告与 help 里标清。
+- 带日期的报告继续只用追加：看板补记 2.5 节里 B3 那一格从“仍未裁定”改为带证据的裁定，**原 2026-10-26 的 B3 卡片
+  逐字节校验保持不动**，本次 diff 的删除行只落在当天自己新增的那一节。help 文本新增 4 条停止语义断言
+  （`help-surface-renders`）。
+- 验证证据：`help-surface-renders` 5/5；`npm run test:affected` 因动态 import 自动升级为全量 248/248 文件、
+  tests=2407 pass=2398 fail=0 skipped=9；`node scripts/check-syntax.mjs` checked=1283 failures=0；看板 HTML 标签平衡。
+
 ## [6.14.1] - 2026-10-27
 
 ### Fixed
